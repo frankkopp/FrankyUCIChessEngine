@@ -3,15 +3,20 @@ package fko.javaUCIEngineFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Scanner;
 
 /** UCIProtocollHandler */
 public class UCIProtocollHandler implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(UCIProtocollHandler.class);
+
+  // back reference to the engine
+  private final UCIEngine uciEngine;
+
+  // input and outputStream of command stream
+  private final InputStream inputStream;
+  private final PrintStream outputStream;
 
   // -- the handler runs in a separate thread --
   private Thread myThread = null;
@@ -21,7 +26,12 @@ public class UCIProtocollHandler implements Runnable {
   // command
   private Boolean uciProtocollConfirmed = false;
 
-  public UCIProtocollHandler() {}
+
+  public UCIProtocollHandler(final UCIEngine uciEngine) {
+    this.uciEngine = uciEngine;
+    this.inputStream = System.in;
+    this.outputStream = System.out;
+  }
 
   /**
    * Start a new playroom thread to play one or multiple games<br>
@@ -56,7 +66,7 @@ public class UCIProtocollHandler implements Runnable {
 
       BufferedReader in;
       try {
-        in = new BufferedReader(new InputStreamReader(System.in));
+        in = new BufferedReader(new InputStreamReader(inputStream));
 
         // wait until a line is ready to be read
         final String readLine = in.readLine();
@@ -67,17 +77,44 @@ public class UCIProtocollHandler implements Runnable {
         if (scanner.hasNext()) {
           // while uci command has not been confirmed just look for uci and ignore rest
           if (uciProtocollConfirmed) {
-            String command = scanner.next();
-            LOG.debug("UCI Protocol Command? " + command);
+            String command = scanner.next().toLowerCase();
 
             // interpreting the command
             switch (command) {
+              case "isready":
+                LOG.info("Received isready command");
+                send("readyok");
+                break;
+              case "setoption":
+                LOG.warn("UCI Protocol Command: " + command + " not yet implemented!");
+                break;
+              case "ucinewgame":
+                LOG.warn("UCI Protocol Command: " + command + " not yet implemented!");
+                break;
+              case "position":
+                LOG.warn("UCI Protocol Command: " + command + " not yet implemented!");
+                break;
+              case "go":
+                LOG.warn("UCI Protocol Command: " + command + " not yet implemented!");
+                break;
+              case "stop":
+                LOG.warn("UCI Protocol Command: " + command + " not yet implemented!");
+                break;
+              case "ponderhit":
+                LOG.warn("UCI Protocol Command: " + command + " not yet implemented!");
+                break;
+              case "register":
+                LOG.warn("UCI Protocol Command: " + command + " not yet implemented!");
+                break;
+              case "debug":
+                LOG.warn("UCI Protocol Command: " + command + " not yet implemented!");
+                break;
               case "quit":
                 LOG.info("Received quit command");
                 running=false;
                 break;
               default:
-                LOG.warn("Unknown command");
+                LOG.warn("UCI Protocol Unknown Command: " + command);
                 break;
             }
 
@@ -88,6 +125,10 @@ public class UCIProtocollHandler implements Runnable {
 
           } else {
             if (scanner.next().equalsIgnoreCase("uci")) {
+              send("id name " + uciEngine.getiDName());
+              send("id author " + uciEngine.getiDAuthor());
+              // TODO Options
+              send("uciok");
               uciProtocollConfirmed = true;
               LOG.info("UCI Protocol confirmed");
             } else {
@@ -102,5 +143,10 @@ public class UCIProtocollHandler implements Runnable {
       }
     }
     LOG.debug("Quitting");
+  }
+
+  private void send(final String msg) {
+    LOG.debug("Send: "+msg);
+    outputStream.println(msg);
   }
 }
