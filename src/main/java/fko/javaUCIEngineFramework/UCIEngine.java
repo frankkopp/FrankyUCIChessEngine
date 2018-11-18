@@ -7,22 +7,41 @@ import java.time.Instant;
 
 
 /** UCIEngine */
-public class UCIEngine {
+public class UCIEngine implements IUCIEngine {
 
   private static final Logger LOG = LoggerFactory.getLogger(UCIEngine.class);
 
-  private final UCIProtocollHandler handler;
+  private final UCIProtocolHandler handler;
 
   // ID of engine
   private String iDName = "MyEngine v0.1";
   private String iDAuthor = "Frank Kopp";
 
   /**
-   * Default Contructor
+   * Default Constructor
    */
   public UCIEngine() {
-    handler = new UCIProtocollHandler(this);
+    handler = new UCIProtocolHandler(this);
     handler.startHandler();
+  }
+
+  /**
+   * Contructor for unit tests
+   * @param handler
+   */
+  public UCIEngine(UCIProtocolHandler handler) {
+    this.handler = handler;
+    handler.startHandler();
+  }
+
+  @Override
+  public String getiDName() {
+    return iDName;
+  }
+
+  @Override
+  public String getiDAuthor() {
+    return iDAuthor;
   }
 
   /**
@@ -34,13 +53,5 @@ public class UCIEngine {
     LOG.debug("Start UCI Engine Framework" + Instant.now());
     UCIEngine uciEngine = new UCIEngine();
     LOG.debug("Started UCI Engine Framework" + Instant.now());
-  }
-
-  public String getiDName() {
-    return iDName;
-  }
-
-  public String getiDAuthor() {
-    return iDAuthor;
   }
 }
