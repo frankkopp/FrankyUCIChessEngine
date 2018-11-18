@@ -3,7 +3,6 @@ package fko.javaUCIEngineFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
 import java.time.Instant;
 
 
@@ -12,7 +11,15 @@ public class UCIEngine {
 
   private static final Logger LOG = LoggerFactory.getLogger(UCIEngine.class);
 
-  public UCIEngine() {}
+  private final UCIProtocollHandler handler;
+
+  /**
+   * Default Contructor
+   */
+  public UCIEngine() {
+    handler = new UCIProtocollHandler();
+    handler.startHandler();
+  }
 
   /**
    * The main() method parses the command line arguments<br>
@@ -21,31 +28,11 @@ public class UCIEngine {
    */
   public static void main(final String[] args) {
 
-    LOG.debug("Hello World! " + Instant.now());
+    LOG.debug("Start UCI Engine Framework" + Instant.now());
 
-    BufferedReader in;
-    try {
-      in = new BufferedReader(new InputStreamReader(System.in));
-      while (in.ready()) {
-        LOG.debug("INPUT: "+in.readLine());
-      }
-      // done, however you can choose to cycle over this line
-      // in this thread or launch another to check for new input
-      // in.close();
-    } catch (IOException ex) {
-      LOG.error("IO Exception at buffered read!!", ex);
-      System.exit(-1);
-    }
+    UCIEngine uciEngine = new UCIEngine();
 
-    PrintStream out;
-
-    out = System.out;
-
-    out.println("id name JavaUCI");
-    out.println("id author Frank Kopp");
-    out.println("uciok");
-
-    // out.close();
+    LOG.debug("Started UCI Engine Framework" + Instant.now());
 
   }
 }
