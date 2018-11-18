@@ -3,7 +3,10 @@ package fko.javaUCIEngineFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Scanner;
 
 /** UCIProtocollHandler */
 public class UCIProtocollHandler implements Runnable {
@@ -57,37 +60,36 @@ public class UCIProtocollHandler implements Runnable {
 
         // wait until a line is ready to be read
         final String readLine = in.readLine();
-
         LOG.debug("Received: " + readLine);
 
-        // returns a stream of token (words separated by white space)
-        StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(readLine));
-        // ignore case of tokens
-        tokenizer.lowerCaseMode(true);
-        tokenizer.parseNumbers();
-        tokenizer.ordinaryChar('!');
-        tokenizer.ordinaryChar('-');
+        // Scanner parses the line to tokenize it
+        Scanner scanner = new Scanner(readLine);
+        if (scanner.hasNext()) {
+          // while uci command has not been confirmed just look for uci and ignore rest
+          if (uciProtocollConfirmed) {
+            String command = scanner.next();
+            LOG.debug("UCI Protocol Command? " + command);
 
-        if (uciProtocollConfirmed) {
-          while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
-            switch (tokenizer.ttype) {
-              case StreamTokenizer.TT_WORD:
-                LOG.debug("UCI Command WORD? " + tokenizer.sval);
-                break;
-              case StreamTokenizer.TT_NUMBER:
-                LOG.debug("UCI Command NUMBER? " + tokenizer.nval);
+            // interpreting the command
+            switch (command) {
+              case "quit":
+                LOG.info("Received quit command");
+                running=false;
                 break;
               default:
-                LOG.debug("UCI Command UNNKNOWN? " + tokenizer.ttype);
+                LOG.warn("Unknown command");
                 break;
             }
-          }
-        } else {
-          while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
-            if (tokenizer.sval.equals("uci")) {
+
+            // interpreting the options
+            while (scanner.hasNext()) {
+              LOG.debug("UCI Protocol Command Option? " + scanner.next());
+            }
+
+          } else {
+            if (scanner.next().equalsIgnoreCase("uci")) {
               uciProtocollConfirmed = true;
-              LOG.debug("UCI Protocol confirmed");
-              break; // ignore other tokens
+              LOG.info("UCI Protocol confirmed");
             } else {
               LOG.debug("UCI Protocol not yet confirmed");
             }
@@ -99,5 +101,6 @@ public class UCIProtocollHandler implements Runnable {
         System.exit(-1);
       }
     }
+    LOG.debug("Quitting");
   }
 }
