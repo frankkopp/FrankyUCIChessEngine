@@ -51,7 +51,7 @@
                         <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>fko.jarkanoid.Jarkanoid</mainClass>
+                            <mainClass>fko.javaUCIEngineFramework.UCIMain</mainClass>
                             <classpathPrefix>libs/</classpathPrefix>
                         </manifest>
                     </archive>

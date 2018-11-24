@@ -25,45 +25,34 @@
 
 package fko.javaUCIEngineFramework;
 
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** Interface for UCI Engines */
-public interface IUCIEngine {
+import java.time.Instant;
 
-  String getIDName();
+/**
+ * UCIMain
+ */
+public class UCIMain {
 
-  String getIDAuthor();
+  private static final Logger LOG = LoggerFactory.getLogger(UCIMain.class);
 
-  List<IUCIOption> getOptions();
+  /**
+   * The main() method parses the command line arguments<br>
+   *
+   * @param args command line options
+   */
+  public static void main(final String[] args) {
 
-  int getHashSize();
+    LOG.debug("Start UCI Engine Framework" + Instant.now());
 
-  void setHashSize(int hashSize);
+    UCIEngine uciEngine = new UCIEngine();
+    final UCIProtocolHandler handler = new UCIProtocolHandler(uciEngine);
+    handler.startHandler();
 
-  void setPonder(boolean ponderOn);
+    LOG.debug("Started UCI Engine Framework" + Instant.now());
 
-  boolean getPonder();
 
-  interface IUCIOption {
-
-    String getNameID();
-
-    UCIOptionType getOptionType();
-
-    String getDefaultValue();
-
-    String getMinValue();
-
-    String getMaxValue();
-
-    String getVarValue();
   }
 
-  enum UCIOptionType {
-    check,
-    spin,
-    combo,
-    button,
-    string
-  }
 }
