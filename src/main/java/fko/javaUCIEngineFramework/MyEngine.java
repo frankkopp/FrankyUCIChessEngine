@@ -25,6 +25,10 @@
 
 package fko.javaUCIEngineFramework;
 
+import fko.javaUCIEngineFramework.UCI.IUCIEngine;
+import fko.javaUCIEngineFramework.UCI.IUCISearchMode;
+import fko.javaUCIEngineFramework.UCI.UCIOption;
+import fko.javaUCIEngineFramework.UCI.UCISearchMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,16 +44,14 @@ public class UCIEngine implements IUCIEngine {
 
   private static final Logger LOG = LoggerFactory.getLogger(UCIEngine.class);
 
-  /** UCIEngine */
-
   // ID of engine
-  private static final String iDName = "MyEngine v0.1";
-  private static final String iDAuthor = "Frank Kopp";
+  private String iDName = "UCI Engine Example v0.1";
+  private String iDAuthor = "Frank Kopp";
 
   // options of engine
   private int hashSizeOption = 16;
   private boolean ponderOption = true;
-  private boolean useBookOption = true;
+  private boolean useOwnBookOption = true;
   private boolean debugOption = false;
 
   List<IUCIEngine.IUCIOption> iUciOptions = new ArrayList<>();
@@ -80,7 +82,7 @@ public class UCIEngine implements IUCIEngine {
         new UCIOption(
             "OwnBook",
                 IUCIEngine.UCIOptionType.check,
-                useBookOption ? "true" : "false",
+                useOwnBookOption ? "true" : "false",
                 "",
                 "",
                 ""));
