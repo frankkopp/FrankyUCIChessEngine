@@ -35,9 +35,9 @@ package fko.javaUCIEngineFramework.Franky;
  *
  * @author Frank Kopp (frank@familie-kopp.de)
  */
-public enum OmegaColor {
+public enum Color {
 
-    // order has influence on OmegaPiece
+    // order has influence on Piece
     WHITE       (1),      // 0
     BLACK       (-1),     // 1
     NOCOLOR     (0);      // 2
@@ -47,11 +47,11 @@ public enum OmegaColor {
      */
     public final int factor;
 
-    OmegaColor(int factor) {
+    Color(int factor) {
         this.factor = factor;
     }
 
-    public static final OmegaColor[] values = {
+    public static final Color[] values = {
             WHITE, BLACK
     };
 
@@ -59,7 +59,7 @@ public enum OmegaColor {
      * Returns the other ChesslyColor.
      * @return int - as defined in ChesslyColor
      */
-    public OmegaColor getInverseColor() {
+    public Color getInverseColor() {
         switch (this) {
             case BLACK:
                 return WHITE;
@@ -125,16 +125,16 @@ public enum OmegaColor {
     /**
      * Convert from GameColor
      * @param c
-     * @return matching OmegaColor
+     * @return matching Color
      */
-//    public static OmegaColor convertFromGameColor(GameColor c) {
+//    public static Color convertFromGameColor(GameColor c) {
 //        switch (c) {
 //            case WHITE:
-//                return OmegaColor.WHITE;
+//                return Color.WHITE;
 //            case BLACK:
-//                return OmegaColor.BLACK;
+//                return Color.BLACK;
 //            case NONE:
-//                return OmegaColor.NOCOLOR;
+//                return Color.NOCOLOR;
 //            default:
 //                throw new RuntimeException("Invalid Color");
 //        }

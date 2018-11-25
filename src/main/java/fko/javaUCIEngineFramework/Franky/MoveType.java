@@ -25,25 +25,26 @@
 
 package fko.javaUCIEngineFramework.Franky;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
- * @author fkopp
- *
+ * Move types of Move
  */
-public class TestOmegaPiece {
+public enum MoveType {
 
-    /**
-     *
-     */
-    @Test
-    public void test() {
-        // get piece
-        OmegaPiece op = OmegaPiece.getPiece(OmegaPieceType.KNIGHT, OmegaColor.BLACK);
-        assertTrue(op.equals(OmegaPiece.BLACK_KNIGHT));
+    NOMOVETYPE, // 0
+    NORMAL,     // 1
+    PAWNDOUBLE, // 2
+    PROMOTION,  // 3
+    ENPASSANT,  // 4
+    CASTLING;   // 5
 
+    static public final MoveType[] values;
+
+    static {
+        values = MoveType.values();
+    }
+
+    static boolean isValid(int mt) {
+        return mt >= 0 && mt <= 5;
     }
 
 }

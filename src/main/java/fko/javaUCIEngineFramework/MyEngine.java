@@ -25,8 +25,8 @@
 
 package fko.javaUCIEngineFramework;
 
-import fko.javaUCIEngineFramework.Franky.OmegaBoardPosition;
-import fko.javaUCIEngineFramework.Franky.OmegaMove;
+import fko.javaUCIEngineFramework.Franky.BoardPosition;
+import fko.javaUCIEngineFramework.Franky.Move;
 import fko.javaUCIEngineFramework.UCI.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class MyEngine implements IUCIEngine {
   private boolean useOwnBookOption = false;
   private boolean debugOption      = false;
 
-  private OmegaBoardPosition boardPosition;
+  private BoardPosition boardPosition;
 
   List<IUCIEngine.IUCIOption> iUciOptions = new ArrayList<>();
 
@@ -148,7 +148,7 @@ public class MyEngine implements IUCIEngine {
 
   @Override
   public void setPosition(final String fen) {
-    LOG.info("Engine got Position command: " + fen); boardPosition = new OmegaBoardPosition(fen);
+    LOG.info("Engine got Position command: " + fen); boardPosition = new BoardPosition(fen);
   }
 
   @Override
@@ -157,14 +157,14 @@ public class MyEngine implements IUCIEngine {
   }
 
   @Override
-  public OmegaBoardPosition getBoardPosition() {
+  public BoardPosition getBoardPosition() {
     return boardPosition;
   }
 
   @Override
   public void doMove(final String move) {
     LOG.info("Engine got doMove command: " + move);
-    final int omegaMove = OmegaMove.fromUCINotation(boardPosition, move);
+    final int omegaMove = Move.fromUCINotation(boardPosition, move);
     boardPosition.makeMove(omegaMove);
   }
 

@@ -31,7 +31,7 @@ package fko.javaUCIEngineFramework.Franky;
  *
  * @author Frank Kopp
  */
-public class OmegaMove {
+public class Move {
 
   // NOMOVE
   /** */
@@ -61,16 +61,16 @@ public class OmegaMove {
   private static final int MOVETYPE_MASK = MOVETYPE_bitMASK << MOVETYPE_SHIFT;
 
   // no instantiation of this class
-  private OmegaMove() {}
+  private Move() {}
 
-  /** Create a OmegaMove. */
+  /** Create a Move. */
   static int createMove(
-      OmegaMoveType movetype,
-      OmegaSquare start,
-      OmegaSquare end,
-      OmegaPiece piece,
-      OmegaPiece target,
-      OmegaPiece promotion) {
+      MoveType movetype,
+      Square start,
+      Square end,
+      Piece piece,
+      Piece target,
+      Piece promotion) {
     int move = 0;
     // Encode start
     move |= start.ordinal() << START_SQUARE_SHIFT;
@@ -93,11 +93,11 @@ public class OmegaMove {
    * @param move the move.
    * @return start position of the move.
    */
-  static OmegaSquare getStart(int move) {
+  static Square getStart(int move) {
     assert move != NOMOVE;
     int position = (move & START_SQUARE_MASK) >>> START_SQUARE_SHIFT;
     assert (position & 0x88) == 0;
-    return OmegaSquare.getSquare(position);
+    return Square.getSquare(position);
   }
 
   /**
@@ -106,11 +106,11 @@ public class OmegaMove {
    * @param move the move.
    * @return the end position of the move.
    */
-  static OmegaSquare getEnd(int move) {
+  static Square getEnd(int move) {
     assert move != NOMOVE;
     int position = (move & END_SQUARE_MASK) >>> END_SQUARE_SHIFT;
     assert (position & 0x88) == 0;
-    return OmegaSquare.getSquare(position);
+    return Square.getSquare(position);
   }
 
   /**
@@ -119,10 +119,10 @@ public class OmegaMove {
    * @param move the IntMove.
    * @return the piece
    */
-  static OmegaPiece getPiece(int move) {
+  static Piece getPiece(int move) {
     assert move != NOMOVE;
     int chessman = (move & PIECE_MASK) >>> PIECE_SHIFT;
-    return OmegaPiece.values[chessman];
+    return Piece.values[chessman];
   }
 
   /**
@@ -131,10 +131,10 @@ public class OmegaMove {
    * @param move the move.
    * @return the target piece.
    */
-  static OmegaPiece getTarget(int move) {
+  static Piece getTarget(int move) {
     assert move != NOMOVE;
     int chessman = (move & TARGET_MASK) >>> TARGET_SHIFT;
-    return OmegaPiece.values[chessman];
+    return Piece.values[chessman];
   }
 
   /**
@@ -143,10 +143,10 @@ public class OmegaMove {
    * @param move the move.
    * @return the promotion piece.
    */
-  static OmegaPiece getPromotion(int move) {
+  static Piece getPromotion(int move) {
     assert move != NOMOVE;
     int promotion = ((move & PROMOTION_MASK) >>> PROMOTION_SHIFT);
-    return OmegaPiece.values[promotion];
+    return Piece.values[promotion];
   }
 
   /**
@@ -155,10 +155,10 @@ public class OmegaMove {
    * @param move the move.
    * @return the type.
    */
-  static OmegaMoveType getMoveType(int move) {
+  static MoveType getMoveType(int move) {
     assert move != NOMOVE : "STOP";
     int type = ((move & MOVETYPE_MASK) >>> MOVETYPE_SHIFT);
-    return OmegaMoveType.values[type];
+    return MoveType.values[type];
   }
 
   /**
@@ -170,7 +170,7 @@ public class OmegaMove {
   static String toString(int move) {
     if (move == NOMOVE) return "NOMOVE";
     String s = "";
-    if (getMoveType(move) == OmegaMoveType.CASTLING) {
+    if (getMoveType(move) == MoveType.CASTLING) {
       switch (getEnd(move)) {
         case g1:
           s += "O-O";
@@ -189,7 +189,7 @@ public class OmegaMove {
       }
     } else {
       s += getMoveType(move) + " " + getPiece(move) + getStart(move);
-      s += getTarget(move) == OmegaPiece.NOPIECE ? "-" : "x" + getTarget(move).toString();
+      s += getTarget(move) == Piece.NOPIECE ? "-" : "x" + getTarget(move).toString();
       s += getEnd(move).toString() + getPromotion(move).toString();
     }
     return s;
@@ -209,9 +209,9 @@ public class OmegaMove {
     return s;
   }
 
-  public static int fromUCINotation(final OmegaBoardPosition position, final String move) {
-    OmegaSquare from = OmegaSquare.fromUCINotation(move.substring(0, 2));
-    OmegaSquare to = OmegaSquare.fromUCINotation(move.substring(2, 4));
+  public static int fromUCINotation(final BoardPosition position, final String move) {
+    Square from = Square.fromUCINotation(move.substring(0, 2));
+    Square to = Square.fromUCINotation(move.substring(2, 4));
     String promotion = "";
     if (move.length() > 4) {
       promotion = move.substring(4, 5);
@@ -219,18 +219,18 @@ public class OmegaMove {
 
     // to find the move type it is easiest to generate all legal moves and then look
     // for a move with the same from and to
-    OmegaMoveGenerator omg = new OmegaMoveGenerator();
-    OmegaMoveList moves = omg.getLegalMoves(position, false);
+    MoveGenerator omg = new MoveGenerator();
+    MoveList moves = omg.getLegalMoves(position, false);
 
     for (int m : moves) {
-      OmegaSquare f = OmegaMove.getStart(m);
-      OmegaSquare t = OmegaMove.getEnd(m);
+      Square f = Move.getStart(m);
+      Square t = Move.getEnd(m);
       if (from.equals(f) && to.equals(t)) {
         if (promotion.isEmpty()) {
           return m;
         }
-        if (OmegaMove.getMoveType(m).equals(OmegaMoveType.PROMOTION)
-                && OmegaMove.getPromotion(m).getShortName().toLowerCase().equals(promotion)) {
+        if (Move.getMoveType(m).equals(MoveType.PROMOTION)
+            && Move.getPromotion(m).getShortName().toLowerCase().equals(promotion)) {
           return m;
         }
       }
@@ -245,7 +245,7 @@ public class OmegaMove {
    * @return the matching GameMove
    */
   //    static GameMove convertToGameMove(int move) {
-  //        if (move == NOMOVE || !OmegaMove.isValid(move)) return null;
+  //        if (move == NOMOVE || !Move.isValid(move)) return null;
   //        GameMove gameMove = new GameMoveImpl(
   //                getStart(move).convertToGamePosition(),
   //                getEnd(move).convertToGamePosition(),
@@ -253,7 +253,7 @@ public class OmegaMove {
   //                );
   //        switch (getMoveType(move)) {
   //            case NORMAL:
-  //                if (getTarget(move) != OmegaPiece.NOPIECE) {
+  //                if (getTarget(move) != Piece.NOPIECE) {
   //                    gameMove.setCapturedPiece(getTarget(move).convertToGamePiece());
   //                }
   //                break;
@@ -286,58 +286,58 @@ public class OmegaMove {
   //
   //        if (move.getPromotedTo() != null) {
   //            return createMove(
-  //                    OmegaMoveType.PROMOTION,
-  //                    OmegaSquare.convertFromGamePosition(move.getFromField()),
-  //                    OmegaSquare.convertFromGamePosition(move.getToField()),
-  //                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
-  //                    OmegaPiece.convertFromGamePiece(move.getCapturedPiece()),
-  //                    OmegaPiece.convertFromGamePiece(move.getPromotedTo()));
+  //                    MoveType.PROMOTION,
+  //                    Square.convertFromGamePosition(move.getFromField()),
+  //                    Square.convertFromGamePosition(move.getToField()),
+  //                    Piece.convertFromGamePiece(move.getMovedPiece()),
+  //                    Piece.convertFromGamePiece(move.getCapturedPiece()),
+  //                    Piece.convertFromGamePiece(move.getPromotedTo()));
   //
   //        } else if (move.isEnPassantNextMovePossible()) {
   //            //} else if (isPawnDouble(move, board)) {
   //            return createMove(
-  //                    OmegaMoveType.PAWNDOUBLE,
-  //                    OmegaSquare.convertFromGamePosition(move.getFromField()),
-  //                    OmegaSquare.convertFromGamePosition(move.getToField()),
-  //                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
-  //                    OmegaPiece.NOPIECE,
-  //                    OmegaPiece.NOPIECE);
+  //                    MoveType.PAWNDOUBLE,
+  //                    Square.convertFromGamePosition(move.getFromField()),
+  //                    Square.convertFromGamePosition(move.getToField()),
+  //                    Piece.convertFromGamePiece(move.getMovedPiece()),
+  //                    Piece.NOPIECE,
+  //                    Piece.NOPIECE);
   //
   //        } else if (move.getWasEnPassantCapture()) {
   //            //} else if (isEnPassant(move, board)) {
   //            return createMove(
-  //                    OmegaMoveType.ENPASSANT,
-  //                    OmegaSquare.convertFromGamePosition(move.getFromField()),
-  //                    OmegaSquare.convertFromGamePosition(move.getToField()),
-  //                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
-  //                    OmegaPiece.convertFromGamePiece(move.getCapturedPiece()),
-  //                    OmegaPiece.NOPIECE);
+  //                    MoveType.ENPASSANT,
+  //                    Square.convertFromGamePosition(move.getFromField()),
+  //                    Square.convertFromGamePosition(move.getToField()),
+  //                    Piece.convertFromGamePiece(move.getMovedPiece()),
+  //                    Piece.convertFromGamePiece(move.getCapturedPiece()),
+  //                    Piece.NOPIECE);
   //
   //        } else if (move.getCastlingType() != GameCastling.NOCASTLING) {
   //            //} else if (isCastling(move, board)) {
   //            return createMove(
-  //                    OmegaMoveType.CASTLING,
-  //                    OmegaSquare.convertFromGamePosition(move.getFromField()),
-  //                    OmegaSquare.convertFromGamePosition(move.getToField()),
-  //                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
-  //                    OmegaPiece.NOPIECE,
-  //                    OmegaPiece.NOPIECE);
+  //                    MoveType.CASTLING,
+  //                    Square.convertFromGamePosition(move.getFromField()),
+  //                    Square.convertFromGamePosition(move.getToField()),
+  //                    Piece.convertFromGamePiece(move.getMovedPiece()),
+  //                    Piece.NOPIECE,
+  //                    Piece.NOPIECE);
   //
   //        } else {
   //            return createMove(
-  //                    OmegaMoveType.NORMAL,
-  //                    OmegaSquare.convertFromGamePosition(move.getFromField()),
-  //                    OmegaSquare.convertFromGamePosition(move.getToField()),
-  //                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
-  //                    OmegaPiece.convertFromGamePiece(move.getCapturedPiece()),
-  //                    OmegaPiece.NOPIECE);
+  //                    MoveType.NORMAL,
+  //                    Square.convertFromGamePosition(move.getFromField()),
+  //                    Square.convertFromGamePosition(move.getToField()),
+  //                    Piece.convertFromGamePiece(move.getMovedPiece()),
+  //                    Piece.convertFromGamePiece(move.getCapturedPiece()),
+  //                    Piece.NOPIECE);
   //        }
   //    }
 
   /**
    * Lightweight check if the given int is a valid int representing a move.<br>
    * <b>This does not check if this is a legal move</b>.<br>
-   * It simply checks if the we can extract a valid OmegaSquare as "from" and "to" and valid
+   * It simply checks if the we can extract a valid Square as "from" and "to" and valid
    * OmegaPieces for piece (without NOPIECE), target and promotion.
    *
    * @param move
@@ -346,7 +346,7 @@ public class OmegaMove {
   static boolean isValid(int move) {
     // is it a valid move type (excludes NOMOVETYPE
     int type = ((move & MOVETYPE_MASK) >>> MOVETYPE_SHIFT);
-    if (type == 0 || !OmegaMoveType.isValid(type)) return false;
+    if (type == 0 || !MoveType.isValid(type)) return false;
     // is there a valid from (start) square
     int start = ((move & START_SQUARE_MASK) >>> START_SQUARE_SHIFT);
     if ((start & 0x88) != 0) return false;
@@ -355,12 +355,12 @@ public class OmegaMove {
     if ((end & 0x88) != 0) return false;
     // is the piece a valid piece excluding NOPIECE
     int piece = (move & PIECE_MASK) >>> PIECE_SHIFT;
-    if (piece == 0 || !OmegaPiece.isValid(piece)) return false;
+    if (piece == 0 || !Piece.isValid(piece)) return false;
     // is the target and the promotion a valid piece including NOPIECE
     int target = (move & TARGET_MASK) >>> TARGET_SHIFT;
-    if (!OmegaPiece.isValid(target)) return false;
+    if (!Piece.isValid(target)) return false;
     int promotion = (move & PROMOTION_MASK) >>> PROMOTION_SHIFT;
-    if (!OmegaPiece.isValid(promotion)) return false;
+    if (!Piece.isValid(promotion)) return false;
     return true;
   }
 }

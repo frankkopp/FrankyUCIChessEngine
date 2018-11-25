@@ -56,6 +56,7 @@ class UCIProtocolHandlerTest {
 
     engine = new MyEngine();
     handler = new UCIProtocolHandler(engine, handlerInput, handlerOutput);
+    engine.registerProtocolHandler(handler);
     handler.startHandler();
   }
 

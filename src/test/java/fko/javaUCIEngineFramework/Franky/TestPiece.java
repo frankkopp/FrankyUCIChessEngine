@@ -25,25 +25,25 @@
 
 package fko.javaUCIEngineFramework.Franky;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
- * Class to store a move and value pair.
+ * @author fkopp
+ *
  */
-public class OmegaRootMoveEntry {
+public class TestPiece {
 
-  final int move;
-  final int value;
+    /**
+     *
+     */
+    @Test
+    public void test() {
+        // get piece
+        Piece op = Piece.getPiece(PieceType.KNIGHT, Color.BLACK);
+        assertTrue(op.equals(Piece.BLACK_KNIGHT));
 
-  /**
-   * @param move
-   * @param value
-   */
-  public OmegaRootMoveEntry(int move, int value) {
-    this.move = move;
-    this.value = value;
-  }
+    }
 
-  @Override
-  public String toString() {
-    return "" + OmegaMove.toString(move) + " (" + value + ") ";
-  }
 }

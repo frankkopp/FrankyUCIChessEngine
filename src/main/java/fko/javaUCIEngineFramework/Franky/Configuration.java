@@ -30,7 +30,7 @@ package fko.javaUCIEngineFramework.Franky;
  * and can be changed during runtime. They are deliberately not static
  * so we can change white and black differently when engine vs. engine.
  */
-public class OmegaConfiguration {
+public class Configuration {
 
   /** test the search without any pruning and count perft value **/
   static public boolean PERFT = false;

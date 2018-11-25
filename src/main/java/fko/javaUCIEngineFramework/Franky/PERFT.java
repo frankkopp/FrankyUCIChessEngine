@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * @author Frank
  *
  */
-public class OmegaPERFT {
+public class PERFT {
 
     private static final boolean DIVIDE=false;
 
@@ -45,14 +45,14 @@ public class OmegaPERFT {
     /**
      * @param fen
      */
-    public OmegaPERFT(String fen) {
+    public PERFT(String fen) {
         _fen = fen;
     }
 
     /**
      *
      */
-    public OmegaPERFT() {
+    public PERFT() {
         _fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     }
 
@@ -67,12 +67,12 @@ public class OmegaPERFT {
 
         System.out.format("Testing at depth %d%n", depth);
 
-        OmegaMoveGenerator[] mg = new OmegaMoveGenerator[maxDepth];
+        MoveGenerator[] mg = new MoveGenerator[maxDepth];
         for (int i=0; i<maxDepth; i++) {
-            mg[i] = new OmegaMoveGenerator();
+            mg[i] = new MoveGenerator();
         }
 
-        OmegaBoardPosition board = new OmegaBoardPosition(_fen);
+        BoardPosition board = new BoardPosition(_fen);
 
         long result = 0;
 
@@ -95,8 +95,8 @@ public class OmegaPERFT {
      * @param move
      * @return
      */
-    private long dividePerft(int depth, OmegaMoveGenerator[] mg, OmegaBoardPosition board, int move) {
-        if (DIVIDE) System.out.print(OmegaMove.toSimpleString(move)+" ");
+    private long dividePerft(int depth, MoveGenerator[] mg, BoardPosition board, int move) {
+        if (DIVIDE) System.out.print(Move.toSimpleString(move) + " ");
         board.makeMove(move);
         long r = miniMax(depth - 1, board, mg, 1);
         if (DIVIDE) System.out.println(r);
@@ -104,7 +104,7 @@ public class OmegaPERFT {
         return r;
     }
 
-    private long miniMax(int depthleft, OmegaBoardPosition board, OmegaMoveGenerator[] mg, int ply) {
+    private long miniMax(int depthleft, BoardPosition board, MoveGenerator[] mg, int ply) {
 
         // PERFT only looks at leaf nodes
         if (depthleft == 0) {
@@ -117,9 +117,9 @@ public class OmegaPERFT {
 
         // moves to search recursively
         // some convenience fields
-        OmegaColor _activePlayer = board._nextPlayer;
-        OmegaColor _passivePlayer = board._nextPlayer.getInverseColor();
-        OmegaMoveList moves = mg[ply].getPseudoLegalMoves(board, false);
+        Color _activePlayer = board._nextPlayer;
+        Color _passivePlayer = board._nextPlayer.getInverseColor();
+        MoveList moves = mg[ply].getPseudoLegalMoves(board, false);
         for(int i = 0; i < moves.size(); i++) {
             int move = moves.get(i);
             board.makeMove(move);
@@ -135,7 +135,7 @@ public class OmegaPERFT {
     /**
      * @param board
      */
-    private void updateCounter(OmegaBoardPosition board) {
+    private void updateCounter(BoardPosition board) {
         if (board.hasCheck()) {
             _checkCounter++;
             if (board.hasCheckMate()) {
@@ -143,10 +143,10 @@ public class OmegaPERFT {
             }
         }
         int lastMove = board.getLastMove();
-        if (OmegaMove.getTarget(lastMove) != OmegaPiece.NOPIECE) {
+        if (Move.getTarget(lastMove) != Piece.NOPIECE) {
             _captureCounter++;
         }
-        if (OmegaMove.getMoveType(lastMove) == OmegaMoveType.ENPASSANT) {
+        if (Move.getMoveType(lastMove) == MoveType.ENPASSANT) {
             _enpassantCounter++;
         }
     }

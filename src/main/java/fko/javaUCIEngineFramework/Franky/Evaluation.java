@@ -42,7 +42,7 @@ package fko.javaUCIEngineFramework.Franky;
  * TODO: Square Control
  * TODO: King Protection
  */
-public class OmegaEvaluation {
+public class Evaluation {
 
   static private final boolean MATERIAL       = true;
   static private final boolean MOBILITY       = true;
@@ -53,7 +53,7 @@ public class OmegaEvaluation {
    * Creates an instance of the OmegaEvaluator using a new Engine
    * and a new Move Generator.
    */
-  public OmegaEvaluation() {
+  public Evaluation() {
   }
 
   /**
@@ -62,9 +62,9 @@ public class OmegaEvaluation {
    * @param board
    * @return value of the position from active player's view.
    */
-  public int evaluate(OmegaBoardPosition board) {
+  public int evaluate(BoardPosition board) {
 
-    int value = OmegaEvaluation.Value.DRAW;
+    int value = Evaluation.Value.DRAW;
 
     // Material
     if (MATERIAL) value += material(board);
@@ -82,9 +82,9 @@ public class OmegaEvaluation {
    * @param board
    * @return material balance from the view of the active player
    */
-  int material(final OmegaBoardPosition board) {
+  int material(final BoardPosition board) {
     int material =
-      board._nextPlayer.factor * (board.getMaterial(OmegaColor.WHITE) - board.getMaterial(OmegaColor.BLACK));
+      board._nextPlayer.factor * (board.getMaterial(Color.WHITE) - board.getMaterial(Color.BLACK));
 
     // bonus/malus for bishop pair
     if (board._bishopSquares[board._nextPlayer.ordinal()].size() >= 2) material += 50;
@@ -97,43 +97,43 @@ public class OmegaEvaluation {
    * @param board
    * @return number of pseudo legal moves for the next player
    */
-  int mobility(final OmegaBoardPosition board) {
+  int mobility(final BoardPosition board) {
     int mobility = 0;
 
     // to influence the weight of the piece type
     int factor = 1;
 
-    final OmegaColor activePlayer = board._nextPlayer;
-    final OmegaColor passivePlayer = activePlayer.getInverseColor();
+    final Color activePlayer = board._nextPlayer;
+    final Color passivePlayer = activePlayer.getInverseColor();
 
     // knights
     factor = 2;
-    mobility += factor * mobilityForPieces(board, activePlayer, OmegaPieceType.KNIGHT,
-                                           board._knightSquares[activePlayer.ordinal()], OmegaSquare.knightDirections);
-    mobility -= factor * mobilityForPieces(board, passivePlayer, OmegaPieceType.KNIGHT,
-                                           board._knightSquares[passivePlayer.ordinal()], OmegaSquare.knightDirections);
+    mobility += factor * mobilityForPieces(board, activePlayer, PieceType.KNIGHT,
+                                           board._knightSquares[activePlayer.ordinal()], Square.knightDirections);
+    mobility -= factor * mobilityForPieces(board, passivePlayer, PieceType.KNIGHT,
+                                           board._knightSquares[passivePlayer.ordinal()], Square.knightDirections);
 
     // bishops
     factor = 2;
-    mobility += factor * mobilityForPieces(board, activePlayer, OmegaPieceType.BISHOP,
-                                           board._bishopSquares[activePlayer.ordinal()], OmegaSquare.bishopDirections);
-    mobility -= factor * mobilityForPieces(board, passivePlayer, OmegaPieceType.BISHOP,
-                                           board._bishopSquares[passivePlayer.ordinal()], OmegaSquare.bishopDirections);
+    mobility += factor * mobilityForPieces(board, activePlayer, PieceType.BISHOP,
+                                           board._bishopSquares[activePlayer.ordinal()], Square.bishopDirections);
+    mobility -= factor * mobilityForPieces(board, passivePlayer, PieceType.BISHOP,
+                                           board._bishopSquares[passivePlayer.ordinal()], Square.bishopDirections);
 
     // rooks
     factor = 2;
     mobility += factor *
-                mobilityForPieces(board, activePlayer, OmegaPieceType.ROOK, board._rookSquares[activePlayer.ordinal()],
-                                  OmegaSquare.rookDirections);
-    mobility -= factor * mobilityForPieces(board, passivePlayer, OmegaPieceType.ROOK,
-                                           board._rookSquares[passivePlayer.ordinal()], OmegaSquare.rookDirections);
+                mobilityForPieces(board, activePlayer, PieceType.ROOK, board._rookSquares[activePlayer.ordinal()],
+                                  Square.rookDirections);
+    mobility -= factor * mobilityForPieces(board, passivePlayer, PieceType.ROOK,
+                                           board._rookSquares[passivePlayer.ordinal()], Square.rookDirections);
 
     // queens
     factor = 1;
-    mobility += factor * mobilityForPieces(board, activePlayer, OmegaPieceType.QUEEN,
-                                           board._queenSquares[activePlayer.ordinal()], OmegaSquare.queenDirections);
-    mobility -= factor * mobilityForPieces(board, passivePlayer, OmegaPieceType.QUEEN,
-                                           board._queenSquares[passivePlayer.ordinal()], OmegaSquare.queenDirections);
+    mobility += factor * mobilityForPieces(board, activePlayer, PieceType.QUEEN,
+                                           board._queenSquares[activePlayer.ordinal()], Square.queenDirections);
+    mobility -= factor * mobilityForPieces(board, passivePlayer, PieceType.QUEEN,
+                                           board._queenSquares[passivePlayer.ordinal()], Square.queenDirections);
 
     return mobility;
   }
@@ -146,13 +146,13 @@ public class OmegaEvaluation {
    * @param pieceDirections
    * @return
    */
-  private static int mobilityForPieces(OmegaBoardPosition board, OmegaColor color, OmegaPieceType type,
-                                       OmegaSquareList squareList, int[] pieceDirections) {
+  private static int mobilityForPieces(BoardPosition board, Color color, PieceType type,
+                                       SquareList squareList, int[] pieceDirections) {
     int numberOfMoves = 0;
     // iterate over all squares where we have a piece
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
-      OmegaSquare square = squareList.get(i);
+      Square square = squareList.get(i);
       numberOfMoves += mobilityForPiece(board, color, type, square, pieceDirections);
     }
     return numberOfMoves;
@@ -165,16 +165,16 @@ public class OmegaEvaluation {
    * @param square
    * @param pieceDirections
    */
-  private static int mobilityForPiece(OmegaBoardPosition board, OmegaColor color, OmegaPieceType type,
-                                      OmegaSquare square, int[] pieceDirections) {
+  private static int mobilityForPiece(BoardPosition board, Color color, PieceType type,
+                                      Square square, int[] pieceDirections) {
     int numberOfMoves = 0;
     int[] directions = pieceDirections;
     for (int d : directions) {
       int to = square.ordinal() + d;
       while ((to & 0x88) == 0) { // slide while valid square
-        final OmegaPiece target = board._x88Board[to];
+        final Piece target = board._x88Board[to];
         // free square - non capture
-        if (target == OmegaPiece.NOPIECE) {
+        if (target == Piece.NOPIECE) {
           numberOfMoves++;
         }
         // occupied square - capture if opponent and stop sliding
@@ -201,7 +201,7 @@ public class OmegaEvaluation {
    * @param board
    * @return
    */
-  int position(OmegaBoardPosition board) {
+  int position(BoardPosition board) {
     return 0;
   }
 

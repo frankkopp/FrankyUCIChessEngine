@@ -25,6 +25,7 @@
 
 package fko.javaUCIEngineFramework.Franky;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Frank
  */
-public class TestOmegaPERFT {
+public class TestPERFT {
 
   /**
    * Perft Test https://chessprogramming.wikispaces.com/Perft+Results
@@ -56,9 +57,9 @@ public class TestOmegaPERFT {
     };
     // @formatter:on
 
-    int maxDepth = 6;
+    int maxDepth = 5;
 
-    OmegaPERFT perftTest = new OmegaPERFT();
+    PERFT perftTest = new PERFT();
 
     for (int i = 1; i <= maxDepth; i++) {
       perftTest.testPerft(i);
@@ -95,7 +96,7 @@ public class TestOmegaPERFT {
 
     int maxDepth = 4;
 
-    OmegaPERFT perftTest = new OmegaPERFT("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    PERFT perftTest = new PERFT("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
 
     for (int i = 4; i <= maxDepth; i++) {
       perftTest.testPerft(i);
@@ -133,7 +134,7 @@ public class TestOmegaPERFT {
 
     int maxDepth = 4;
 
-    OmegaPERFT perftTest = new OmegaPERFT("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    PERFT perftTest = new PERFT("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
 
     for (int i = 1; i <= maxDepth; i++) {
       perftTest.testPerft(i);
@@ -169,7 +170,7 @@ public class TestOmegaPERFT {
 
     int maxDepth = 2;
 
-    OmegaPERFT perftTest = new OmegaPERFT("8/3K4/2p5/p2b2r1/5k2/8/8/1q6 b - - 1 67");
+    PERFT perftTest = new PERFT("8/3K4/2p5/p2b2r1/5k2/8/8/1q6 b - - 1 67");
 
     for (int i = 1; i <= maxDepth; i++) {
       perftTest.testPerft(i);
@@ -210,7 +211,7 @@ public class TestOmegaPERFT {
 
     int maxDepth = 4;
 
-    OmegaPERFT perftTest = new OmegaPERFT("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -");
+    PERFT perftTest = new PERFT("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -");
 
     for (int i = 1; i <= maxDepth; i++) {
       perftTest.testPerft(i);
@@ -250,7 +251,7 @@ public class TestOmegaPERFT {
 
     int maxDepth = 4;
 
-    OmegaPERFT perftTest = new OmegaPERFT("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8");
+    PERFT perftTest = new PERFT("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8");
 
     for (int i = 1; i <= maxDepth; i++) {
       perftTest.testPerft(i);
@@ -270,6 +271,7 @@ public class TestOmegaPERFT {
    * https://chessprogramming.wikispaces.com/Perft+Results
    */
   @Test
+  @Disabled
   public void testStandardPerftTiming() {
 
     int maxDepth = 6;
@@ -286,7 +288,7 @@ public class TestOmegaPERFT {
     };
    // @formatter:on
 
-    OmegaPERFT perftTest = new OmegaPERFT();
+    PERFT perftTest = new PERFT();
     perftTest.testPerft(maxDepth);
     assertEquals(perftTest.get_nodes(), results[maxDepth][1]);
     assertEquals(perftTest.get_captureCounter(), results[maxDepth][2]);

@@ -32,7 +32,7 @@ package fko.javaUCIEngineFramework.Franky;
  * <code>entries[key%maxNumberOfEntries]</code>. As long as key is randomly distributed
  * this works just fine.
  */
-public class OmegaTranspositionTable {
+public class TranspositionTable {
 
   static private final int MB = 1024;
 
@@ -51,7 +51,7 @@ public class OmegaTranspositionTable {
    *
    * @param size in MB (1024^2)
    */
-  public OmegaTranspositionTable(int size) {
+  public TranspositionTable(int size) {
     _size = size * MB * MB;
 
     // check available mem - add some head room
@@ -85,7 +85,7 @@ public class OmegaTranspositionTable {
    * @param depth
    * @param moveList
    */
-  public void put(OmegaBoardPosition position, int value, TT_EntryType type, int depth, OmegaMoveList moveList) {
+  public void put(BoardPosition position, int value, TT_EntryType type, int depth, MoveList moveList) {
 
     final int hash = getHash(position._zobristKey);
 
@@ -98,7 +98,7 @@ public class OmegaTranspositionTable {
       entries[hash].type = type;
       entries[hash].depth = depth;
       entries[hash].move_list = moveList;
-      //entries[hash].move_list = new SoftReference<OmegaMoveList>(moveList);
+      //entries[hash].move_list = new SoftReference<MoveList>(moveList);
 
     }
     // different position - overwrite
@@ -111,7 +111,7 @@ public class OmegaTranspositionTable {
       entries[hash].type = type;
       entries[hash].depth = depth;
       entries[hash].move_list = moveList;
-      //entries[hash].move_list = new SoftReference<OmegaMoveList>(moveList);
+      //entries[hash].move_list = new SoftReference<MoveList>(moveList);
     }
     // Collision or update
     else if (position._zobristKey == entries[hash].key  // same position
@@ -137,7 +137,7 @@ public class OmegaTranspositionTable {
       entries[hash].type = type;
       entries[hash].depth = depth;
       entries[hash].move_list = moveList;
-      //entries[hash].move_list = new SoftReference<OmegaMoveList>(moveList);
+      //entries[hash].move_list = new SoftReference<MoveList>(moveList);
     }
     // ignore new values for cache
   }
@@ -150,7 +150,7 @@ public class OmegaTranspositionTable {
    * @param position TODO
    * @return value for key or <tt>Integer.MIN_VALUE</tt> if not found
    */
-  public TT_Entry get(OmegaBoardPosition position) {
+  public TT_Entry get(BoardPosition position) {
     final int hash = getHash(position._zobristKey);
     if (entries[hash].key == position._zobristKey) { // hash hit
       return entries[hash];
@@ -220,13 +220,13 @@ public class OmegaTranspositionTable {
                             ) * 2 // 64bit?
                             + 8 // enum
       ;//+ 40; // SoftReference
-    long          key       = 0L;
+    long         key       = 0L;
     //String fen = "";
-    int           value     = Integer.MIN_VALUE;
-    int           depth     = 0;
-    TT_EntryType  type      = TT_EntryType.ALPHA;
-    OmegaMoveList move_list = null;
-    //SoftReference<OmegaMoveList> move_list = new SoftReference<OmegaMoveList>(null);
+    int          value     = Integer.MIN_VALUE;
+    int          depth     = 0;
+    TT_EntryType type      = TT_EntryType.ALPHA;
+    MoveList     move_list = null;
+    //SoftReference<MoveList> move_list = new SoftReference<MoveList>(null);
   }
 
   /**

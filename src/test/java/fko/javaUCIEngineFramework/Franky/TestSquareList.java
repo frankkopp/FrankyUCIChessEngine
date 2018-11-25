@@ -33,9 +33,9 @@ import org.junit.jupiter.api.Test;
  * @author Frank
  *
  */
-public class TestOmegaSquareList {
+public class TestSquareList {
 
-    static OmegaSquareList list;
+    static SquareList list;
 
     /**
      * @throws Exception
@@ -43,7 +43,7 @@ public class TestOmegaSquareList {
     @BeforeAll
     static public void setUp() throws Exception {
 
-        list = new OmegaSquareList();
+        list = new SquareList();
 
     }
 
@@ -54,32 +54,32 @@ public class TestOmegaSquareList {
     public final void testAdd() {
 
         System.out.println(list);
-        list.add(OmegaSquare.a8);
+        list.add(Square.a8);
         System.out.println(list);
-        list.add(OmegaSquare.b2);
+        list.add(Square.b2);
         System.out.println(list);
-        list.add(OmegaSquare.a3);
+        list.add(Square.a3);
         System.out.println(list);
-        list.add(OmegaSquare.c1);
+        list.add(Square.c1);
         System.out.println(list);
-        list.add(OmegaSquare.a1);
-        System.out.println(list);
-
-        System.out.println(list);
-        list.remove(OmegaSquare.a4);
-        System.out.println(list);
-        list.remove(OmegaSquare.a1);
-        System.out.println(list);
-        list.remove(OmegaSquare.b2);
-        System.out.println(list);
-        list.remove(OmegaSquare.a3);
+        list.add(Square.a1);
         System.out.println(list);
 
-
-        list.remove(OmegaSquare.a4);
+        System.out.println(list);
+        list.remove(Square.a4);
+        System.out.println(list);
+        list.remove(Square.a1);
+        System.out.println(list);
+        list.remove(Square.b2);
+        System.out.println(list);
+        list.remove(Square.a3);
         System.out.println(list);
 
-        list.remove(OmegaSquare.a2);
+
+        list.remove(Square.a4);
+        System.out.println(list);
+
+        list.remove(Square.a2);
         System.out.println(list);
 
     }
@@ -90,24 +90,24 @@ public class TestOmegaSquareList {
     @Test
     public final void testIterate() {
 
-        list.add(OmegaSquare.a1);
-        list.add(OmegaSquare.a2);
-        list.add(OmegaSquare.a3);
-        list.add(OmegaSquare.a4);
+        list.add(Square.a1);
+        list.add(Square.a2);
+        list.add(Square.a3);
+        list.add(Square.a4);
 
         System.out.println(list);
         for (int i=0; i<list.size(); i++) {
             System.out.print(list.get(i) + " ");
             // remove and add element - should not influence the iteration
             // (we had a bug because of this)
-            list.remove(OmegaSquare.a1);
-            list.add(OmegaSquare.a1);
+            list.remove(Square.a1);
+            list.add(Square.a1);
         }
         System.out.println();
         System.out.println(list);
 
-        list.remove(OmegaSquare.a1);
-        list.remove(OmegaSquare.a3);
+        list.remove(Square.a1);
+        list.remove(Square.a3);
 
         System.out.println(list);
         for (int i=0; i<list.size(); i++) {

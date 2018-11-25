@@ -35,7 +35,7 @@ import java.util.Comparator;
  *
  * @author Frank
  */
-public class OmegaMoveList extends SimpleIntList {
+public class MoveList extends SimpleIntList {
 
     /**
      * Creates a list with a initial capacity of 75 elements
@@ -44,7 +44,7 @@ public class OmegaMoveList extends SimpleIntList {
      * Max for pseudo legal moves seems to be 225
      * we use 75 and let it grow to save space as more than 75 is rare
      */
-    public OmegaMoveList() {
+    public MoveList() {
         super(75);
     }
 
@@ -52,7 +52,7 @@ public class OmegaMoveList extends SimpleIntList {
      * Creates a list with a maximum of max_site elements
      * @param max
      */
-    public OmegaMoveList(int max) {
+    public MoveList(int max) {
         super(max);
     }
 
@@ -60,7 +60,7 @@ public class OmegaMoveList extends SimpleIntList {
      * Creates a list as a copy of the provided list.
      * @param old
      */
-    public OmegaMoveList(OmegaMoveList old) {
+    public MoveList(MoveList old) {
         super(old);
     }
 
@@ -69,7 +69,7 @@ public class OmegaMoveList extends SimpleIntList {
      */
     @Override
     public void add(int move) {
-        if (!OmegaMove.isValid(move))
+        if (!Move.isValid(move))
             throw new IllegalArgumentException("not a valid move: "+move);
         super.add(move);
     }
@@ -79,8 +79,8 @@ public class OmegaMoveList extends SimpleIntList {
      */
     @Override
     public void add(SimpleIntList newList) {
-        if (!(newList instanceof OmegaMoveList))
-            throw new IllegalArgumentException("not a valid OmegaMoveList: "+newList);
+        if (!(newList instanceof MoveList))
+            throw new IllegalArgumentException("not a valid MoveList: "+newList);
         super.add(newList);
     }
 
@@ -92,8 +92,8 @@ public class OmegaMoveList extends SimpleIntList {
         int temp;
         for (int i = _head + 1; i < _tail; i++) {
             for (int j = i; j > _head; j--) {
-                if (OmegaMove.getPiece(_list[j]).getType().getValue() - OmegaMove.getTarget(_list[j]).getType().getValue()
-                        -(OmegaMove.getPiece(_list[j-1]).getType().getValue() - OmegaMove.getTarget(_list[j-1]).getType().getValue()) < 0) {
+                if (Move.getPiece(_list[j]).getType().getValue() - Move.getTarget(_list[j]).getType().getValue()
+                    - (Move.getPiece(_list[j - 1]).getType().getValue() - Move.getTarget(_list[j - 1]).getType().getValue()) < 0) {
                     temp = _list[j];
                     _list[j] = _list[j-1];
                     _list[j-1] = temp;
@@ -109,7 +109,7 @@ public class OmegaMoveList extends SimpleIntList {
     public String toString() {
         String s = "MoveList size="+size()+" available capacity="+getAvailableCapacity()+" [";
         for (int i=0; i<size(); i++) {
-            s += get(i) + " ("+OmegaMove.toString(get(i))+")";
+            s += get(i) + " (" + Move.toString(get(i)) + ")";
             if (i<size()-1) s += ", ";
         }
         s+="]";
@@ -124,7 +124,7 @@ public class OmegaMoveList extends SimpleIntList {
     public String toNotationString() {
         String s = "";
         for (int i=0; i<size(); i++) {
-            s += OmegaMove.toSimpleString(get(i))+" ";
+            s += Move.toSimpleString(get(i)) + " ";
         }
         return s;
     }
@@ -133,8 +133,8 @@ public class OmegaMoveList extends SimpleIntList {
      * clones the list
      */
     @Override
-    public OmegaMoveList clone() {
-        return new OmegaMoveList(this);
+    public MoveList clone() {
+        return new MoveList(this);
     }
 
     /**
@@ -144,7 +144,7 @@ public class OmegaMoveList extends SimpleIntList {
      * @param src
      * @param dest
      */
-    static void savePV(int move, OmegaMoveList src, OmegaMoveList dest) {
+    static void savePV(int move, MoveList src, MoveList dest) {
         dest._list[0] = move;
         System.arraycopy(src._list, src._head, dest._list, 1, src.size());
         dest._tail = src.size() + 1;

@@ -32,7 +32,7 @@ package fko.javaUCIEngineFramework.Franky;
  * <code>entries[key%maxNumberOfEntries]</code>. As long as key is randomly distributed
  * this works just fine.
  */
-public class OmegaEvaluationCache {
+public class EvaluationCache {
 
     static private final int MB = 1024;
 
@@ -50,7 +50,7 @@ public class OmegaEvaluationCache {
      * The hash function is very simple using the modulo of number of entries on the key
      * @param size in MB (1024^2)
      */
-    public OmegaEvaluationCache(int size) {
+    public EvaluationCache(int size) {
         _size = size*MB*MB;
 
         // check available mem - add some head room

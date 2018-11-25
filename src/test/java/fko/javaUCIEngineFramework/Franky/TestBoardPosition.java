@@ -25,6 +25,7 @@
 
 package fko.javaUCIEngineFramework.Franky;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -34,7 +35,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** @author fkopp */
-public class TestOmegaBoardPosition {
+public class TestBoardPosition {
 
   private static final int ITERATIONS = 999;
 
@@ -43,73 +44,73 @@ public class TestOmegaBoardPosition {
   public void testInsufficientMaterial() {
 
     String fen;
-    OmegaBoardPosition omegaBoard;
+    BoardPosition omegaBoard;
 
     // KK
     fen = "8/3k4/8/8/8/8/4K3/8 w - -";
-    omegaBoard = new OmegaBoardPosition(fen);
+    omegaBoard = new BoardPosition(fen);
     assertTrue(omegaBoard.checkInsufficientMaterial());
 
     // KQK
     fen = "8/3k4/8/8/8/8/4KQ2/8 w - -";
-    omegaBoard = new OmegaBoardPosition(fen);
+    omegaBoard = new BoardPosition(fen);
     assertFalse(omegaBoard.checkInsufficientMaterial());
 
     // KNK
     fen = "8/3k4/8/8/8/8/4KN2/8 w - -";
-    omegaBoard = new OmegaBoardPosition(fen);
+    omegaBoard = new BoardPosition(fen);
     assertTrue(omegaBoard.checkInsufficientMaterial());
 
     // KNNK
     fen = "8/3k4/8/8/8/8/4KNN1/8 w - -";
-    omegaBoard = new OmegaBoardPosition(fen);
+    omegaBoard = new BoardPosition(fen);
     assertTrue(omegaBoard.checkInsufficientMaterial());
 
     // KKN
     fen = "8/2nk4/8/8/8/8/4K3/8 w - -";
-    omegaBoard = new OmegaBoardPosition(fen);
+    omegaBoard = new BoardPosition(fen);
     assertTrue(omegaBoard.checkInsufficientMaterial());
 
     // KNNK
     fen = "8/1nnk4/8/8/8/8/4K3/8 w - -";
-    omegaBoard = new OmegaBoardPosition(fen);
+    omegaBoard = new BoardPosition(fen);
     assertTrue(omegaBoard.checkInsufficientMaterial());
 
     // KBKB - B same field color
     fen = "8/3k1b2/8/8/8/8/4K1B1/8 w - -";
-    omegaBoard = new OmegaBoardPosition(fen);
+    omegaBoard = new BoardPosition(fen);
     assertTrue(omegaBoard.checkInsufficientMaterial());
 
     // KBKB - B different field color
     fen = "8/3k2b1/8/8/8/8/4K1B1/8 w - -";
-    omegaBoard = new OmegaBoardPosition(fen);
+    omegaBoard = new BoardPosition(fen);
     assertFalse(omegaBoard.checkInsufficientMaterial());
   }
 
   /** Test Null Move */
   @Test
   public void test3Repetitions() {
-    OmegaBoardPosition omegaBoard = new OmegaBoardPosition();
+    BoardPosition omegaBoard = new BoardPosition();
 
     int move;
 
     move =
-        OmegaMove.createMove(
-            OmegaMoveType.NORMAL,
-            OmegaSquare.e2,
-            OmegaSquare.e4,
-            OmegaPiece.WHITE_PAWN,
-            OmegaPiece.NOPIECE,
-            OmegaPiece.NOPIECE);
+        Move.createMove(
+          MoveType.NORMAL,
+          Square.e2,
+          Square.e4,
+          Piece.WHITE_PAWN,
+          Piece.NOPIECE,
+          Piece.NOPIECE);
     omegaBoard.makeMove(move);
     move =
-        OmegaMove.createMove(
-            OmegaMoveType.NORMAL,
-            OmegaSquare.e7,
-            OmegaSquare.e5,
-            OmegaPiece.BLACK_PAWN,
-            OmegaPiece.NOPIECE,
-            OmegaPiece.NOPIECE);
+        Move.createMove(
+          MoveType.NORMAL,
+          Square.e7,
+          Square.e5,
+          Piece.BLACK_PAWN,
+          Piece.NOPIECE,
+          Piece.NOPIECE);
     omegaBoard.makeMove(move);
 
     System.out.println("3-Repetitions: " + omegaBoard.check3Repetitions());
@@ -118,40 +119,40 @@ public class TestOmegaBoardPosition {
     // Simple repetition
     for (int i = 0; i < 2; i++) {
       move =
-          OmegaMove.createMove(
-              OmegaMoveType.NORMAL,
-              OmegaSquare.b1,
-              OmegaSquare.c3,
-              OmegaPiece.WHITE_KNIGHT,
-              OmegaPiece.NOPIECE,
-              OmegaPiece.NOPIECE);
+          Move.createMove(
+            MoveType.NORMAL,
+            Square.b1,
+            Square.c3,
+            Piece.WHITE_KNIGHT,
+            Piece.NOPIECE,
+            Piece.NOPIECE);
       omegaBoard.makeMove(move);
       move =
-          OmegaMove.createMove(
-              OmegaMoveType.NORMAL,
-              OmegaSquare.b8,
-              OmegaSquare.c6,
-              OmegaPiece.BLACK_KNIGHT,
-              OmegaPiece.NOPIECE,
-              OmegaPiece.NOPIECE);
+          Move.createMove(
+            MoveType.NORMAL,
+            Square.b8,
+            Square.c6,
+            Piece.BLACK_KNIGHT,
+            Piece.NOPIECE,
+            Piece.NOPIECE);
       omegaBoard.makeMove(move);
       move =
-          OmegaMove.createMove(
-              OmegaMoveType.NORMAL,
-              OmegaSquare.c3,
-              OmegaSquare.b1,
-              OmegaPiece.WHITE_KNIGHT,
-              OmegaPiece.NOPIECE,
-              OmegaPiece.NOPIECE);
+          Move.createMove(
+            MoveType.NORMAL,
+            Square.c3,
+            Square.b1,
+            Piece.WHITE_KNIGHT,
+            Piece.NOPIECE,
+            Piece.NOPIECE);
       omegaBoard.makeMove(move);
       move =
-          OmegaMove.createMove(
-              OmegaMoveType.NORMAL,
-              OmegaSquare.c6,
-              OmegaSquare.b8,
-              OmegaPiece.BLACK_KNIGHT,
-              OmegaPiece.NOPIECE,
-              OmegaPiece.NOPIECE);
+          Move.createMove(
+            MoveType.NORMAL,
+            Square.c6,
+            Square.b8,
+            Piece.BLACK_KNIGHT,
+            Piece.NOPIECE,
+            Piece.NOPIECE);
       omegaBoard.makeMove(move);
     }
     System.out.println("3-Repetitions: " + omegaBoard.check3Repetitions());
@@ -159,43 +160,43 @@ public class TestOmegaBoardPosition {
 
     // Simple repetition
     move =
-        OmegaMove.createMove(
-            OmegaMoveType.NORMAL,
-            OmegaSquare.g1,
-            OmegaSquare.f3,
-            OmegaPiece.WHITE_KNIGHT,
-            OmegaPiece.NOPIECE,
-            OmegaPiece.NOPIECE);
+        Move.createMove(
+          MoveType.NORMAL,
+          Square.g1,
+          Square.f3,
+          Piece.WHITE_KNIGHT,
+          Piece.NOPIECE,
+          Piece.NOPIECE);
     omegaBoard.makeMove(move);
     move =
-        OmegaMove.createMove(
-            OmegaMoveType.NORMAL,
-            OmegaSquare.g8,
-            OmegaSquare.f6,
-            OmegaPiece.BLACK_KNIGHT,
-            OmegaPiece.NOPIECE,
-            OmegaPiece.NOPIECE);
+        Move.createMove(
+          MoveType.NORMAL,
+          Square.g8,
+          Square.f6,
+          Piece.BLACK_KNIGHT,
+          Piece.NOPIECE,
+          Piece.NOPIECE);
     omegaBoard.makeMove(move);
     System.out.println("3-Repetitions: " + omegaBoard.check3Repetitions());
     assertFalse(omegaBoard.check3Repetitions());
 
     move =
-        OmegaMove.createMove(
-            OmegaMoveType.NORMAL,
-            OmegaSquare.f3,
-            OmegaSquare.g1,
-            OmegaPiece.WHITE_KNIGHT,
-            OmegaPiece.NOPIECE,
-            OmegaPiece.NOPIECE);
+        Move.createMove(
+          MoveType.NORMAL,
+          Square.f3,
+          Square.g1,
+          Piece.WHITE_KNIGHT,
+          Piece.NOPIECE,
+          Piece.NOPIECE);
     omegaBoard.makeMove(move);
     move =
-        OmegaMove.createMove(
-            OmegaMoveType.NORMAL,
-            OmegaSquare.f6,
-            OmegaSquare.g8,
-            OmegaPiece.BLACK_KNIGHT,
-            OmegaPiece.NOPIECE,
-            OmegaPiece.NOPIECE);
+        Move.createMove(
+          MoveType.NORMAL,
+          Square.f6,
+          Square.g8,
+          Piece.BLACK_KNIGHT,
+          Piece.NOPIECE,
+          Piece.NOPIECE);
     omegaBoard.makeMove(move);
     System.out.println("3-Repetitions: " + omegaBoard.check3Repetitions());
     assertTrue(omegaBoard.check3Repetitions());
@@ -205,7 +206,7 @@ public class TestOmegaBoardPosition {
   @Test
   public void testNullMove() {
     String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
-    OmegaBoardPosition omegaBoard = new OmegaBoardPosition(fen);
+    BoardPosition omegaBoard = new BoardPosition(fen);
 
     String f1 = omegaBoard.toFENString();
     omegaBoard.makeNullMove();
@@ -225,10 +226,10 @@ public class TestOmegaBoardPosition {
   @Test
   public void testNullMove_moveGen() {
     String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
-    OmegaBoardPosition omegaBoard = new OmegaBoardPosition(fen);
-    OmegaMoveGenerator omg = new OmegaMoveGenerator();
+    BoardPosition omegaBoard = new BoardPosition(fen);
+    MoveGenerator omg = new MoveGenerator();
 
-    OmegaMoveList moves = omg.getLegalMoves(omegaBoard, false);
+    MoveList moves = omg.getLegalMoves(omegaBoard, false);
     assertEquals(81, moves.size());
 
     omegaBoard.makeNullMove();
@@ -246,16 +247,16 @@ public class TestOmegaBoardPosition {
   @Test
   public void testMoveOnBoard() {
     //        GameBoard gameBoard = new GameBoardImpl();
-    //        OmegaBoardPosition omegaBoard = new OmegaBoardPosition(gameBoard);
+    //        BoardPosition omegaBoard = new BoardPosition(gameBoard);
     //
     //        String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
     //
     //        // normal
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new OmegaBoardPosition(gameBoard);
+    //        omegaBoard = new BoardPosition(gameBoard);
     //        GameMove gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"c4-a4");
-    //        int move = OmegaMove.convertFromGameMove(gameMove);
-    //        GameMove convertedMove = OmegaMove.convertToGameMove(move);
+    //        int move = Move.convertFromGameMove(gameMove);
+    //        GameMove convertedMove = Move.convertToGameMove(move);
     //        assert(gameMove.equals(convertedMove));
     //        omegaBoard.makeMove(move);
     //
@@ -268,10 +269,10 @@ public class TestOmegaBoardPosition {
     //
     //        // normal pawn move
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new OmegaBoardPosition(gameBoard);
+    //        omegaBoard = new BoardPosition(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"b7-b6");
-    //        move = OmegaMove.convertFromGameMove(gameMove);
-    //        convertedMove = OmegaMove.convertToGameMove(move);
+    //        move = Move.convertFromGameMove(gameMove);
+    //        convertedMove = Move.convertToGameMove(move);
     //        assert(gameMove.equals(convertedMove));
     //        omegaBoard.makeMove(move);
     //
@@ -284,10 +285,10 @@ public class TestOmegaBoardPosition {
     //
     //        // normal capture
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new OmegaBoardPosition(gameBoard);
+    //        omegaBoard = new BoardPosition(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"c4-e4");
-    //        move = OmegaMove.convertFromGameMove(gameMove);
-    //        convertedMove = OmegaMove.convertToGameMove(move);
+    //        move = Move.convertFromGameMove(gameMove);
+    //        convertedMove = Move.convertToGameMove(move);
     //        assert(gameMove.equals(convertedMove));
     //        omegaBoard.makeMove(move);
     //
@@ -300,10 +301,10 @@ public class TestOmegaBoardPosition {
     //
     //        // pawn double
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new OmegaBoardPosition(gameBoard);
+    //        omegaBoard = new BoardPosition(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"b7-b5");
-    //        move = OmegaMove.convertFromGameMove(gameMove);
-    //        convertedMove = OmegaMove.convertToGameMove(move);
+    //        move = Move.convertFromGameMove(gameMove);
+    //        convertedMove = Move.convertToGameMove(move);
     //        assert(gameMove.equals(convertedMove));
     //        omegaBoard.makeMove(move);
     //
@@ -316,10 +317,10 @@ public class TestOmegaBoardPosition {
     //
     //        // castling
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new OmegaBoardPosition(gameBoard);
+    //        omegaBoard = new BoardPosition(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"e8-g8");
-    //        move = OmegaMove.convertFromGameMove(gameMove);
-    //        convertedMove = OmegaMove.convertToGameMove(move);
+    //        move = Move.convertFromGameMove(gameMove);
+    //        convertedMove = Move.convertToGameMove(move);
     //        assert(gameMove.equals(convertedMove));
     //        omegaBoard.makeMove(move);
     //
@@ -332,10 +333,10 @@ public class TestOmegaBoardPosition {
     //
     //        // promotion
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new OmegaBoardPosition(gameBoard);
+    //        omegaBoard = new BoardPosition(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"a2-a1Q");
-    //        move = OmegaMove.convertFromGameMove(gameMove);
-    //        convertedMove = OmegaMove.convertToGameMove(move);
+    //        move = Move.convertFromGameMove(gameMove);
+    //        convertedMove = Move.convertToGameMove(move);
     //        assert(gameMove.equals(convertedMove));
     //        omegaBoard.makeMove(move);
     //
@@ -348,10 +349,10 @@ public class TestOmegaBoardPosition {
     //
     //        // promotion capture
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new OmegaBoardPosition(gameBoard);
+    //        omegaBoard = new BoardPosition(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"a2-b1R");
-    //        move = OmegaMove.convertFromGameMove(gameMove);
-    //        convertedMove = OmegaMove.convertToGameMove(move);
+    //        move = Move.convertFromGameMove(gameMove);
+    //        convertedMove = Move.convertToGameMove(move);
     //        assert(gameMove.equals(convertedMove));
     //        omegaBoard.makeMove(move);
     //
@@ -364,10 +365,10 @@ public class TestOmegaBoardPosition {
     //
     //        // en passant
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new OmegaBoardPosition(gameBoard);
+    //        omegaBoard = new BoardPosition(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"f4-e3");
-    //        move = OmegaMove.convertFromGameMove(gameMove);
-    //        convertedMove = OmegaMove.convertToGameMove(move);
+    //        move = Move.convertFromGameMove(gameMove);
+    //        convertedMove = Move.convertToGameMove(move);
     //        assert(gameMove.equals(convertedMove));
     //        omegaBoard.makeMove(move);
     //
@@ -381,11 +382,11 @@ public class TestOmegaBoardPosition {
     //        // multiple moves
     //        // normal
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new OmegaBoardPosition(gameBoard);
+    //        omegaBoard = new BoardPosition(gameBoard);
     //        // en passant
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"f4-e3");
-    //        move = OmegaMove.convertFromGameMove(gameMove);
-    //        convertedMove = OmegaMove.convertToGameMove(move);
+    //        move = Move.convertFromGameMove(gameMove);
+    //        convertedMove = Move.convertToGameMove(move);
     //        assert(gameMove.equals(convertedMove));
     //        omegaBoard.makeMove(move);
     //        gameBoard.makeMove(convertedMove);
@@ -395,8 +396,8 @@ public class TestOmegaBoardPosition {
     // kq - 0 114"));
     //        // pawn capture
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"f2-e3");
-    //        move = OmegaMove.convertFromGameMove(gameMove);
-    //        convertedMove = OmegaMove.convertToGameMove(move);
+    //        move = Move.convertFromGameMove(gameMove);
+    //        convertedMove = Move.convertToGameMove(move);
     //        assert(gameMove.equals(convertedMove));
     //        omegaBoard.makeMove(move);
     //        gameBoard.makeMove(convertedMove);
@@ -406,8 +407,8 @@ public class TestOmegaBoardPosition {
     // kq - 0 114"));
     //        // castling
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"e8-g8");
-    //        move = OmegaMove.convertFromGameMove(gameMove);
-    //        convertedMove = OmegaMove.convertToGameMove(move);
+    //        move = Move.convertFromGameMove(gameMove);
+    //        convertedMove = Move.convertToGameMove(move);
     //        assert(gameMove.equals(convertedMove));
     //        omegaBoard.makeMove(move);
     //        gameBoard.makeMove(convertedMove);
@@ -417,8 +418,8 @@ public class TestOmegaBoardPosition {
     // - 1 115"));
     //        // pawn double
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"h2-h4");
-    //        move = OmegaMove.convertFromGameMove(gameMove);
-    //        convertedMove = OmegaMove.convertToGameMove(move);
+    //        move = Move.convertFromGameMove(gameMove);
+    //        convertedMove = Move.convertToGameMove(move);
     //        assert(gameMove.equals(convertedMove));
     //        omegaBoard.makeMove(move);
     //        gameBoard.makeMove(convertedMove);
@@ -428,8 +429,8 @@ public class TestOmegaBoardPosition {
     // - h3 0 115"));
     //        // pawn promotion
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"a2-b1R");
-    //        move = OmegaMove.convertFromGameMove(gameMove);
-    //        convertedMove = OmegaMove.convertToGameMove(move);
+    //        move = Move.convertFromGameMove(gameMove);
+    //        convertedMove = Move.convertToGameMove(move);
     //        assert(gameMove.equals(convertedMove));
     //        omegaBoard.makeMove(move);
     //        gameBoard.makeMove(convertedMove);
@@ -464,19 +465,19 @@ public class TestOmegaBoardPosition {
   @Test
   public void testTimings() {
 
-    OmegaPiece[] _x88Board = new OmegaPiece[129];
+    Piece[] _x88Board = new Piece[129];
 
     // fill array
     System.out.println("x88Board fill with value 1. Arrays.fill 2. for loop");
     Instant start = Instant.now();
-    for (int i = 0; i < ITERATIONS; i++) Arrays.fill(_x88Board, OmegaPiece.NOPIECE);
+    for (int i = 0; i < ITERATIONS; i++) Arrays.fill(_x88Board, Piece.NOPIECE);
     Instant end = Instant.now();
     System.out.println(Duration.between(start, end));
     start = Instant.now();
     // clear board
     for (int i = 0; i < ITERATIONS; i++) {
-      for (OmegaSquare s : OmegaSquare.getValueList()) {
-        _x88Board[s.ordinal()] = OmegaPiece.NOPIECE;
+      for (Square s : Square.getValueList()) {
+        _x88Board[s.ordinal()] = Piece.NOPIECE;
       }
     }
     end = Instant.now();
@@ -484,8 +485,8 @@ public class TestOmegaBoardPosition {
 
     // copy array
     System.out.println("Copy x88Board - 1. System.arraycopy 2. Arrays.copyof");
-    _x88Board = new OmegaPiece[128];
-    OmegaPiece[] _x88Board2 = new OmegaPiece[128];
+    _x88Board = new Piece[128];
+    Piece[] _x88Board2 = new Piece[128];
     start = Instant.now();
     // clear board
     for (int i = 0; i < ITERATIONS; i++)
@@ -498,35 +499,34 @@ public class TestOmegaBoardPosition {
     end = Instant.now();
     System.out.println(Duration.between(start, end));
 
-    System.out.println("OmegaBoardPosition creation and Copy Contructor of OmegaBoardPosition");
+    System.out.println("BoardPosition creation and Copy Contructor of BoardPosition");
     String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq e4 0 2";
-    OmegaBoardPosition obp = null;
+    BoardPosition obp = null;
     start = Instant.now();
-    for (int i = 0; i < ITERATIONS; i++) obp = new OmegaBoardPosition(fen);
+    for (int i = 0; i < ITERATIONS; i++) obp = new BoardPosition(fen);
     end = Instant.now();
     System.out.println(Duration.between(start, end));
-    @SuppressWarnings("unused")
-    OmegaBoardPosition obp_copy = null;
+    @SuppressWarnings("unused") BoardPosition obp_copy = null;
     start = Instant.now();
-    for (int i = 0; i < ITERATIONS; i++) obp_copy = new OmegaBoardPosition(obp);
+    for (int i = 0; i < ITERATIONS; i++) obp_copy = new BoardPosition(obp);
     end = Instant.now();
     System.out.println(Duration.between(start, end));
 
-    //        System.out.println("GameBoard creation and Copy Contructor of OmegaBoardPosition");
+    //        System.out.println("GameBoard creation and Copy Contructor of BoardPosition");
     //        GameBoard gb = null;;
     //        start = Instant.now();
     //        for (int i=0;i<ITERATIONS;i++) gb = new GameBoardImpl(fen);
     //        end = Instant.now();
     //        System.out.println(Duration.between(start, end));
     //        start = Instant.now();
-    //        for (int i=0;i<ITERATIONS;i++) obp_copy = new OmegaBoardPosition(gb);
+    //        for (int i=0;i<ITERATIONS;i++) obp_copy = new BoardPosition(gb);
     //        System.out.println(Duration.between(start, end));
   }
 
   @Test
   public void testFromNotation() {
-    OmegaSquare os = OmegaSquare.fromUCINotation("e2");
-    assertEquals(OmegaSquare.e2, os);
+    Square os = Square.fromUCINotation("e2");
+    assertEquals(Square.e2, os);
   }
 
   @Test
@@ -557,7 +557,7 @@ public class TestOmegaBoardPosition {
     black, ep on e4, O-O & O-O-O for black
     */
 
-    OmegaBoardPosition obp = new OmegaBoardPosition(fen);
+    BoardPosition obp = new BoardPosition(fen);
     System.out.println(fen);
     System.out.println(obp.toFENString());
     assertEquals(fen, obp.toFENString());
@@ -566,14 +566,14 @@ public class TestOmegaBoardPosition {
     assertThrows(IllegalArgumentException.class,()->{
         //do whatever you want to do here
         String fen2 = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq k9 0 113";
-        OmegaBoardPosition obp2 = new OmegaBoardPosition(fen2);
+        BoardPosition obp2 = new BoardPosition(fen2);
     });
 
 
-    //        OmegaBoardPosition omegaBoard = new OmegaBoardPosition(fen);
+    //        BoardPosition omegaBoard = new BoardPosition(fen);
     //        GameBoard gameBoard = new GameBoardImpl(fen);
-    //        OmegaBoardPosition omegaBoard2 = new OmegaBoardPosition(gameBoard);
-    // OmegaBoardPosition omegaBoard3 = new OmegaBoardPosition(fen);
+    //        BoardPosition omegaBoard2 = new BoardPosition(gameBoard);
+    // BoardPosition omegaBoard3 = new BoardPosition(fen);
     // assertTrue(omegaBoard.equals(omegaBoard3));
 
     //        System.out.println(omegaBoard.toFENString());
@@ -587,8 +587,8 @@ public class TestOmegaBoardPosition {
   @Test
   public void testCopyContructor() {
     String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq e3 0 2";
-    OmegaBoardPosition obp = new OmegaBoardPosition(fen);
-    OmegaBoardPosition obp_copy = new OmegaBoardPosition(obp);
+    BoardPosition obp = new BoardPosition(fen);
+    BoardPosition obp_copy = new BoardPosition(obp);
     assertEquals(obp, obp_copy);
     assertEquals(obp.toFENString(), obp_copy.toFENString());
   }
@@ -598,7 +598,7 @@ public class TestOmegaBoardPosition {
   //    public void testContructorFromGameBoard() {
   //        String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq e3 0 2";
   //        GameBoard gb = new GameBoardImpl(fen);
-  //        OmegaBoardPosition obp_copy = new OmegaBoardPosition(gb);
+  //        BoardPosition obp_copy = new BoardPosition(gb);
   //        assertTrue(gb.toFENString().equals(obp_copy.toFENString()));
   //    }
 
@@ -610,9 +610,9 @@ public class TestOmegaBoardPosition {
     long initialZobrist = 0;
     long zobrist = 0;
 
-    OmegaBoardPosition omegaBoard = new OmegaBoardPosition(testFen);
+    BoardPosition omegaBoard = new BoardPosition(testFen);
     //        GameBoard gameBoard = new GameBoardImpl(testFen);
-    //        OmegaBoardPosition omegaBoard2 = new OmegaBoardPosition(gameBoard);
+    //        BoardPosition omegaBoard2 = new BoardPosition(gameBoard);
 
     //        System.out.println("Test if board are equal.");
     //        System.out.println(omegaBoard.toFENString());
@@ -625,13 +625,13 @@ public class TestOmegaBoardPosition {
     //        assertEquals(omegaBoard.getZobristKey(), omegaBoard2.getZobristKey());
 
     int testMove =
-        OmegaMove.createMove(
-            OmegaMoveType.NORMAL,
-            OmegaSquare.b7,
-            OmegaSquare.b6,
-            OmegaPiece.BLACK_PAWN,
-            OmegaPiece.NOPIECE,
-            OmegaPiece.NOPIECE);
+        Move.createMove(
+          MoveType.NORMAL,
+          Square.b7,
+          Square.b6,
+          Piece.BLACK_PAWN,
+          Piece.NOPIECE,
+          Piece.NOPIECE);
 
     System.out.println("Test if zobrist after move/undo are equal.");
     initialZobrist = omegaBoard.getZobristKey();
@@ -648,7 +648,7 @@ public class TestOmegaBoardPosition {
     // as a newly created one
     String fenAfterMove = "r3k2r/2pn3p/1pq1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq - 0 114";
     omegaBoard.makeMove(testMove);
-    OmegaBoardPosition omegaBoard2 = new OmegaBoardPosition(fenAfterMove);
+    BoardPosition omegaBoard2 = new BoardPosition(fenAfterMove);
     System.out.println(omegaBoard.getZobristKey() + " " + omegaBoard.toFENString());
     System.out.println(omegaBoard2.getZobristKey() + " " + omegaBoard2.toFENString());
     assertEquals(omegaBoard.toFENString(), omegaBoard2.toFENString());
@@ -659,48 +659,49 @@ public class TestOmegaBoardPosition {
   @Test
   public void testIsAttacked() {
     String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
-    OmegaBoardPosition omegaBoard = new OmegaBoardPosition(testFen);
+    BoardPosition omegaBoard = new BoardPosition(testFen);
 
     System.out.println(omegaBoard);
 
     // pawns
-    assertTrue(omegaBoard.isAttacked(OmegaColor.WHITE, OmegaSquare.g3));
-    assertTrue(omegaBoard.isAttacked(OmegaColor.WHITE, OmegaSquare.e3));
-    assertTrue(omegaBoard.isAttacked(OmegaColor.BLACK, OmegaSquare.b1));
-    assertTrue(omegaBoard.isAttacked(OmegaColor.BLACK, OmegaSquare.e4));
-    assertTrue(omegaBoard.isAttacked(OmegaColor.BLACK, OmegaSquare.e3));
+    assertTrue(omegaBoard.isAttacked(Color.WHITE, Square.g3));
+    assertTrue(omegaBoard.isAttacked(Color.WHITE, Square.e3));
+    assertTrue(omegaBoard.isAttacked(Color.BLACK, Square.b1));
+    assertTrue(omegaBoard.isAttacked(Color.BLACK, Square.e4));
+    assertTrue(omegaBoard.isAttacked(Color.BLACK, Square.e3));
 
     // sliding
-    assertTrue(omegaBoard.isAttacked(OmegaColor.WHITE, OmegaSquare.g6));
-    assertTrue(omegaBoard.isAttacked(OmegaColor.BLACK, OmegaSquare.a5));
+    assertTrue(omegaBoard.isAttacked(Color.WHITE, Square.g6));
+    assertTrue(omegaBoard.isAttacked(Color.BLACK, Square.a5));
 
     // king
     testFen = "rnbqkbnr/1ppppppp/8/p7/Q1P5/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
-    omegaBoard = new OmegaBoardPosition(testFen);
+    omegaBoard = new BoardPosition(testFen);
     System.out.println(omegaBoard);
-    assertFalse(omegaBoard.isAttacked(OmegaColor.WHITE, OmegaSquare.e8));
+    assertFalse(omegaBoard.isAttacked(Color.WHITE, Square.e8));
   }
 
   /** Tests the timing */
   @Test
+  @Disabled
   public void testIsAttackedTiming() {
 
     int ITERATIONS = 0;
     int DURATION = 2;
 
-    OmegaBoardPosition board = null;
+    BoardPosition board = null;
 
     int i = 0;
     String[] fens = getFENs();
     while (fens[i] != null) {
       String testFen = fens[i];
-      board = new OmegaBoardPosition(testFen);
+      board = new BoardPosition(testFen);
 
       boolean test = false;
       Instant start = Instant.now();
       while (true) {
         ITERATIONS++;
-        test = board.isAttacked(OmegaColor.WHITE, OmegaSquare.d4);
+        test = board.isAttacked(Color.WHITE, Square.d4);
         if (Duration.between(start, Instant.now()).getSeconds() == DURATION) {
           break;
         }

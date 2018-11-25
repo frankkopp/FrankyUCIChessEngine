@@ -28,9 +28,9 @@ package fko.javaUCIEngineFramework.Franky;
 /**
  * Enumeration of all piece types in chess
  */
-public enum OmegaPieceType {
+public enum PieceType {
 
-    // order has influence on OmegaPiece
+    // order has influence on Piece
     NOTYPE ("-", false, 0),    // 0
     PAWN   ("P", false, 100),  // 1
     KNIGHT ("N", false, 320),  // 2
@@ -39,7 +39,7 @@ public enum OmegaPieceType {
     QUEEN  ("Q", true,  900),  // 5
     KING   ("K", false, 20000);// 6
 
-    static final OmegaPieceType[] values = {
+    static final PieceType[] values = {
             NOTYPE,
             PAWN  ,
             KNIGHT,
@@ -53,7 +53,7 @@ public enum OmegaPieceType {
     private final int _value;
     private boolean _sliding;
 
-    OmegaPieceType(String shortName, boolean sliding, int value) {
+    PieceType(String shortName, boolean sliding, int value) {
         _shortName = shortName;
         _sliding = sliding;
         _value = value;

@@ -28,33 +28,33 @@ package fko.javaUCIEngineFramework.Franky;
 /**
  * Enumeration of all chess pieces with pieces types and color.
  */
-public enum OmegaPiece {
+public enum Piece {
 
-    NOPIECE      (OmegaPieceType.NOTYPE, OmegaColor.NOCOLOR, ""),// 0
-    WHITE_PAWN   (OmegaPieceType.PAWN,   OmegaColor.WHITE, "P"), // 1
-    WHITE_KNIGHT (OmegaPieceType.KNIGHT, OmegaColor.WHITE, "N"), // 2
-    WHITE_BISHOP (OmegaPieceType.BISHOP, OmegaColor.WHITE, "B"), // 3
-    WHITE_ROOK   (OmegaPieceType.ROOK,   OmegaColor.WHITE, "R"), // 4
-    WHITE_QUEEN  (OmegaPieceType.QUEEN,  OmegaColor.WHITE, "Q"), // 5
-    WHITE_KING   (OmegaPieceType.KING,   OmegaColor.WHITE, "K"), // 6
-    BLACK_PAWN   (OmegaPieceType.PAWN,   OmegaColor.BLACK, "p"), // 7
-    BLACK_KNIGHT (OmegaPieceType.KNIGHT, OmegaColor.BLACK, "n"), // 8
-    BLACK_BISHOP (OmegaPieceType.BISHOP, OmegaColor.BLACK, "b"), // 9
-    BLACK_ROOK   (OmegaPieceType.ROOK,   OmegaColor.BLACK, "r"), // 10
-    BLACK_QUEEN  (OmegaPieceType.QUEEN,  OmegaColor.BLACK, "q"), // 11
-    BLACK_KING   (OmegaPieceType.KING,   OmegaColor.BLACK, "k"); // 12
+    NOPIECE      (PieceType.NOTYPE, Color.NOCOLOR, ""),// 0
+    WHITE_PAWN   (PieceType.PAWN, Color.WHITE, "P"), // 1
+    WHITE_KNIGHT (PieceType.KNIGHT, Color.WHITE, "N"), // 2
+    WHITE_BISHOP (PieceType.BISHOP, Color.WHITE, "B"), // 3
+    WHITE_ROOK   (PieceType.ROOK, Color.WHITE, "R"), // 4
+    WHITE_QUEEN  (PieceType.QUEEN, Color.WHITE, "Q"), // 5
+    WHITE_KING   (PieceType.KING, Color.WHITE, "K"), // 6
+    BLACK_PAWN   (PieceType.PAWN, Color.BLACK, "p"), // 7
+    BLACK_KNIGHT (PieceType.KNIGHT, Color.BLACK, "n"), // 8
+    BLACK_BISHOP (PieceType.BISHOP, Color.BLACK, "b"), // 9
+    BLACK_ROOK   (PieceType.ROOK, Color.BLACK, "r"), // 10
+    BLACK_QUEEN  (PieceType.QUEEN, Color.BLACK, "q"), // 11
+    BLACK_KING   (PieceType.KING, Color.BLACK, "k"); // 12
 
-    static final OmegaPiece[] values;
+    static final Piece[] values;
 
-    private final OmegaPieceType _type;
-    private final OmegaColor _color;
-    private final String _shortName;
+    private final PieceType _type;
+    private final Color     _color;
+    private final String    _shortName;
 
     static {
-        values = OmegaPiece.values();
+        values = Piece.values();
     }
 
-    OmegaPiece(OmegaPieceType type, OmegaColor color, String shortName) {
+    Piece(PieceType type, Color color, String shortName) {
         _type = type;
         _color = color;
         _shortName = shortName;
@@ -63,14 +63,14 @@ public enum OmegaPiece {
     /**
      * @return the type
      */
-    public OmegaPieceType getType() {
+    public PieceType getType() {
         return _type;
     }
 
     /**
      * @return the color
      */
-    public OmegaColor getColor() {
+    public Color getColor() {
         return _color;
     }
 
@@ -90,16 +90,16 @@ public enum OmegaPiece {
      * Returns the Omega piece for this type and color.
      * @param type
      * @param color
-     * @return matching OmegaPiece
+     * @return matching Piece
      */
-    public static OmegaPiece getPiece(OmegaPieceType type, OmegaColor color) {
+    public static Piece getPiece(PieceType type, Color color) {
         // this only works if the ordinal of all enums stay the same - if they change this
         // has to be changed as well
-        return OmegaPiece.values[ (color.ordinal()*6) + type.ordinal() ];
+        return Piece.values[(color.ordinal() * 6) + type.ordinal() ];
     }
 
     /**
-     * Convert this OmegaPiece to the matching GamePiece
+     * Convert this Piece to the matching GamePiece
      */
 //    public GamePiece convertToGamePiece() {
 //        switch (this) {
@@ -121,19 +121,19 @@ public enum OmegaPiece {
 //    }
 
     /**
-     * Convert e GamePiece to an OmegaPiece
-     * @return matching OmegaPiece
+     * Convert e GamePiece to an Piece
+     * @return matching Piece
      */
-//    public static OmegaPiece convertFromGamePiece(GamePiece gp) {
-//        if (gp == null) return OmegaPiece.NOPIECE;
+//    public static Piece convertFromGamePiece(GamePiece gp) {
+//        if (gp == null) return Piece.NOPIECE;
 //        assert (gp.isWhite() || gp.isBlack());
 //        switch (gp.getType()) {
-//            case KING:   return gp.isWhite() ? OmegaPiece.WHITE_KING : OmegaPiece.BLACK_KING;
-//            case QUEEN:  return gp.isWhite() ? OmegaPiece.WHITE_QUEEN : OmegaPiece.BLACK_QUEEN;
-//            case ROOK:   return gp.isWhite() ? OmegaPiece.WHITE_ROOK : OmegaPiece.BLACK_ROOK;
-//            case BISHOP: return gp.isWhite() ? OmegaPiece.WHITE_BISHOP : OmegaPiece.BLACK_BISHOP;
-//            case KNIGHT: return gp.isWhite() ? OmegaPiece.WHITE_KNIGHT : OmegaPiece.BLACK_KNIGHT;
-//            case PAWN:   return gp.isWhite() ? OmegaPiece.WHITE_PAWN : OmegaPiece.BLACK_PAWN;
+//            case KING:   return gp.isWhite() ? Piece.WHITE_KING : Piece.BLACK_KING;
+//            case QUEEN:  return gp.isWhite() ? Piece.WHITE_QUEEN : Piece.BLACK_QUEEN;
+//            case ROOK:   return gp.isWhite() ? Piece.WHITE_ROOK : Piece.BLACK_ROOK;
+//            case BISHOP: return gp.isWhite() ? Piece.WHITE_BISHOP : Piece.BLACK_BISHOP;
+//            case KNIGHT: return gp.isWhite() ? Piece.WHITE_KNIGHT : Piece.BLACK_KNIGHT;
+//            case PAWN:   return gp.isWhite() ? Piece.WHITE_PAWN : Piece.BLACK_PAWN;
 //            default:
 //                throw new RuntimeException("Invalid GamePieceType: "+gp);
 //        }

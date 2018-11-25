@@ -28,16 +28,16 @@ package fko.javaUCIEngineFramework.Franky;
 /**
  * A simple and fast list for OmegaSquares for use as piece lists.<br>
  */
-public class OmegaSquareList {
+public class SquareList {
 
     private static final int MAX_SIZE = 65;
 
-    private final OmegaSquare[] elements = new OmegaSquare[MAX_SIZE];
+    private final Square[] elements = new Square[MAX_SIZE];
     /**
      * @param i
      * @return the element at index i
      */
-    public OmegaSquare get(int i) {
+    public Square get(int i) {
         if (i>=size) throw new ArrayIndexOutOfBoundsException();
         return this.elements[i];
     }
@@ -54,9 +54,9 @@ public class OmegaSquareList {
      * Adds the given square to the beginning of the list
      * @param square
      */
-    public void add(OmegaSquare square) {
+    public void add(Square square) {
         if (size >= MAX_SIZE-1)
-            throw new ArrayStoreException("OmegaSquareList is full");
+            throw new ArrayStoreException("SquareList is full");
 
         /*
          * we need to keep the order stable because when
@@ -88,14 +88,14 @@ public class OmegaSquareList {
      * Does nothing if element is not in the list.
      * @param square
      */
-    public void remove(OmegaSquare square) {
+    public void remove(Square square) {
 
         /*
          * Go over the array from left to right until you found the element.
          * copy the next element to the elements place (overwriting it).
          * Done.
          */
-        OmegaSquare toBeRemoved = square;
+        Square toBeRemoved = square;
         for (int i=0; i<size; i++) {
             if (toBeRemoved == elements[i]) { // hit
                 elements[i] = elements[i+1]; // overwrite the element with the one from the right
@@ -128,8 +128,8 @@ public class OmegaSquareList {
      * Returns a deep copy of the list
      */
     @Override
-    public OmegaSquareList clone() {
-        OmegaSquareList clone = new OmegaSquareList();
+    public SquareList clone() {
+        SquareList clone = new SquareList();
         System.arraycopy(this.elements, 0, clone.elements, 0, elements.length);
         clone.size = this.size;
         return clone;

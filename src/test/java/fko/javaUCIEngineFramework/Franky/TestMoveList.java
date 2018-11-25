@@ -34,24 +34,24 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Frank
  *
  */
-public class TestOmegaMoveList {
+public class TestMoveList {
 
     @Test
     public void testListWithInts() {
-        OmegaMoveList list = new OmegaMoveList();
+        MoveList list = new MoveList();
 
         // empty list
         testEmptyList(list);
 
         // add one entry
-        int move1 = OmegaMove.createMove(
-                OmegaMoveType.NORMAL,
-                OmegaSquare.b1,
-                OmegaSquare.c3,
-                OmegaPiece.WHITE_KNIGHT,
-                OmegaPiece.NOPIECE,
-                OmegaPiece.NOPIECE
-                );
+        int move1 = Move.createMove(
+          MoveType.NORMAL,
+          Square.b1,
+          Square.c3,
+          Piece.WHITE_KNIGHT,
+          Piece.NOPIECE,
+          Piece.NOPIECE
+                                   );
 
         int value = move1;
 
@@ -73,75 +73,75 @@ public class TestOmegaMoveList {
 
         // add 10 entries
         for (int i=100; i<110; i++) {
-            int move = OmegaMove.createMove(
-                    OmegaMoveType.NORMAL,
-                    OmegaSquare.getValueList().get(i-100),
-                    OmegaSquare.getValueList().get(i-100),
-                    OmegaPiece.WHITE_PAWN,
-                    OmegaPiece.NOPIECE,
-                    OmegaPiece.NOPIECE
-                    );
+            int move = Move.createMove(
+              MoveType.NORMAL,
+              Square.getValueList().get(i - 100),
+              Square.getValueList().get(i - 100),
+              Piece.WHITE_PAWN,
+              Piece.NOPIECE,
+              Piece.NOPIECE
+                                      );
             list.add(move);
             assertEquals(list.size(), i - 100 + 1);
             assertFalse(list.empty());
         }
 
         // get one entry
-        assertEquals(list.get(4), OmegaMove.createMove(
-                OmegaMoveType.NORMAL,
-                OmegaSquare.values[4],
-                OmegaSquare.values[4],
-                OmegaPiece.WHITE_PAWN,
-                OmegaPiece.NOPIECE,
-                OmegaPiece.NOPIECE
-        ));
+        assertEquals(list.get(4), Move.createMove(
+          MoveType.NORMAL,
+          Square.values[4],
+          Square.values[4],
+          Piece.WHITE_PAWN,
+          Piece.NOPIECE,
+          Piece.NOPIECE
+                                                 ));
 
         // remove one entry
         element = list.removeLast();
-        assertEquals(element, OmegaMove.createMove(
-                OmegaMoveType.NORMAL,
-                OmegaSquare.b2,
-                OmegaSquare.b2,
-                OmegaPiece.WHITE_PAWN,
-                OmegaPiece.NOPIECE,
-                OmegaPiece.NOPIECE
-        ));
-        assertEquals(list.getLast(), OmegaMove.createMove(
-                OmegaMoveType.NORMAL,
-                OmegaSquare.a2,
-                OmegaSquare.a2,
-                OmegaPiece.WHITE_PAWN,
-                OmegaPiece.NOPIECE,
-                OmegaPiece.NOPIECE
-        ));
+        assertEquals(element, Move.createMove(
+          MoveType.NORMAL,
+          Square.b2,
+          Square.b2,
+          Piece.WHITE_PAWN,
+          Piece.NOPIECE,
+          Piece.NOPIECE
+                                             ));
+        assertEquals(list.getLast(), Move.createMove(
+          MoveType.NORMAL,
+          Square.a2,
+          Square.a2,
+          Piece.WHITE_PAWN,
+          Piece.NOPIECE,
+          Piece.NOPIECE
+                                                    ));
         element = list.removeFirst();
-        assertEquals(element, OmegaMove.createMove(
-                OmegaMoveType.NORMAL,
-                OmegaSquare.a1,
-                OmegaSquare.a1,
-                OmegaPiece.WHITE_PAWN,
-                OmegaPiece.NOPIECE,
-                OmegaPiece.NOPIECE
-        ));
-        assertEquals(list.getFirst(), OmegaMove.createMove(
-                OmegaMoveType.NORMAL,
-                OmegaSquare.b1,
-                OmegaSquare.b1,
-                OmegaPiece.WHITE_PAWN,
-                OmegaPiece.NOPIECE,
-                OmegaPiece.NOPIECE
-        ));
+        assertEquals(element, Move.createMove(
+          MoveType.NORMAL,
+          Square.a1,
+          Square.a1,
+          Piece.WHITE_PAWN,
+          Piece.NOPIECE,
+          Piece.NOPIECE
+                                             ));
+        assertEquals(list.getFirst(), Move.createMove(
+          MoveType.NORMAL,
+          Square.b1,
+          Square.b1,
+          Piece.WHITE_PAWN,
+          Piece.NOPIECE,
+          Piece.NOPIECE
+                                                     ));
         assertEquals(8, list.size());
 
         // get one entry
-        assertEquals(list.get(4), OmegaMove.createMove(
-                OmegaMoveType.NORMAL,
-                OmegaSquare.f1,
-                OmegaSquare.f1,
-                OmegaPiece.WHITE_PAWN,
-                OmegaPiece.NOPIECE,
-                OmegaPiece.NOPIECE
-        ));
+        assertEquals(list.get(4), Move.createMove(
+          MoveType.NORMAL,
+          Square.f1,
+          Square.f1,
+          Piece.WHITE_PAWN,
+          Piece.NOPIECE,
+          Piece.NOPIECE
+                                                 ));
 
         // get entry higher than size
         try {
@@ -164,7 +164,7 @@ public class TestOmegaMoveList {
     /**
      * @param list
      */
-    private static void testEmptyList(OmegaMoveList list) {
+    private static void testEmptyList(MoveList list) {
         // list is empty
         assertEquals(0, list.size());
         assertTrue(list.empty());

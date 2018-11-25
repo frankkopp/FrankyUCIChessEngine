@@ -28,13 +28,13 @@ package fko.javaUCIEngineFramework.Franky;
 import java.util.ArrayList;
 
 /**
- * List of OmegaMove with additional information such as value.<br>
+ * List of Move with additional information such as value.<br>
  * Moves and Value are encapsulated in a class Entry.<br>
  * <br>
  * List with NOMOVE entries created when this class is instantiated.
  * This saves time during usage of this list.
  */
-public class OmegaRootMoveList extends ArrayList<OmegaRootMoveEntry> {
+public class RootMoveList extends ArrayList<RootMoveEntry> {
 
   private static final long serialVersionUID = -8905465753105752609L;
 
@@ -43,7 +43,7 @@ public class OmegaRootMoveList extends ArrayList<OmegaRootMoveEntry> {
    * @param value
    */
   public void add(int move, int value) {
-    final OmegaRootMoveEntry e = new OmegaRootMoveEntry(move, value);
+    final RootMoveEntry e = new RootMoveEntry(move, value);
     this.add(e);
   }
 
@@ -53,7 +53,7 @@ public class OmegaRootMoveList extends ArrayList<OmegaRootMoveEntry> {
    * @param value
    */
   public void set(int i, int move, int value) {
-    final OmegaRootMoveEntry e = new OmegaRootMoveEntry(move, value);
+    final RootMoveEntry e = new RootMoveEntry(move, value);
     this.set(i, e);
   }
 
@@ -88,7 +88,7 @@ public class OmegaRootMoveList extends ArrayList<OmegaRootMoveEntry> {
   public String toString() {
     StringBuilder s = new StringBuilder();
     this.stream().forEach((i) -> {
-      s.append(OmegaMove.toSimpleString(i.move));
+      s.append(Move.toSimpleString(i.move));
       s.append(" (");
       s.append(i.value);
       s.append(") ");
@@ -102,8 +102,8 @@ public class OmegaRootMoveList extends ArrayList<OmegaRootMoveEntry> {
    * @param move
    */
   public void pushToHead(int move) {
-    OmegaRootMoveEntry element = null;
-    for (OmegaRootMoveEntry e : this) {
+    RootMoveEntry element = null;
+    for (RootMoveEntry e : this) {
       if (e.move == move) {
         element = e;
         break;

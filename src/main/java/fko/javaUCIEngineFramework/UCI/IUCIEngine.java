@@ -25,7 +25,7 @@
 
 package fko.javaUCIEngineFramework.UCI;
 
-import fko.javaUCIEngineFramework.Franky.OmegaBoardPosition;
+import fko.javaUCIEngineFramework.Franky.BoardPosition;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ public interface IUCIEngine {
 
   void registerProtocolHandler(UCIProtocolHandler uciProtocolHandler);
 
-  OmegaBoardPosition getBoardPosition();
+  BoardPosition getBoardPosition();
 
   String getIDName();
 

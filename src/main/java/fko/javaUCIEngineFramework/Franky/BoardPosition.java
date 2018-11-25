@@ -33,7 +33,7 @@ import java.util.Random;
  * It uses a x88 board, a stack for undo moves, zobrist keys for transposition tables, piece lists,
  * material counter.<br>
  * Can be created with any FEN notation and also from GameBoards or as a copy from another
- * OmegaBoardPosition.
+ * BoardPosition.
  *
  * <p>x88 method
  *
@@ -52,7 +52,7 @@ import java.util.Random;
  *
  * <p>https://www.chessprogramming.org/0x88
  */
-public class OmegaBoardPosition {
+public class BoardPosition {
 
   /* Size of 0x88 board */
   private static final int BOARDSIZE = 128;
@@ -82,10 +82,10 @@ public class OmegaBoardPosition {
   // unique chess position
   //
   // 0x88 Board
-  OmegaPiece[] _x88Board = new OmegaPiece[BOARDSIZE];
+  Piece[] _x88Board = new Piece[BOARDSIZE];
   // hash for pieces - piece, board
   static final long[][] _piece_Zobrist =
-      new long[OmegaPiece.values.length][OmegaSquare.values.length];
+      new long[Piece.values.length][Square.values.length];
 
   // Castling rights
   boolean _castlingWK = true;
@@ -102,10 +102,10 @@ public class OmegaBoardPosition {
   static final long _castlingBQ_Zobrist;
 
   // en passant field - if NOSQUARE then we do not have an en passant option
-  OmegaSquare _enPassantSquare = OmegaSquare.NOSQUARE;
-  OmegaSquare[] _enPassantSquare_History = new OmegaSquare[MAX_HISTORY];
+  Square   _enPassantSquare         = Square.NOSQUARE;
+  Square[] _enPassantSquare_History = new Square[MAX_HISTORY];
   // hash for castling rights
-  static final long[] _enPassantSquare_Zobrist = new long[OmegaSquare.values.length];
+  static final long[] _enPassantSquare_Zobrist = new long[Square.values.length];
 
   // half move clock - number of half moves since last capture
   int _halfMoveClock = 0;
@@ -113,7 +113,7 @@ public class OmegaBoardPosition {
   // has no zobrist key
 
   // next player color
-  OmegaColor _nextPlayer = OmegaColor.WHITE;
+  Color _nextPlayer = Color.WHITE;
   // hash for next player
   static final long _nextPlayer_Zobrist;
   //
@@ -131,13 +131,13 @@ public class OmegaBoardPosition {
   int _nextHalfMoveNumber = 1;
 
   /** Lists for all pieces */
-  final OmegaSquareList[] _pawnSquares = new OmegaSquareList[OmegaColor.values.length];
+  final SquareList[] _pawnSquares = new SquareList[Color.values.length];
 
-  final OmegaSquareList[] _knightSquares = new OmegaSquareList[OmegaColor.values.length];
-  final OmegaSquareList[] _bishopSquares = new OmegaSquareList[OmegaColor.values.length];
-  final OmegaSquareList[] _rookSquares = new OmegaSquareList[OmegaColor.values.length];
-  final OmegaSquareList[] _queenSquares = new OmegaSquareList[OmegaColor.values.length];
-  final OmegaSquare[] _kingSquares = new OmegaSquare[OmegaColor.values.length];
+  final SquareList[] _knightSquares = new SquareList[Color.values.length];
+  final SquareList[] _bishopSquares = new SquareList[Color.values.length];
+  final SquareList[] _rookSquares   = new SquareList[Color.values.length];
+  final SquareList[] _queenSquares  = new SquareList[Color.values.length];
+  final Square[]     _kingSquares   = new Square[Color.values.length];
 
   // Material value will always be up to date
   int[] _material;
@@ -149,7 +149,7 @@ public class OmegaBoardPosition {
   private Flag _hasMate = Flag.TBD;
   Flag[] _hasMateFlag_History = new Flag[MAX_HISTORY];
 
-  private final OmegaMoveGenerator _mateCheckMG = new OmegaMoveGenerator();
+  private final MoveGenerator _mateCheckMG = new MoveGenerator();
 
   private enum Flag {
     TBD,
@@ -161,8 +161,8 @@ public class OmegaBoardPosition {
   // static initialization
   static {
     // all pieces on all squares
-    for (OmegaPiece p : OmegaPiece.values) {
-      for (OmegaSquare s : OmegaSquare.values) {
+    for (Piece p : Piece.values) {
+      for (Square s : Square.values) {
         _piece_Zobrist[p.ordinal()][s.ordinal()] = Math.abs(random.nextLong());
       }
     }
@@ -174,7 +174,7 @@ public class OmegaBoardPosition {
 
     // all possible positions of the en passant square (easiest to use all fields and not just the
     // ones where en passant is indeed possible)
-    for (OmegaSquare s : OmegaSquare.values) {
+    for (Square s : Square.values) {
       _enPassantSquare_Zobrist[s.ordinal()] = Math.abs(random.nextLong());
     }
     // set or unset this for the two color options
@@ -184,7 +184,7 @@ public class OmegaBoardPosition {
   // Constructors START -----------------------------------------
 
   /** Creates a standard Chessly board and initializes it with standard chess setup. */
-  public OmegaBoardPosition() {
+  public BoardPosition() {
     this(STANDARD_BOARD_FEN);
   }
 
@@ -193,17 +193,17 @@ public class OmegaBoardPosition {
    *
    * @param fen
    */
-  public OmegaBoardPosition(String fen) {
+  public BoardPosition(String fen) {
     initializeLists();
     initBoard(fen);
   }
 
   /**
-   * Copy constructor - creates a copy of the given OmegaBoardPosition
+   * Copy constructor - creates a copy of the given BoardPosition
    *
    * @param op
    */
-  public OmegaBoardPosition(OmegaBoardPosition op) {
+  public BoardPosition(BoardPosition op) {
     if (op == null) throw new NullPointerException("Parameter op may not be null");
 
     // x88 board
@@ -265,24 +265,24 @@ public class OmegaBoardPosition {
   }
 
   /**
-   * Copy constructor from GameBoard - creates a equivalent OmegaBoardPosition from the give
+   * Copy constructor from GameBoard - creates a equivalent BoardPosition from the give
    * GameBoard
    *
    * @param oldBoard
    */
-  // public OmegaBoardPosition(GameBoard oldBoard) {
+  // public BoardPosition(GameBoard oldBoard) {
   //        this(oldBoard.toFENString());
   //    }
 
   /** Initialize the lists for the pieces and the material counter */
   private void initializeLists() {
     for (int i = 0; i <= 1; i++) { // foreach color
-      _pawnSquares[i] = new OmegaSquareList();
-      _knightSquares[i] = new OmegaSquareList();
-      _bishopSquares[i] = new OmegaSquareList();
-      _rookSquares[i] = new OmegaSquareList();
-      _queenSquares[i] = new OmegaSquareList();
-      _kingSquares[i] = OmegaSquare.NOSQUARE;
+      _pawnSquares[i] = new SquareList();
+      _knightSquares[i] = new SquareList();
+      _bishopSquares[i] = new SquareList();
+      _rookSquares[i] = new SquareList();
+      _queenSquares[i] = new SquareList();
+      _kingSquares[i] = Square.NOSQUARE;
     }
     _material = new int[2];
   }
@@ -295,16 +295,16 @@ public class OmegaBoardPosition {
    * @param move the move
    */
   public void makeMove(int move) {
-    assert (move != OmegaMove.NOMOVE);
+    assert (move != Move.NOMOVE);
 
-    OmegaSquare fromSquare = OmegaMove.getStart(move);
+    Square fromSquare = Move.getStart(move);
     assert fromSquare.isValidSquare();
-    OmegaSquare toSquare = OmegaMove.getEnd(move);
+    Square toSquare = Move.getEnd(move);
     assert toSquare.isValidSquare();
-    OmegaPiece piece = OmegaMove.getPiece(move);
-    assert piece != OmegaPiece.NOPIECE;
-    OmegaPiece target = OmegaMove.getTarget(move);
-    OmegaPiece promotion = OmegaMove.getPromotion(move);
+    Piece piece = Move.getPiece(move);
+    assert piece != Piece.NOPIECE;
+    Piece target = Move.getTarget(move);
+    Piece promotion = Move.getPromotion(move);
 
     // Save state for undoMove
     _moveHistory[_historyCounter] = move;
@@ -325,14 +325,14 @@ public class OmegaBoardPosition {
     _hasMate = Flag.TBD;
 
     // make move
-    switch (OmegaMove.getMoveType(move)) {
+    switch (Move.getMoveType(move)) {
       case NORMAL:
         invalidateCastlingRights(fromSquare, toSquare);
         makeNormalMove(fromSquare, toSquare, piece, target);
         // clear en passant
-        if (_enPassantSquare != OmegaSquare.NOSQUARE) {
+        if (_enPassantSquare != Square.NOSQUARE) {
           _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
-          _enPassantSquare = OmegaSquare.NOSQUARE;
+          _enPassantSquare = Square.NOSQUARE;
         }
         break;
       case PAWNDOUBLE:
@@ -340,7 +340,7 @@ public class OmegaBoardPosition {
         assert !piece.getColor().isNone();
         movePiece(fromSquare, toSquare, piece);
         // clear old en passant
-        if (_enPassantSquare != OmegaSquare.NOSQUARE) {
+        if (_enPassantSquare != Square.NOSQUARE) {
           _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // in
         }
         // set new en passant target field - always one "behind" the toSquare
@@ -349,38 +349,38 @@ public class OmegaBoardPosition {
         _halfMoveClock = 0; // reset half move clock because of pawn move
         break;
       case ENPASSANT:
-        assert target != OmegaPiece.NOPIECE;
-        assert target.getType() == OmegaPieceType.PAWN;
+        assert target != Piece.NOPIECE;
+        assert target.getType() == PieceType.PAWN;
         assert !target.getColor().isNone();
-        OmegaSquare targetSquare =
+        Square targetSquare =
             target.getColor().isWhite() ? toSquare.getNorth() : toSquare.getSouth();
         removePiece(targetSquare, target);
         movePiece(fromSquare, toSquare, piece);
         // clear en passant
-        if (_enPassantSquare != OmegaSquare.NOSQUARE) {
+        if (_enPassantSquare != Square.NOSQUARE) {
           _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
-          _enPassantSquare = OmegaSquare.NOSQUARE;
+          _enPassantSquare = Square.NOSQUARE;
         }
         _halfMoveClock = 0; // reset half move clock because of pawn move
         break;
       case CASTLING:
         makeCastlingMove(fromSquare, toSquare, piece);
         // clear en passant
-        if (_enPassantSquare != OmegaSquare.NOSQUARE) {
+        if (_enPassantSquare != Square.NOSQUARE) {
           _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
-          _enPassantSquare = OmegaSquare.NOSQUARE;
+          _enPassantSquare = Square.NOSQUARE;
         }
         _halfMoveClock++;
         break;
       case PROMOTION:
-        if (target != OmegaPiece.NOPIECE) removePiece(toSquare, target);
+        if (target != Piece.NOPIECE) removePiece(toSquare, target);
         invalidateCastlingRights(fromSquare, toSquare);
         removePiece(fromSquare, piece);
         putPiece(toSquare, promotion);
         // clear en passant
-        if (_enPassantSquare != OmegaSquare.NOSQUARE) {
+        if (_enPassantSquare != Square.NOSQUARE) {
           _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
-          _enPassantSquare = OmegaSquare.NOSQUARE;
+          _enPassantSquare = Square.NOSQUARE;
         }
         _halfMoveClock = 0; // reset half move clock because of pawn move
         break;
@@ -405,22 +405,22 @@ public class OmegaBoardPosition {
     int move = _moveHistory[_historyCounter];
 
     // reset move history
-    _moveHistory[_historyCounter] = OmegaMove.NOMOVE;
+    _moveHistory[_historyCounter] = Move.NOMOVE;
 
     // undo piece move / restore board
-    OmegaSquare fromSquare = OmegaMove.getStart(move);
+    Square fromSquare = Move.getStart(move);
     assert fromSquare.isValidSquare();
-    OmegaSquare toSquare = OmegaMove.getEnd(move);
+    Square toSquare = Move.getEnd(move);
     assert toSquare.isValidSquare();
-    OmegaPiece piece = OmegaMove.getPiece(move);
-    assert piece != OmegaPiece.NOPIECE;
-    OmegaPiece target = OmegaMove.getTarget(move);
-    OmegaPiece promotion = OmegaMove.getPromotion(move);
+    Piece piece = Move.getPiece(move);
+    assert piece != Piece.NOPIECE;
+    Piece target = Move.getTarget(move);
+    Piece promotion = Move.getPromotion(move);
 
-    switch (OmegaMove.getMoveType(move)) {
+    switch (Move.getMoveType(move)) {
       case NORMAL:
         movePiece(toSquare, fromSquare, piece);
-        if (target != OmegaPiece.NOPIECE) {
+        if (target != Piece.NOPIECE) {
           putPiece(toSquare, target);
         }
         break;
@@ -428,7 +428,7 @@ public class OmegaBoardPosition {
         movePiece(toSquare, fromSquare, piece);
         break;
       case ENPASSANT:
-        OmegaSquare targetSquare =
+        Square targetSquare =
             target.getColor().isWhite() ? toSquare.getNorth() : toSquare.getSouth();
         movePiece(toSquare, fromSquare, piece);
         putPiece(targetSquare, target);
@@ -439,7 +439,7 @@ public class OmegaBoardPosition {
       case PROMOTION:
         removePiece(toSquare, promotion);
         putPiece(fromSquare, piece);
-        if (target != OmegaPiece.NOPIECE) putPiece(toSquare, target);
+        if (target != Piece.NOPIECE) putPiece(toSquare, target);
         break;
       case NOMOVETYPE:
       default:
@@ -479,12 +479,12 @@ public class OmegaBoardPosition {
    * @param target
    */
   private void makeNormalMove(
-      OmegaSquare fromSquare, OmegaSquare toSquare, OmegaPiece piece, OmegaPiece target) {
+    Square fromSquare, Square toSquare, Piece piece, Piece target) {
 
-    if (target != OmegaPiece.NOPIECE) {
+    if (target != Piece.NOPIECE) {
       removePiece(toSquare, target);
       _halfMoveClock = 0; // reset half move clock because of capture
-    } else if (piece.getType() == OmegaPieceType.PAWN) {
+    } else if (piece.getType() == PieceType.PAWN) {
       _halfMoveClock = 0; // reset half move clock because of pawn move
     } else {
       _halfMoveClock++;
@@ -497,36 +497,36 @@ public class OmegaBoardPosition {
    * @param fromSquare
    * @param toSquare
    */
-  private void invalidateCastlingRights(OmegaSquare fromSquare, OmegaSquare toSquare) {
+  private void invalidateCastlingRights(Square fromSquare, Square toSquare) {
     // check for castling rights invalidation
     // no else here - combination of these can occur! BIG BUG before :)
-    if (fromSquare == OmegaSquare.e1 || toSquare == OmegaSquare.e1) {
+    if (fromSquare == Square.e1 || toSquare == Square.e1) {
       // only take out zobrist if the castling was true before.
       if (_castlingWK) _zobristKey ^= _castlingWK_Zobrist;
       _castlingWK = false;
       if (_castlingWQ) _zobristKey ^= _castlingWQ_Zobrist;
       _castlingWQ = false;
     }
-    if (fromSquare == OmegaSquare.e8 || toSquare == OmegaSquare.e8) {
+    if (fromSquare == Square.e8 || toSquare == Square.e8) {
       // only take out zobrist if the castling was true before.
       if (_castlingBK) _zobristKey ^= _castlingBK_Zobrist;
       _castlingBK = false;
       if (_castlingBQ) _zobristKey ^= _castlingBQ_Zobrist;
       _castlingBQ = false;
     }
-    if (fromSquare == OmegaSquare.a1 || toSquare == OmegaSquare.a1) {
+    if (fromSquare == Square.a1 || toSquare == Square.a1) {
       if (_castlingWQ) _zobristKey ^= _castlingWQ_Zobrist;
       _castlingWQ = false;
     }
-    if (fromSquare == OmegaSquare.h1 || toSquare == OmegaSquare.h1) {
+    if (fromSquare == Square.h1 || toSquare == Square.h1) {
       if (_castlingWK) _zobristKey ^= _castlingWK_Zobrist;
       _castlingWK = false;
     }
-    if (fromSquare == OmegaSquare.a8 || toSquare == OmegaSquare.a8) {
+    if (fromSquare == Square.a8 || toSquare == Square.a8) {
       if (_castlingBQ) _zobristKey ^= _castlingBQ_Zobrist;
       _castlingBQ = false;
     }
-    if (fromSquare == OmegaSquare.h8 || toSquare == OmegaSquare.h8) {
+    if (fromSquare == Square.h8 || toSquare == Square.h8) {
       if (_castlingBK) _zobristKey ^= _castlingBK_Zobrist;
       _castlingBK = false;
     }
@@ -537,48 +537,48 @@ public class OmegaBoardPosition {
    * @param toSquare
    * @param piece
    */
-  private void makeCastlingMove(OmegaSquare fromSquare, OmegaSquare toSquare, OmegaPiece piece) {
-    assert piece.getType() == OmegaPieceType.KING;
+  private void makeCastlingMove(Square fromSquare, Square toSquare, Piece piece) {
+    assert piece.getType() == PieceType.KING;
 
-    OmegaPiece rook = OmegaPiece.NOPIECE;
-    OmegaSquare rookFromSquare = OmegaSquare.NOSQUARE;
-    OmegaSquare rookToSquare = OmegaSquare.NOSQUARE;
+    Piece rook = Piece.NOPIECE;
+    Square rookFromSquare = Square.NOSQUARE;
+    Square rookToSquare = Square.NOSQUARE;
 
     switch (toSquare) {
       case g1: // white kingside
         assert (_castlingWK);
-        rook = OmegaPiece.WHITE_ROOK;
-        rookFromSquare = OmegaSquare.h1;
+        rook = Piece.WHITE_ROOK;
+        rookFromSquare = Square.h1;
         assert (_x88Board[rookFromSquare.ordinal()] == rook) // check if rook is indeed there
             : "rook to castle not there";
-        rookToSquare = OmegaSquare.f1;
+        rookToSquare = Square.f1;
         invalidateCastlingRights(fromSquare, toSquare);
         break;
       case c1: // white queenside
         assert (_castlingWQ);
-        rook = OmegaPiece.WHITE_ROOK;
-        rookFromSquare = OmegaSquare.a1;
+        rook = Piece.WHITE_ROOK;
+        rookFromSquare = Square.a1;
         assert (_x88Board[rookFromSquare.ordinal()] == rook) // check if rook is indeed there
             : "rook to castle not there";
-        rookToSquare = OmegaSquare.d1;
+        rookToSquare = Square.d1;
         invalidateCastlingRights(fromSquare, toSquare);
         break;
       case g8: // black kingside
         assert (_castlingBK);
-        rook = OmegaPiece.BLACK_ROOK;
-        rookFromSquare = OmegaSquare.h8;
+        rook = Piece.BLACK_ROOK;
+        rookFromSquare = Square.h8;
         assert (_x88Board[rookFromSquare.ordinal()] == rook) // check if rook is indeed there
             : "rook to castle not there";
-        rookToSquare = OmegaSquare.f8;
+        rookToSquare = Square.f8;
         invalidateCastlingRights(fromSquare, toSquare);
         break;
       case c8: // black queenside
         assert (_castlingBQ);
-        rook = OmegaPiece.BLACK_ROOK;
-        rookFromSquare = OmegaSquare.a8;
+        rook = Piece.BLACK_ROOK;
+        rookFromSquare = Square.a8;
         assert (_x88Board[rookFromSquare.ordinal()] == rook) // check if rook is indeed there
             : "rook to castle not there";
-        rookToSquare = OmegaSquare.d8;
+        rookToSquare = Square.d8;
         invalidateCastlingRights(fromSquare, toSquare);
         break;
       default:
@@ -595,32 +595,32 @@ public class OmegaBoardPosition {
    * @param toSquare
    * @param piece
    */
-  private void undoCastlingMove(OmegaSquare fromSquare, OmegaSquare toSquare, OmegaPiece piece) {
+  private void undoCastlingMove(Square fromSquare, Square toSquare, Piece piece) {
     // update castling rights
-    OmegaPiece rook = OmegaPiece.NOPIECE;
-    OmegaSquare rookFromSquare = OmegaSquare.NOSQUARE;
-    OmegaSquare rookToSquare = OmegaSquare.NOSQUARE;
+    Piece rook = Piece.NOPIECE;
+    Square rookFromSquare = Square.NOSQUARE;
+    Square rookToSquare = Square.NOSQUARE;
 
     switch (toSquare) {
       case g1: // white kingside
-        rook = OmegaPiece.WHITE_ROOK;
-        rookFromSquare = OmegaSquare.h1;
-        rookToSquare = OmegaSquare.f1;
+        rook = Piece.WHITE_ROOK;
+        rookFromSquare = Square.h1;
+        rookToSquare = Square.f1;
         break;
       case c1: // white queenside
-        rook = OmegaPiece.WHITE_ROOK;
-        rookFromSquare = OmegaSquare.a1;
-        rookToSquare = OmegaSquare.d1;
+        rook = Piece.WHITE_ROOK;
+        rookFromSquare = Square.a1;
+        rookToSquare = Square.d1;
         break;
       case g8: // black kingside
-        rook = OmegaPiece.BLACK_ROOK;
-        rookFromSquare = OmegaSquare.h8;
-        rookToSquare = OmegaSquare.f8;
+        rook = Piece.BLACK_ROOK;
+        rookFromSquare = Square.h8;
+        rookToSquare = Square.f8;
         break;
       case c8: // black queenside
-        rook = OmegaPiece.BLACK_ROOK;
-        rookFromSquare = OmegaSquare.a8;
-        rookToSquare = OmegaSquare.d8;
+        rook = Piece.BLACK_ROOK;
+        rookFromSquare = Square.a8;
+        rookToSquare = Square.d8;
         break;
       default:
         throw new IllegalArgumentException("Castling to wrong square " + toSquare.toString());
@@ -654,9 +654,9 @@ public class OmegaBoardPosition {
     _hasMate = Flag.TBD;
 
     // clear en passant
-    if (_enPassantSquare != OmegaSquare.NOSQUARE) {
+    if (_enPassantSquare != Square.NOSQUARE) {
       _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
-      _enPassantSquare = OmegaSquare.NOSQUARE;
+      _enPassantSquare = Square.NOSQUARE;
     }
 
     // increase half move clock
@@ -706,19 +706,19 @@ public class OmegaBoardPosition {
    * @param toSquare
    * @param piece
    */
-  private void movePiece(OmegaSquare fromSquare, OmegaSquare toSquare, OmegaPiece piece) {
+  private void movePiece(Square fromSquare, Square toSquare, Piece piece) {
     assert fromSquare.isValidSquare();
     assert toSquare.isValidSquare();
-    assert piece != OmegaPiece.NOPIECE;
+    assert piece != Piece.NOPIECE;
     // assert
     assert (_x88Board[fromSquare.ordinal()] == piece) // check if moved piece is indeed there
         : "piece to move not there";
-    assert (_x88Board[toSquare.ordinal()] == OmegaPiece.NOPIECE) // // should be empty
+    assert (_x88Board[toSquare.ordinal()] == Piece.NOPIECE) // // should be empty
         : "to square should be empty";
     // due to performance we do not call remove and put
     // no need to update counters when moving
     // remove
-    _x88Board[fromSquare.ordinal()] = OmegaPiece.NOPIECE;
+    _x88Board[fromSquare.ordinal()] = Piece.NOPIECE;
     _zobristKey ^= _piece_Zobrist[piece.ordinal()][fromSquare.ordinal()]; // out
     // update piece lists
     final int color = piece.getColor().ordinal();
@@ -734,10 +734,10 @@ public class OmegaBoardPosition {
    * @param square
    * @param piece
    */
-  private void putPiece(OmegaSquare square, OmegaPiece piece) {
+  private void putPiece(Square square, Piece piece) {
     assert square.isValidSquare();
-    assert piece != OmegaPiece.NOPIECE;
-    assert _x88Board[square.ordinal()] == OmegaPiece.NOPIECE; // should be empty
+    assert piece != Piece.NOPIECE;
+    assert _x88Board[square.ordinal()] == Piece.NOPIECE; // should be empty
     // put
     _x88Board[square.ordinal()] = piece;
     _zobristKey ^= _piece_Zobrist[piece.ordinal()][square.ordinal()]; // in
@@ -749,14 +749,14 @@ public class OmegaBoardPosition {
   }
 
   /** @return the removed piece */
-  private OmegaPiece removePiece(OmegaSquare square, OmegaPiece piece) {
+  private Piece removePiece(Square square, Piece piece) {
     assert square.isValidSquare();
-    assert piece != OmegaPiece.NOPIECE;
+    assert piece != Piece.NOPIECE;
     assert _x88Board[square.ordinal()] == piece // check if removed piece is indeed there
         : "piece to be removed not there";
     // remove
-    OmegaPiece old = _x88Board[square.ordinal()];
-    _x88Board[square.ordinal()] = OmegaPiece.NOPIECE;
+    Piece old = _x88Board[square.ordinal()];
+    _x88Board[square.ordinal()] = Piece.NOPIECE;
     _zobristKey ^= _piece_Zobrist[piece.ordinal()][square.ordinal()]; // out
     // update piece lists
     final int color = piece.getColor().ordinal();
@@ -772,7 +772,7 @@ public class OmegaBoardPosition {
    * @param piece
    * @param color
    */
-  private void addToPieceLists(OmegaSquare toSquare, OmegaPiece piece, final int color) {
+  private void addToPieceLists(Square toSquare, Piece piece, final int color) {
     switch (piece.getType()) {
       case PAWN:
         _pawnSquares[color].add(toSquare);
@@ -802,7 +802,7 @@ public class OmegaBoardPosition {
    * @param piece
    * @param color
    */
-  private void removeFromPieceLists(OmegaSquare fromSquare, OmegaPiece piece, final int color) {
+  private void removeFromPieceLists(Square fromSquare, Piece piece, final int color) {
     switch (piece.getType()) {
       case PAWN:
         _pawnSquares[color].remove(fromSquare);
@@ -820,7 +820,7 @@ public class OmegaBoardPosition {
         _queenSquares[color].remove(fromSquare);
         break;
       case KING:
-        _kingSquares[color] = OmegaSquare.NOSQUARE;
+        _kingSquares[color] = Square.NOSQUARE;
         break;
       default:
         break;
@@ -837,8 +837,8 @@ public class OmegaBoardPosition {
    * @param kingPosition
    * @return true if under attack
    */
-  public boolean isAttacked(OmegaColor attackerColor, OmegaSquare kingPosition) {
-    assert (kingPosition != OmegaSquare.NOSQUARE);
+  public boolean isAttacked(Color attackerColor, Square kingPosition) {
+    assert (kingPosition != Square.NOSQUARE);
     assert (!attackerColor.isNone());
 
     final int os_Index = kingPosition.ordinal();
@@ -851,8 +851,8 @@ public class OmegaBoardPosition {
     // check pawns
     // reverse direction to look for pawns which could attack
     final int pawnDir = isWhite ? -1 : 1;
-    final OmegaPiece attackerPawn = isWhite ? OmegaPiece.WHITE_PAWN : OmegaPiece.BLACK_PAWN;
-    for (int d : OmegaSquare.pawnAttackDirections) {
+    final Piece attackerPawn = isWhite ? Piece.WHITE_PAWN : Piece.BLACK_PAWN;
+    for (int d : Square.pawnAttackDirections) {
       final int i = os_Index + d * pawnDir;
       if ((i & 0x88) == 0 && _x88Board[i] == attackerPawn) return true;
     }
@@ -862,13 +862,13 @@ public class OmegaBoardPosition {
     // check sliding horizontal (rook + queen) if there are any
     if (!(_rookSquares[attackerColorIndex].isEmpty()
         && _queenSquares[attackerColorIndex].isEmpty())) {
-      for (int d : OmegaSquare.rookDirections) {
+      for (int d : Square.rookDirections) {
         int i = os_Index + d;
         while ((i & 0x88) == 0) { // slide while valid square
-          if (_x88Board[i] != OmegaPiece.NOPIECE) { // not empty
+          if (_x88Board[i] != Piece.NOPIECE) { // not empty
             if (_x88Board[i].getColor() == attackerColor // attacker piece
-                && (_x88Board[i].getType() == OmegaPieceType.ROOK
-                    || _x88Board[i].getType() == OmegaPieceType.QUEEN)) {
+                && (_x88Board[i].getType() == PieceType.ROOK
+                    || _x88Board[i].getType() == PieceType.QUEEN)) {
               return true;
             }
             break; // not an attacker color or attacker piece blocking the way.
@@ -881,13 +881,13 @@ public class OmegaBoardPosition {
     // check sliding diagonal (bishop + queen) if there are any
     if (!(_bishopSquares[attackerColorIndex].isEmpty()
         && _queenSquares[attackerColorIndex].isEmpty())) {
-      for (int d : OmegaSquare.bishopDirections) {
+      for (int d : Square.bishopDirections) {
         int i = os_Index + d;
         while ((i & 0x88) == 0) { // slide while valid square
-          if (_x88Board[i] != OmegaPiece.NOPIECE) { // not empty
+          if (_x88Board[i] != Piece.NOPIECE) { // not empty
             if (_x88Board[i].getColor() == attackerColor // attacker piece
-                && (_x88Board[i].getType() == OmegaPieceType.BISHOP
-                    || _x88Board[i].getType() == OmegaPieceType.QUEEN)) {
+                && (_x88Board[i].getType() == PieceType.BISHOP
+                    || _x88Board[i].getType() == PieceType.QUEEN)) {
               return true;
             }
             break; // not an attacker color or attacker piece blocking the way.
@@ -899,12 +899,12 @@ public class OmegaBoardPosition {
 
     // check knights if there are any
     if (!(_knightSquares[attackerColorIndex].isEmpty())) {
-      for (int d : OmegaSquare.knightDirections) {
+      for (int d : Square.knightDirections) {
         int i = os_Index + d;
         if ((i & 0x88) == 0) { // valid square
-          if (_x88Board[i] != OmegaPiece.NOPIECE // not empty
+          if (_x88Board[i] != Piece.NOPIECE // not empty
               && _x88Board[i].getColor() == attackerColor // attacker piece
-              && (_x88Board[i].getType() == OmegaPieceType.KNIGHT)) {
+              && (_x88Board[i].getType() == PieceType.KNIGHT)) {
             return true;
           }
         }
@@ -912,41 +912,41 @@ public class OmegaBoardPosition {
     }
 
     // check king
-    for (int d : OmegaSquare.kingDirections) {
+    for (int d : Square.kingDirections) {
       int i = os_Index + d;
       if ((i & 0x88) == 0) { // valid square
-        if (_x88Board[i] != OmegaPiece.NOPIECE // not empty
+        if (_x88Board[i] != Piece.NOPIECE // not empty
             && _x88Board[i].getColor() == attackerColor // attacker piece
-            && (_x88Board[i].getType() == OmegaPieceType.KING)) {
+            && (_x88Board[i].getType() == PieceType.KING)) {
           return true;
         }
       }
     }
 
     // check en passant
-    if (this._enPassantSquare != OmegaSquare.NOSQUARE) {
+    if (this._enPassantSquare != Square.NOSQUARE) {
       if (isWhite // white is attacker
           && _x88Board[_enPassantSquare.getSouth().ordinal()]
-              == OmegaPiece.BLACK_PAWN // black is target
+             == Piece.BLACK_PAWN // black is target
           && this._enPassantSquare.getSouth()
               == kingPosition) { // this is indeed the en passant attacked square
         // left
-        int i = os_Index + OmegaSquare.W;
-        if ((i & 0x88) == 0 && _x88Board[i] == OmegaPiece.WHITE_PAWN) return true;
+        int i = os_Index + Square.W;
+        if ((i & 0x88) == 0 && _x88Board[i] == Piece.WHITE_PAWN) return true;
         // right
-        i = os_Index + OmegaSquare.E;
-        if ((i & 0x88) == 0 && _x88Board[i] == OmegaPiece.WHITE_PAWN) return true;
+        i = os_Index + Square.E;
+        if ((i & 0x88) == 0 && _x88Board[i] == Piece.WHITE_PAWN) return true;
       } else if (!isWhite // black is attacker (assume not noColor)
-          && _x88Board[_enPassantSquare.getNorth().ordinal()]
-              == OmegaPiece.WHITE_PAWN // white is target
-          && this._enPassantSquare.getNorth()
+                 && _x88Board[_enPassantSquare.getNorth().ordinal()]
+                    == Piece.WHITE_PAWN // white is target
+                 && this._enPassantSquare.getNorth()
               == kingPosition) { // this is indeed the en passant attacked square
         // attack from left
-        int i = os_Index + OmegaSquare.W;
-        if ((i & 0x88) == 0 && _x88Board[i] == OmegaPiece.BLACK_PAWN) return true;
+        int i = os_Index + Square.W;
+        if ((i & 0x88) == 0 && _x88Board[i] == Piece.BLACK_PAWN) return true;
         // attack from right
-        i = os_Index + OmegaSquare.E;
-        if ((i & 0x88) == 0 && _x88Board[i] == OmegaPiece.BLACK_PAWN) return true;
+        i = os_Index + Square.E;
+        if ((i & 0x88) == 0 && _x88Board[i] == Piece.BLACK_PAWN) return true;
       }
     }
 
@@ -1035,52 +1035,52 @@ public class OmegaBoardPosition {
      * one side has two knights against the bare king
      * both sides have a king and a bishop, the bishops being the same color
      */
-    if (_pawnSquares[OmegaColor.WHITE.ordinal()].size() == 0
-        && _pawnSquares[OmegaColor.BLACK.ordinal()].size() == 0
-        && _rookSquares[OmegaColor.WHITE.ordinal()].size() == 0
-        && _rookSquares[OmegaColor.BLACK.ordinal()].size() == 0
-        && _queenSquares[OmegaColor.WHITE.ordinal()].size() == 0
-        && _queenSquares[OmegaColor.BLACK.ordinal()].size() == 0) {
+    if (_pawnSquares[Color.WHITE.ordinal()].size() == 0
+        && _pawnSquares[Color.BLACK.ordinal()].size() == 0
+        && _rookSquares[Color.WHITE.ordinal()].size() == 0
+        && _rookSquares[Color.BLACK.ordinal()].size() == 0
+        && _queenSquares[Color.WHITE.ordinal()].size() == 0
+        && _queenSquares[Color.BLACK.ordinal()].size() == 0) {
 
       // white king bare KK*
-      if (_knightSquares[OmegaColor.WHITE.ordinal()].size() == 0
-          && _bishopSquares[OmegaColor.WHITE.ordinal()].size() == 0) {
+      if (_knightSquares[Color.WHITE.ordinal()].size() == 0
+          && _bishopSquares[Color.WHITE.ordinal()].size() == 0) {
 
         // both kings bare KK, KKN, KKNN
-        if (_knightSquares[OmegaColor.BLACK.ordinal()].size() <= 2
-            && _bishopSquares[OmegaColor.BLACK.ordinal()].size() == 0) {
+        if (_knightSquares[Color.BLACK.ordinal()].size() <= 2
+            && _bishopSquares[Color.BLACK.ordinal()].size() == 0) {
           return true;
         }
 
         // KKB
-        if (_knightSquares[OmegaColor.BLACK.ordinal()].size() == 0
-            && _bishopSquares[OmegaColor.BLACK.ordinal()].size() == 1) {
+        if (_knightSquares[Color.BLACK.ordinal()].size() == 0
+            && _bishopSquares[Color.BLACK.ordinal()].size() == 1) {
           return true;
         }
 
       }
       // only black king bare K*K
-      else if (_knightSquares[OmegaColor.BLACK.ordinal()].size() == 0
-          && _bishopSquares[OmegaColor.BLACK.ordinal()].size() == 0) {
+      else if (_knightSquares[Color.BLACK.ordinal()].size() == 0
+          && _bishopSquares[Color.BLACK.ordinal()].size() == 0) {
 
         // both kings bare KK, KNK, KNNK
-        if (_knightSquares[OmegaColor.WHITE.ordinal()].size() <= 2
-            && _bishopSquares[OmegaColor.WHITE.ordinal()].size() == 0) {
+        if (_knightSquares[Color.WHITE.ordinal()].size() <= 2
+            && _bishopSquares[Color.WHITE.ordinal()].size() == 0) {
           return true;
         }
 
         // KBK
-        if (_knightSquares[OmegaColor.BLACK.ordinal()].size() == 0
-            && _bishopSquares[OmegaColor.BLACK.ordinal()].size() == 1) {
+        if (_knightSquares[Color.BLACK.ordinal()].size() == 0
+            && _bishopSquares[Color.BLACK.ordinal()].size() == 1) {
           return true;
         }
       }
 
       // KBKB - B same field color
-      else if (_knightSquares[OmegaColor.BLACK.ordinal()].size() == 0
-          && _bishopSquares[OmegaColor.BLACK.ordinal()].size() == 1
-          && _knightSquares[OmegaColor.WHITE.ordinal()].size() == 0
-          && _bishopSquares[OmegaColor.WHITE.ordinal()].size() == 1) {
+      else if (_knightSquares[Color.BLACK.ordinal()].size() == 0
+          && _bishopSquares[Color.BLACK.ordinal()].size() == 1
+          && _knightSquares[Color.WHITE.ordinal()].size() == 0
+          && _bishopSquares[Color.WHITE.ordinal()].size() == 1) {
 
         /*
          * Bishops are on the same field color if the sum of the
@@ -1088,10 +1088,10 @@ public class OmegaBoardPosition {
          * (file + rank) % 2 == 0 = black field
          * (file + rank) % 2 == 1 = white field
          */
-        final OmegaSquare whiteBishop = _bishopSquares[OmegaColor.WHITE.ordinal()].get(0);
+        final Square whiteBishop = _bishopSquares[Color.WHITE.ordinal()].get(0);
         int file_w = whiteBishop.getFile().get();
         int rank_w = whiteBishop.getRank().get();
-        final OmegaSquare blackBishop = _bishopSquares[OmegaColor.BLACK.ordinal()].get(0);
+        final Square blackBishop = _bishopSquares[Color.BLACK.ordinal()].get(0);
         int file_b = blackBishop.getFile().get();
         int rank_b = blackBishop.getRank().get();
         if (((file_w + rank_w) % 2) == ((file_b + rank_b) % 2)) {
@@ -1108,32 +1108,32 @@ public class OmegaBoardPosition {
   }
 
   /**
-   * @param c OmegaColor
+   * @param c Color
    * @return the material value
    */
-  public int getMaterial(OmegaColor c) {
+  public int getMaterial(Color c) {
     return this._material[c.ordinal()];
   }
 
   /** @return color of next player */
-  public OmegaColor getNextPlayer() {
+  public Color getNextPlayer() {
     return _nextPlayer;
   }
 
   /**
-   * Returns the last move. Returns OmegaMove.NOMOVE if there is no last move.
+   * Returns the last move. Returns Move.NOMOVE if there is no last move.
    *
    * @return int representing a move
    */
   public int getLastMove() {
-    if (_historyCounter == 0) return OmegaMove.NOMOVE;
+    if (_historyCounter == 0) return Move.NOMOVE;
     return _moveHistory[_historyCounter - 1];
   }
 
   /** @param fen */
   private void initBoard(String fen) {
     // clear board
-    Arrays.fill(_x88Board, OmegaPiece.NOPIECE);
+    Arrays.fill(_x88Board, Piece.NOPIECE);
     // Standard Start Board
     setupFromFEN(fen);
     // used for debugging
@@ -1163,22 +1163,22 @@ public class OmegaBoardPosition {
         if (s.toLowerCase().equals(s)) { // black
           switch (s) {
             case "p":
-              putPiece(OmegaSquare.getSquare(file, rank), OmegaPiece.BLACK_PAWN);
+              putPiece(Square.getSquare(file, rank), Piece.BLACK_PAWN);
               break;
             case "n":
-              putPiece(OmegaSquare.getSquare(file, rank), OmegaPiece.BLACK_KNIGHT);
+              putPiece(Square.getSquare(file, rank), Piece.BLACK_KNIGHT);
               break;
             case "b":
-              putPiece(OmegaSquare.getSquare(file, rank), OmegaPiece.BLACK_BISHOP);
+              putPiece(Square.getSquare(file, rank), Piece.BLACK_BISHOP);
               break;
             case "r":
-              putPiece(OmegaSquare.getSquare(file, rank), OmegaPiece.BLACK_ROOK);
+              putPiece(Square.getSquare(file, rank), Piece.BLACK_ROOK);
               break;
             case "q":
-              putPiece(OmegaSquare.getSquare(file, rank), OmegaPiece.BLACK_QUEEN);
+              putPiece(Square.getSquare(file, rank), Piece.BLACK_QUEEN);
               break;
             case "k":
-              putPiece(OmegaSquare.getSquare(file, rank), OmegaPiece.BLACK_KING);
+              putPiece(Square.getSquare(file, rank), Piece.BLACK_KING);
               break;
             default:
               throw new IllegalArgumentException("FEN Syntax not valid - expected a-hA-H");
@@ -1186,22 +1186,22 @@ public class OmegaBoardPosition {
         } else if (s.toUpperCase().equals(s)) { // white
           switch (s) {
             case "P":
-              putPiece(OmegaSquare.getSquare(file, rank), OmegaPiece.WHITE_PAWN);
+              putPiece(Square.getSquare(file, rank), Piece.WHITE_PAWN);
               break;
             case "N":
-              putPiece(OmegaSquare.getSquare(file, rank), OmegaPiece.WHITE_KNIGHT);
+              putPiece(Square.getSquare(file, rank), Piece.WHITE_KNIGHT);
               break;
             case "B":
-              putPiece(OmegaSquare.getSquare(file, rank), OmegaPiece.WHITE_BISHOP);
+              putPiece(Square.getSquare(file, rank), Piece.WHITE_BISHOP);
               break;
             case "R":
-              putPiece(OmegaSquare.getSquare(file, rank), OmegaPiece.WHITE_ROOK);
+              putPiece(Square.getSquare(file, rank), Piece.WHITE_ROOK);
               break;
             case "Q":
-              putPiece(OmegaSquare.getSquare(file, rank), OmegaPiece.WHITE_QUEEN);
+              putPiece(Square.getSquare(file, rank), Piece.WHITE_QUEEN);
               break;
             case "K":
-              putPiece(OmegaSquare.getSquare(file, rank), OmegaPiece.WHITE_KING);
+              putPiece(Square.getSquare(file, rank), Piece.WHITE_KING);
               break;
             default:
               throw new IllegalArgumentException("FEN Syntax not valid - expected a-hA-H");
@@ -1225,13 +1225,13 @@ public class OmegaBoardPosition {
     _nextPlayer = null;
     if (parts.length >= 2) {
       s = parts[1];
-      if (s.equals("w")) _nextPlayer = OmegaColor.WHITE;
+      if (s.equals("w")) _nextPlayer = Color.WHITE;
       else if (s.equals("b")) {
-        _nextPlayer = OmegaColor.BLACK;
+        _nextPlayer = Color.BLACK;
         _zobristKey ^= _nextPlayer_Zobrist; // only when black to have the right in/out rhythm
       } else throw new IllegalArgumentException("FEN Syntax not valid - expected w or b");
     } else { // default "w"
-      _nextPlayer = OmegaColor.WHITE;
+      _nextPlayer = Color.WHITE;
     }
 
     // castling
@@ -1267,15 +1267,15 @@ public class OmegaBoardPosition {
     if (parts.length >= 4) { // default "-"
       s = parts[3];
       if (!s.equals("-")) {
-        _enPassantSquare = OmegaSquare.fromUCINotation(s);
-        if (_enPassantSquare.equals(OmegaSquare.NOSQUARE)) {
+        _enPassantSquare = Square.fromUCINotation(s);
+        if (_enPassantSquare.equals(Square.NOSQUARE)) {
           throw new IllegalArgumentException(
               "FEN Syntax not valid - expected valid en passant square");
         }
       }
     }
     // set en passant if not NOSQUARE
-    if (_enPassantSquare != OmegaSquare.NOSQUARE) {
+    if (_enPassantSquare != Square.NOSQUARE) {
       _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // in
     }
 
@@ -1320,9 +1320,9 @@ public class OmegaBoardPosition {
       int emptySquares = 0;
       for (int file = 1; file <= 8; file++) {
 
-        OmegaPiece piece = _x88Board[OmegaSquare.getSquare(file, rank).ordinal()];
+        Piece piece = _x88Board[Square.getSquare(file, rank).ordinal()];
 
-        if (piece == OmegaPiece.NOPIECE) {
+        if (piece == Piece.NOPIECE) {
           emptySquares++;
         } else {
           if (emptySquares > 0) {
@@ -1373,7 +1373,7 @@ public class OmegaBoardPosition {
     fen += ' ';
 
     // En passant
-    if (this._enPassantSquare != OmegaSquare.NOSQUARE) {
+    if (this._enPassantSquare != Square.NOSQUARE) {
       fen += _enPassantSquare.toString();
     } else {
       fen += '-';
@@ -1410,8 +1410,8 @@ public class OmegaBoardPosition {
 
       // fields
       for (int file = 1; file <= 8; file++) {
-        OmegaPiece p = _x88Board[OmegaSquare.getSquare(file, rank).ordinal()];
-        if (p == OmegaPiece.NOPIECE) {
+        Piece p = _x88Board[Square.getSquare(file, rank).ordinal()];
+        if (p == Piece.NOPIECE) {
           boardString.append("   |");
         } else {
           boardString.append(" ").append(p.toString()).append(" |");
@@ -1428,7 +1428,7 @@ public class OmegaBoardPosition {
     for (int file = 1; file <= 8; file++) {
       boardString
           .append(' ')
-          .append(OmegaSquare.File.get(file).toString().toUpperCase())
+          .append(Square.File.get(file).toString().toUpperCase())
           .append("  ");
     }
     boardString.append("\n\n");
@@ -1456,10 +1456,10 @@ public class OmegaBoardPosition {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof OmegaBoardPosition)) {
+    if (!(obj instanceof BoardPosition)) {
       return false;
     }
-    OmegaBoardPosition other = (OmegaBoardPosition) obj;
+    BoardPosition other = (BoardPosition) obj;
     if (this._zobristKey != other._zobristKey) {
       return false;
     }

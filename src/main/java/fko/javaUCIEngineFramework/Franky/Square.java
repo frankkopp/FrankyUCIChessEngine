@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  * As enumeration is type safe and also very fast this is preferred over
  * static final int.
  */
-public enum OmegaSquare {
+public enum Square {
 
   /*
    0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15 */
@@ -54,13 +54,13 @@ public enum OmegaSquare {
   NOSQUARE;
 
   // pre-filled list with all squares
-  static final OmegaSquare[] values;
+  static final Square[] values;
 
   // pre-computed if square is valid
   private final boolean _validSquare;
 
   // pre-filled list with all valid squares
-  static final List<OmegaSquare> validSquares;
+  static final List<Square> validSquares;
 
   // Move deltas north, south, east, west and combinations
   static final int N = 16;
@@ -100,23 +100,23 @@ public enum OmegaSquare {
   };
 
   static {
-    values = OmegaSquare.values();
+    values = Square.values();
     validSquares =
-        Arrays.stream(values()).filter(OmegaSquare::isValidSquare).collect(Collectors.toList());
+        Arrays.stream(values()).filter(Square::isValidSquare).collect(Collectors.toList());
   }
 
-  OmegaSquare() {
+  Square() {
     _validSquare = (this.ordinal() & 0x88) == 0;
   }
 
   /**
    * @param index
-   * @return the OmegaSquare for the given index of a 0x88 board - returns INVALID if not a valid
+   * @return the Square for the given index of a 0x88 board - returns INVALID if not a valid
    *     index
    */
-  public static OmegaSquare getSquare(int index) {
+  public static Square getSquare(int index) {
     if ((index & 0x88) != 0) return NOSQUARE;
-    return OmegaSquare.values[index];
+    return Square.values[index];
   }
 
   /**
@@ -124,30 +124,30 @@ public enum OmegaSquare {
    * it is a valid square.
    *
    * @param s
-   * @return The OmegaSquare of the notation or NOSQAURE if the notation was invalid
+   * @return The Square of the notation or NOSQAURE if the notation was invalid
    */
-  public static OmegaSquare fromUCINotation(final String s) {
-    final OmegaSquare omegaSquare;
+  public static Square fromUCINotation(final String s) {
+    final Square square;
     try {
-      omegaSquare = OmegaSquare.valueOf(s);
+      square = Square.valueOf(s);
     } catch (IllegalArgumentException e) {
       return NOSQUARE;
     }
-    return omegaSquare.isValidSquare() ? omegaSquare : NOSQUARE;
+    return square.isValidSquare() ? square : NOSQUARE;
   }
 
-  /** @return true if OmegaSquare is a valid chess square */
+  /** @return true if Square is a valid chess square */
   public boolean isValidSquare() {
     return _validSquare;
   }
 
   /** */
-  public static OmegaSquare getSquare(int file, int rank) {
-    if (file < 1 || file > 8 || rank < 1 || rank > 8) return OmegaSquare.NOSQUARE;
+  public static Square getSquare(int file, int rank) {
+    if (file < 1 || file > 8 || rank < 1 || rank > 8) return Square.NOSQUARE;
     // index starts with 0 while file and rank start with 1 - decrease
     final int index = (rank - 1) * 16 + (file - 1);
     if ((index & 0x88) != 0) return NOSQUARE; // is this extra check necessary?
-    return OmegaSquare.values[index];
+    return Square.values[index];
   }
 
   /**
@@ -155,10 +155,10 @@ public enum OmegaSquare {
    *
    * @return square north
    */
-  public OmegaSquare getNorth() {
+  public Square getNorth() {
     int index = this.ordinal() + N;
     if ((index & 0x88) != 0) return NOSQUARE;
-    return OmegaSquare.values[index];
+    return Square.values[index];
   }
 
   /**
@@ -166,10 +166,10 @@ public enum OmegaSquare {
    *
    * @return square north
    */
-  public OmegaSquare getSouth() {
+  public Square getSouth() {
     int index = this.ordinal() + S;
     if ((index & 0x88) != 0) return NOSQUARE;
-    return OmegaSquare.values[index];
+    return Square.values[index];
   }
 
   /**
@@ -177,10 +177,10 @@ public enum OmegaSquare {
    *
    * @return square north
    */
-  public OmegaSquare getEast() {
+  public Square getEast() {
     int index = this.ordinal() + E;
     if ((index & 0x88) != 0) return NOSQUARE;
-    return OmegaSquare.values[index];
+    return Square.values[index];
   }
 
   /**
@@ -188,19 +188,19 @@ public enum OmegaSquare {
    *
    * @return square north
    */
-  public OmegaSquare getWest() {
+  public Square getWest() {
     int index = this.ordinal() + W;
     if ((index & 0x88) != 0) return NOSQUARE;
-    return OmegaSquare.values[index];
+    return Square.values[index];
   }
 
-  /** @return OmegaSquare.File for this QmegaSquare */
+  /** @return Square.File for this QmegaSquare */
   public File getFile() {
     if (!this._validSquare) return File.NOFILE;
     return File.values()[this.ordinal() % 16];
   }
 
-  /** @return OmegaSquare.Rank for this QmegaSquare */
+  /** @return Square.Rank for this QmegaSquare */
   public Rank getRank() {
     if (!this._validSquare) return Rank.NORANK;
     return Rank.values()[this.ordinal() >>> 4];
@@ -211,7 +211,7 @@ public enum OmegaSquare {
    *
    * @author fkopp
    */
-  public static List<OmegaSquare> getValueList() {
+  public static List<Square> getValueList() {
     return validSquares;
   }
 
@@ -291,13 +291,13 @@ public enum OmegaSquare {
     }
   }
 
-  public static final EnumSet<OmegaSquare> WHITE_PAWNBASE_ROW =
+  public static final EnumSet<Square> WHITE_PAWNBASE_ROW  =
       EnumSet.of(a2, b2, c2, d2, e2, f2, g2, h2);
-  public static final EnumSet<OmegaSquare> BLACK_PAWNBASE_ROW =
+  public static final EnumSet<Square> BLACK_PAWNBASE_ROW  =
       EnumSet.of(a7, b7, c7, d7, e7, f7, g7, h7);
-  public static final EnumSet<OmegaSquare> WHITE_PROMOTION_ROW =
+  public static final EnumSet<Square> WHITE_PROMOTION_ROW =
       EnumSet.of(a8, b8, c8, d8, e8, f8, g8, h8);
-  public static final EnumSet<OmegaSquare> BLACK_PROMOTION_ROW =
+  public static final EnumSet<Square> BLACK_PROMOTION_ROW =
       EnumSet.of(a1, b1, c1, d1, e1, f1, g1, h1);
 
   public boolean isWhitePawnBaseRow() {
@@ -308,7 +308,7 @@ public enum OmegaSquare {
     return BLACK_PAWNBASE_ROW.contains(this);
   }
 
-  public boolean isPawnBaseRow(OmegaColor c) {
+  public boolean isPawnBaseRow(Color c) {
     switch (c) {
       case WHITE:
         return isWhitePawnBaseRow();
@@ -320,18 +320,18 @@ public enum OmegaSquare {
   }
 
   /**
-   * Returns the matching OmegaSquare to a given GamePosition
+   * Returns the matching Square to a given GamePosition
    *
    * @param gp
-   * @return matching OmegaSquare
+   * @return matching Square
    */
-  //    public static OmegaSquare convertFromGamePosition(GamePosition gp) {
-  //        if (gp==null) return OmegaSquare.NOSQUARE;
-  //        return OmegaSquare.values[(gp.getRank()-1) * 16 +gp.getFile()-1];
+  //    public static Square convertFromGamePosition(GamePosition gp) {
+  //        if (gp==null) return Square.NOSQUARE;
+  //        return Square.values[(gp.getRank()-1) * 16 +gp.getFile()-1];
   //    }
 
   /**
-   * Returns the matching GamePosition to this OmegaSquare
+   * Returns the matching GamePosition to this Square
    *
    * @return matching GamePosition
    */
