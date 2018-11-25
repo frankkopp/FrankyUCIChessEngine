@@ -25,6 +25,8 @@
 
 package fko.javaUCIEngineFramework;
 
+import fko.javaUCIEngineFramework.Franky.OmegaBoardPosition;
+import fko.javaUCIEngineFramework.Franky.OmegaMove;
 import fko.javaUCIEngineFramework.UCI.IUCIEngine;
 import fko.javaUCIEngineFramework.UCI.IUCISearchMode;
 import fko.javaUCIEngineFramework.UCI.UCIOption;
@@ -37,15 +39,13 @@ import java.util.List;
 
 /**
  * MyEngine
- *
- * <p>TODO: implement commands
  */
 public class MyEngine implements IUCIEngine {
 
   private static final Logger LOG = LoggerFactory.getLogger(MyEngine.class);
 
   // ID of engine
-  private String iDName = "UCI Engine Example v0.1";
+  private String iDName = "MyEngine v0.1";
   private String iDAuthor = "Frank Kopp";
 
   // options of engine
@@ -53,6 +53,8 @@ public class MyEngine implements IUCIEngine {
   private boolean ponderOption = true;
   private boolean useOwnBookOption = true;
   private boolean debugOption = false;
+
+  private OmegaBoardPosition boardPosition;
 
   List<IUCIEngine.IUCIOption> iUciOptions = new ArrayList<>();
 
@@ -140,14 +142,20 @@ public class MyEngine implements IUCIEngine {
 
   @Override
   public void setPosition(final String fen) {
-    LOG.info("Engine got Position command: "+fen);
-    // TODO
+    LOG.info("Engine got Position command: " + fen);
+    boardPosition = new OmegaBoardPosition(fen);
+  }
+
+  @Override
+  public OmegaBoardPosition getBoardPosition() {
+    return boardPosition;
   }
 
   @Override
   public void doMove(final String move) {
-    LOG.info("Engine got doMove command: "+ move);
-    // TODO
+    LOG.info("Engine got doMove command: " + move);
+    final int omegaMove = OmegaMove.fromUCINotation(boardPosition, move);
+    boardPosition.makeMove(omegaMove);
   }
 
   @Override
@@ -168,17 +176,20 @@ public class MyEngine implements IUCIEngine {
 
   @Override
   public void startSearch(final IUCISearchMode searchMode) {
+    // TODO startSearch
     this.searchMode = searchMode;
-    LOG.info("Engine Search start with "+this.searchMode.toString());
+    LOG.info("Engine Search start with " + this.searchMode.toString());
   }
 
   @Override
   public void stopSearch() {
+    // TODO stopSearch
     LOG.info("Engine Stop");
   }
 
   @Override
   public void ponderHit() {
-    LOG.info("Engine PonderHit start with "+this.searchMode.toString());
+    // TODO ponderHit
+    LOG.info("Engine PonderHit start with " + this.searchMode.toString());
   }
 }

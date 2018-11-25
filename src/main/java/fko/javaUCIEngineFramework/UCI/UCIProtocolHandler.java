@@ -278,9 +278,10 @@ public class UCIProtocolHandler implements Runnable {
   }
 
   private void commandPosition(final Scanner scanner) {
-    String startFen = "";
+    String startFen = START_FEN;
     String token = scanner.next();
     if (token.equals("fen")) {
+      startFen = "";
       while (!(token = scanner.next()).equals("moves")) {
         startFen += token + " ";
       }

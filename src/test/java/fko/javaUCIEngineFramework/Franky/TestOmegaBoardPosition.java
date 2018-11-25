@@ -25,7 +25,6 @@
 
 package fko.javaUCIEngineFramework.Franky;
 
-import fko.javaUCIEngineFramework.UCI.UCIProtocolHandler;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -526,7 +525,7 @@ public class TestOmegaBoardPosition {
 
   @Test
   public void testFromNotation() {
-    OmegaSquare os = OmegaSquare.fromNotation("e2");
+    OmegaSquare os = OmegaSquare.fromUCINotation("e2");
     assertEquals(OmegaSquare.e2, os);
   }
 

@@ -25,10 +25,14 @@
 
 package fko.javaUCIEngineFramework.UCI;
 
+import fko.javaUCIEngineFramework.Franky.OmegaBoardPosition;
+
 import java.util.List;
 
 /** Interface for UCI Engines */
 public interface IUCIEngine {
+
+  OmegaBoardPosition getBoardPosition();
 
   String getIDName();
 

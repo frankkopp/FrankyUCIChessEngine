@@ -1267,7 +1267,7 @@ public class OmegaBoardPosition {
     if (parts.length >= 4) { // default "-"
       s = parts[3];
       if (!s.equals("-")) {
-        _enPassantSquare = OmegaSquare.fromNotation(s);
+        _enPassantSquare = OmegaSquare.fromUCINotation(s);
         if (_enPassantSquare.equals(OmegaSquare.NOSQUARE)) {
           throw new IllegalArgumentException(
               "FEN Syntax not valid - expected valid en passant square");
@@ -1291,6 +1291,7 @@ public class OmegaBoardPosition {
     if (parts.length >= 6) { // default "1"
       s = parts[5];
       _nextHalfMoveNumber = (2 * Integer.parseInt(s));
+      if (_nextHalfMoveNumber == 0) _nextHalfMoveNumber = 2;
     } else {
       _nextHalfMoveNumber = 2;
     }

@@ -127,17 +127,31 @@ class UCIProtocolHandlerTest {
   @Test
   void positionCommand() {
 
-    // TODO: add asserts when board and do move works
+    // promotion
+    toHandlerPrinter.println(
+            "position fen 8/3P4/6K1/8/8/1k6/8/8 w - - 0 0 moves d7d8q");
+    handler.waitUntilProcessed();
+    assertEquals("3Q4/8/6K1/8/8/1k6/8/8 b - - 0 1",engine.getBoardPosition().toFENString());
 
+    // castling
+    toHandlerPrinter.println(
+            "position fen r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 0 moves e1g1");
+    handler.waitUntilProcessed();
+    assertEquals("r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 1 1",engine.getBoardPosition().toFENString());
+
+    // normal
     toHandlerPrinter.println("position startpos moves e2e4 e7e5");
     handler.waitUntilProcessed();
+    assertEquals("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",engine.getBoardPosition().toFENString());
 
     toHandlerPrinter.println("position moves e2e4 e7e5");
     handler.waitUntilProcessed();
+    assertEquals("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",engine.getBoardPosition().toFENString());
 
     toHandlerPrinter.println(
         "position fen rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1 moves e1e2 e8e7");
     handler.waitUntilProcessed();
+    assertEquals("rnbq1bnr/4k3/8/8/8/8/4K3/RNBQ1BNR w - - 2 2",engine.getBoardPosition().toFENString());
 
     toHandlerPrinter.println("quit");
   }

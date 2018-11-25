@@ -126,7 +126,7 @@ public enum OmegaSquare {
    * @param s
    * @return The OmegaSquare of the notation or NOSQAURE if the notation was invalid
    */
-  public static OmegaSquare fromNotation(final String s) {
+  public static OmegaSquare fromUCINotation(final String s) {
     final OmegaSquare omegaSquare;
     try {
       omegaSquare = OmegaSquare.valueOf(s);
