@@ -23,27 +23,13 @@
  *
  */
 
-package fko.javaUCIEngineFramework.Omega;
+package fko.javaUCIEngineFramework.UCI;
 
-/**
- * Class to store a move and value pair.
- */
-public class OmegaRootMoveEntry {
+public interface IUCIProtocolHandler {
 
-    final int move;
-    final int value;
+  String START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-    /**
-     * @param move
-     * @param value
-     */
-    public OmegaRootMoveEntry(int move, int value) {
-        this.move = move;
-        this.value = value;
-    }
+  void sendInfoToUCI(String msg);
+  void sendInfoStringToUCI(String msg);
 
-    @Override
-    public String toString() {
-        return "" + OmegaMove.toString(move) + " (" + value + ") ";
-    }
 }

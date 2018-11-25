@@ -23,31 +23,27 @@
  *
  */
 
-package fko.javaUCIEngineFramework.Omega;
+package fko.javaUCIEngineFramework.Franky;
 
 /**
- * Move types of OmegaMove
+ * Class to store a move and value pair.
  */
-@SuppressWarnings("javadoc")
-public enum OmegaMoveType {
+public class OmegaRootMoveEntry {
 
+  final int move;
+  final int value;
 
-    NOMOVETYPE, // 0
-    NORMAL,     // 1
-    PAWNDOUBLE, // 2
-    PROMOTION,  // 3
-    ENPASSANT,  // 4
-    CASTLING;   // 5
+  /**
+   * @param move
+   * @param value
+   */
+  public OmegaRootMoveEntry(int move, int value) {
+    this.move = move;
+    this.value = value;
+  }
 
-    static public final OmegaMoveType[] values;
-
-    static {
-        values = OmegaMoveType.values();
-    }
-
-    static boolean isValid(int mt) {
-        if (mt<0 || mt>5) return false;
-        return true;
-    }
-
+  @Override
+  public String toString() {
+    return "" + OmegaMove.toString(move) + " (" + value + ") ";
+  }
 }

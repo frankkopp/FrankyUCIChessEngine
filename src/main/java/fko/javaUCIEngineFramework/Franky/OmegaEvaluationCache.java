@@ -23,7 +23,7 @@
  *
  */
 
-package fko.javaUCIEngineFramework.Omega;
+package fko.javaUCIEngineFramework.Franky;
 
 /**
  * A cache for board evaluation values to reduce evaluation calculation during
@@ -90,7 +90,7 @@ public class OmegaEvaluationCache {
 
     /**
      * @param key
-     * @return value for key or <tt>Integer.MIN_VALUE</tt> if not found
+     * @return value for key or Integer.MIN_VALUE if not found
      */
     public int get(long key) {
         final int hash = getHash(key);

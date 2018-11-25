@@ -40,11 +40,9 @@ import java.util.concurrent.Semaphore;
  * <p>Handles all communication related to the UCI protocol and interacts with a IUCIEngine to
  * handle engine searches
  */
-public class UCIProtocolHandler implements Runnable {
+public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(UCIProtocolHandler.class);
-
-  public static final String START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
   // back reference to the engine
   private final IUCIEngine uciEngine;
@@ -56,8 +54,8 @@ public class UCIProtocolHandler implements Runnable {
   // -- the handler runs in a separate thread --
   private Thread myThread = null;
 
-  Semaphore semaphore = new Semaphore(1, true);
-  private boolean running = false;
+  private Semaphore semaphore = new Semaphore(1, true);
+  private boolean   running   = false;
 
   /**
    * Default contructor
@@ -70,6 +68,8 @@ public class UCIProtocolHandler implements Runnable {
     this.uciEngine = uciEngine;
     this.inputStream = System.in;
     this.outputStream = System.out;
+
+    uciEngine.registerProtocolHandler(this);
   }
 
   /**
@@ -278,7 +278,7 @@ public class UCIProtocolHandler implements Runnable {
   }
 
   private void commandPosition(final Scanner scanner) {
-    String startFen = START_FEN;
+    String startFen = IUCIProtocolHandler.START_FEN;
     String token = scanner.next();
     if (token.equals("fen")) {
       startFen = "";
@@ -286,7 +286,7 @@ public class UCIProtocolHandler implements Runnable {
         startFen += token + " ";
       }
     } else if (token.equals("startpos")) {
-      startFen = START_FEN;
+      startFen = IUCIProtocolHandler.START_FEN;
     }
     List<String> moves = new ArrayList<>();
     if (token.equals("moves") || (token=scanner.next()).equals("moves")) {
@@ -389,5 +389,15 @@ public class UCIProtocolHandler implements Runnable {
 
   public boolean isRunning() {
     return running;
+  }
+
+  @Override
+  public void sendInfoToUCI(String msg) {
+    send(msg);
+  }
+
+  @Override
+  public void sendInfoStringToUCI(final String msg) {
+    send("info string " + msg);
   }
 }

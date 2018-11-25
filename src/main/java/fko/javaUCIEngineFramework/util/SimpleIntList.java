@@ -53,7 +53,7 @@ public class SimpleIntList implements Iterable<Integer> {
     protected int _tail = 0;
 
     /**
-     * Creates a list with a maximum of <tt>DEFAULT_MAX_ENTRIES</tt> elements
+     * Creates a list with a maximum of DEFAULT_MAX_ENTRIES elements
      */
     public SimpleIntList() {
         this(DEFAULT_MAX_ENTRIES);

@@ -32,6 +32,8 @@ import java.util.List;
 /** Interface for UCI Engines */
 public interface IUCIEngine {
 
+  void registerProtocolHandler(UCIProtocolHandler uciProtocolHandler);
+
   OmegaBoardPosition getBoardPosition();
 
   String getIDName();
@@ -66,7 +68,7 @@ public interface IUCIEngine {
 
   void ponderHit();
 
-  /**
+    /**
    * An Option for a MyEngine
    */
   interface IUCIOption {

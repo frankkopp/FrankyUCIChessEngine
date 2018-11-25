@@ -27,10 +27,7 @@ package fko.javaUCIEngineFramework;
 
 import fko.javaUCIEngineFramework.Franky.OmegaBoardPosition;
 import fko.javaUCIEngineFramework.Franky.OmegaMove;
-import fko.javaUCIEngineFramework.UCI.IUCIEngine;
-import fko.javaUCIEngineFramework.UCI.IUCISearchMode;
-import fko.javaUCIEngineFramework.UCI.UCIOption;
-import fko.javaUCIEngineFramework.UCI.UCISearchMode;
+import fko.javaUCIEngineFramework.UCI.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,15 +41,18 @@ public class MyEngine implements IUCIEngine {
 
   private static final Logger LOG = LoggerFactory.getLogger(MyEngine.class);
 
+  // back reference to the uci protocol handler for sending messages to the UCI UI
+  private UCIProtocolHandler uciProtocolHandler = null;
+
   // ID of engine
-  private String iDName = "MyEngine v0.1";
+  private String iDName   = "MyEngine v0.1";
   private String iDAuthor = "Frank Kopp";
 
   // options of engine
-  private int hashSizeOption = 16;
-  private boolean ponderOption = true;
-  private boolean useOwnBookOption = true;
-  private boolean debugOption = false;
+  private int     hashSizeOption   = 16;
+  private boolean ponderOption     = true;
+  private boolean useOwnBookOption = false;
+  private boolean debugOption      = false;
 
   private OmegaBoardPosition boardPosition;
 
@@ -60,22 +60,25 @@ public class MyEngine implements IUCIEngine {
 
   private IUCISearchMode searchMode = new UCISearchMode();
 
-  /** Default Constructor */
+  /**
+   * Default Constructor
+   */
   public MyEngine() {
     initOptions();
   }
 
   private void initOptions() {
+    // @formatter:off
     iUciOptions.add(
         new UCIOption("Hash",
-                IUCIEngine.UCIOptionType.spin,
+                UCIOptionType.spin,
                 "" + hashSizeOption,
                 "1",
                 "4096",
                 ""));
     iUciOptions.add(
         new UCIOption("Ponder",
-                IUCIEngine.UCIOptionType.check,
+                UCIOptionType.check,
                 ponderOption ? "true" : "false",
                 "",
                 "",
@@ -83,7 +86,7 @@ public class MyEngine implements IUCIEngine {
     iUciOptions.add(
         new UCIOption(
             "OwnBook",
-                IUCIEngine.UCIOptionType.check,
+                UCIOptionType.check,
                 useOwnBookOption ? "true" : "false",
                 "",
                 "",
@@ -91,10 +94,11 @@ public class MyEngine implements IUCIEngine {
     iUciOptions.add( // DUMMY for testing
         new UCIOption(
             "Style",
-                IUCIEngine.UCIOptionType.combo,
+                UCIOptionType.combo,
                 "Normal", "",
                 "",
                 "Solid Normal Risky"));
+   // @formatter:on
   }
 
   @Override
@@ -114,8 +118,9 @@ public class MyEngine implements IUCIEngine {
 
   @Override
   public void setHashSizeOption(final int hashSizeOption) {
-    LOG.info("Engine Hash Size set to " + hashSizeOption);
     this.hashSizeOption = hashSizeOption;
+    final String msg = "Hash Size set to " + this.hashSizeOption; LOG.info(msg);
+    uciProtocolHandler.sendInfoStringToUCI(msg);
   }
 
   @Override
@@ -125,8 +130,9 @@ public class MyEngine implements IUCIEngine {
 
   @Override
   public void setPonderOption(final boolean ponderOption) {
-    LOG.info("Engine Ponder set to " + (ponderOption ? "On" : "Off"));
     this.ponderOption = ponderOption;
+    final String msg = "Engine Ponder set to " + (this.ponderOption ? "On" : "Off"); LOG.info(msg);
+    uciProtocolHandler.sendInfoStringToUCI(msg);
   }
 
   @Override
@@ -142,8 +148,12 @@ public class MyEngine implements IUCIEngine {
 
   @Override
   public void setPosition(final String fen) {
-    LOG.info("Engine got Position command: " + fen);
-    boardPosition = new OmegaBoardPosition(fen);
+    LOG.info("Engine got Position command: " + fen); boardPosition = new OmegaBoardPosition(fen);
+  }
+
+  @Override
+  public void registerProtocolHandler(UCIProtocolHandler uciProtocolHandler) {
+    this.uciProtocolHandler = uciProtocolHandler;
   }
 
   @Override
@@ -165,8 +175,9 @@ public class MyEngine implements IUCIEngine {
 
   @Override
   public void setDebugOption(final boolean debugOption) {
-    LOG.info("Engine Debug set to " + (debugOption ? "On" : "Off"));
     this.debugOption = debugOption;
+    final String msg = "Engine Debug set to " + (this.debugOption ? "On" : "Off"); LOG.info(msg);
+    uciProtocolHandler.sendInfoStringToUCI(msg);
   }
 
   @Override
@@ -192,4 +203,5 @@ public class MyEngine implements IUCIEngine {
     // TODO ponderHit
     LOG.info("Engine PonderHit start with " + this.searchMode.toString());
   }
+
 }
