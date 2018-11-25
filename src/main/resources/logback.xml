@@ -26,10 +26,10 @@
   -->
 
 <configuration>
-    <!-- debug="true" scan="true" -->
+    <!-- debugOption="true" scan="true" -->
     <contextName>JavaUCIEngineFramework</contextName>
 
-    <!-- Send debug messages to System.out -->
+    <!-- Send debugOption messages to System.out -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>

@@ -34,53 +34,63 @@ import java.util.List;
 /**
  * UCIEngine
  *
- * TODO: implement commands
+ * <p>TODO: implement commands
  */
 public class UCIEngine implements IUCIEngine {
 
   private static final Logger LOG = LoggerFactory.getLogger(UCIEngine.class);
 
-  /**
-   * UCIEngine
-   */
+  /** UCIEngine */
 
   // ID of engine
-  private String iDName = "MyEngine v0.1";
-  private String iDAuthor = "Frank Kopp";
+  private static final String iDName = "MyEngine v0.1";
+  private static final String iDAuthor = "Frank Kopp";
 
   // options of engine
-  private int hashSize = 16;
-  private boolean ponder = true;
-
+  private int hashSizeOption = 16;
+  private boolean ponderOption = true;
+  private boolean useBookOption = true;
+  private boolean debugOption = false;
 
   List<IUCIEngine.IUCIOption> iUciOptions = new ArrayList<>();
 
-  /**
-   * Default Constructor
-   */
+  private IUCISearchMode searchMode = new UCISearchMode();
+
+  /** Default Constructor */
   public UCIEngine() {
     initOptions();
   }
 
   private void initOptions() {
-    iUciOptions.add(new UCIOption("Hash",
-            IUCIEngine.UCIOptionType.spin,
-            ""+hashSize,
-            "1",
-            "4096",
-            ""));
-    iUciOptions.add(new UCIOption("Ponder",
-            IUCIEngine.UCIOptionType.check,
-            ponder ? "true" : "false",
-            "",
-            "",
-            ""));
-    iUciOptions.add(new UCIOption("Style",
-            IUCIEngine.UCIOptionType.combo,
-            "Normal",
-            "",
-            "",
-            "Solid Normal Risky"));
+    iUciOptions.add(
+        new UCIOption("Hash",
+                IUCIEngine.UCIOptionType.spin,
+                "" + hashSizeOption,
+                "1",
+                "4096",
+                ""));
+    iUciOptions.add(
+        new UCIOption("Ponder",
+                IUCIEngine.UCIOptionType.check,
+                ponderOption ? "true" : "false",
+                "",
+                "",
+                ""));
+    iUciOptions.add(
+        new UCIOption(
+            "OwnBook",
+                IUCIEngine.UCIOptionType.check,
+                useBookOption ? "true" : "false",
+                "",
+                "",
+                ""));
+    iUciOptions.add( // DUMMY for testing
+        new UCIOption(
+            "Style",
+                IUCIEngine.UCIOptionType.combo,
+                "Normal", "",
+                "",
+                "Solid Normal Risky"));
   }
 
   @Override
@@ -99,23 +109,74 @@ public class UCIEngine implements IUCIEngine {
   }
 
   @Override
-  public void setHashSize(final int hashSize) {
-    LOG.info("Engine Hash Size set to " + hashSize);
-    this.hashSize = hashSize;
+  public void setHashSizeOption(final int hashSizeOption) {
+    LOG.info("Engine Hash Size set to " + hashSizeOption);
+    this.hashSizeOption = hashSizeOption;
   }
 
   @Override
-  public void setPonder(final boolean ponder) {
-    LOG.info("Engine Ponder set to " + (ponder ? "On" : "Off"));
-    this.ponder = ponder;
+  public int getHashSizeOption() {
+    return hashSizeOption;
   }
 
   @Override
-  public boolean getPonder() {
-    return ponder;
+  public void setPonderOption(final boolean ponderOption) {
+    LOG.info("Engine Ponder set to " + (ponderOption ? "On" : "Off"));
+    this.ponderOption = ponderOption;
   }
 
   @Override
-  public int getHashSize() { return hashSize; }
+  public boolean getPonderOption() {
+    return ponderOption;
+  }
 
+  @Override
+  public void newGame() {
+    // TODO what need to be done for forgetting existing game
+    LOG.info("Engine got New Game command");
+  }
+
+  @Override
+  public void setPosition(final String fen) {
+    LOG.info("Engine got Position command: "+fen);
+    // TODO
+  }
+
+  @Override
+  public void doMove(final String move) {
+    LOG.info("Engine got doMove command: "+ move);
+    // TODO
+  }
+
+  @Override
+  public boolean isReady() {
+    return true;
+  }
+
+  @Override
+  public void setDebugOption(final boolean debugOption) {
+    LOG.info("Engine Debug set to " + (debugOption ? "On" : "Off"));
+    this.debugOption = debugOption;
+  }
+
+  @Override
+  public boolean getDebugOption() {
+    return debugOption;
+  }
+
+  @Override
+  public void startSearch(final IUCISearchMode searchMode) {
+    this.searchMode = searchMode;
+    LOG.info("Engine Search start with "+this.searchMode.toString());
+  }
+
+  @Override
+  public void stopSearch() {
+    LOG.info("Engine Stop");
+  }
+
+  @Override
+  public void ponderHit() {
+    LOG.info("Engine PonderHit start with "+this.searchMode.toString());
+  }
 }

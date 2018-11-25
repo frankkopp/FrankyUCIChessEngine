@@ -27,67 +27,53 @@ package fko.javaUCIEngineFramework;
 
 import java.util.List;
 
-/** Interface for UCI Engines */
-public interface IUCIEngine {
+public interface IUCISearchMode {
 
-  String getIDName();
+  int getBlackInc();
 
-  String getIDAuthor();
+  int getBlackTime();
 
-  List<IUCIOption> getOptions();
+  int getDepth();
 
-  int getHashSizeOption();
+  int getMate();
 
-  void setHashSizeOption(int hashSizeOption);
+  List<String> getMoves();
 
-  void setPonderOption(boolean ponderOn);
+  int getMoveTime();
 
-  boolean getPonderOption();
+  long getNodes();
 
-  void newGame();
+  int getWhiteInc();
 
-  void setPosition(String startFen);
+  int getWhiteTime();
 
-  void doMove(String move);
+  boolean isInfinite();
 
-  boolean isReady();
+  boolean isPonder();
 
-  void setDebugOption(boolean debugOption);
+  int getMovesToGo();
 
-  boolean getDebugOption();
+  void setBlackInc(int blackInc);
 
-  void startSearch(IUCISearchMode searchMode);
+  void setBlackTime(int blackTime);
 
-  void stopSearch();
+  void setDepth(int depth);
 
-  void ponderHit();
+  void setInfinite(boolean infinite);
 
-  /**
-   * An Option for a UCIEngine
-   */
-  interface IUCIOption {
+  void setMate(int mate);
 
-    String getNameID();
+  void setMoves(List<String> moves);
 
-    UCIOptionType getOptionType();
+  void setMoveTime(int movetime);
 
-    String getDefaultValue();
+  void setNodes(long nodes);
 
-    String getMinValue();
+  void setPonder(boolean ponder);
 
-    String getMaxValue();
+  void setWhiteInc(int whiteInc);
 
-    String getVarValue();
-  }
+  void setWhiteTime(int whiteTime);
 
-  /**
-   * UCI Option can have these types
-   */
-  enum UCIOptionType {
-    check,
-    spin,
-    combo,
-    button,
-    string
-  }
+  void setMovesToGo(int movesToGo);
 }

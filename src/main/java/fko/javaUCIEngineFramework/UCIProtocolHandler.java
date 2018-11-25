@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.Semaphore;
@@ -42,6 +43,8 @@ import java.util.concurrent.Semaphore;
 public class UCIProtocolHandler implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(UCIProtocolHandler.class);
+
+  public static final String START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
   // back reference to the engine
   private final IUCIEngine uciEngine;
@@ -106,7 +109,9 @@ public class UCIProtocolHandler implements Runnable {
     myThread.interrupt();
   }
 
-  /** Loop for protocol scanning */
+  /**
+   * Loop for protocol scanning
+   */
   @Override
   public void run() {
 
@@ -118,8 +123,9 @@ public class UCIProtocolHandler implements Runnable {
 
         semaphore.acquire();
 
-        // wait until a line is ready to be read
         LOG.debug("Listening...");
+
+        // wait until a line is ready to be read
         final String readLine = in.readLine();
         LOG.debug("Received: " + readLine);
 
@@ -190,9 +196,9 @@ public class UCIProtocolHandler implements Runnable {
       String optionString = "option name " + option.getNameID();
       optionString += " type " + option.getOptionType().name();
       optionString += " default " + option.getDefaultValue();
-      if (option.getMinValue() != "") optionString += " min " + option.getMinValue();
-      if (option.getMaxValue() != "") optionString += " max " + option.getMaxValue();
-      if (option.getVarValue() != "") {
+      if (!option.getMinValue().equals("")) optionString += " min " + option.getMinValue();
+      if (!option.getMaxValue().equals("")) optionString += " max " + option.getMaxValue();
+      if (!option.getVarValue().equals("")) {
         for (String v : option.getVarValue().split(" ")) {
           optionString += " var " + v;
         }
@@ -205,8 +211,7 @@ public class UCIProtocolHandler implements Runnable {
   }
 
   private void commandIsReady(final Scanner scanner) {
-    LOG.info("Received isready command");
-    send("readyok");
+    if (uciEngine.isReady()) send("readyok");
   }
 
   private void commandSetOption(final Scanner scanner) {
@@ -234,7 +239,7 @@ public class UCIProtocolHandler implements Runnable {
     if (keyValue.equals("value")) {
       try {
         int hashSize = Integer.valueOf(scanner.next());
-        uciEngine.setHashSize(hashSize);
+        uciEngine.setHashSizeOption(hashSize);
       } catch (NumberFormatException e) {
         LOG.error("Command setoption Hash is malformed", e);
       }
@@ -246,72 +251,117 @@ public class UCIProtocolHandler implements Runnable {
   private void optionPonder(final Scanner scanner) {
     final String keyValue = scanner.next();
     if (keyValue.equals("value")) {
-      try {
-        boolean ponder = Boolean.valueOf(scanner.next());
-        uciEngine.setPonder(ponder);
-      } catch (NumberFormatException e) {
-        LOG.error("Command setoption Ponder is malformed", e);
-      }
+      boolean ponder = Boolean.valueOf(scanner.next());
+      uciEngine.setPonderOption(ponder);
     } else {
       LOG.error("Command setoption Ponder is malformed - expected key value received: " + keyValue);
     }
   }
 
   private void commandUciNewGame(final Scanner scanner) {
-
-    LOG.warn("UCI Protocol Command: ucinewgame not yet implemented!");
-    // interpreting the options
-    while (scanner.hasNext()) {
-      LOG.debug("UCI Protocol Command Option? " + scanner.next());
-    }
+    uciEngine.newGame();
   }
 
   private void commandDebug(final Scanner scanner) {
-    LOG.warn("UCI Protocol Command: debug not yet implemented!");
-    // interpreting the options
-    while (scanner.hasNext()) {
-      LOG.debug("UCI Protocol Command Option? " + scanner.next());
+    final String keyValue = scanner.next();
+    if (keyValue.equals("on")) {
+      uciEngine.setDebugOption(true);
+    } else if (keyValue.equals("off")) {
+      uciEngine.setDebugOption(false);
+    } else {
+      LOG.error("Command setoption Debug is malformed - expected key value received: " + keyValue);
     }
   }
 
   private void commandRegister(final Scanner scanner) {
-    LOG.warn("UCI Protocol Command: register not yet implemented!");
-    // interpreting the options
-    while (scanner.hasNext()) {
-      LOG.debug("UCI Protocol Command Option? " + scanner.next());
-    }
+    LOG.warn("UCI Protocol Command: register not implemented!");
   }
 
   private void commandPosition(final Scanner scanner) {
-    LOG.warn("UCI Protocol Command: position not yet implemented!");
-    // interpreting the options
-    while (scanner.hasNext()) {
-      LOG.debug("UCI Protocol Command Option? " + scanner.next());
+    String startFen = "";
+    String token = scanner.next();
+    if (token.equals("fen")) {
+      while (!(token = scanner.next()).equals("moves")) {
+        startFen += token + " ";
+      }
+    } else if (token.equals("startpos")) {
+      startFen = START_FEN;
     }
+    List<String> moves = new ArrayList<>();
+    if (token.equals("moves") || (token=scanner.next()).equals("moves")) {
+      while (scanner.hasNext()) {
+        token = scanner.next();
+        moves.add(token);
+      }
+    }
+    uciEngine.setPosition(startFen);
+    for (String move : moves) {
+      uciEngine.doMove(move);
+    }
+
   }
 
   private void commandGo(final Scanner scanner) {
-    LOG.warn("UCI Protocol Command: go not yet implemented!");
-    // interpreting the options
+
+    IUCISearchMode searchMode = new UCISearchMode();
+
     while (scanner.hasNext()) {
-      LOG.debug("UCI Protocol Command Option? " + scanner.next());
+      String token = scanner.next();
+      switch (token) {
+        case "searchmoves": // needs to last token in command
+          while (scanner.hasNext()) {
+            token = scanner.next();
+            searchMode.getMoves().add(token);
+          }
+          break;
+        case "ponder":
+          searchMode.setPonder(true);
+          break;
+        case "wtime":
+          searchMode.setWhiteTime(Integer.valueOf(scanner.next()));
+          break;
+        case "btime":
+          searchMode.setBlackTime(Integer.valueOf(scanner.next()));
+          break;
+        case "winc":
+          searchMode.setWhiteInc(Integer.valueOf(scanner.next()));
+          break;
+        case "binc":
+          searchMode.setBlackInc(Integer.valueOf(scanner.next()));
+          break;
+        case "movestogo":
+          searchMode.setMovesToGo(Integer.valueOf(scanner.next()));
+          break;
+        case "depth":
+          searchMode.setDepth(Integer.valueOf(scanner.next()));
+          break;
+        case "nodes":
+          searchMode.setNodes(Long.valueOf(scanner.next()));
+          break;
+        case "mate":
+          searchMode.setMate(Integer.valueOf(scanner.next()));
+          break;
+        case "movetime":
+          searchMode.setMoveTime(Integer.valueOf(scanner.next()));
+          break;
+        case "infinite":
+          searchMode.setInfinite(true);
+          break;
+        default:
+          LOG.error("Command go is malformed - expected known go subcommand but received " + token);
+          break;
+      }
     }
+
+    uciEngine.startSearch(searchMode);
   }
 
   private void commandStop(final Scanner scanner) {
-    LOG.warn("UCI Protocol Command: stop not yet implemented!");
-    // interpreting the options
-    while (scanner.hasNext()) {
-      LOG.debug("UCI Protocol Command Option? " + scanner.next());
-    }
+    uciEngine.stopSearch();
   }
 
   private void commandPonderhit(final Scanner scanner) {
-    LOG.warn("UCI Protocol Command: ponderhit not yet implemented!");
-    // interpreting the options
-    while (scanner.hasNext()) {
-      LOG.debug("UCI Protocol Command Option? " + scanner.next());
-    }
+    uciEngine.ponderHit();
   }
 
   private void commandQuit(final Scanner scanner) {
@@ -339,5 +389,4 @@ public class UCIProtocolHandler implements Runnable {
   public boolean isRunning() {
     return running;
   }
-
 }

@@ -21,8 +21,8 @@ Description of the universal chess interface (UCI)    April  2006
   but be aware of this when for example running a Linux engine in a Windows GUI.
 
 * arbitrary white space between tokens is allowed
-  Example: "debug on\n" and  "   debug     on  \n" and "\t  debug \t  \t\ton\t  \n"
-  all set the debug mode of the engine on.
+  Example: "debugOption on\n" and  "   debugOption     on  \n" and "\t  debugOption \t  \t\ton\t  \n"
+  all set the debugOption mode of the engine on.
 
 * The engine will always be in forced mode which means it should never start calculating
   or pondering without receiving a "go" command first.
@@ -35,8 +35,8 @@ Description of the universal chess interface (UCI)    April  2006
 
 * if the engine or the GUI receives an unknown command or token it should just ignore it and try to
   parse the rest of the string in this line.
-  Examples: "joho debug on\n" should switch the debug mode on given that joho is not defined,
-            "debug joho on\n" will be undefined however.
+  Examples: "joho debugOption on\n" should switch the debugOption mode on given that joho is not defined,
+            "debugOption joho on\n" will be undefined however.
 
 * if the engine receives a command which is not supposed to come, for example "stop" when the engine is
   not calculating, it should also just ignore it.
@@ -65,9 +65,9 @@ These are all the command the engine gets from the interface.
 	After that the engine should send "uciok" to acknowledge the uci mode.
 	If no uciok is sent within a certain time period, the engine task will be killed by the GUI.
 
-* debug [ on | off ]
-	switch the debug mode of the engine on and off.
-	In debug mode the engine should send additional infos to the GUI, e.g. with the "info string" command,
+* debugOption [ on | off ]
+	switch the debugOption mode of the engine on and off.
+	In debugOption mode the engine should send additional infos to the GUI, e.g. with the "info string" command,
 	to help debugging, e.g. the commands that the engine has received etc.
 	This mode should be switched off by default and this command can be sent
 	any time, also when the engine is thinking.
@@ -137,15 +137,15 @@ These are all the command the engine gets from the interface.
 		restrict search to this moves only
 		Example: After "position startpos" and "go infinite searchmoves e2e4 d2d4"
 		the engine should only search the two moves e2e4 and d2d4 in the initial position.
-	* ponder
+	* ponderOption
 		start searching in pondering mode.
-		Do not exit the search in ponder mode, even if it's mate!
-		This means that the last move sent in in the position string is the ponder move.
+		Do not exit the search in ponderOption mode, even if it's mate!
+		This means that the last move sent in in the position string is the ponderOption move.
 		The engine can do what it wants to do, but after a "ponderhit" command
-		it should execute the suggested move to ponder on. This means that the ponder move sent by
-		the GUI can be interpreted as a recommendation about which move to ponder. However, if the
-		engine decides to ponder on a different move, it should not display any mainlines as they are
-		likely to be misinterpreted by the GUI because the GUI expects the engine to ponder
+		it should execute the suggested move to ponderOption on. This means that the ponderOption move sent by
+		the GUI can be interpreted as a recommendation about which move to ponderOption. However, if the
+		engine decides to ponderOption on a different move, it should not display any mainlines as they are
+		likely to be misinterpreted by the GUI because the GUI expects the engine to ponderOption
 	   on the suggested move.
 	* wtime <x>
 		white has x msec left on the clock
@@ -172,10 +172,10 @@ These are all the command the engine gets from the interface.
     
 * stop
 	stop calculating as soon as possible,
-	don't forget the "bestmove" and possibly the "ponder" token when finishing the search
+	don't forget the "bestmove" and possibly the "ponderOption" token when finishing the search
 
 * ponderhit
-	the user has played the expected move. This will be sent if the engine was told to ponder on the same move
+	the user has played the expected move. This will be sent if the engine was told to ponderOption on the same move
 	the user has played. The engine should continue searching but switch from pondering to normal search.
 
 * quit
@@ -204,9 +204,9 @@ Engine to GUI:
 	but it can be used anytime, even when the engine is searching,
 	and must always be answered with "isready".
 
-* bestmove <move1> [ ponder <move2> ]
+* bestmove <move1> [ ponderOption <move2> ]
 	the engine has stopped searching and found the move <move> best in this position.
-	the engine can send the move it likes to ponder on. The engine must not start pondering automatically.
+	the engine can send the move it likes to ponderOption on. The engine must not start pondering automatically.
 	this command must always be sent if the engine stops searching, also in pondering mode if there is a
 	"stop" command, so for every "go" command a "bestmove" command is needed!
 	Directly before that the engine should send a final "info" command with the final search information,
@@ -349,7 +349,7 @@ Engine to GUI:
 			These last two options should also be present in the initial options exchange dialog
 			when the engine is booted if the engine supports it
 		* <id> = Ponder, type check
-			this means that the engine is able to ponder.
+			this means that the engine is able to ponderOption.
 			The GUI will send this whenever pondering is possible or not.
 			Note: The engine should not start pondering on its own if this is enabled, this option is only
 			needed because the engine might change its time management algorithm when pondering is allowed.
@@ -474,7 +474,7 @@ setoption name NalimovPath value d:\tb;c\tb
 isready
 
 // engine has finished setting up the internal values
-		readyok
+		    readyok
 
 // now we are ready to go
 
@@ -514,7 +514,7 @@ stop
 // the engine has finished searching and is sending the bestmove command
 // which is needed for every "go" command sent to tell the GUI
 // that the engine is ready again
-		bestmove g1f3 ponder d8f6
+		bestmove g1f3 ponderOption d8f6
 
 
 
