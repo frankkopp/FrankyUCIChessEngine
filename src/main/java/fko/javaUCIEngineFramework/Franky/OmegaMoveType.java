@@ -23,14 +23,12 @@
  *
  */
 
-package fko.javaUCIEngineFramework.Omega;
+package fko.javaUCIEngineFramework.Franky;
 
 /**
  * Move types of OmegaMove
  */
-@SuppressWarnings("javadoc")
 public enum OmegaMoveType {
-
 
     NOMOVETYPE, // 0
     NORMAL,     // 1
@@ -46,8 +44,7 @@ public enum OmegaMoveType {
     }
 
     static boolean isValid(int mt) {
-        if (mt<0 || mt>5) return false;
-        return true;
+        return mt >= 0 && mt <= 5;
     }
 
 }

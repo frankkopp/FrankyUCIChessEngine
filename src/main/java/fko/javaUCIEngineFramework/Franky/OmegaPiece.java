@@ -23,16 +23,11 @@
  *
  */
 
-package fko.javaUCIEngineFramework.Omega;
-
-import fko.chessly.game.GameColor;
-import fko.chessly.game.GamePiece;
-import fko.chessly.game.pieces.*;
+package fko.javaUCIEngineFramework.Franky;
 
 /**
  * Enumeration of all chess pieces with pieces types and color.
  */
-@SuppressWarnings("javadoc")
 public enum OmegaPiece {
 
     NOPIECE      (OmegaPieceType.NOTYPE, OmegaColor.NOCOLOR, ""),// 0
@@ -59,7 +54,7 @@ public enum OmegaPiece {
         values = OmegaPiece.values();
     }
 
-    private OmegaPiece(OmegaPieceType type, OmegaColor color, String shortName) {
+    OmegaPiece(OmegaPieceType type, OmegaColor color, String shortName) {
         _type = type;
         _color = color;
         _shortName = shortName;
@@ -106,43 +101,43 @@ public enum OmegaPiece {
     /**
      * Convert this OmegaPiece to the matching GamePiece
      */
-    public GamePiece convertToGamePiece() {
-        switch (this) {
-            case WHITE_KING:   return King.create(GameColor.WHITE);
-            case WHITE_QUEEN:  return Queen.create(GameColor.WHITE);
-            case WHITE_ROOK:   return Rook.create(GameColor.WHITE);
-            case WHITE_BISHOP: return Bishop.create(GameColor.WHITE);
-            case WHITE_KNIGHT: return Knight.create(GameColor.WHITE);
-            case WHITE_PAWN:   return Pawn.create(GameColor.WHITE);
-            case BLACK_KING:   return King.create(GameColor.BLACK);
-            case BLACK_QUEEN:  return Queen.create(GameColor.BLACK);
-            case BLACK_ROOK:   return Rook.create(GameColor.BLACK);
-            case BLACK_BISHOP: return Bishop.create(GameColor.BLACK);
-            case BLACK_KNIGHT: return Knight.create(GameColor.BLACK);
-            case BLACK_PAWN:   return Pawn.create(GameColor.BLACK);
-            default:
-                throw new RuntimeException("Invalid Piece");
-        }
-    }
+//    public GamePiece convertToGamePiece() {
+//        switch (this) {
+//            case WHITE_KING:   return King.create(GameColor.WHITE);
+//            case WHITE_QUEEN:  return Queen.create(GameColor.WHITE);
+//            case WHITE_ROOK:   return Rook.create(GameColor.WHITE);
+//            case WHITE_BISHOP: return Bishop.create(GameColor.WHITE);
+//            case WHITE_KNIGHT: return Knight.create(GameColor.WHITE);
+//            case WHITE_PAWN:   return Pawn.create(GameColor.WHITE);
+//            case BLACK_KING:   return King.create(GameColor.BLACK);
+//            case BLACK_QUEEN:  return Queen.create(GameColor.BLACK);
+//            case BLACK_ROOK:   return Rook.create(GameColor.BLACK);
+//            case BLACK_BISHOP: return Bishop.create(GameColor.BLACK);
+//            case BLACK_KNIGHT: return Knight.create(GameColor.BLACK);
+//            case BLACK_PAWN:   return Pawn.create(GameColor.BLACK);
+//            default:
+//                throw new RuntimeException("Invalid Piece");
+//        }
+//    }
 
     /**
      * Convert e GamePiece to an OmegaPiece
      * @return matching OmegaPiece
      */
-    public static OmegaPiece convertFromGamePiece(GamePiece gp) {
-        if (gp == null) return OmegaPiece.NOPIECE;
-        assert (gp.isWhite() || gp.isBlack());
-        switch (gp.getType()) {
-            case KING:   return gp.isWhite() ? OmegaPiece.WHITE_KING : OmegaPiece.BLACK_KING;
-            case QUEEN:  return gp.isWhite() ? OmegaPiece.WHITE_QUEEN : OmegaPiece.BLACK_QUEEN;
-            case ROOK:   return gp.isWhite() ? OmegaPiece.WHITE_ROOK : OmegaPiece.BLACK_ROOK;
-            case BISHOP: return gp.isWhite() ? OmegaPiece.WHITE_BISHOP : OmegaPiece.BLACK_BISHOP;
-            case KNIGHT: return gp.isWhite() ? OmegaPiece.WHITE_KNIGHT : OmegaPiece.BLACK_KNIGHT;
-            case PAWN:   return gp.isWhite() ? OmegaPiece.WHITE_PAWN : OmegaPiece.BLACK_PAWN;
-            default:
-                throw new RuntimeException("Invalid GamePieceType: "+gp);
-        }
-    }
+//    public static OmegaPiece convertFromGamePiece(GamePiece gp) {
+//        if (gp == null) return OmegaPiece.NOPIECE;
+//        assert (gp.isWhite() || gp.isBlack());
+//        switch (gp.getType()) {
+//            case KING:   return gp.isWhite() ? OmegaPiece.WHITE_KING : OmegaPiece.BLACK_KING;
+//            case QUEEN:  return gp.isWhite() ? OmegaPiece.WHITE_QUEEN : OmegaPiece.BLACK_QUEEN;
+//            case ROOK:   return gp.isWhite() ? OmegaPiece.WHITE_ROOK : OmegaPiece.BLACK_ROOK;
+//            case BISHOP: return gp.isWhite() ? OmegaPiece.WHITE_BISHOP : OmegaPiece.BLACK_BISHOP;
+//            case KNIGHT: return gp.isWhite() ? OmegaPiece.WHITE_KNIGHT : OmegaPiece.BLACK_KNIGHT;
+//            case PAWN:   return gp.isWhite() ? OmegaPiece.WHITE_PAWN : OmegaPiece.BLACK_PAWN;
+//            default:
+//                throw new RuntimeException("Invalid GamePieceType: "+gp);
+//        }
+//    }
 
     /**
      * @param i

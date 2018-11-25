@@ -23,12 +23,11 @@
  *
  */
 
-package fko.javaUCIEngineFramework.Omega;
+package fko.javaUCIEngineFramework.Franky;
 
 /**
  * Enumeration of all piece types in chess
  */
-@SuppressWarnings("javadoc")
 public enum OmegaPieceType {
 
     // order has influence on OmegaPiece
@@ -54,7 +53,7 @@ public enum OmegaPieceType {
     private final int _value;
     private boolean _sliding;
 
-    private OmegaPieceType(String shortName, boolean sliding, int value) {
+    OmegaPieceType(String shortName, boolean sliding, int value) {
         _shortName = shortName;
         _sliding = sliding;
         _value = value;

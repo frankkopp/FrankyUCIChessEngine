@@ -23,7 +23,7 @@
  *
  */
 
-package fko.javaUCIEngineFramework;
+package fko.javaUCIEngineFramework.UCI;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ public interface IUCIEngine {
   void ponderHit();
 
   /**
-   * An Option for a UCIEngine
+   * An Option for a MyEngine
    */
   interface IUCIOption {
 

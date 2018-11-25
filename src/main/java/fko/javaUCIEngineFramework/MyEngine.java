@@ -36,13 +36,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * UCIEngine
+ * MyEngine
  *
  * <p>TODO: implement commands
  */
-public class UCIEngine implements IUCIEngine {
+public class MyEngine implements IUCIEngine {
 
-  private static final Logger LOG = LoggerFactory.getLogger(UCIEngine.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MyEngine.class);
 
   // ID of engine
   private String iDName = "UCI Engine Example v0.1";
@@ -59,7 +59,7 @@ public class UCIEngine implements IUCIEngine {
   private IUCISearchMode searchMode = new UCISearchMode();
 
   /** Default Constructor */
-  public UCIEngine() {
+  public MyEngine() {
     initOptions();
   }
 

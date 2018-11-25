@@ -23,7 +23,7 @@
  *
  */
 
-package fko.javaUCIEngineFramework.Omega;
+package fko.javaUCIEngineFramework.Franky;
 
 /**
  * A simple and fast list for OmegaSquares for use as piece lists.<br>

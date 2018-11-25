@@ -23,9 +23,7 @@
  *
  */
 
-package fko.javaUCIEngineFramework.Omega;
-
-import fko.chessly.game.GameColor;
+package fko.javaUCIEngineFramework.Franky;
 
 /**
  * <p>
@@ -37,12 +35,11 @@ import fko.chessly.game.GameColor;
  *
  * @author Frank Kopp (frank@familie-kopp.de)
  */
-@SuppressWarnings("javadoc")
 public enum OmegaColor {
 
     // order has influence on OmegaPiece
     WHITE       (1),      // 0
-    BLACK      (-1),      // 1
+    BLACK       (-1),     // 1
     NOCOLOR     (0);      // 2
 
     /**
@@ -50,7 +47,7 @@ public enum OmegaColor {
      */
     public final int factor;
 
-    private OmegaColor(int factor) {
+    OmegaColor(int factor) {
         this.factor = factor;
     }
 
@@ -130,34 +127,34 @@ public enum OmegaColor {
      * @param c
      * @return matching OmegaColor
      */
-    public static OmegaColor convertFromGameColor(GameColor c) {
-        switch (c) {
-            case WHITE:
-                return OmegaColor.WHITE;
-            case BLACK:
-                return OmegaColor.BLACK;
-            case NONE:
-                return OmegaColor.NOCOLOR;
-            default:
-                throw new RuntimeException("Invalid Color");
-        }
-    }
+//    public static OmegaColor convertFromGameColor(GameColor c) {
+//        switch (c) {
+//            case WHITE:
+//                return OmegaColor.WHITE;
+//            case BLACK:
+//                return OmegaColor.BLACK;
+//            case NONE:
+//                return OmegaColor.NOCOLOR;
+//            default:
+//                throw new RuntimeException("Invalid Color");
+//        }
+//    }
 
     /**
      * Convert to GameColor
      * @return matching GameColor
      */
-    public GameColor convertToGameColor() {
-        switch (this) {
-            case WHITE:
-                return GameColor.WHITE;
-            case BLACK:
-                return GameColor.BLACK;
-            case NOCOLOR:
-                return GameColor.NONE;
-            default:
-                throw new RuntimeException("Invalid Color");
-        }
-    }
+//    public GameColor convertToGameColor() {
+//        switch (this) {
+//            case WHITE:
+//                return GameColor.WHITE;
+//            case BLACK:
+//                return GameColor.BLACK;
+//            case NOCOLOR:
+//                return GameColor.NONE;
+//            default:
+//                throw new RuntimeException("Invalid Color");
+//        }
+//    }
 
 }

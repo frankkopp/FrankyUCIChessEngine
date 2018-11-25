@@ -23,11 +23,9 @@
  *
  */
 
-package fko.javaUCIEngineFramework;
+package fko.javaUCIEngineFramework.UCI;
 
-import fko.javaUCIEngineFramework.UCI.IUCIEngine;
-import fko.javaUCIEngineFramework.UCI.UCIEngine;
-import fko.javaUCIEngineFramework.UCI.UCIProtocolHandler;
+import fko.javaUCIEngineFramework.MyEngine;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,7 +54,7 @@ class UCIProtocolHandlerTest {
     final PipedOutputStream handlerOutput = new PipedOutputStream(fromHandler);
     fromHandlerReader = new BufferedReader(new InputStreamReader(fromHandler));
 
-    engine = new UCIEngine();
+    engine = new MyEngine();
     handler = new UCIProtocolHandler(engine, handlerInput, handlerOutput);
     handler.startHandler();
   }
@@ -129,7 +127,7 @@ class UCIProtocolHandlerTest {
   @Test
   void positionCommand() {
 
-    //TODO: add asserts when board and do move works
+    // TODO: add asserts when board and do move works
 
     toHandlerPrinter.println("position startpos moves e2e4 e7e5");
     handler.waitUntilProcessed();
@@ -137,7 +135,8 @@ class UCIProtocolHandlerTest {
     toHandlerPrinter.println("position moves e2e4 e7e5");
     handler.waitUntilProcessed();
 
-    toHandlerPrinter.println("position fen rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1 moves e1e2 e8e7");
+    toHandlerPrinter.println(
+        "position fen rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1 moves e1e2 e8e7");
     handler.waitUntilProcessed();
 
     toHandlerPrinter.println("quit");
@@ -146,7 +145,7 @@ class UCIProtocolHandlerTest {
   @Test
   void goCommand() {
 
-    //TODO: add asserts when board and do move works
+    // TODO: add asserts when board and do move works
     toHandlerPrinter.println("go infinite");
     handler.waitUntilProcessed();
 
@@ -179,7 +178,7 @@ class UCIProtocolHandlerTest {
 
   @Test
   void ponderHitCommand() {
-    //TODO: add asserts when board and do move works
+    // TODO: add asserts when board and do move works
     toHandlerPrinter.println("ponderhit");
     handler.waitUntilProcessed();
     toHandlerPrinter.println("quit");
@@ -187,11 +186,9 @@ class UCIProtocolHandlerTest {
 
   @Test
   void stopCommand() {
-    //TODO: add asserts when board and do move works
+    // TODO: add asserts when board and do move works
     toHandlerPrinter.println("stop");
     handler.waitUntilProcessed();
     toHandlerPrinter.println("quit");
   }
-
 }
-

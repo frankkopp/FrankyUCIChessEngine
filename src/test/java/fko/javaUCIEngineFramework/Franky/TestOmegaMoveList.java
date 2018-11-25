@@ -1,38 +1,34 @@
-/**
- * The MIT License (MIT)
+/*
+ * MIT License
  *
- * "Chessly by Frank Kopp"
+ * Copyright (c) 2018 Frank Kopp
  *
- * mail-to:frank@familie-kopp.de
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Copyright (c) 2016 Frank Kopp
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in the
- * Software without restriction, including without limitation the rights to use, copy,
- * modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to the
- * following conditions:
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  *
- * The above copyright notice and this permission notice shall be included in all copies
- * or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
- * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
- * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
- * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
  */
 
-package fko.chessly.player.computer.Omega;
+package fko.javaUCIEngineFramework.Franky;
 
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Frank
@@ -40,9 +36,6 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class TestOmegaMoveList {
 
-    /**
-     *
-     */
     @Test
     public void testListWithInts() {
         OmegaMoveList list = new OmegaMoveList();
@@ -63,19 +56,19 @@ public class TestOmegaMoveList {
         int value = move1;
 
         list.add(value);
-        assertTrue(list.size()==1);
+        assertEquals(1, list.size());
         assertFalse(list.empty());
-        assertTrue(list.get(0)==value);
-        assertTrue(list.getFirst()==value);
-        assertTrue(list.getLast()==value);
+        assertEquals(list.get(0), value);
+        assertEquals(list.getFirst(), value);
+        assertEquals(list.getLast(), value);
 
         // remove one entry
         int element = list.removeLast();
-        assertTrue(element==value);
+        assertEquals(element, value);
         testEmptyList(list);
         list.add(value);
         element = list.removeFirst();
-        assertTrue(element==value);
+        assertEquals(element, value);
         testEmptyList(list);
 
         // add 10 entries
@@ -89,66 +82,66 @@ public class TestOmegaMoveList {
                     OmegaPiece.NOPIECE
                     );
             list.add(move);
-            assertTrue(list.size()==i-100+1);
+            assertEquals(list.size(), i - 100 + 1);
             assertFalse(list.empty());
         }
 
         // get one entry
-        assertTrue(list.get(4)==OmegaMove.createMove(
+        assertEquals(list.get(4), OmegaMove.createMove(
                 OmegaMoveType.NORMAL,
                 OmegaSquare.values[4],
                 OmegaSquare.values[4],
                 OmegaPiece.WHITE_PAWN,
                 OmegaPiece.NOPIECE,
                 OmegaPiece.NOPIECE
-                ));
+        ));
 
         // remove one entry
         element = list.removeLast();
-        assertTrue(element==OmegaMove.createMove(
+        assertEquals(element, OmegaMove.createMove(
                 OmegaMoveType.NORMAL,
                 OmegaSquare.b2,
                 OmegaSquare.b2,
                 OmegaPiece.WHITE_PAWN,
                 OmegaPiece.NOPIECE,
                 OmegaPiece.NOPIECE
-                ));
-        assertTrue(list.getLast()==OmegaMove.createMove(
+        ));
+        assertEquals(list.getLast(), OmegaMove.createMove(
                 OmegaMoveType.NORMAL,
                 OmegaSquare.a2,
                 OmegaSquare.a2,
                 OmegaPiece.WHITE_PAWN,
                 OmegaPiece.NOPIECE,
                 OmegaPiece.NOPIECE
-                ));
+        ));
         element = list.removeFirst();
-        assertTrue(element==OmegaMove.createMove(
+        assertEquals(element, OmegaMove.createMove(
                 OmegaMoveType.NORMAL,
                 OmegaSquare.a1,
                 OmegaSquare.a1,
                 OmegaPiece.WHITE_PAWN,
                 OmegaPiece.NOPIECE,
                 OmegaPiece.NOPIECE
-                ));
-        assertTrue(list.getFirst()==OmegaMove.createMove(
+        ));
+        assertEquals(list.getFirst(), OmegaMove.createMove(
                 OmegaMoveType.NORMAL,
                 OmegaSquare.b1,
                 OmegaSquare.b1,
                 OmegaPiece.WHITE_PAWN,
                 OmegaPiece.NOPIECE,
                 OmegaPiece.NOPIECE
-                ));
-        assertTrue(list.size()==8);
+        ));
+        assertEquals(8, list.size());
 
         // get one entry
-        assertTrue(list.get(4)==OmegaMove.createMove(
+        assertEquals(list.get(4), OmegaMove.createMove(
                 OmegaMoveType.NORMAL,
                 OmegaSquare.f1,
                 OmegaSquare.f1,
                 OmegaPiece.WHITE_PAWN,
                 OmegaPiece.NOPIECE,
                 OmegaPiece.NOPIECE
-                ));
+        ));
 
         // get entry higher than size
         try {
@@ -173,7 +166,7 @@ public class TestOmegaMoveList {
      */
     private static void testEmptyList(OmegaMoveList list) {
         // list is empty
-        assertTrue(list.size()==0);
+        assertEquals(0, list.size());
         assertTrue(list.empty());
 
         // remove from empty list

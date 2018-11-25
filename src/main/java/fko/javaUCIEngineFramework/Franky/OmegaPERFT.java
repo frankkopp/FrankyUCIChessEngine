@@ -23,9 +23,7 @@
  *
  */
 
-package fko.javaUCIEngineFramework.Omega;
-
-import fko.chessly.game.NotationHelper;
+package fko.javaUCIEngineFramework.Franky;
 
 import java.util.concurrent.TimeUnit;
 
@@ -55,7 +53,7 @@ public class OmegaPERFT {
      *
      */
     public OmegaPERFT() {
-        _fen = NotationHelper.StandardBoardFEN;
+        _fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     }
 
     /**

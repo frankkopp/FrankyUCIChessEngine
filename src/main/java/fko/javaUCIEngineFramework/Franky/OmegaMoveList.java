@@ -23,9 +23,9 @@
  *
  */
 
-package fko.javaUCIEngineFramework.Omega;
+package fko.javaUCIEngineFramework.Franky;
 
-import fko.chessly.util.SimpleIntList;
+import fko.javaUCIEngineFramework.util.SimpleIntList;
 
 import java.util.Comparator;
 
@@ -38,7 +38,7 @@ import java.util.Comparator;
 public class OmegaMoveList extends SimpleIntList {
 
     /**
-     * Creates a list with a maximum of 75 elements
+     * Creates a list with a initial capacity of 75 elements
      * Max numbers of possible moves per position is 218
      * fen = "R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"; // 218 moves to make
      * Max for pseudo legal moves seems to be 225
@@ -141,7 +141,6 @@ public class OmegaMoveList extends SimpleIntList {
      * Copies the content of src array into dest array at index 1
      * and sets index 0 of dest array to the specified move.
      * @param move
-     * @param value
      * @param src
      * @param dest
      */

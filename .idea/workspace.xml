@@ -2,15 +2,59 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1a1dfe46-855b-412a-bfcd-658d3bc6f910" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/IUCISearchMode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCISearchMode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/NotationHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaBoardPosition.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaColor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaConfiguration.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaEngine.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaEvaluation.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaEvaluationCache.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaMove.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaMoveGenerator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaMoveList.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaMoveType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaPERFT.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaPiece.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaPieceType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaRootMoveEntry.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaRootMoveList.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaSearch.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaSquare.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaSquareList.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Omega/OmegaTranspositionTable.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaBoardPosition.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaColor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaMove.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaMoveGenerator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaMoveList.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaMoveType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaPERFT.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaPiece.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaPieceType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaSquare.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaSquareList.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/util/SimpleIntList.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaBoardPosition.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaMove.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaMoveGenerator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaMoveList.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaPERFT.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaPiece.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaSquare.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaSquareList.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/util/TestSimpleIntList.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/engine-interface.txt" beforeDir="false" afterPath="$PROJECT_DIR$/engine-interface.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/IUCIEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/IUCIEngine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIEngine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIProtocolHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIProtocolHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/logback.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/logback.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCIProtocolHandlerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCIProtocolHandlerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jar2exe.bat" beforeDir="false" afterPath="$PROJECT_DIR$/jar2exe.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/IUCIEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/IUCIEngine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/IUCISearchMode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/IUCISearchMode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/MyEngine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIOption.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/UCIOption.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIProtocolHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCISearchMode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/UCISearchMode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCIProtocolHandlerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandlerTest.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -24,19 +68,23 @@
     <favorites_list name="JavaUCIEngineFramework" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
+    <splitter split-orientation="horizontal" split-proportion="0.4964249">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pom.xml">
               <provider selected="true" editor-type-id="text-editor">
-                <state>
-                  <caret line="101" column="12" selection-start-line="101" selection-start-column="12" selection-end-line="101" selection-end-column="12" />
+                <state relative-caret-position="972">
+                  <caret line="54" column="47" selection-start-line="54" selection-start-column="47" selection-end-line="54" selection-end-column="47" />
                 </state>
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/resources/logback.xml">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="288">
@@ -48,104 +96,6 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIMain.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="450">
-                  <caret line="51" selection-start-line="51" selection-end-line="51" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/IUCIEngine.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="630">
-                  <caret line="62" column="19" selection-start-line="62" selection-start-column="19" selection-end-line="62" selection-end-column="19" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIEngine.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="414">
-                  <caret line="46" selection-start-line="46" selection-end-line="46" />
-                  <folding>
-                    <element signature="imports" expanded="true" />
-                    <element signature="e#1825#1826#0" expanded="true" />
-                    <element signature="e#1848#1849#0" expanded="true" />
-                    <element signature="e#2462#2463#0" expanded="true" />
-                    <element signature="e#2485#2486#0" expanded="true" />
-                    <element signature="e#2530#2531#0" expanded="true" />
-                    <element signature="e#2555#2556#0" expanded="true" />
-                    <element signature="e#2609#2610#0" expanded="true" />
-                    <element signature="e#2637#2638#0" expanded="true" />
-                    <element signature="e#3144#3145#0" expanded="true" />
-                    <element signature="e#3169#3170#0" expanded="true" />
-                    <element signature="e#2985#2986#0" expanded="true" />
-                    <element signature="e#3008#3009#0" expanded="true" />
-                    <element signature="e#3200#3201#0" expanded="true" />
-                    <element signature="e#3221#3222#0" expanded="true" />
-                    <element signature="e#3735#3736#0" expanded="true" />
-                    <element signature="e#3757#3758#0" expanded="true" />
-                    <element signature="e#4506#4507#0" expanded="true" />
-                    <element signature="e#4539#4540#0" expanded="true" />
-                    <element signature="e#4580#4581#0" expanded="true" />
-                    <element signature="e#4657#4658#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIProtocolHandler.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="576">
-                  <caret line="363" column="21" selection-start-line="363" selection-start-column="21" selection-end-line="363" selection-end-column="21" />
-                  <folding>
-                    <element signature="e#8448#8449#0" expanded="true" />
-                    <element signature="e#8517#8518#0" expanded="true" />
-                    <element signature="e#10935#10936#0" expanded="true" />
-                    <element signature="e#10953#10954#0" expanded="true" />
-                    <element signature="e#11030#11031#0" expanded="true" />
-                    <element signature="e#11048#11049#0" expanded="true" />
-                    <element signature="e#12005#12006#0" expanded="true" />
-                    <element signature="e#12029#12030#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCIProtocolHandlerTest.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state>
-                  <folding>
-                    <element signature="imports" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/target/log/JavaUCIEngineFramework.log">
-              <provider selected="true" editor-type-id="LogFileEditorProvider" />
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/engine-interface.txt">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-282">
-                  <caret line="135" column="17" selection-start-line="135" selection-start-column="6" selection-end-line="135" selection-end-column="17" />
-                </state>
-              </provider>
-            </entry>
-          </file>
         </leaf>
       </split-second>
     </splitter>
@@ -153,9 +103,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JUnit5 Test Class" />
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
+        <option value="JUnit5 Test Class" />
       </list>
     </option>
   </component>
@@ -179,20 +129,56 @@
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/iUCIOption.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/IUCIOption.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIOption.java" />
-        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIMain.java" />
-        <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/jar2exe.bat" />
         <option value="$PROJECT_DIR$/engine-interface.txt" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/IUCISearchMode.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCISearchMode.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIProtocolHandler.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/IUCIEngine.java" />
         <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCIProtocolHandlerTest.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIMain.java" />
+        <option value="$PROJECT_DIR$/jar2exe.bat" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/UCIEngine.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/MyEngine.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandlerTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIEngine.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Main.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Omega/OmegaPieceType.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Omega/OmegaSearch.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/BoardPosition.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/OmegaSquareTest.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaSquare.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaColor.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaSquareList.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaSquareList.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaPieceType.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaPiece.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaPiece.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaMoveType.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaMove.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaMove.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaMoveList.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/util/SimpleIntList.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/util/TestSimpleIntList.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaMoveList.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaTranspositionTable.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaPERFT.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/NotationHelper.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaPERFT.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaMoveGenerator.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaMoveGenerator.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaBoardPosition.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaBoardPosition.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaSquare.java" />
       </list>
     </option>
   </component>
   <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="pluginUpdatePolicy" value="UPDATE" />
+      </MavenGeneralSettings>
+    </option>
     <option name="importingSettings">
       <MavenImportingSettings>
         <option name="importAutomatically" value="true" />
@@ -216,33 +202,22 @@
           <item name="JavaUCIEngineFramework" type="9519ce18:MavenProjectsStructure$ProjectNode" />
           <item name="Run Configurations" type="21c1f71a:MavenProjectsStructure$RunConfigurationsNode" />
         </path>
+        <path>
+          <item name="" type="16c1761:MavenProjectsStructure$RootNode" />
+          <item name="JavaUCIEngineFramework" type="9519ce18:MavenProjectsStructure$ProjectNode" />
+          <item name="Dependencies" type="f4be9f2a:MavenProjectsStructure$DependenciesNode" />
+        </path>
       </expand>
       <select />
     </treeState>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="-11" />
-    <option name="width" value="2730" />
-    <option name="height" value="1404" />
+  <component name="MavenRunner">
+    <option name="skipTests" value="true" />
   </component>
-  <component name="ProjectInspectionProfilesVisibleTreeState">
-    <entry key="Project Default">
-      <profile-state>
-        <expanded-state>
-          <State>
-            <id />
-          </State>
-          <State>
-            <id>Android &gt; Lint &gt; Correctness</id>
-          </State>
-        </expanded-state>
-        <selected-state>
-          <State>
-            <id>Android</id>
-          </State>
-        </selected-state>
-      </profile-state>
-    </entry>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-13" />
+    <option name="width" value="2993" />
+    <option name="height" value="1406" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -253,8 +228,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -298,6 +271,33 @@
               <item name="JavaUCIEngineFramework" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="javaUCIEngineFramework" type="462c0819:PsiDirectoryNode" />
+              <item name="Franky" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JavaUCIEngineFramework" type="b2602c69:ProjectViewProjectNode" />
+              <item name="JavaUCIEngineFramework" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="javaUCIEngineFramework" type="462c0819:PsiDirectoryNode" />
+              <item name="UCI" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JavaUCIEngineFramework" type="b2602c69:ProjectViewProjectNode" />
+              <item name="JavaUCIEngineFramework" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="javaUCIEngineFramework" type="462c0819:PsiDirectoryNode" />
+              <item name="util" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JavaUCIEngineFramework" type="b2602c69:ProjectViewProjectNode" />
+              <item name="JavaUCIEngineFramework" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -332,29 +332,25 @@
             <path>
               <item name="JavaUCIEngineFramework" type="b2602c69:ProjectViewProjectNode" />
               <item name="JavaUCIEngineFramework" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="javaUCIEngineFramework" type="462c0819:PsiDirectoryNode" />
+              <item name="Franky" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JavaUCIEngineFramework" type="b2602c69:ProjectViewProjectNode" />
+              <item name="JavaUCIEngineFramework" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="javaUCIEngineFramework" type="462c0819:PsiDirectoryNode" />
+              <item name="util" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JavaUCIEngineFramework" type="b2602c69:ProjectViewProjectNode" />
+              <item name="JavaUCIEngineFramework" type="462c0819:PsiDirectoryNode" />
               <item name="target" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="JavaUCIEngineFramework" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-            </path>
-            <path>
-              <item name="JavaUCIEngineFramework" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="Maven: ch.qos.logback:logback-classic:1.2.3" type="70bed36:NamedLibraryElementNode" />
-            </path>
-            <path>
-              <item name="JavaUCIEngineFramework" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="Maven: ch.qos.logback:logback-classic:1.2.3" type="70bed36:NamedLibraryElementNode" />
-              <item name="logback-classic-1.2.3.jar" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="JavaUCIEngineFramework" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="Maven: ch.qos.logback:logback-classic:1.2.3" type="70bed36:NamedLibraryElementNode" />
-              <item name="logback-classic-1.2.3.jar" type="462c0819:PsiDirectoryNode" />
-              <item name="classic" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="JavaUCIEngineFramework" type="b2602c69:ProjectViewProjectNode" />
@@ -374,34 +370,48 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1543104117350" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1543144785622" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
     <property name="extract.method.default.visibility" value="private" />
-    <property name="settings.editor.selected.configurable" value="copyright.profiles" />
+    <property name="settings.editor.selected.configurable" value="MavenSettings" />
   </component>
   <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="fko.javaUCIEngineFramework" />
+    </key>
     <key name="ExtractSuperBase.RECENT_KEYS">
       <recent name="fko.javaUCIEngineFramework" />
     </key>
     <key name="CreateTestDialog.RecentsKey">
+      <recent name="fko.javaUCIEngineFramework.Franky" />
       <recent name="fko.javaUCIEngineFramework" />
     </key>
     <key name="CreateTestDialog.Recents.Supers">
       <recent name="" />
     </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework" />
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="fko.javaUCIEngineFramework" />
+      <recent name="fko.javaUCIEngineFramework.UCI" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\src\main\java\fko\javaUCIEngineFramework\Franky" />
+      <recent name="C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\src\main\java\fko\javaUCIEngineFramework" />
       <recent name="C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework" />
       <recent name="C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\src\main\resources" />
     </key>
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="fko.javaUCIEngineFramework" />
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="fko.javaUCIEngineFramework.Franky" />
+      <recent name="fko.javaUCIEngineFramework.util" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\src\main\java\fko\javaUCIEngineFramework\Omega" />
+      <recent name="C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -416,11 +426,11 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.UCIProtocolHandlerTest">
+  <component name="RunManager" selected="JUnit.fko.javaUCIEngineFramework.Franky in JavaUCIEngineFramework">
     <configuration name="JavaUCIEngineFramework" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.UCIEngine" />
+      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.MyEngine" />
       <module name="JavaUCIEngineFramework" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -434,80 +444,62 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UCIProtocolHandlerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="TestOmegaBoardPosition" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="JavaUCIEngineFramework" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="fko.javaUCIEngineFramework.*" />
+          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.UCIProtocolHandlerTest" />
+      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
+      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestOmegaBoardPosition" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UCIProtocolHandlerTest.goCommand" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="TestOmegaBoardPosition.testContructorFromFEN" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="JavaUCIEngineFramework" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="fko.javaUCIEngineFramework.*" />
+          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.UCIProtocolHandlerTest" />
-      <option name="METHOD_NAME" value="goCommand" />
+      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
+      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestOmegaBoardPosition" />
+      <option name="METHOD_NAME" value="testContructorFromFEN" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UCIProtocolHandlerTest.ponderHitCommand" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="TestOmegaBoardPosition.testFromNotation" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="JavaUCIEngineFramework" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="fko.javaUCIEngineFramework.*" />
+          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.UCIProtocolHandlerTest" />
-      <option name="METHOD_NAME" value="ponderHitCommand" />
+      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
+      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestOmegaBoardPosition" />
+      <option name="METHOD_NAME" value="testFromNotation" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UCIProtocolHandlerTest.positionCommand" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="TestOmegaMoveGenerator" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="JavaUCIEngineFramework" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="fko.javaUCIEngineFramework.*" />
+          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.UCIProtocolHandlerTest" />
-      <option name="METHOD_NAME" value="positionCommand" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="UCIProtocolHandlerTest.stopCommand" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="JavaUCIEngineFramework" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="fko.javaUCIEngineFramework.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.UCIProtocolHandlerTest" />
-      <option name="METHOD_NAME" value="stopCommand" />
-      <option name="TEST_OBJECT" value="method" />
+      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
+      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestOmegaMoveGenerator" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -520,10 +512,24 @@
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.UCIProtocolHandlerTest" />
+      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.UCI" />
+      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.UCI.UCIProtocolHandlerTest" />
       <option name="METHOD_NAME" value="uciCommand" />
       <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="fko.javaUCIEngineFramework.Franky in JavaUCIEngineFramework" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="JavaUCIEngineFramework" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
+      <option name="TEST_OBJECT" value="package" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -558,19 +564,19 @@
       <item itemvalue="Application.JavaUCIEngineFramework" />
       <item itemvalue="JUnit.UCIProtocolHandlerTest.uciCommand" />
       <item itemvalue="Maven.Install_EXE" />
-      <item itemvalue="JUnit.UCIProtocolHandlerTest.positionCommand" />
-      <item itemvalue="JUnit.UCIProtocolHandlerTest.goCommand" />
-      <item itemvalue="JUnit.UCIProtocolHandlerTest.stopCommand" />
-      <item itemvalue="JUnit.UCIProtocolHandlerTest.ponderHitCommand" />
-      <item itemvalue="JUnit.UCIProtocolHandlerTest" />
+      <item itemvalue="JUnit.TestOmegaMoveGenerator" />
+      <item itemvalue="JUnit.TestOmegaBoardPosition" />
+      <item itemvalue="JUnit.TestOmegaBoardPosition.testFromNotation" />
+      <item itemvalue="JUnit.TestOmegaBoardPosition.testContructorFromFEN" />
+      <item itemvalue="JUnit.fko.javaUCIEngineFramework.Franky in JavaUCIEngineFramework" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.UCIProtocolHandlerTest" />
-        <item itemvalue="JUnit.UCIProtocolHandlerTest.ponderHitCommand" />
-        <item itemvalue="JUnit.UCIProtocolHandlerTest.stopCommand" />
-        <item itemvalue="JUnit.UCIProtocolHandlerTest.goCommand" />
-        <item itemvalue="JUnit.UCIProtocolHandlerTest.positionCommand" />
+        <item itemvalue="JUnit.fko.javaUCIEngineFramework.Franky in JavaUCIEngineFramework" />
+        <item itemvalue="JUnit.TestOmegaBoardPosition.testContructorFromFEN" />
+        <item itemvalue="JUnit.TestOmegaBoardPosition.testFromNotation" />
+        <item itemvalue="JUnit.TestOmegaBoardPosition" />
+        <item itemvalue="JUnit.TestOmegaMoveGenerator" />
       </list>
     </recent_temporary>
   </component>
@@ -585,43 +591,43 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="UCIProtocolHandlerTest_debugCommand - 2018.11.24 at 23h 34m 25s.xml">
-      <configuration name="UCIProtocolHandlerTest.debugCommand" configurationId="JUnit" />
+    <history-entry file="TestOmegaBoardPosition_testContructorFromFEN - 2018.11.25 at 11h 28m 32s.xml">
+      <configuration name="TestOmegaBoardPosition.testContructorFromFEN" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_positionCommand - 2018.11.24 at 23h 39m 24s.xml">
-      <configuration name="UCIProtocolHandlerTest.positionCommand" configurationId="JUnit" />
+    <history-entry file="TestOmegaBoardPosition_testContructorFromFEN - 2018.11.25 at 11h 31m 41s.xml">
+      <configuration name="TestOmegaBoardPosition.testContructorFromFEN" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_positionCommand - 2018.11.24 at 23h 41m 40s.xml">
-      <configuration name="UCIProtocolHandlerTest.positionCommand" configurationId="JUnit" />
+    <history-entry file="TestOmegaBoardPosition_testContructorFromFEN - 2018.11.25 at 11h 34m 05s.xml">
+      <configuration name="TestOmegaBoardPosition.testContructorFromFEN" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_positionCommand - 2018.11.24 at 23h 42m 42s.xml">
-      <configuration name="UCIProtocolHandlerTest.positionCommand" configurationId="JUnit" />
+    <history-entry file="TestOmegaBoardPosition_testContructorFromFEN - 2018.11.25 at 11h 35m 33s.xml">
+      <configuration name="TestOmegaBoardPosition.testContructorFromFEN" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_positionCommand - 2018.11.24 at 23h 46m 08s.xml">
-      <configuration name="UCIProtocolHandlerTest.positionCommand" configurationId="JUnit" />
+    <history-entry file="TestOmegaBoardPosition_testContructorFromFEN - 2018.11.25 at 11h 36m 46s.xml">
+      <configuration name="TestOmegaBoardPosition.testContructorFromFEN" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_goCommand - 2018.11.25 at 00h 47m 29s.xml">
-      <configuration name="UCIProtocolHandlerTest.goCommand" configurationId="JUnit" />
+    <history-entry file="TestOmegaBoardPosition_testContructorFromFEN - 2018.11.25 at 11h 41m 12s.xml">
+      <configuration name="TestOmegaBoardPosition.testContructorFromFEN" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_goCommand - 2018.11.25 at 00h 52m 01s.xml">
-      <configuration name="UCIProtocolHandlerTest.goCommand" configurationId="JUnit" />
+    <history-entry file="TestOmegaBoardPosition_testContructorFromFEN - 2018.11.25 at 11h 41m 47s.xml">
+      <configuration name="TestOmegaBoardPosition.testContructorFromFEN" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_stopCommand - 2018.11.25 at 00h 58m 12s.xml">
-      <configuration name="UCIProtocolHandlerTest.stopCommand" configurationId="JUnit" />
+    <history-entry file="TestOmegaBoardPosition_testContructorFromFEN - 2018.11.25 at 11h 42m 05s.xml">
+      <configuration name="TestOmegaBoardPosition.testContructorFromFEN" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_ponderHitCommand - 2018.11.25 at 00h 59m 01s.xml">
-      <configuration name="UCIProtocolHandlerTest.ponderHitCommand" configurationId="JUnit" />
+    <history-entry file="TestOmegaBoardPosition_testContructorFromFEN - 2018.11.25 at 11h 42m 17s.xml">
+      <configuration name="TestOmegaBoardPosition.testContructorFromFEN" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_ponderHitCommand - 2018.11.25 at 00h 59m 06s.xml">
-      <configuration name="UCIProtocolHandlerTest.ponderHitCommand" configurationId="JUnit" />
+    <history-entry file="fko_javaUCIEngineFramework_Franky_in_JavaUCIEngineFramework - 2018.11.25 at 11h 44m 17s.xml">
+      <configuration name="fko.javaUCIEngineFramework.Franky in JavaUCIEngineFramework" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-9" y="0" width="2382" height="1225" extended-state="0" />
+    <frame x="-11" y="0" width="2612" height="1227" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.565625" visible="true" weight="0.15732759" />
-      <window_info id="Structure" order="1" sideWeight="0.434375" side_tool="true" visible="true" weight="0.15732759" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.56284916" visible="true" weight="0.1454902" />
+      <window_info id="Structure" order="1" sideWeight="0.43715084" side_tool="true" visible="true" weight="0.1454902" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
       <window_info id="Capture Tool" order="4" />
@@ -630,15 +636,15 @@
       <window_info id="Favorites" order="7" sideWeight="0.5023563" side_tool="true" weight="0.16067466" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32956687" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.3283161" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.39736345" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.32706767" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39661655" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32987747" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32737535" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Messages" order="10" weight="0.32768363" />
+      <window_info anchor="bottom" id="Messages" order="10" weight="0.32706767" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -647,7 +653,7 @@
       <window_info anchor="right" id="Theme Preview" order="5" />
       <window_info anchor="right" id="Palette&#9;" order="6" />
       <window_info anchor="right" id="Maven Projects" order="7" visible="true" weight="0.08614565" />
-      <window_info anchor="right" id="Maven" order="8" visible="true" weight="0.09525862" />
+      <window_info anchor="right" id="Maven" order="8" visible="true" weight="0.20431373" />
     </layout>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -696,86 +702,7 @@
     </ignored-roots>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/log/JavaUCIEngineFramework.log">
-      <provider editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dependency-reduced-pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1100" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/IUCIOption.java" />
-    <entry file="file://$PROJECT_DIR$/jar2exe.bat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="315" lean-forward="true" selection-start-column="315" selection-end-column="315" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIOption.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="601">
-          <caret line="64" column="25" selection-start-line="64" selection-start-column="25" selection-end-line="64" selection-end-column="25" />
-          <folding>
-            <element signature="e#2290#2291#0" expanded="true" />
-            <element signature="e#2315#2316#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/ch/qos/logback/logback-classic/1.2.3/logback-classic-1.2.3-sources.jar!/ch/qos/logback/classic/Logger.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="213">
-          <caret line="579" selection-start-line="579" selection-end-line="579" />
-          <folding>
-            <element signature="e#19833#19834#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="101" column="12" selection-start-line="101" selection-start-column="12" selection-end-line="101" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/logback.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="39" column="18" selection-start-line="39" selection-start-column="18" selection-end-line="39" selection-end-column="18" />
-          <folding>
-            <element signature="e#40#1201#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIMain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="51" selection-start-line="51" selection-end-line="51" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/target/log/JavaUCIEngineFramework.log">
-      <provider selected="true" editor-type-id="LogFileEditorProvider" />
-      <provider editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/engine-interface.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-282">
-          <caret line="135" column="17" selection-start-line="135" selection-start-column="6" selection-end-line="135" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCISearchMode.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/UCISearchMode.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1434">
           <caret line="192" selection-start-line="192" selection-end-line="192" />
@@ -832,72 +759,450 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/IUCISearchMode.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/IUCISearchMode.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="792">
           <caret line="67" column="14" selection-start-line="67" selection-start-column="14" selection-end-line="67" selection-end-column="14" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIProtocolHandler.java">
+    <entry file="file://$PROJECT_DIR$/jar2exe.bat">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="363" column="21" selection-start-line="363" selection-start-column="21" selection-end-line="363" selection-end-column="21" />
-          <folding>
-            <element signature="e#8448#8449#0" expanded="true" />
-            <element signature="e#8517#8518#0" expanded="true" />
-            <element signature="e#10935#10936#0" expanded="true" />
-            <element signature="e#10953#10954#0" expanded="true" />
-            <element signature="e#11030#11031#0" expanded="true" />
-            <element signature="e#11048#11049#0" expanded="true" />
-            <element signature="e#12005#12006#0" expanded="true" />
-            <element signature="e#12029#12030#0" expanded="true" />
-          </folding>
+        <state>
+          <caret column="230" selection-start-column="230" selection-end-column="230" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/IUCIEngine.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="630">
+        <state relative-caret-position="360">
+          <caret line="48" column="31" selection-start-line="48" selection-start-column="31" selection-end-line="48" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/IUCIEngine.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="702">
           <caret line="62" column="19" selection-start-line="62" selection-start-column="19" selection-end-line="62" selection-end-column="19" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCIEngine.java">
+    <entry file="file://$PROJECT_DIR$/engine-interface.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="414">
-          <caret line="46" selection-start-line="46" selection-end-line="46" />
+        <state relative-caret-position="18">
+          <caret line="355" column="24" selection-start-line="355" selection-start-column="17" selection-end-line="355" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandlerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="62" column="47" selection-start-line="62" selection-start-column="47" selection-end-line="62" selection-end-column="47" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1825#1826#0" expanded="true" />
-            <element signature="e#1848#1849#0" expanded="true" />
-            <element signature="e#2462#2463#0" expanded="true" />
-            <element signature="e#2485#2486#0" expanded="true" />
-            <element signature="e#2530#2531#0" expanded="true" />
-            <element signature="e#2555#2556#0" expanded="true" />
-            <element signature="e#2609#2610#0" expanded="true" />
-            <element signature="e#2637#2638#0" expanded="true" />
-            <element signature="e#3144#3145#0" expanded="true" />
-            <element signature="e#3169#3170#0" expanded="true" />
-            <element signature="e#2985#2986#0" expanded="true" />
-            <element signature="e#3008#3009#0" expanded="true" />
-            <element signature="e#3200#3201#0" expanded="true" />
-            <element signature="e#3221#3222#0" expanded="true" />
-            <element signature="e#3735#3736#0" expanded="true" />
-            <element signature="e#3757#3758#0" expanded="true" />
-            <element signature="e#4506#4507#0" expanded="true" />
-            <element signature="e#4539#4540#0" expanded="true" />
-            <element signature="e#4580#4581#0" expanded="true" />
-            <element signature="e#4657#4658#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCIProtocolHandlerTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/MyEngine.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="42" column="7" selection-start-line="42" selection-start-column="7" selection-end-line="42" selection-end-column="7" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaColor.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaConfiguration.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaPieceType.java">
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <folding>
+            <element signature="e#0#2459#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/BoardPosition.java" />
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaSearch.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="994">
+          <caret line="82" selection-start-line="82" selection-end-line="82" />
+          <folding>
             <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaMove.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1458">
+          <folding>
+            <element signature="e#0#12148#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaSquare.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-5095">
+          <folding>
+            <element signature="e#0#10048#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/OmegaSquareTest.java" />
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaSquareList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-378">
+          <folding>
+            <element signature="e#0#4301#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaEngine.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-5994" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaPiece.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret selection-end-line="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaSquareList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-432">
+          <folding>
+            <element signature="e#0#3286#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaPiece.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="29" column="3" lean-forward="true" selection-start-line="29" selection-start-column="3" selection-end-line="29" selection-end-column="3" />
+          <folding>
+            <element signature="e#2782#2783#0" expanded="true" />
+            <element signature="e#2810#2811#0" expanded="true" />
+            <element signature="e#2887#2888#0" expanded="true" />
+            <element signature="e#2916#2917#0" expanded="true" />
+            <element signature="e#2997#2998#0" expanded="true" />
+            <element signature="e#3030#3031#0" expanded="true" />
+            <element signature="e#3076#3077#0" expanded="true" />
+            <element signature="e#3109#3110#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaPiece.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="486">
+          <caret line="27" column="23" selection-start-line="27" selection-start-column="23" selection-end-line="27" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#1912#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaPieceType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="28" selection-start-line="28" selection-end-line="64" selection-end-column="35" />
+          <folding>
+            <element signature="e#2123#2124#0" expanded="true" />
+            <element signature="e#2161#2162#0" expanded="true" />
+            <element signature="e#2238#2239#0" expanded="true" />
+            <element signature="e#2269#2270#0" expanded="true" />
+            <element signature="e#2342#2343#0" expanded="true" />
+            <element signature="e#2376#2377#0" expanded="true" />
+            <element signature="e#2422#2423#0" expanded="true" />
+            <element signature="e#2455#2456#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaSquareList.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaColor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="468">
+          <caret line="49" column="26" lean-forward="true" selection-start-line="49" selection-start-column="26" selection-end-line="49" selection-end-column="26" />
+          <folding>
+            <element signature="e#2033#2034#0" expanded="true" />
+            <element signature="e#2069#2070#0" expanded="true" />
+            <element signature="e#2958#2959#0" expanded="true" />
+            <element signature="e#2989#2990#0" expanded="true" />
+            <element signature="e#3606#3607#0" expanded="true" />
+            <element signature="e#3640#3641#0" expanded="true" />
+            <element signature="e#3777#3778#0" expanded="true" />
+            <element signature="e#3811#3812#0" expanded="true" />
+            <element signature="e#3964#3965#0" expanded="true" />
+            <element signature="e#4000#4001#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaMoveType.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaMoveType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="486">
+          <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
+          <folding>
+            <element signature="e#1517#1518#0" expanded="true" />
+            <element signature="e#1558#1559#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaMove.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1044">
+          <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
+          <folding>
+            <element signature="e#0#5969#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaMoveGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1836" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/util/SimpleIntList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-180">
+          <caret line="57" column="26" lean-forward="true" selection-start-line="57" selection-start-column="26" selection-end-line="57" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#11762#0" expanded="true" />
+            <element signature="e#1994#1995#0" expanded="true" />
+            <element signature="e#2035#2036#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaMoveList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2430">
+          <caret line="137" column="37" lean-forward="true" selection-start-line="137" selection-start-column="37" selection-end-line="137" selection-end-column="37" />
+          <folding>
+            <element signature="e#0#6263#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/util/TestSimpleIntList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-648">
+          <caret line="32" column="49" lean-forward="true" selection-start-line="32" selection-start-column="49" selection-end-line="32" selection-end-column="49" />
+          <folding>
+            <element signature="e#0#9648#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaMoveList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="39" column="7" lean-forward="true" selection-start-line="39" selection-start-column="7" selection-end-line="39" selection-end-column="7" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaMove.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="237" column="22" lean-forward="true" selection-start-line="237" selection-start-column="22" selection-end-line="237" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaTranspositionTable.java" />
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaTranspositionTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2052">
+          <folding>
+            <element signature="e#0#8364#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaRootMoveList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1597">
+          <folding>
+            <element signature="e#0#3290#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaRootMoveEntry.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaBoardPosition.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-810">
+          <folding>
+            <element signature="e#0#56228#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaPERFT.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-378">
+          <folding>
+            <element signature="e#0#10890#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Omega/NotationHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-113">
+          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#13982#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="46" column="99" lean-forward="true" selection-start-line="46" selection-start-column="41" selection-end-line="46" selection-end-column="99" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaPERFT.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="558">
+          <caret line="54" column="25" lean-forward="true" selection-start-line="54" selection-start-column="25" selection-end-line="54" selection-end-column="25" />
+          <folding>
+            <element signature="e#1646#1647#0" expanded="true" />
+            <element signature="e#1672#1673#0" expanded="true" />
+            <element signature="e#1776#1777#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaMoveGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="412">
+          <caret line="193" column="16" selection-start-line="193" selection-start-column="16" selection-end-line="193" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#12293#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaSquare.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8">
+          <caret line="50" selection-start-line="49" selection-end-line="50" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestOmegaBoardPosition.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#27417#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <element signature="e#19803#19830#1" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaSquare.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="324">
+          <caret line="41" column="25" lean-forward="true" selection-start-line="41" selection-start-column="25" selection-end-line="41" selection-end-column="25" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#3663#3664#0" expanded="true" />
+            <element signature="e#3716#3717#0" expanded="true" />
+            <element signature="e#4280#4281#0" expanded="true" />
+            <element signature="e#4309#4310#0" expanded="true" />
+            <element signature="e#6343#6344#0" expanded="true" />
+            <element signature="e#6372#6373#0" expanded="true" />
+            <element signature="e#7141#7142#0" expanded="true" />
+            <element signature="e#7180#7181#0" expanded="true" />
+            <element signature="e#7330#7331#0" expanded="true" />
+            <element signature="e#7372#7373#0" expanded="true" />
+            <element signature="e#7526#7527#0" expanded="true" />
+            <element signature="e#7565#7566#0" expanded="true" />
+            <element signature="e#7715#7716#0" expanded="true" />
+            <element signature="e#7757#7758#0" expanded="true" />
+            <element signature="e#8391#8392#0" expanded="true" />
+            <element signature="e#8441#8442#0" expanded="true" />
+            <element signature="e#8482#8483#0" expanded="true" />
+            <element signature="e#8532#8533#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaMoveGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8">
+          <caret line="181" column="17" selection-start-line="181" selection-start-column="17" selection-end-line="181" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/OmegaBoardPosition.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="232">
+          <caret line="1270" column="12" selection-start-line="1270" selection-start-column="12" selection-end-line="1270" selection-end-column="12" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#7853#7854#0" expanded="true" />
+            <element signature="e#7887#7888#0" expanded="true" />
+            <element signature="e#36415#36416#0" expanded="true" />
+            <element signature="e#36458#36459#0" expanded="true" />
+            <element signature="e#40700#40701#0" expanded="true" />
+            <element signature="e#40733#40734#0" expanded="true" />
+            <element signature="e#40844#40845#0" expanded="true" />
+            <element signature="e#40888#40889#0" expanded="true" />
+            <element signature="e#40965#40966#0" expanded="true" />
+            <element signature="e#40993#40994#0" expanded="true" />
+            <element signature="e#47306#47307#0" expanded="true" />
+            <element signature="e#47338#47339#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="972">
+          <caret line="54" column="47" selection-start-line="54" selection-start-column="47" selection-end-line="54" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/logback.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="39" column="18" selection-start-line="39" selection-start-column="18" selection-end-line="39" selection-end-column="18" />
+          <folding>
+            <element signature="e#40#1201#0" />
           </folding>
         </state>
       </provider>

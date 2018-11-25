@@ -1,37 +1,31 @@
-/**
- * The MIT License (MIT)
+/*
+ * MIT License
  *
- * "Chessly by Frank Kopp"
+ * Copyright (c) 2018 Frank Kopp
  *
- * mail-to:frank@familie-kopp.de
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Copyright (c) 2016 Frank Kopp
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in the
- * Software without restriction, including without limitation the rights to use, copy,
- * modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to the
- * following conditions:
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  *
- * The above copyright notice and this permission notice shall be included in all copies
- * or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
- * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
- * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
- * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
  */
 
-package fko.chessly.util;
+package fko.javaUCIEngineFramework.util;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.IntStream;
 
 /**
@@ -66,12 +60,12 @@ public class SimpleIntList implements Iterable<Integer> {
     }
 
     /**
-     * Creates a list with a maximum of <tt>max_size</tt> elements
-     * @param max_size
+     * Creates a list with an initial size of <tt>size</tt> elements
+     * @param size
      */
-    public SimpleIntList(int max_size) {
-        this._arraySize = max_size;
-        _list = new int[max_size];
+    public SimpleIntList(int size) {
+        this._arraySize = size;
+        _list = new int[size];
     }
 
     /**
@@ -297,7 +291,7 @@ public class SimpleIntList implements Iterable<Integer> {
     /**
      * A MoveList is equal to another MoveList when they have the same
      * elements in the same order independent from internal implementation.
-     * @see java.lang.Object#equals(java.lang.Object)
+     * @see Object#equals(Object)
      */
     @Override
     public boolean equals(Object obj) {
@@ -407,7 +401,7 @@ public class SimpleIntList implements Iterable<Integer> {
         int cursor = _head;
 
         /**
-         * @see java.util.Iterator#hasNext()
+         * @see Iterator#hasNext()
          */
         @Override
         public boolean hasNext() {
@@ -417,7 +411,7 @@ public class SimpleIntList implements Iterable<Integer> {
         }
 
         /**
-         * @see java.util.Iterator#next()
+         * @see Iterator#next()
          */
         @Override
         public Integer next() {

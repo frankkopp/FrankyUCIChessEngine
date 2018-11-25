@@ -23,11 +23,7 @@
  *
  */
 
-package fko.javaUCIEngineFramework.Omega;
-
-import fko.chessly.game.GameCastling;
-import fko.chessly.game.GameMove;
-import fko.chessly.game.GameMoveImpl;
+package fko.javaUCIEngineFramework.Franky;
 
 /**
  * This class represents a move in the Omega Engine.
@@ -215,93 +211,93 @@ public class OmegaMove {
      * @param move
      * @return the matching GameMove
      */
-    static GameMove convertToGameMove(int move) {
-        if (move == NOMOVE || !OmegaMove.isValid(move)) return null;
-        GameMove gameMove = new GameMoveImpl(
-                getStart(move).convertToGamePosition(),
-                getEnd(move).convertToGamePosition(),
-                getPiece(move).convertToGamePiece()
-                );
-        switch (getMoveType(move)) {
-            case NORMAL:
-                if (getTarget(move) != OmegaPiece.NOPIECE) {
-                    gameMove.setCapturedPiece(getTarget(move).convertToGamePiece());
-                }
-                break;
-            case PAWNDOUBLE:
-                break;
-            case ENPASSANT:
-                break;
-            case CASTLING:
-                break;
-            case PROMOTION:
-                gameMove.setPromotedTo(getPromotion(move).convertToGamePiece());
-                break;
-                //return new GameMove(Square.valueOfIntPosition(start), Square.valueOfIntPosition(end), Piece.valueOfIntChessman(getPromotion(move)));
-            case NOMOVETYPE:
-            default:
-                throw new IllegalArgumentException();
-        }
-        return gameMove;
-    }
+//    static GameMove convertToGameMove(int move) {
+//        if (move == NOMOVE || !OmegaMove.isValid(move)) return null;
+//        GameMove gameMove = new GameMoveImpl(
+//                getStart(move).convertToGamePosition(),
+//                getEnd(move).convertToGamePosition(),
+//                getPiece(move).convertToGamePiece()
+//                );
+//        switch (getMoveType(move)) {
+//            case NORMAL:
+//                if (getTarget(move) != OmegaPiece.NOPIECE) {
+//                    gameMove.setCapturedPiece(getTarget(move).convertToGamePiece());
+//                }
+//                break;
+//            case PAWNDOUBLE:
+//                break;
+//            case ENPASSANT:
+//                break;
+//            case CASTLING:
+//                break;
+//            case PROMOTION:
+//                gameMove.setPromotedTo(getPromotion(move).convertToGamePiece());
+//                break;
+//                //return new GameMove(Square.valueOfIntPosition(start), Square.valueOfIntPosition(end), Piece.valueOfIntChessman(getPromotion(move)));
+//            case NOMOVETYPE:
+//            default:
+//                throw new IllegalArgumentException();
+//        }
+//        return gameMove;
+//    }
 
     /**
      * Converts GameMove to move integer
      * @param gm
      * @return integer representing matching move for the GameMove
      */
-    static int convertFromGameMove(GameMove move) {
-        assert move != null;
-
-        if (move.getPromotedTo() != null) {
-            return createMove(
-                    OmegaMoveType.PROMOTION,
-                    OmegaSquare.convertFromGamePosition(move.getFromField()),
-                    OmegaSquare.convertFromGamePosition(move.getToField()),
-                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
-                    OmegaPiece.convertFromGamePiece(move.getCapturedPiece()),
-                    OmegaPiece.convertFromGamePiece(move.getPromotedTo()));
-
-        } else if (move.isEnPassantNextMovePossible()) {
-            //} else if (isPawnDouble(move, board)) {
-            return createMove(
-                    OmegaMoveType.PAWNDOUBLE,
-                    OmegaSquare.convertFromGamePosition(move.getFromField()),
-                    OmegaSquare.convertFromGamePosition(move.getToField()),
-                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
-                    OmegaPiece.NOPIECE,
-                    OmegaPiece.NOPIECE);
-
-        } else if (move.getWasEnPassantCapture()) {
-            //} else if (isEnPassant(move, board)) {
-            return createMove(
-                    OmegaMoveType.ENPASSANT,
-                    OmegaSquare.convertFromGamePosition(move.getFromField()),
-                    OmegaSquare.convertFromGamePosition(move.getToField()),
-                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
-                    OmegaPiece.convertFromGamePiece(move.getCapturedPiece()),
-                    OmegaPiece.NOPIECE);
-
-        } else if (move.getCastlingType() != GameCastling.NOCASTLING) {
-            //} else if (isCastling(move, board)) {
-            return createMove(
-                    OmegaMoveType.CASTLING,
-                    OmegaSquare.convertFromGamePosition(move.getFromField()),
-                    OmegaSquare.convertFromGamePosition(move.getToField()),
-                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
-                    OmegaPiece.NOPIECE,
-                    OmegaPiece.NOPIECE);
-
-        } else {
-            return createMove(
-                    OmegaMoveType.NORMAL,
-                    OmegaSquare.convertFromGamePosition(move.getFromField()),
-                    OmegaSquare.convertFromGamePosition(move.getToField()),
-                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
-                    OmegaPiece.convertFromGamePiece(move.getCapturedPiece()),
-                    OmegaPiece.NOPIECE);
-        }
-    }
+//    static int convertFromGameMove(GameMove move) {
+//        assert move != null;
+//
+//        if (move.getPromotedTo() != null) {
+//            return createMove(
+//                    OmegaMoveType.PROMOTION,
+//                    OmegaSquare.convertFromGamePosition(move.getFromField()),
+//                    OmegaSquare.convertFromGamePosition(move.getToField()),
+//                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
+//                    OmegaPiece.convertFromGamePiece(move.getCapturedPiece()),
+//                    OmegaPiece.convertFromGamePiece(move.getPromotedTo()));
+//
+//        } else if (move.isEnPassantNextMovePossible()) {
+//            //} else if (isPawnDouble(move, board)) {
+//            return createMove(
+//                    OmegaMoveType.PAWNDOUBLE,
+//                    OmegaSquare.convertFromGamePosition(move.getFromField()),
+//                    OmegaSquare.convertFromGamePosition(move.getToField()),
+//                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
+//                    OmegaPiece.NOPIECE,
+//                    OmegaPiece.NOPIECE);
+//
+//        } else if (move.getWasEnPassantCapture()) {
+//            //} else if (isEnPassant(move, board)) {
+//            return createMove(
+//                    OmegaMoveType.ENPASSANT,
+//                    OmegaSquare.convertFromGamePosition(move.getFromField()),
+//                    OmegaSquare.convertFromGamePosition(move.getToField()),
+//                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
+//                    OmegaPiece.convertFromGamePiece(move.getCapturedPiece()),
+//                    OmegaPiece.NOPIECE);
+//
+//        } else if (move.getCastlingType() != GameCastling.NOCASTLING) {
+//            //} else if (isCastling(move, board)) {
+//            return createMove(
+//                    OmegaMoveType.CASTLING,
+//                    OmegaSquare.convertFromGamePosition(move.getFromField()),
+//                    OmegaSquare.convertFromGamePosition(move.getToField()),
+//                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
+//                    OmegaPiece.NOPIECE,
+//                    OmegaPiece.NOPIECE);
+//
+//        } else {
+//            return createMove(
+//                    OmegaMoveType.NORMAL,
+//                    OmegaSquare.convertFromGamePosition(move.getFromField()),
+//                    OmegaSquare.convertFromGamePosition(move.getToField()),
+//                    OmegaPiece.convertFromGamePiece(move.getMovedPiece()),
+//                    OmegaPiece.convertFromGamePiece(move.getCapturedPiece()),
+//                    OmegaPiece.NOPIECE);
+//        }
+//    }
 
     /**
      * Lightweight check if the given int is a valid int representing a move.<br>

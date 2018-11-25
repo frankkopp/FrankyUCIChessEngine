@@ -25,17 +25,19 @@
 
 package fko.javaUCIEngineFramework;
 
+import fko.javaUCIEngineFramework.UCI.IUCIEngine;
+import fko.javaUCIEngineFramework.UCI.UCIProtocolHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 
 /**
- * UCIMain
+ * Main
  */
-public class UCIMain {
+public class Main {
 
-  private static final Logger LOG = LoggerFactory.getLogger(UCIMain.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
   /**
    * The main() method parses the command line arguments<br>
@@ -46,7 +48,7 @@ public class UCIMain {
 
     LOG.debug("Start UCI Engine Framework" + Instant.now());
 
-    UCIEngine uciEngine = new UCIEngine();
+    IUCIEngine uciEngine = new MyEngine();
     final UCIProtocolHandler handler = new UCIProtocolHandler(uciEngine);
     handler.startHandler();
 
