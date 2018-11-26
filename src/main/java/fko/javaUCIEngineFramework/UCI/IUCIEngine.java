@@ -68,7 +68,9 @@ public interface IUCIEngine {
 
   void ponderHit();
 
-    /**
+  void sendResult(int bestMove, int ponderMove);
+
+  /**
    * An Option for a MyEngine
    */
   interface IUCIOption {

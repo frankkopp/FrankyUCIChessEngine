@@ -27,10 +27,13 @@ package fko.javaUCIEngineFramework;
 
 import fko.javaUCIEngineFramework.Franky.BoardPosition;
 import fko.javaUCIEngineFramework.Franky.Move;
+import fko.javaUCIEngineFramework.Franky.Search;
+import fko.javaUCIEngineFramework.Franky.SearchMode;
 import fko.javaUCIEngineFramework.UCI.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.print.attribute.standard.MediaSize;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +47,11 @@ public class MyEngine implements IUCIEngine {
   // back reference to the uci protocol handler for sending messages to the UCI UI
   private UCIProtocolHandler uciProtocolHandler = null;
 
+  // the current search instance
+  private Search search;
+
   // ID of engine
-  private String iDName   = "MyEngine v0.1";
+  private String iDName   = "Franky v0.1";
   private String iDAuthor = "Frank Kopp";
 
   // options of engine
@@ -53,18 +59,18 @@ public class MyEngine implements IUCIEngine {
   private boolean ponderOption     = true;
   private boolean useOwnBookOption = false;
   private boolean debugOption      = false;
-
-  private BoardPosition boardPosition;
-
   List<IUCIEngine.IUCIOption> iUciOptions = new ArrayList<>();
 
-  private IUCISearchMode searchMode = new UCISearchMode();
+  // engine state
+  private BoardPosition  boardPosition;
+  private IUCISearchMode uciSearchMode = new UCISearchMode();
 
   /**
    * Default Constructor
    */
   public MyEngine() {
     initOptions();
+    search = new Search(this, hashSizeOption);
   }
 
   private void initOptions() {
@@ -120,6 +126,7 @@ public class MyEngine implements IUCIEngine {
   public void setHashSizeOption(final int hashSizeOption) {
     this.hashSizeOption = hashSizeOption;
     final String msg = "Hash Size set to " + this.hashSizeOption; LOG.info(msg);
+    search.setHashSize(hashSizeOption);
     uciProtocolHandler.sendInfoStringToUCI(msg);
   }
 
@@ -144,6 +151,7 @@ public class MyEngine implements IUCIEngine {
   public void newGame() {
     // TODO what need to be done for forgetting existing game
     LOG.info("Engine got New Game command");
+    search.newGame();
   }
 
   @Override
@@ -186,22 +194,44 @@ public class MyEngine implements IUCIEngine {
   }
 
   @Override
-  public void startSearch(final IUCISearchMode searchMode) {
+  public void startSearch(final IUCISearchMode uciSearchMode) {
     // TODO startSearch
-    this.searchMode = searchMode;
-    LOG.info("Engine Search start with " + this.searchMode.toString());
+    this.uciSearchMode = uciSearchMode;
+    LOG.info("Engine Search start with " + this.uciSearchMode.toString());
+
+    SearchMode searchMode = new SearchMode(uciSearchMode.getWhiteTime(),
+                                           uciSearchMode.getBlackTime(),
+                                           uciSearchMode.getWhiteInc(),
+                                           uciSearchMode.getBlackInc(),
+                                           uciSearchMode.getMovesToGo(),
+                                           uciSearchMode.getDepth(),
+                                           uciSearchMode.getNodes(),
+                                           uciSearchMode.getMate(),
+                                           uciSearchMode.getMoveTime(),
+                                           uciSearchMode.getMoves(),
+                                           uciSearchMode.isPonder(),
+                                           uciSearchMode.isInfinite(),
+                                          false);
+
+    search.startSearch(boardPosition, searchMode);
   }
 
   @Override
   public void stopSearch() {
-    // TODO stopSearch
     LOG.info("Engine Stop");
+    search.stopSearch();
   }
 
   @Override
   public void ponderHit() {
     // TODO ponderHit
-    LOG.info("Engine PonderHit start with " + this.searchMode.toString());
+    LOG.info("Engine PonderHit start with " + this.uciSearchMode.toString());
+  }
+
+  @Override
+  public void sendResult(int bestMove, int ponderMove) {
+    // TODO send bestmove
+    LOG.warn("Send bestmove not yet implemented");
   }
 
 }
