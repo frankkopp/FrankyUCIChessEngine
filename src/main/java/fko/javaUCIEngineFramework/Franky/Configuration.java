@@ -33,7 +33,7 @@ package fko.javaUCIEngineFramework.Franky;
 public class Configuration {
 
   /** test the search without any pruning and count perft value **/
-  static public boolean PERFT = false;
+  static public boolean PERFT = true;
 
   /** null evaluation **/
   boolean DO_NULL_EVALUATION = false;

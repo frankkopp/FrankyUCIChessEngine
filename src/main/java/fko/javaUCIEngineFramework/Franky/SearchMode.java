@@ -39,13 +39,15 @@ public class SearchMode {
 
   private static final Logger LOG = LoggerFactory.getLogger(SearchMode.class);
 
+  private static final int MAX_SEARCH_DEPTH = 100;
+
   // defaults time control
   private Duration whiteTime = Duration.ZERO;
   private Duration blackTime = Duration.ZERO;
   private Duration whiteInc  = Duration.ZERO;
   private Duration blackInc  = Duration.ZERO;
   private int      movesToGo = 0;
-  private Duration movetime  = Duration.ZERO;
+  private Duration moveTime  = Duration.ZERO;
 
   // extra limits
   private int          depth = 0;
@@ -60,6 +62,8 @@ public class SearchMode {
 
   // state
   private boolean timeControl = false;
+  private int     startDepth  = 1;
+  private int     maxDepth    = MAX_SEARCH_DEPTH;
 
   /**
    * Keeps the search mode state
@@ -72,13 +76,13 @@ public class SearchMode {
    * @param depth
    * @param nodes
    * @param mate
-   * @param movetime
+   * @param moveTime
    * @param moves
    * @param ponder
    * @param infinite
    */
   public SearchMode(int whiteTime, int blackTime, int whiteInc, int blackInc, int movesToGo,
-                    int depth, long nodes, int mate, int movetime, List<String> moves,
+                    int depth, long nodes, int mate, int moveTime, List<String> moves,
                     boolean ponder, boolean infinite, boolean perft) {
 
     this.whiteTime = Duration.ofSeconds(whiteTime);
@@ -86,7 +90,7 @@ public class SearchMode {
     this.whiteInc = Duration.ofSeconds(whiteInc);
     this.blackInc = Duration.ofSeconds(blackInc);
     this.movesToGo = movesToGo;
-    this.movetime = Duration.ofSeconds(movetime);
+    this.moveTime = Duration.ofSeconds(moveTime);
 
     this.depth = depth;
     this.nodes = nodes;
@@ -98,8 +102,70 @@ public class SearchMode {
 
     this.moves = moves;
 
-    timeControl = !this.ponder && !this.infinite && this.perft && this.mate <= 0;
 
+    // time management necessary and set start and max depth?
+    if (this.perft){
+      // no limits
+      timeControl = false;
+      startDepth = this.depth;
+      maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;;
+    } else if (this.infinite) {
+      // no limits
+      timeControl = false;
+      startDepth = 1;
+      maxDepth = MAX_SEARCH_DEPTH;
+    } else if (this.ponder ) {
+      // limits per depth only, start with 1
+      timeControl = false;
+      startDepth = 1;
+      maxDepth =  this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
+    } else if (this.mate > 0) {
+      // limits per mate depth only
+      timeControl = false;
+      startDepth = 1; // might start with mate depth directly??
+      maxDepth = this.mate;
+    } else if (this.whiteTime.toMillis() > 0 && this.blackTime.toMillis() > 0) {
+      // normal game with time for each player
+      timeControl = true;
+      startDepth = 1;
+      // might be limited be depth as well
+      maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
+    } else if (this.moveTime.toMillis() > 0) {
+      // normal game with time for each move
+      timeControl = true;
+      startDepth = 1;
+      // might be limited be depth as well
+      maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
+    } else if (this.depth > 0 && this.nodes == 0) {
+      // limited only by depth and starts by depth directly
+      timeControl = false;
+      startDepth = this.depth;
+      // might be limited be depth as well
+      maxDepth = this.depth;
+    } else if (this.nodes > 0) {
+      // limited only by the number of nodes visited
+      timeControl = false;
+      startDepth = 1;
+      // might be limited be depth as well
+      maxDepth = maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
+    } else {
+      // INVALID SearchMode
+      String msg =
+        "SearchMode is invalid as no mode could be deducted from settings: " + this.toString();
+      IllegalArgumentException e = new IllegalArgumentException(msg);
+      LOG.error(msg, e);
+      throw e;
+    }
+  }
+
+  public Duration getRemainingTime(Color color) {
+    if (color == Color.NOCOLOR) {
+      String msg = "Color ust be either WHITE or BLACK";
+      IllegalArgumentException e = new IllegalArgumentException(msg);
+      LOG.error(msg, e);
+      throw e;
+    }
+    return color == Color.WHITE ? whiteTime : blackTime;
   }
 
   public Duration getWhiteTime() {
@@ -110,16 +176,15 @@ public class SearchMode {
     return blackTime;
   }
 
-  public Duration getRemainingTime(Color color) {
+  public Duration getTimeInc(Color color) {
     if (color == Color.NOCOLOR) {
       String msg = "Color ust be either WHITE or BLACK";
       IllegalArgumentException e = new IllegalArgumentException(msg);
       LOG.error(msg, e);
       throw e;
     }
-    return color == Color.WHITE ? whiteInc : blackTime;
+    return color == Color.WHITE ? whiteInc : blackInc;
   }
-
 
   public Duration getWhiteInc() {
     return whiteInc;
@@ -133,8 +198,8 @@ public class SearchMode {
     return movesToGo;
   }
 
-  public Duration getMovetime() {
-    return movetime;
+  public Duration getMoveTime() {
+    return moveTime;
   }
 
   public int getDepth() {
@@ -167,5 +232,23 @@ public class SearchMode {
 
   public boolean isPerft() {
     return perft;
+  }
+
+  public int getStartDepth() {
+    return startDepth;
+  }
+
+  public int getMaxDepth() {
+    return maxDepth;
+  }
+
+  @Override
+  public String toString() {
+    return "SearchMode{" + "whiteTime=" + whiteTime + ", blackTime=" + blackTime + ", whiteInc=" +
+           whiteInc + ", blackInc=" + blackInc + ", movesToGo=" + movesToGo + ", moveTime=" +
+           moveTime + ", depth=" + depth + ", nodes=" + nodes + ", moves=" + moves + ", mate=" +
+           mate + ", ponder=" + ponder + ", infinite=" + infinite + ", perft=" + perft +
+           ", timeControl=" + timeControl + ", startDepth=" + startDepth + ", maxDepth=" +
+           maxDepth + '}';
   }
 }

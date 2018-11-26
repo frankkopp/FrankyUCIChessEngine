@@ -33,7 +33,6 @@ import fko.javaUCIEngineFramework.UCI.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.print.attribute.standard.MediaSize;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +70,7 @@ public class MyEngine implements IUCIEngine {
   public MyEngine() {
     initOptions();
     search = new Search(this, hashSizeOption);
+    boardPosition = new BoardPosition(); // default is standard start board
   }
 
   private void initOptions() {
@@ -125,7 +125,8 @@ public class MyEngine implements IUCIEngine {
   @Override
   public void setHashSizeOption(final int hashSizeOption) {
     this.hashSizeOption = hashSizeOption;
-    final String msg = "Hash Size set to " + this.hashSizeOption; LOG.info(msg);
+    final String msg = "Hash Size set to " + this.hashSizeOption;
+    LOG.info(msg);
     search.setHashSize(hashSizeOption);
     uciProtocolHandler.sendInfoStringToUCI(msg);
   }
@@ -138,7 +139,8 @@ public class MyEngine implements IUCIEngine {
   @Override
   public void setPonderOption(final boolean ponderOption) {
     this.ponderOption = ponderOption;
-    final String msg = "Engine Ponder set to " + (this.ponderOption ? "On" : "Off"); LOG.info(msg);
+    final String msg = "Engine Ponder set to " + (this.ponderOption ? "On" : "Off");
+    LOG.info(msg);
     uciProtocolHandler.sendInfoStringToUCI(msg);
   }
 
@@ -156,7 +158,8 @@ public class MyEngine implements IUCIEngine {
 
   @Override
   public void setPosition(final String fen) {
-    LOG.info("Engine got Position command: " + fen); boardPosition = new BoardPosition(fen);
+    LOG.info("Engine got Position command: " + fen);
+    boardPosition = new BoardPosition(fen);
   }
 
   @Override
@@ -184,7 +187,8 @@ public class MyEngine implements IUCIEngine {
   @Override
   public void setDebugOption(final boolean debugOption) {
     this.debugOption = debugOption;
-    final String msg = "Engine Debug set to " + (this.debugOption ? "On" : "Off"); LOG.info(msg);
+    final String msg = "Engine Debug set to " + (this.debugOption ? "On" : "Off");
+    LOG.info(msg);
     uciProtocolHandler.sendInfoStringToUCI(msg);
   }
 
@@ -195,23 +199,22 @@ public class MyEngine implements IUCIEngine {
 
   @Override
   public void startSearch(final IUCISearchMode uciSearchMode) {
-    // TODO startSearch
+
+    if (search.isSearching()) {
+      LOG.warn("Previous search was still running. Stopping to start new search!");
+      search.stopSearch();
+    }
+
     this.uciSearchMode = uciSearchMode;
     LOG.info("Engine Search start with " + this.uciSearchMode.toString());
 
-    SearchMode searchMode = new SearchMode(uciSearchMode.getWhiteTime(),
-                                           uciSearchMode.getBlackTime(),
-                                           uciSearchMode.getWhiteInc(),
-                                           uciSearchMode.getBlackInc(),
-                                           uciSearchMode.getMovesToGo(),
-                                           uciSearchMode.getDepth(),
-                                           uciSearchMode.getNodes(),
-                                           uciSearchMode.getMate(),
-                                           uciSearchMode.getMoveTime(),
-                                           uciSearchMode.getMoves(),
-                                           uciSearchMode.isPonder(),
-                                           uciSearchMode.isInfinite(),
-                                          false);
+    SearchMode searchMode =
+      new SearchMode(uciSearchMode.getWhiteTime(), uciSearchMode.getBlackTime(),
+                     uciSearchMode.getWhiteInc(), uciSearchMode.getBlackInc(),
+                     uciSearchMode.getMovesToGo(), uciSearchMode.getDepth(),
+                     uciSearchMode.getNodes(), uciSearchMode.getMate(), uciSearchMode.getMoveTime(),
+                     uciSearchMode.getMoves(), uciSearchMode.isPonder(), uciSearchMode.isInfinite(),
+                     uciSearchMode.isPerft());
 
     search.startSearch(boardPosition, searchMode);
   }
@@ -231,7 +234,8 @@ public class MyEngine implements IUCIEngine {
   @Override
   public void sendResult(int bestMove, int ponderMove) {
     // TODO send bestmove
-    LOG.warn("Send bestmove not yet implemented");
+    LOG.warn("Send bestmove not yet implemented: " + Move.toSimpleString(bestMove) + " [" +
+             Move.toSimpleString(ponderMove) + "]");
   }
 
 }

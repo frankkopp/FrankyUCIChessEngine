@@ -99,6 +99,10 @@ public class Search implements Runnable {
   private long nodeCache_Misses        = 0;
   private long movesFromCache          = 0;
   private long movesGenerated          = 0;
+  private long checkCounter            = 0;
+  private long checkMateCounter        = 0;
+  private long captureCounter          = 0;
+  private long enPassantCounter        = 0;
   // @formatter:on
 
   private void resetCounter() {
@@ -118,6 +122,11 @@ public class Search implements Runnable {
     nodeCache_Misses = 0;
     movesFromCache = 0;
     movesGenerated = 0;
+    movesGenerated = 0;
+    checkCounter = 0;
+    checkMateCounter = 0;
+    captureCounter = 0;
+    enPassantCounter = 0;
   }
 
   /**
@@ -176,9 +185,6 @@ public class Search implements Runnable {
     this.myColor = currentBoardPosition.getNextPlayer();
     this.searchMode = searchMode;
 
-    // configure search
-    //TODO
-
     // setup latch
     waitForInitializaitonLatch = new CountDownLatch(1);
 
@@ -191,6 +197,8 @@ public class Search implements Runnable {
     searchThread = new Thread(this, threadName);
     searchThread.setDaemon(true);
     searchThread.start();
+
+    if (isPerftSearch()) LOG.info("****** PERFT SEARCH *******");
 
     // Wait for initialization in run() before returning from call
     try {
@@ -233,6 +241,9 @@ public class Search implements Runnable {
     // reset counter
     resetCounter();
 
+    // reset time limits
+    softTimeLimit = hardTimeLimit = 0;
+
     // release latch so the caller can continue
     waitForInitializaitonLatch.countDown();
 
@@ -242,6 +253,7 @@ public class Search implements Runnable {
     // TODO: send info to UCI
 
     // send the result
+    LOG.debug(searchResult.toString());
     engine.sendResult(searchResult.bestMove, searchResult.ponderMove);
   }
 
@@ -261,7 +273,9 @@ public class Search implements Runnable {
     MoveList legalMoves = moveGenerators[0].getLegalMoves(position, false);
 
     // no legal root moves - game already ended!
-    if (legalMoves.size() == 0) return new SearchResult();
+    if (legalMoves.size() == 0) {
+      return new SearchResult();
+    }
 
     // prepare principal variation lists
     for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
@@ -271,8 +285,14 @@ public class Search implements Runnable {
     // create rootMoves list
     rootMoves.clear();
     for (int i = 0; i < legalMoves.size(); i++) {
-      // TODO filter UCI search moves
-      rootMoves.add(legalMoves.get(i), Evaluation.Value.NOVALUE);
+      // filter UCI search moves
+      if (searchMode.getMoves().isEmpty()) {
+        rootMoves.add(legalMoves.get(i), Evaluation.Value.NOVALUE);
+      } else {
+        if (searchMode.getMoves().contains(Move.toUCINotation(position, legalMoves.get(i)))) {
+          rootMoves.add(legalMoves.get(i), Evaluation.Value.NOVALUE);
+        }
+      }
     }
 
     // temporary best move - take the first move available
@@ -282,22 +302,14 @@ public class Search implements Runnable {
     // prepare search result
     SearchResult searchResult = new SearchResult();
 
-    // define start search depth - for timed games this 1 otherwise it is
-    // either mate depth for mate searches or max depth otherwise
-    int startIterativeDepth = 1;
+    // if time based game setup the time soft and hard time limits
     if (searchMode.isTimeControl()) {
       configureTimeLimits();
-    } else {
-      startIterativeDepth =
-        searchMode.getMate() > 0 ? searchMode.getMate() // TODO: do we iterate for mate searches?
-                                 : searchMode.getDepth();
     }
-    // define max search depth according to search mode
-    int maxIterativeDepth = searchMode.getMate() > 0 ? searchMode.getMate() : searchMode.getDepth();
 
     // #############################
     // ### BEGIN Iterative Deepening
-    int depth = startIterativeDepth;
+    int depth = searchMode.getStartDepth();
     do {
       currentIterationDepth = depth;
 
@@ -312,16 +324,15 @@ public class Search implements Runnable {
       }
 
       // check if we need to stop search - could be external or time.
-      final long elapsedTime = Duration.between(Instant.now(), startTime).toMillis();
-      if (stopSearch || elapsedTime >= softTimeLimit || elapsedTime >= hardTimeLimit) {
+      if (stopSearch || softTimeLimitReached() || hardTimeLimitReached()) {
         break;
       }
 
-    } while (++depth <= maxIterativeDepth);
+    } while (++depth <= searchMode.getMaxDepth());
     // ### ENDOF Iterative Deepening
     // #############################
 
-    // we should have a sorted _rootMoves list here
+    // we should have a sorted rootMoves list here
     // create searchRestult here
     searchResult.bestMove = currentBestRootMove;
     searchResult.resultValue = currentBestRootValue;
@@ -335,6 +346,15 @@ public class Search implements Runnable {
       searchResult.ponderMove = Move.NOMOVE;
     }
 
+    LOG.info(String.format(
+      "Search complete. " + "Nodes visited: %d " + "Boards Evaluated: %d " + "Captures: %d " +
+      "EP: %d " + "Checks: %d " + "Mates: %d ", nodesVisited, boardsEvaluated, captureCounter,
+      enPassantCounter, checkCounter, checkMateCounter));
+    LOG.info("Search took " + elapsedTime());
+    LOG.info(
+      "Speed: " + String.format("%,d", (int) (boardsEvaluated / (elapsedTime().toMillis()/1e3))) +
+      " N/s");
+
     return searchResult;
   }
 
@@ -346,9 +366,296 @@ public class Search implements Runnable {
    */
   private void rootMovesSearch(BoardPosition position, int depth) {
 
-    // TODO rootMovesSearch
-    
+    LOG.debug("");
+    LOG.debug("Searching in Position: " + position.toFENString());
+    LOG.debug("Searching these moves: " + rootMoves.toString());
+    LOG.debug("Search Mode: " + searchMode.toString());
+    LOG.debug("Time Management: " + (searchMode.isTimeControl() ? "ON" : "OFF") + " soft: " +
+              softTimeLimit + " hard: " + hardTimeLimit);
+    LOG.debug("Start Depth: " + depth);
+    LOG.debug("Max Depth: " + searchMode.getMaxDepth());
+    LOG.debug("");
+
+    final int rootPly = 0;
+
+    // some stats for iteration
+    long boardsCounter = -boardsEvaluated;
+    Instant iterationStart = Instant.now();
+
+    int bestValue = Evaluation.Value.NOVALUE;
+
+    final int alpha = -Evaluation.Value.INFINITE;
+    final int beta = Evaluation.Value.INFINITE;
+
+    // ##### Iterate through all available root moves
+    for (int i = 0; i < rootMoves.size(); i++) {
+      int move = rootMoves.getMove(i);
+
+      // store the current move for Engine Watcher
+      currentRootMove = move;
+      currentRootMoveNumber = i + 1;
+
+      // #### START - Commit move and go deeper into recursion
+      position.makeMove(move);
+      currentVariation.add(move);
+
+      int value = Evaluation.Value.NOVALUE;
+
+      if (isPerftSearch()) {
+        value = -negamax(position, depth - 1, rootPly + 1, -beta, -alpha, false, false);
+      } else {
+        // TODO if not PERFT add PV etc.
+        value = -negamax(position, depth - 1, rootPly + 1, -beta, -alpha, true, false);
+      }
+
+      // write the value back to the root moves list
+      rootMoves.set(i, move, value);
+
+      // Evaluate the calculated value and compare to current best move
+      if (value > bestValue) {
+        bestValue = value;
+        currentBestRootValue = value;
+        currentBestRootMove = move;
+        MoveList.savePV(move, principalVariation[rootPly + 1], principalVariation[rootPly]);
+      }
+
+      position.undoMove();
+      //TODO printCurrentVariation(i, 0, rootMoves.size(), value);
+      currentVariation.removeLast();
+      // #### END - Commit move and go deeper into recursion
+
+      // check if we need to stop search - could be external or time.
+      // we should have any best move here
+      if (stopSearch || hardTimeLimitReached()) break;
+
+    } // ##### Iterate through all available moves
+
+    // sort root moves - higher values first
+    // best move is not necessarily at index 0
+    // best move is in _currentBestMove or _principalVariation[0].get(0)
+    rootMoves.sort();
+    // push PV move to head of list
+    if (principalVariation[0].size() != 0) {
+      rootMoves.pushToHead(principalVariation[0].get(0));
+    }
+
+    boardsCounter += boardsEvaluated;
+
   }
+
+  /**
+   * NegaMax Search
+   *
+   * @param position
+   * @param depthLeft
+   * @param ply
+   * @param pvSearch
+   * @param doNullMove
+   * @return value of the search
+   */
+  private int negamax(BoardPosition position, int depthLeft, int ply, int alpha, int beta,
+                      boolean pvSearch, boolean doNullMove) {
+
+    // nodes counter - not fully accurate here as we have counted the
+    // first call to this the previous alpha beta.
+    nodesVisited++;
+
+    // Initialize best values
+    int bestMove = Move.NOMOVE;
+    int bestValue = Evaluation.Value.NOVALUE;
+
+    // current search depth
+    if (currentSearchDepth < ply) currentSearchDepth = ply;
+    if (currentExtraSearchDepth < ply) currentExtraSearchDepth = ply;
+
+    // clear principal Variation for this depth
+    principalVariation[ply].clear();
+
+    // check draw through 50-moves-rule, 3-fold-repetition, insufficient material
+    if (!isPerftSearch()) {
+      if (position.check50Moves() || position.check3Repetitions() ||
+          position.checkInsufficientMaterial()) {
+        return Evaluation.Value.DRAW;
+      }
+    }
+
+    // on leaf node call quiescence
+    if (depthLeft <= 0) {
+      if (isPerftSearch()) {
+        return evaluate(position);
+      }
+      return quiescence(position, ply, alpha, beta);
+    }
+
+    // Initialize best values
+    int myBestMove = Move.NOMOVE;
+    int myBbestValue = Evaluation.Value.NOVALUE;
+
+    // needed to remember if we even had a legal move
+    boolean hadLegaMove = false;
+
+    // generate moves or get them from cache
+    MoveList moves;
+    //    if (engine._CONFIGURATION._USE_MOVE_CACHE && tt_moves != null) {
+    //      moves = tt_moves; _MovesFromCache++;
+    //    } else {
+    moves = moveGenerators[ply].getPseudoLegalMoves(position, false);
+    movesGenerated++;
+    //    }
+
+    // moves to search recursively
+    for (int i = 0; i < moves.size(); i++) {
+      int move = moves.get(i);
+      int value = bestValue;
+
+      position.makeMove(move);
+      // Check if legal move before going into recursion
+      if (!position.isAttacked(position._nextPlayer,
+                               position._kingSquares[position._nextPlayer.getInverseColor()
+                                                                         .ordinal()])) {
+
+        // needed to remember if we even had a legal move
+        hadLegaMove = true;
+
+        // keep track of current variation
+        currentVariation.add(move);
+
+        // go one ply deeper into the search tree
+        // if (!_omegaEngine._CONFIGURATION._USE_PVS ||
+        if (isPerftSearch()) {
+          value = -negamax(position, depthLeft - 1, ply + 1, -beta, -alpha, false, false);
+        } else {
+          value = -negamax(position, depthLeft - 1, ply + 1, -beta, -alpha, false, doNullMove);
+        }
+
+        // PRUNING START
+        if (value > bestValue) {
+          bestValue = value;
+          bestMove = move;
+
+          if (value > alpha) {
+            alpha = value;
+            //            tt_Type = TT_EntryType.EXACT;
+            MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
+
+            if (value >= beta) {
+              if (!isPerftSearch()) {
+                // tt_Type = TT_EntryType.BETA;
+                bestValue = beta; // same as return beta
+                // printCurrentVariation(i, ply, moves.size(), value);
+                currentVariation.removeLast();
+                position.undoMove();
+                prunings++;
+                break;
+              }
+            }
+          }
+        }
+        // PRUNING END
+
+        //  printCurrentVariation(i, ply, moves.size(), value);
+        currentVariation.removeLast();
+      }
+      position.undoMove();
+
+      // check if we need to stop search - could be external or time.
+      // we should have any best move here
+      if (stopSearch || hardTimeLimitReached()) break;
+    }
+
+    // if we did not have a legal move then we have a mate
+    if (!hadLegaMove && !stopSearch) {
+      if (position.hasCheck()) {
+        // We have a check mate. Return a -CHECKMATE.
+        bestValue = -Evaluation.Value.CHECKMATE + ply;
+      } else {
+        // We have a stale mate. Return the draw value.
+        bestValue = Evaluation.Value.DRAW;
+      }
+    }
+
+    return bestValue;
+  }
+
+  private int quiescence(BoardPosition position, int ply, int alpha, int beta) {
+    if (moveGenerators[ply].hasLegalMove(position)) {
+      // if (!_omegaEngine._CONFIGURATION._USE_QUIESCENCE) {
+      return evaluate(position);
+      // }
+    } // no moves - mate position?
+    else {
+      if (position.hasCheck()) {
+        // We have a check mate. Return a -CHECKMATE.
+        alpha = -Evaluation.Value.CHECKMATE + ply;
+      } else {
+        // We have a stale mate. Return the draw value.
+        alpha = Evaluation.Value.DRAW;
+      }
+    }
+    return alpha;
+  }
+
+  private int evaluate(BoardPosition position) {
+    // count all leaf nodes evaluated
+    boardsEvaluated++;
+
+    // special cases for testing
+    //    if (_omegaEngine._CONFIGURATION.DO_NULL_EVALUATION) return 0;
+    if (isPerftSearch()) {
+      perftUpdateCounter(position);
+      return 1;
+    }
+
+    // retrieve evaluation value from evaluation cache
+    //    if (_cacheEnabled && _omegaEngine._CONFIGURATION._USE_BOARD_CACHE) {
+    //      final int value = _evalCache.get(position.getZobristKey()); if (value > Integer.MIN_VALUE) {
+    //        _evalCache_Hits++; return value;
+    //      } _evalCache_Misses++;
+    //    }
+
+    // call the evaluation
+    final int value = evaluator.evaluate(position);
+
+    // store evaluation value in evaluation cache
+    //    if (_cacheEnabled && _omegaEngine._CONFIGURATION._USE_BOARD_CACHE) {
+    //      _evalCache.put(position.getZobristKey(), value);
+    //    }
+
+    return value;
+  }
+
+  private boolean isPerftSearch() {
+    return Configuration.PERFT || searchMode.isPerft();
+  }
+
+  private void perftUpdateCounter(BoardPosition board) {
+    if (board.hasCheck()) {
+      checkCounter++;
+      if (board.hasCheckMate()) {
+        checkMateCounter++;
+      }
+    }
+    int lastMove = board.getLastMove();
+    if (Move.getTarget(lastMove) != Piece.NOPIECE) {
+      captureCounter++;
+    }
+    if (Move.getMoveType(lastMove) == MoveType.ENPASSANT) {
+      enPassantCounter++;
+    }
+  }
+
+  private boolean softTimeLimitReached() {
+    return elapsedTime().toMillis() < softTimeLimit;
+  }
+
+  private boolean hardTimeLimitReached() {
+    return elapsedTime().toMillis() < hardTimeLimit;
+  }
+
+  private Duration elapsedTime() {
+    return Duration.between(startTime, Instant.now());
+  }
+
 
   /**
    * Configure time limits<br>
@@ -357,8 +664,10 @@ public class Search implements Runnable {
    */
   private void configureTimeLimits() {
 
-    if (searchMode.getMovetime().toMillis() > 0) { // mode time per move
-      hardTimeLimit = searchMode.getMovetime().toMillis();
+    // TODO calculate time inc into the estimation
+
+    if (searchMode.getMoveTime().toMillis() > 0) { // mode time per move
+      hardTimeLimit = searchMode.getMoveTime().toMillis();
     } else { // remaining time - estimated time per move
       // reset flags
       long timeLeft = searchMode.getRemainingTime(myColor).toMillis();
@@ -400,6 +709,13 @@ public class Search implements Runnable {
   public void newGame() {
     transpositionTable.clear();
     evalCache.clear();
+  }
+
+  /**
+   * @return true if previous search is still running
+   */
+  public boolean isSearching() {
+    return searchThread != null;
   }
 
   /**

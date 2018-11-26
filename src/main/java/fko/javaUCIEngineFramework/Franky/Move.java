@@ -238,6 +238,14 @@ public class Move {
     return NOMOVE;
   }
 
+  public static String toUCINotation(final BoardPosition boardPosition, int move) {
+    String promotion = "";
+    if (Move.getMoveType(move) == MoveType.PROMOTION) {
+      promotion = Move.getPromotion(move).getType().getShortName().toLowerCase();
+    }
+    return Move.getStart(move).toString() + Move.getEnd(move).toString() + promotion;
+  }
+
   /**
    * Converts move to GameMove. If the move is invalid or NOMOVE it returns null:
    *

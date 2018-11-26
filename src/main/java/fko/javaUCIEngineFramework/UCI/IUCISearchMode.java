@@ -76,4 +76,8 @@ public interface IUCISearchMode {
   void setWhiteTime(int whiteTime);
 
   void setMovesToGo(int movesToGo);
+
+  boolean isPerft();
+
+  void setPerft(boolean perft);
 }

@@ -165,7 +165,7 @@ These are all the command the engine gets from the interface.
 	   search x nodes only,
 	* mate <x>
 		search for a mate in x moves
-	* movetime <x>
+	* moveTime <x>
 		search exactly x mseconds
 	* infinite
 		search until the "stop" command. Do not exit the search without being told so in this mode!

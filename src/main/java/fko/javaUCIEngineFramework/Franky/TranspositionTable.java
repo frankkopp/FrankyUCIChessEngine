@@ -34,7 +34,7 @@ package fko.javaUCIEngineFramework.Franky;
  */
 public class TranspositionTable {
 
-  static private final int MB = 1024;
+  private static final int MB = 1024;
 
   private       int _size;
   private final int _max_entries;
@@ -61,8 +61,8 @@ public class TranspositionTable {
     int percentage = 10;
     if (freeMemory * percentage / 100 < _size) {
       System.err.println(
-        String.format("Not enough memory for a %,dMB transposition cache - reducing to %,dMB", _size / (MB * MB),
-                      (freeMemory * percentage / 100) / (MB * MB)));
+        String.format("Not enough memory for a %,dMB transposition cache - reducing to %,dMB",
+                      _size / (MB * MB), (freeMemory * percentage / 100) / (MB * MB)));
       _size = (int) (freeMemory * percentage / 100); // % of memory
     }
 
@@ -85,7 +85,8 @@ public class TranspositionTable {
    * @param depth
    * @param moveList
    */
-  public void put(BoardPosition position, int value, TT_EntryType type, int depth, MoveList moveList) {
+  public void put(BoardPosition position, int value, TT_EntryType type, int depth,
+                  MoveList moveList) {
 
     final int hash = getHash(position._zobristKey);
 
@@ -116,19 +117,6 @@ public class TranspositionTable {
     // Collision or update
     else if (position._zobristKey == entries[hash].key  // same position
              && depth >= entries[hash].depth) { // Overwrite only when new value from deeper search
-
-      // this asserts if key=key but fen!=fen ==> COLLISION!!!
-      // DEBUG code
-      //            final String fenCache = entries[hash].fen;
-      //            final String fenNew = position.toFENString();
-      //            final String fc = fenCache.replaceAll(" \\d+ \\d+$", "");
-      //            final String fg = fenNew.replaceAll(" \\d+ \\d+$", "");
-      //            if (!fc.equals(fg)) {
-      //                System.err.println("key=key but fen!=fen");
-      //                System.err.println("new  : "+fg);
-      //                System.err.println("cache: "+fc);
-      //                System.err.println();
-      //            }
 
       _numberOfCollisions++;
       entries[hash].key = position._zobristKey;
@@ -218,8 +206,7 @@ public class TranspositionTable {
                              + Integer.BYTES // value
                              + Integer.BYTES // depth
                             ) * 2 // 64bit?
-                            + 8 // enum
-      ;//+ 40; // SoftReference
+                            + 8; // enum // +40; // SoftReference
     long         key       = 0L;
     //String fen = "";
     int          value     = Integer.MIN_VALUE;

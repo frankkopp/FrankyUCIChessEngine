@@ -48,8 +48,9 @@
         </encoder>
     </appender>
 
-
-    <logger name="fko.javaUCIEngineFramework" level="DEBUG" additivity="true"></logger>
+    <logger name="fko.javaUCIEngineFramework" level="INFO" additivity="true"></logger>
+    <logger name="fko.javaUCIEngineFramework.UCI" level="WARN" additivity="true"></logger>
+    <logger name="fko.javaUCIEngineFramework.Franky" level="DEBUG" additivity="true"></logger>
 
     <!-- By default, the level of the root level is set to DEBUG -->
     <root level="DEBUG"><appender-ref ref="FILE"/></root>

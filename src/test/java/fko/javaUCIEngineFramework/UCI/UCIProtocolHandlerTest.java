@@ -173,7 +173,13 @@ class UCIProtocolHandlerTest {
     toHandlerPrinter.println("go wtime 120 btime 110 movestogo 25");
     handler.waitUntilProcessed();
 
-    toHandlerPrinter.println("go wtime 60 btime 50 winc 2 binc 2");
+    toHandlerPrinter.println("go wtime 120 btime 110 movestogo 5");
+    handler.waitUntilProcessed();
+
+    toHandlerPrinter.println("go wtime 120 btime 110");
+    handler.waitUntilProcessed();
+
+    toHandlerPrinter.println("go wtime 120 btime 110 winc 2 binc 2");
     handler.waitUntilProcessed();
 
     toHandlerPrinter.println("go movetime 10");
@@ -189,6 +195,29 @@ class UCIProtocolHandlerTest {
     handler.waitUntilProcessed();
 
     toHandlerPrinter.println("quit");
+  }
+
+  @Test
+  void perftCommand() {
+    // @formatter:off
+    /*
+    //N  Nodes      Captures EP     Checks  Mates
+    { 0, 1,         0,       0,     0,      0},
+    { 1, 20,        0,       0,     0,      0},
+    { 2, 400,       0,       0,     0,      0},
+    { 3, 8902,      34,      0,     12,     0},
+    { 4, 197281,    1576,    0,     469,    8},
+    { 5, 4865609,   82719,   258,   27351,  347},
+    { 6, 119060324, 2812008, 5248,  809099, 10828},
+    { 7, 3195901860L, 108329926, 319617, 33103848, 435816 }
+    */
+    // @formatter:on
+    toHandlerPrinter.println("go perft 3");
+    handler.waitUntilProcessed();
+
+    
+
+    //toHandlerPrinter.println("quit");
   }
 
   @Test

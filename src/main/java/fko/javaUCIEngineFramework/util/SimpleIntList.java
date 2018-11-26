@@ -73,7 +73,22 @@ public class SimpleIntList implements Iterable<Integer> {
      * @param old
      */
     public SimpleIntList(SimpleIntList old) {
-        _list = Arrays.copyOfRange(old._list, old._head, old._list.length);
+        _list = old._list.clone(); // clone is faster as Array copy - see unit tests
+        this._arraySize = old._arraySize;
+        this._head = 0;
+        this._tail = old._tail-old._head;
+    }
+
+    /**
+     * Only for unit testing
+     * @param old
+     */
+    SimpleIntList(SimpleIntList old, boolean clone) {
+        if (clone) {
+            this._list = old._list.clone();
+        } else {
+            this._list = Arrays.copyOfRange(old._list, old._head, old._list.length);
+        }
         this._arraySize = old._arraySize;
         this._head = 0;
         this._tail = old._tail-old._head;
@@ -88,13 +103,13 @@ public class SimpleIntList implements Iterable<Integer> {
 
     /**
      * Adds an element to the end of the list.
-     * @param omegaIntegerList
+     * @param integer
      */
-    public void add(int omegaIntegerList) {
+    public void add(int integer) {
         if (_tail>=_list.length) {
             grow(1);
         }
-        _list[_tail++] = omegaIntegerList;
+        _list[_tail++] = integer;
     }
 
     /**
@@ -384,6 +399,16 @@ public class SimpleIntList implements Iterable<Integer> {
     /**
      * Returns an iterator over the elements contained in this list.  The
      * iterator traverses the elements in their <i>natural order</i>.
+     *
+     * Using a for loop instead the iterator is about 15% faster
+     * See units tests
+     *
+     *          for (int i=0; i<_squareList.size(); i++) {
+     *             for (int j=0; j<_squareList.size(); j++) {
+     *                 tempa = _squareList.get(i);
+     *                 tempb = _squareList.get(j);
+     *             }
+     *         }
      *
      * @return an iterator over the elements contained in this list
      */

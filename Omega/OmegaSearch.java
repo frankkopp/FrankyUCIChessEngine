@@ -470,7 +470,8 @@ public class OmegaSearch implements Runnable {
     final int rootply = 0;
 
     // some stats for iteration
-    long boardsCounter = -_boardsEvaluated; Instant iterationStart = Instant.now();
+    long boardsCounter = -_boardsEvaluated;
+    Instant iterationStart = Instant.now();
 
     int bestValue = OmegaEvaluation.Value.NOVALUE;
 
@@ -485,10 +486,13 @@ public class OmegaSearch implements Runnable {
       //if (_omegaEngine.getGame().isPresent()) _omegaEngine.getGame().get().waitWhileGamePaused();
 
       // store the current move for Engine Watcher
-      _currentRootMove = move; _currentRootMoveNumber = i + 1;
+      _currentRootMove = move;
+      _currentRootMoveNumber = i + 1;
+
 
       // #### START - Commit move and go deeper into recursion
-      position.makeMove(move); _currentVariation.add(move);
+      position.makeMove(move);
+      _currentVariation.add(move);
 
       int value = OmegaEvaluation.Value.NOVALUE;
       if (OmegaConfiguration.PERFT || !_omegaEngine._CONFIGURATION._USE_PVS) {
@@ -513,13 +517,17 @@ public class OmegaSearch implements Runnable {
 
       // Evaluate the calculated value and compare to current best move
       if (value > bestValue && value != -OmegaEvaluation.Value.NOVALUE) {
-        bestValue = value; _currentBestRootValue = value; _currentBestRootMove = move;
+        bestValue = value;
+        _currentBestRootValue = value;
+        _currentBestRootMove = move;
         OmegaMoveList.savePV(move, _principalVariation[rootply + 1], _principalVariation[rootply]);
       }
 
-      position.undoMove(); printCurrentVariation(i, 0, _rootMoves.size(), value);
+      position.undoMove();
+      printCurrentVariation(i, 0, _rootMoves.size(), value);
       _currentVariation.removeLast();
       // #### END - Commit move and go deeper into recursion
+
 
       // check if we need to stop search - could be external or time.
       // we should have any best move here
@@ -696,7 +704,8 @@ public class OmegaSearch implements Runnable {
      **********************/
 
     // Initialize best values
-    int bestMove = OmegaMove.NOMOVE; int bestValue = OmegaEvaluation.Value.NOVALUE;
+    int bestMove = OmegaMove.NOMOVE;
+    int bestValue = OmegaEvaluation.Value.NOVALUE;
 
     // needed to remember if we even had a legal move
     boolean hadLegaMove = false;
@@ -773,9 +782,9 @@ public class OmegaSearch implements Runnable {
         }
         // PRUNING END
 
-        printCurrentVariation(i, ply, moves.size(), value); _currentVariation.removeLast();
+        printCurrentVariation(i, ply, moves.size(), value);
+        _currentVariation.removeLast();
       }
-
       position.undoMove();
 
       // check if we need to stop search - could be external or time.

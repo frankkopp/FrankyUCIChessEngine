@@ -27,6 +27,9 @@ package fko.javaUCIEngineFramework.util;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.stream.IntStream;
 
@@ -34,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** @author Frank */
 public class TestSimpleIntList {
+
+  private SimpleIntList _list_1;
 
   /** Test Iterator in a simple case */
   @Test
@@ -112,7 +117,7 @@ public class TestSimpleIntList {
   @Test
   public void testIterator_simpleIterationModification() {
 
-    SimpleIntList list = new SimpleIntList();
+    SimpleIntList list = new SimpleIntList(1024);
 
     // add many entries
     for (int i = 1; i <= 100; i++) {
@@ -347,6 +352,65 @@ public class TestSimpleIntList {
     System.out.println(list.stream().average());
 
     list.stream().filter(i -> i % 2 == 0).forEach(System.out::println);
-    ;
   }
+
+  @Test
+  public void testTiming() {
+
+    prepare();
+
+    int ROUNDS = 5;
+    int DURATION = 5;
+
+    int ITERATIONS = 0;
+
+    Instant start;
+
+    System.out.println("Running Timing Test Test 1 vs. Test 2");
+
+    for (int j = 0; j < ROUNDS; j++) {
+
+      System.gc();
+
+      start = Instant.now();
+      ITERATIONS = 0;
+      for (; ; ) {
+        ITERATIONS++;
+        test1();
+        if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) break;
+      }
+      System.out.println(String.format("Test 1 (copy): %,7d runs/s", ITERATIONS / DURATION));
+
+      start = Instant.now();
+      ITERATIONS = 0;
+      for (; ; ) {
+        ITERATIONS++;
+        test2();
+        if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) break;
+      }
+      System.out.println(String.format("Test 2 (clone): %,7d runs/s", ITERATIONS / DURATION));
+    }
+  }
+
+  /** */
+  private void prepare() {
+    _list_1 = new SimpleIntList(1024);
+    // add many entries
+    for (int i = 0; i < 1024; i++) {
+      _list_1.add((int) (Math.random() * Integer.MAX_VALUE));
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private void test1() {
+    SimpleIntList copy = new SimpleIntList(_list_1, false);
+    assertEquals(_list_1, copy);
+  }
+
+  @SuppressWarnings("unused")
+  private void test2() {
+    SimpleIntList copy = new SimpleIntList(_list_1, true);
+    assertEquals(_list_1, copy);
+  }
+
 }

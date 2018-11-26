@@ -28,8 +28,9 @@ package fko.javaUCIEngineFramework.Franky;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Frank
+ * Perft check using only the MoveGenerator and an own minimax
  *
+ * @author Frank
  */
 public class PERFT {
 

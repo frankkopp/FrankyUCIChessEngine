@@ -47,11 +47,12 @@ public class UCISearchMode implements IUCISearchMode {
   private int depth = 0;
   private long nodes = 0;
   private int mate = 0;
-  private int movetime = 5;
+  private int movetime = 0;
   private List<String> moves = new ArrayList<>();
 
   private boolean ponder = false;
   private boolean infinite = false;
+  private boolean perft = false;
 
   @Override
   public int getWhiteTime() {
@@ -174,6 +175,16 @@ public class UCISearchMode implements IUCISearchMode {
   }
 
   @Override
+  public boolean isPerft() {
+    return perft;
+  }
+
+  @Override
+  public void setPerft(boolean perft) {
+    this.perft = perft;
+  }
+
+  @Override
   public String toString() {
     return "UCISearchMode{" +
             "whiteTime=" + whiteTime +
@@ -190,5 +201,6 @@ public class UCISearchMode implements IUCISearchMode {
             ", infinite=" + infinite +
             '}';
   }
+
 
 }

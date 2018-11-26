@@ -348,6 +348,10 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
         case "infinite":
           searchMode.setInfinite(true);
           break;
+        case "perft":
+          searchMode.setPerft(true);
+          searchMode.setDepth(Integer.valueOf(scanner.next()));
+          break;
         default:
           LOG.error("Command go is malformed - expected known go subcommand but received " + token);
           break;
