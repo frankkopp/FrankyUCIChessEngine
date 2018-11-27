@@ -54,6 +54,8 @@ import java.util.Random;
  */
 public class BoardPosition {
 
+  public static final String START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
   /* Size of 0x88 board */
   private static final int BOARDSIZE = 128;
 

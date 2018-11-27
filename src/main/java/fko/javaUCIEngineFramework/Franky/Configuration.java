@@ -33,7 +33,7 @@ package fko.javaUCIEngineFramework.Franky;
 public class Configuration {
 
   /** test the search without any pruning and count perft value **/
-  static public boolean PERFT = true;
+  boolean PERFT = false;
 
   /** null evaluation **/
   boolean DO_NULL_EVALUATION = false;
@@ -50,7 +50,6 @@ public class Configuration {
 
   /** verbose variation **/
   boolean VERBOSE_STATS = true;
-
 
   /** If set to true we will use the opening book */
   boolean _USE_BOOK = true;

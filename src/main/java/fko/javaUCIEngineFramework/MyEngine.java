@@ -233,9 +233,15 @@ public class MyEngine implements IUCIEngine {
 
   @Override
   public void sendResult(int bestMove, int ponderMove) {
-    // TODO send bestmove
-    LOG.warn("Send bestmove not yet implemented: " + Move.toSimpleString(bestMove) + " [" +
+    LOG.info("Best Move: " + Move.toSimpleString(bestMove) + " [Ponder " +
              Move.toSimpleString(ponderMove) + "]");
+
+    if (ponderMove == Move.NOMOVE) {
+      uciProtocolHandler.resultToUCI(Move.toUCINotation(boardPosition, bestMove));
+    } else {
+      uciProtocolHandler.resultToUCI(Move.toUCINotation(boardPosition, bestMove),
+                                     Move.toUCINotation(boardPosition, ponderMove));
+    }
   }
 
 }

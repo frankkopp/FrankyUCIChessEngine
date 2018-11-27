@@ -42,6 +42,12 @@ public class Search implements Runnable {
 
   private static final int MAX_SEARCH_DEPTH = 100;
 
+  // configuration parameters
+  private final Configuration config = new Configuration();
+
+  // search counters
+  private final SearchCounter searchCounter = new SearchCounter();
+
   // back reference to the engine
   private IUCIEngine engine;
 
@@ -62,7 +68,7 @@ public class Search implements Runnable {
   private final Evaluation evaluator;
 
   // used to wait for move from search
-  private CountDownLatch waitForInitializaitonLatch = new CountDownLatch(1);
+  private CountDownLatch waitForInitializationLatch = new CountDownLatch(1);
 
   // time variables
   private Instant startTime;
@@ -74,60 +80,13 @@ public class Search implements Runnable {
   private BoardPosition currentBoardPosition;
   private Color         myColor;
   private SearchMode    searchMode;
+  private SearchResult  lastSearchResult;
 
   // running search global variables
   private RootMoveList rootMoves = new RootMoveList();
   // current variation of the search
   MoveList   currentVariation   = new MoveList(MAX_SEARCH_DEPTH);
   MoveList[] principalVariation = new MoveList[MAX_SEARCH_DEPTH];
-  // @formatter:off
-  private int  currentBestRootMove     = Move.NOMOVE; // current best move found by search
-  private int  currentBestRootValue    = Evaluation.Value.NOVALUE; // value of the current best move
-  private int  currentIterationDepth   = 0; // how deep will the search go in the current iteration
-  private int  currentSearchDepth      = 0; // how deep did the search go this iteration
-  private int  currentExtraSearchDepth = 0; // how deep did we search including quiescence depth this iteration
-  private int  currentRootMove         = 0; // current root move that is searched
-  private int  currentRootMoveNumber   = 0; // number of the current root move in the list of root moves
-  private long nodesVisited            = 0; // how many times a node has been visited (negamax calls)
-  private long boardsEvaluated         = 0; // how many times a node has been visited (= boards evaluated)
-  private long boardsNonQuiet          = 0; // board/nodes evaluated in quiescence search
-  private long prunings                = 0;
-  private long pv_researches           = 0;
-  private long evalCache_Hits          = 0;
-  private long evalCache_Misses        = 0;
-  private long nodeCache_Hits          = 0;
-  private long nodeCache_Misses        = 0;
-  private long movesFromCache          = 0;
-  private long movesGenerated          = 0;
-  private long checkCounter            = 0;
-  private long checkMateCounter        = 0;
-  private long captureCounter          = 0;
-  private long enPassantCounter        = 0;
-  // @formatter:on
-
-  private void resetCounter() {
-    currentIterationDepth = 0;
-    currentSearchDepth = 0;
-    currentExtraSearchDepth = 0;
-    currentRootMove = 0;
-    currentRootMoveNumber = 0;
-    nodesVisited = 0;
-    boardsEvaluated = 0;
-    boardsNonQuiet = 0;
-    prunings = 0;
-    pv_researches = 0;
-    evalCache_Hits = 0;
-    evalCache_Misses = 0;
-    nodeCache_Hits = 0;
-    nodeCache_Misses = 0;
-    movesFromCache = 0;
-    movesGenerated = 0;
-    movesGenerated = 0;
-    checkCounter = 0;
-    checkMateCounter = 0;
-    captureCounter = 0;
-    enPassantCounter = 0;
-  }
 
   /**
    * /**
@@ -173,8 +132,8 @@ public class Search implements Runnable {
    * @param searchMode
    */
   public void startSearch(BoardPosition boardPosition, SearchMode searchMode) {
-    if (searchThread != null) {
-      final String s = "OmegaSearch already running - can only be started once";
+    if (searchThread != null && searchThread.isAlive()) {
+      final String s = "Search already running - can only be started once";
       IllegalStateException e = new IllegalStateException(s);
       LOG.error(s, e);
       throw e;
@@ -186,7 +145,7 @@ public class Search implements Runnable {
     this.searchMode = searchMode;
 
     // setup latch
-    waitForInitializaitonLatch = new CountDownLatch(1);
+    waitForInitializationLatch = new CountDownLatch(1);
 
     // reset the stop search flag
     stopSearch = false;
@@ -199,10 +158,13 @@ public class Search implements Runnable {
     searchThread.start();
 
     if (isPerftSearch()) LOG.info("****** PERFT SEARCH *******");
+    if (searchMode.isPonder()) LOG.info("****** PONDER SEARCH *******");
+    if (searchMode.isInfinite()) LOG.info("****** INFINITE SEARCH *******");
+    if (searchMode.getMate() > 0) LOG.info("****** MATE SEARCH *******");
 
     // Wait for initialization in run() before returning from call
     try {
-      waitForInitializaitonLatch.await();
+      waitForInitializationLatch.await();
     } catch (InterruptedException ignored) {
     }
   }
@@ -217,6 +179,8 @@ public class Search implements Runnable {
 
     // return if no search is running
     if (searchThread == null) return;
+
+    LOG.info("Search has been stopped");
 
     // Wait for the thread to die
     try {
@@ -238,23 +202,26 @@ public class Search implements Runnable {
       throw e;
     }
 
+    // reset lastSearchResult
+    lastSearchResult = new SearchResult();
+
     // reset counter
-    resetCounter();
+    searchCounter.resetCounter();
 
     // reset time limits
     softTimeLimit = hardTimeLimit = 0;
 
     // release latch so the caller can continue
-    waitForInitializaitonLatch.countDown();
+    waitForInitializationLatch.countDown();
 
     // run the search itself
-    SearchResult searchResult = iterativeSearch(currentBoardPosition);
+    lastSearchResult = iterativeSearch(currentBoardPosition);
 
-    // TODO: send info to UCI
+    LOG.info("Search result was: " + lastSearchResult.toString() + " Value: " +
+             lastSearchResult.resultValue + " PV: " + principalVariation[0].toNotationString());
 
-    // send the result
-    LOG.debug(searchResult.toString());
-    engine.sendResult(searchResult.bestMove, searchResult.ponderMove);
+    engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
+
   }
 
   /**
@@ -296,8 +263,8 @@ public class Search implements Runnable {
     }
 
     // temporary best move - take the first move available
-    currentBestRootMove = rootMoves.getMove(0);
-    currentBestRootValue = Evaluation.Value.NOVALUE;
+    searchCounter.currentBestRootMove = rootMoves.getMove(0);
+    searchCounter.currentBestRootValue = Evaluation.Value.NOVALUE;
 
     // prepare search result
     SearchResult searchResult = new SearchResult();
@@ -307,18 +274,28 @@ public class Search implements Runnable {
       configureTimeLimits();
     }
 
+    int depth = searchMode.getStartDepth();
+
+    LOG.debug("Searching in Position: " + position.toFENString());
+    LOG.debug("Searching these moves: " + rootMoves.toString());
+    LOG.debug("Search Mode: " + searchMode.toString());
+    LOG.debug("Time Management: " + (searchMode.isTimeControl() ? "ON" : "OFF") + " soft: " +
+              softTimeLimit + " hard: " + hardTimeLimit);
+    LOG.debug("Start Depth: " + depth);
+    LOG.debug("Max Depth: " + searchMode.getMaxDepth());
+    LOG.debug("");
+
     // #############################
     // ### BEGIN Iterative Deepening
-    int depth = searchMode.getStartDepth();
     do {
-      currentIterationDepth = depth;
+      searchCounter.currentIterationDepth = depth;
 
       // do search
       rootMovesSearch(position, depth);
 
       // sure mate value found?
-      if (currentBestRootValue >= Evaluation.Value.CHECKMATE - depth ||
-          currentBestRootValue <= -Evaluation.Value.CHECKMATE + depth) {
+      if (searchCounter.currentBestRootValue >= Evaluation.Value.CHECKMATE - depth ||
+          searchCounter.currentBestRootValue <= -Evaluation.Value.CHECKMATE + depth) {
         //System.err.println("Already found Mate: "+position.toFENString());
         stopSearch = true;
       }
@@ -334,13 +311,15 @@ public class Search implements Runnable {
 
     // we should have a sorted rootMoves list here
     // create searchRestult here
-    searchResult.bestMove = currentBestRootMove;
-    searchResult.resultValue = currentBestRootValue;
-    searchResult.depth = currentIterationDepth;
+    searchResult.bestMove = searchCounter.currentBestRootMove;
+    searchResult.resultValue = searchCounter.currentBestRootValue;
+    searchResult.depth = searchCounter.currentIterationDepth;
     int p_move;
     if (principalVariation[0].size() > 1 &&
         (p_move = principalVariation[0].get(1)) != Move.NOMOVE) {
-      //System.out.println("Best Move: "+OmegaMove.toString(searchResult.bestMove)+" Ponder Move: "+OmegaMove.toString(p_move)+" ("+_principalVariation[0].toNotationString()+")");
+      //      System.out.println("Best Move: " + Move.toString(searchResult.bestMove) + " Ponder Move: " +
+      //                         Move.toString(p_move) + " (" + principalVariation[0].toNotationString() +
+      //                         ")");
       searchResult.ponderMove = p_move;
     } else {
       searchResult.ponderMove = Move.NOMOVE;
@@ -348,12 +327,14 @@ public class Search implements Runnable {
 
     LOG.info(String.format(
       "Search complete. " + "Nodes visited: %d " + "Boards Evaluated: %d " + "Captures: %d " +
-      "EP: %d " + "Checks: %d " + "Mates: %d ", nodesVisited, boardsEvaluated, captureCounter,
-      enPassantCounter, checkCounter, checkMateCounter));
+      "EP: %d " + "Checks: %d " + "Mates: %d ", searchCounter.nodesVisited,
+      searchCounter.boardsEvaluated, searchCounter.captureCounter, searchCounter.enPassantCounter,
+      searchCounter.checkCounter, searchCounter.checkMateCounter));
+    LOG.info("Search Depth was " + searchCounter.currentIterationDepth + " (" +
+             searchCounter.currentExtraSearchDepth + ")");
     LOG.info("Search took " + elapsedTime());
-    LOG.info(
-      "Speed: " + String.format("%,d", (int) (boardsEvaluated / (elapsedTime().toMillis()/1e3))) +
-      " N/s");
+    LOG.info("Speed: " + String.format("%,d", (int) (searchCounter.boardsEvaluated /
+                                                     (elapsedTime().toMillis() / 1e3))) + " N/s");
 
     return searchResult;
   }
@@ -366,20 +347,10 @@ public class Search implements Runnable {
    */
   private void rootMovesSearch(BoardPosition position, int depth) {
 
-    LOG.debug("");
-    LOG.debug("Searching in Position: " + position.toFENString());
-    LOG.debug("Searching these moves: " + rootMoves.toString());
-    LOG.debug("Search Mode: " + searchMode.toString());
-    LOG.debug("Time Management: " + (searchMode.isTimeControl() ? "ON" : "OFF") + " soft: " +
-              softTimeLimit + " hard: " + hardTimeLimit);
-    LOG.debug("Start Depth: " + depth);
-    LOG.debug("Max Depth: " + searchMode.getMaxDepth());
-    LOG.debug("");
-
     final int rootPly = 0;
 
     // some stats for iteration
-    long boardsCounter = -boardsEvaluated;
+    long boardsCounter = -searchCounter.boardsEvaluated;
     Instant iterationStart = Instant.now();
 
     int bestValue = Evaluation.Value.NOVALUE;
@@ -392,8 +363,8 @@ public class Search implements Runnable {
       int move = rootMoves.getMove(i);
 
       // store the current move for Engine Watcher
-      currentRootMove = move;
-      currentRootMoveNumber = i + 1;
+      searchCounter.currentRootMove = move;
+      searchCounter.currentRootMoveNumber = i + 1;
 
       // #### START - Commit move and go deeper into recursion
       position.makeMove(move);
@@ -414,8 +385,8 @@ public class Search implements Runnable {
       // Evaluate the calculated value and compare to current best move
       if (value > bestValue) {
         bestValue = value;
-        currentBestRootValue = value;
-        currentBestRootMove = move;
+        searchCounter.currentBestRootValue = value;
+        searchCounter.currentBestRootMove = move;
         MoveList.savePV(move, principalVariation[rootPly + 1], principalVariation[rootPly]);
       }
 
@@ -439,7 +410,7 @@ public class Search implements Runnable {
       rootMoves.pushToHead(principalVariation[0].get(0));
     }
 
-    boardsCounter += boardsEvaluated;
+    boardsCounter += searchCounter.boardsEvaluated;
 
   }
 
@@ -458,15 +429,18 @@ public class Search implements Runnable {
 
     // nodes counter - not fully accurate here as we have counted the
     // first call to this the previous alpha beta.
-    nodesVisited++;
+    searchCounter.nodesVisited++;
+    if (searchMode.getNodes() > 0 && searchCounter.nodesVisited >= searchMode.getNodes()) {
+      stopSearch=true;
+    }
 
     // Initialize best values
     int bestMove = Move.NOMOVE;
     int bestValue = Evaluation.Value.NOVALUE;
 
     // current search depth
-    if (currentSearchDepth < ply) currentSearchDepth = ply;
-    if (currentExtraSearchDepth < ply) currentExtraSearchDepth = ply;
+    if (searchCounter.currentSearchDepth < ply) searchCounter.currentSearchDepth = ply;
+    if (searchCounter.currentExtraSearchDepth < ply) searchCounter.currentExtraSearchDepth = ply;
 
     // clear principal Variation for this depth
     principalVariation[ply].clear();
@@ -500,7 +474,7 @@ public class Search implements Runnable {
     //      moves = tt_moves; _MovesFromCache++;
     //    } else {
     moves = moveGenerators[ply].getPseudoLegalMoves(position, false);
-    movesGenerated++;
+    searchCounter.movesGenerated++;
     //    }
 
     // moves to search recursively
@@ -545,7 +519,7 @@ public class Search implements Runnable {
                 // printCurrentVariation(i, ply, moves.size(), value);
                 currentVariation.removeLast();
                 position.undoMove();
-                prunings++;
+                searchCounter.prunings++;
                 break;
               }
             }
@@ -579,7 +553,7 @@ public class Search implements Runnable {
 
   private int quiescence(BoardPosition position, int ply, int alpha, int beta) {
     if (moveGenerators[ply].hasLegalMove(position)) {
-      // if (!_omegaEngine._CONFIGURATION._USE_QUIESCENCE) {
+      // TODO if (!_omegaEngine._CONFIGURATION._USE_QUIESCENCE) {
       return evaluate(position);
       // }
     } // no moves - mate position?
@@ -597,7 +571,7 @@ public class Search implements Runnable {
 
   private int evaluate(BoardPosition position) {
     // count all leaf nodes evaluated
-    boardsEvaluated++;
+    searchCounter.boardsEvaluated++;
 
     // special cases for testing
     //    if (_omegaEngine._CONFIGURATION.DO_NULL_EVALUATION) return 0;
@@ -625,31 +599,33 @@ public class Search implements Runnable {
   }
 
   private boolean isPerftSearch() {
-    return Configuration.PERFT || searchMode.isPerft();
+    return config.PERFT || searchMode.isPerft();
   }
 
   private void perftUpdateCounter(BoardPosition board) {
     if (board.hasCheck()) {
-      checkCounter++;
+      searchCounter.checkCounter++;
       if (board.hasCheckMate()) {
-        checkMateCounter++;
+        searchCounter.checkMateCounter++;
       }
     }
     int lastMove = board.getLastMove();
     if (Move.getTarget(lastMove) != Piece.NOPIECE) {
-      captureCounter++;
+      searchCounter.captureCounter++;
     }
     if (Move.getMoveType(lastMove) == MoveType.ENPASSANT) {
-      enPassantCounter++;
+      searchCounter.enPassantCounter++;
     }
   }
 
   private boolean softTimeLimitReached() {
-    return elapsedTime().toMillis() < softTimeLimit;
+    if (!searchMode.isTimeControl()) return false;
+    return elapsedTime().toMillis() >= softTimeLimit;
   }
 
   private boolean hardTimeLimitReached() {
-    return elapsedTime().toMillis() < hardTimeLimit;
+    if (!searchMode.isTimeControl()) return false;
+    return elapsedTime().toMillis() >= hardTimeLimit;
   }
 
   private Duration elapsedTime() {
@@ -715,8 +691,23 @@ public class Search implements Runnable {
    * @return true if previous search is still running
    */
   public boolean isSearching() {
-    return searchThread != null;
+    return searchThread != null && searchThread.isAlive();
   }
+
+  /**
+   * @return Search result of the last search. Has NOMOVE if no result available.
+   */
+  public SearchResult getLastSearchResult() {
+    return lastSearchResult;
+  }
+
+  /**
+   * @return a wrapper for all search counters
+   */
+  public SearchCounter getSearchCounter() {
+    return searchCounter;
+  }
+
 
   /**
    * Parameter class for the search result
@@ -733,6 +724,75 @@ public class Search implements Runnable {
     @Override
     public String toString() {
       return "Best Move: " + Move.toString(bestMove) + " Ponder Move: " + Move.toString(ponderMove);
+    }
+  }
+
+  /**
+   * Convenience Wrapper class for all counters
+   */
+  public class SearchCounter {
+    int  currentBestRootMove     = Move.NOMOVE;
+    int  currentBestRootValue    = Evaluation.Value.NOVALUE;
+    int  currentIterationDepth   = 0;
+    int  currentSearchDepth      = 0;
+    int  currentExtraSearchDepth = 0;
+    int  currentRootMove         = 0;
+    int  currentRootMoveNumber   = 0;
+    long nodesVisited            = 0;
+    long boardsEvaluated         = 0;
+    long boardsNonQuiet          = 0;
+    long prunings                = 0;
+    long pv_researches           = 0;
+    long evalCache_Hits          = 0;
+    long evalCache_Misses        = 0;
+    long nodeCache_Hits          = 0;
+    long nodeCache_Misses        = 0;
+    long movesFromCache          = 0;
+    long movesGenerated          = 0;
+    long checkCounter            = 0;
+    long checkMateCounter        = 0;
+    long captureCounter          = 0;
+    long enPassantCounter        = 0;
+
+    private void resetCounter() {
+      currentIterationDepth = 0;
+      currentSearchDepth = 0;
+      currentExtraSearchDepth = 0;
+      currentRootMove = 0;
+      currentRootMoveNumber = 0;
+      nodesVisited = 0;
+      boardsEvaluated = 0;
+      boardsNonQuiet = 0;
+      prunings = 0;
+      pv_researches = 0;
+      evalCache_Hits = 0;
+      evalCache_Misses = 0;
+      nodeCache_Hits = 0;
+      nodeCache_Misses = 0;
+      movesFromCache = 0;
+      movesGenerated = 0;
+      movesGenerated = 0;
+      checkCounter = 0;
+      checkMateCounter = 0;
+      captureCounter = 0;
+      enPassantCounter = 0;
+    }
+
+    @Override
+    public String toString() {
+      return "SearchCounter{" + "currentBestRootMove=" + currentBestRootMove +
+             ", currentBestRootValue=" + currentBestRootValue + ", currentIterationDepth=" +
+             currentIterationDepth + ", currentSearchDepth=" + currentSearchDepth +
+             ", currentExtraSearchDepth=" + currentExtraSearchDepth + ", currentRootMove=" +
+             currentRootMove + ", currentRootMoveNumber=" + currentRootMoveNumber +
+             ", nodesVisited=" + nodesVisited + ", boardsEvaluated=" + boardsEvaluated +
+             ", boardsNonQuiet=" + boardsNonQuiet + ", prunings=" + prunings + ", pv_researches=" +
+             pv_researches + ", evalCache_Hits=" + evalCache_Hits + ", evalCache_Misses=" +
+             evalCache_Misses + ", nodeCache_Hits=" + nodeCache_Hits + ", nodeCache_Misses=" +
+             nodeCache_Misses + ", movesFromCache=" + movesFromCache + ", movesGenerated=" +
+             movesGenerated + ", checkCounter=" + checkCounter + ", checkMateCounter=" +
+             checkMateCounter + ", captureCounter=" + captureCounter + ", enPassantCounter=" +
+             enPassantCounter + '}';
     }
   }
 

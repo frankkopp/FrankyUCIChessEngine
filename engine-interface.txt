@@ -345,7 +345,7 @@ Engine to GUI:
 			this is the path on the hard disk to the Nalimov compressed format.
 			Multiple directories can be concatenated with ";"
 		* <id> = NalimovCache, type spin
-			this is the size in MB for the cache for the nalimov table bases
+			this is the sizeInBytes in MB for the cache for the nalimov table bases
 			These last two options should also be present in the initial options exchange dialog
 			when the engine is booted if the engine supports it
 		* <id> = Ponder, type check
@@ -444,7 +444,7 @@ uci
 		id author Stefan MK
 
 // engine sends the options it can change
-// the engine can change the hash size from 1 to 128 MB
+// the engine can change the hash sizeInBytes from 1 to 128 MB
 		option name Hash type spin default 1 min 1 max 128
 
 // the engine supports Nalimov endgame tablebases

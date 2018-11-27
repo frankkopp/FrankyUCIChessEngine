@@ -289,7 +289,7 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
       startFen = IUCIProtocolHandler.START_FEN;
     }
     List<String> moves = new ArrayList<>();
-    if (token.equals("moves") || (token=scanner.next()).equals("moves")) {
+    if (token.equals("moves") || (scanner.hasNext() &&(token=scanner.next()).equals("moves"))) {
       while (scanner.hasNext()) {
         token = scanner.next();
         moves.add(token);
@@ -403,5 +403,15 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   @Override
   public void sendInfoStringToUCI(final String msg) {
     send("info string " + msg);
+  }
+
+  @Override
+  public void resultToUCI(String result) {
+    send("bestmove " + result);
+  }
+
+  @Override
+  public void resultToUCI(String result, String ponder) {
+    send("bestmove " + result+" ponder "+ponder);
   }
 }

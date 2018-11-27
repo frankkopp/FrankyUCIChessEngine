@@ -97,7 +97,7 @@ class UCIProtocolHandlerTest {
   void setoptionCommand() {
 
     assertEquals(16, engine.getHashSizeOption());
-    toHandlerPrinter.println("setoption name Hash value 32");
+    toHandlerPrinter.println("setoption name Hash value 4096");
     handler.waitUntilProcessed();
     assertEquals(32, engine.getHashSizeOption());
 
@@ -214,8 +214,6 @@ class UCIProtocolHandlerTest {
     // @formatter:on
     toHandlerPrinter.println("go perft 3");
     handler.waitUntilProcessed();
-
-    
 
     //toHandlerPrinter.println("quit");
   }

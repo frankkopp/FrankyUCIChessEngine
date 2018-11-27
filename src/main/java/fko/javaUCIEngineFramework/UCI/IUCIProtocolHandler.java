@@ -32,4 +32,6 @@ public interface IUCIProtocolHandler {
   void sendInfoToUCI(String msg);
   void sendInfoStringToUCI(String msg);
 
+  void resultToUCI(String result);
+  void resultToUCI(String result, String ponder);
 }

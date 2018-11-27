@@ -68,29 +68,29 @@ public class SearchMode {
   /**
    * Keeps the search mode state
    *
-   * @param whiteTime
-   * @param blackTime
-   * @param whiteInc
-   * @param blackInc
-   * @param movesToGo
-   * @param depth
-   * @param nodes
-   * @param mate
-   * @param moveTime
-   * @param moves
-   * @param ponder
-   * @param infinite
+   * @param whiteTime remaining time in msec
+   * @param blackTime remaining in msec
+   * @param whiteInc time inc per move in msec
+   * @param blackInc time inc in msec
+   * @param movesToGo until next time control
+   * @param depth max depth of search
+   * @param nodes max number of nodes to search
+   * @param mate mate in x search
+   * @param moveTime time per move in msec
+   * @param moves list of moves to search
+   * @param ponder true or false
+   * @param infinite true or false
    */
   public SearchMode(int whiteTime, int blackTime, int whiteInc, int blackInc, int movesToGo,
                     int depth, long nodes, int mate, int moveTime, List<String> moves,
                     boolean ponder, boolean infinite, boolean perft) {
 
-    this.whiteTime = Duration.ofSeconds(whiteTime);
-    this.blackTime = Duration.ofSeconds(blackTime);
-    this.whiteInc = Duration.ofSeconds(whiteInc);
-    this.blackInc = Duration.ofSeconds(blackInc);
+    this.whiteTime = Duration.ofMillis(whiteTime);
+    this.blackTime = Duration.ofMillis(blackTime);
+    this.whiteInc = Duration.ofMillis(whiteInc);
+    this.blackInc = Duration.ofMillis(blackInc);
     this.movesToGo = movesToGo;
-    this.moveTime = Duration.ofSeconds(moveTime);
+    this.moveTime = Duration.ofMillis(moveTime);
 
     this.depth = depth;
     this.nodes = nodes;
@@ -101,7 +101,9 @@ public class SearchMode {
     this.perft = perft;
 
     this.moves = moves;
-
+    if (this.moves == null) {
+      this.moves = new ArrayList<>();
+    }
 
     // time management necessary and set start and max depth?
     if (this.perft){
@@ -123,7 +125,7 @@ public class SearchMode {
       // limits per mate depth only
       timeControl = false;
       startDepth = 1; // might start with mate depth directly??
-      maxDepth = this.mate;
+      maxDepth = this.mate * 2;
     } else if (this.whiteTime.toMillis() > 0 && this.blackTime.toMillis() > 0) {
       // normal game with time for each player
       timeControl = true;
