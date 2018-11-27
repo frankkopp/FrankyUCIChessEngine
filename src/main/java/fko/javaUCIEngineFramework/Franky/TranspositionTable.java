@@ -25,6 +25,9 @@
 
 package fko.javaUCIEngineFramework.Franky;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A cache for node results during AlphaBeta search.
  * Implementation uses a simple array of an Entry class. The array indexes
@@ -34,44 +37,49 @@ package fko.javaUCIEngineFramework.Franky;
  */
 public class TranspositionTable {
 
-  private static final int MB = 1024;
+  private static final Logger LOG = LoggerFactory.getLogger(TranspositionTable.class);
 
-  private       int _size;
-  private final int _max_entries;
+  private static final int KB = 1024;
 
-  private int  _numberOfEntries    = 0;
-  private long _numberOfCollisions = 0L;
+  private long sizeInByte;
+  private int  maxNumberOfEntries;
+
+  private int  numberOfEntries    = 0;
+  private long numberOfCollisions = 0L;
 
   private final TT_Entry[] entries;
 
   /**
    * Creates a hash table with a approximated number of entries calculated by
-   * the size in MB divided by the entry size.<br>
+   * the size in KB divided by the entry size.<br>
    * The hash function is very simple using the modulo of number of entries on the key
    *
    * @param size in MB (1024^2)
    */
   public TranspositionTable(int size) {
-    _size = size * MB * MB;
+    sizeInByte = (long) size * KB * KB;
 
     // check available mem - add some head room
     System.gc();
     long usedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
     long freeMemory = (Runtime.getRuntime().maxMemory() - usedMemory);
     int percentage = 10;
-    if (freeMemory * percentage / 100 < _size) {
-      System.err.println(
+    if (freeMemory * percentage / 100 < sizeInByte) {
+      LOG.error(
         String.format("Not enough memory for a %,dMB transposition cache - reducing to %,dMB",
-                      _size / (MB * MB), (freeMemory * percentage / 100) / (MB * MB)));
-      _size = (int) (freeMemory * percentage / 100); // % of memory
+                      sizeInByte / (KB * KB), (freeMemory * percentage / 100) / (KB * KB)));
+      sizeInByte = (int) (freeMemory * percentage / 100); // % of memory
     }
 
     // size in byte divided by entry size plus size for array bucket
-    _max_entries = _size / (TT_Entry.SIZE + Integer.BYTES);
+    maxNumberOfEntries = (int) (sizeInByte / (TT_Entry.SIZE + Integer.BYTES));
+    if (maxNumberOfEntries > Integer.MAX_VALUE) {
+      maxNumberOfEntries = Integer.MAX_VALUE;
+    }
     // create buckets for hash table
-    entries = new TT_Entry[_max_entries];
+    entries = new TT_Entry[maxNumberOfEntries];
     // initialize
-    for (int i = 0; i < _max_entries; i++) {
+    for (int i = 0; i < maxNumberOfEntries; i++) {
       entries[i] = new TT_Entry();
     }
   }
@@ -92,7 +100,7 @@ public class TranspositionTable {
 
     // new value
     if (entries[hash].key == 0) {
-      _numberOfEntries++;
+      numberOfEntries++;
       entries[hash].key = position._zobristKey;
       //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
@@ -105,7 +113,7 @@ public class TranspositionTable {
     // different position - overwrite
     else if (position._zobristKey != entries[hash].key) {
 
-      _numberOfCollisions++;
+      numberOfCollisions++;
       entries[hash].key = position._zobristKey;
       //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
@@ -118,7 +126,7 @@ public class TranspositionTable {
     else if (position._zobristKey == entries[hash].key  // same position
              && depth >= entries[hash].depth) { // Overwrite only when new value from deeper search
 
-      _numberOfCollisions++;
+      numberOfCollisions++;
       entries[hash].key = position._zobristKey;
       //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
@@ -149,7 +157,7 @@ public class TranspositionTable {
 
 
   private int getHash(long key) {
-    return (int) (key % _max_entries);
+    return (int) (key % maxNumberOfEntries);
   }
 
   /**
@@ -158,43 +166,43 @@ public class TranspositionTable {
    */
   public void clear() {
     // initialize
-    for (int i = 0; i < _max_entries; i++) {
+    for (int i = 0; i < maxNumberOfEntries; i++) {
       entries[i].key = 0L;
       //entries[i].fen = "";
       entries[i].value = Integer.MIN_VALUE;
       entries[i].depth = 0;
       entries[i].type = TT_EntryType.ALPHA;
     }
-    _numberOfEntries = 0;
-    _numberOfCollisions = 0;
+    numberOfEntries = 0;
+    numberOfCollisions = 0;
   }
 
   /**
    * @return the numberOfEntries
    */
   public int getNumberOfEntries() {
-    return this._numberOfEntries;
+    return this.numberOfEntries;
   }
 
   /**
-   * @return the size in MB
+   * @return the size in KB
    */
-  public int getSize() {
-    return this._size;
+  public long getSize() {
+    return this.sizeInByte;
   }
 
   /**
    * @return the max_entries
    */
   public int getMaxEntries() {
-    return this._max_entries;
+    return this.maxNumberOfEntries;
   }
 
   /**
    * @return the numberOfCollisions
    */
   public long getNumberOfCollisions() {
-    return _numberOfCollisions;
+    return numberOfCollisions;
   }
 
   /**
