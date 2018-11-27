@@ -34,125 +34,130 @@ package fko.javaUCIEngineFramework.Franky;
  */
 public class EvaluationCache {
 
-    static private final int MB = 1024;
+  static private final int KB = 1024;
 
-    private int _size;
-    private int _max_entries;
+  private long sizeInBytes;
+  private int  maxEntries;
 
-    private int _numberOfEntries = 0;
-    private long _numberOfCollisions = 0L;
+  private int  numberOfEntries    = 0;
+  private long numberOfCollisions = 0L;
 
-    private final Entry[] entries;
+  private final Entry[] entries;
 
-    /**
-     * Creates a hash table with a approximated number of entries calculated by
-     * the size in MB divided by the entry size.<br>
-     * The hash function is very simple using the modulo of number of entries on the key
-     * @param size in MB (1024^2)
-     */
-    public EvaluationCache(int size) {
-        _size = size*MB*MB;
+  /**
+   * Creates a hash table with a approximated number of entries calculated by
+   * the sizeInBytes in KB divided by the entry sizeInBytes.<br>
+   * The hash function is very simple using the modulo of number of entries on the key
+   *
+   * @param sizeInBytes in KB (1024^2)
+   */
+  public EvaluationCache(int sizeInBytes) {
+    this.sizeInBytes = (long) sizeInBytes * KB * KB;
 
-        // check available mem - add some head room
-        System.gc();
-        long usedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        long freeMemory = (Runtime.getRuntime().maxMemory()-usedMemory);
-        int percentage = 10;
-        if (freeMemory*percentage/100 < _size) {
-            System.err.println(String.format("Not enough memory for a %,dMB evaluation cache - reducing to %,dMB", _size/(MB*MB), (freeMemory*percentage/100)/(MB*MB)));
-            _size = (int) (freeMemory*percentage/100); // % of memory
-        }
-
-        // size in byte divided by entry size plus size for array bucket
-        _max_entries = _size / (Entry.SIZE + Integer.BYTES);
-        // create buckets for hash table
-        entries = new Entry[_max_entries];
-        // initialize
-        for (int i=0; i<_max_entries; i++) {
-            entries[i] = new Entry();
-        }
+    // check available mem - add some head room
+    System.gc();
+    long usedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+    long freeMemory = (Runtime.getRuntime().maxMemory() - usedMemory);
+    int percentage = 10;
+    if (freeMemory * percentage / 100 < this.sizeInBytes) {
+      System.err.println(
+        String.format("Not enough memory for a %,dMB evaluation cache - reducing to %,dMB",
+                      this.sizeInBytes / (KB * KB), (freeMemory * percentage / 100) / (KB * KB)));
+      this.sizeInBytes = (int) (freeMemory * percentage / 100); // % of memory
     }
 
-    /**
-     * @param key
-     * @param value
-     */
-    public void put(long key, int value) {
-        final int hash = getHash(key);
-        if (entries[hash].key == 0) { // new value
-            _numberOfEntries++;
-        } else { // collision
-            _numberOfCollisions++;
-        }
-        entries[hash].key = key;
-        entries[hash].value = value;
+    // sizeInBytes in byte divided by entry sizeInBytes plus sizeInBytes for array bucket
+    maxEntries = (int) this.sizeInBytes / (Entry.SIZE + Integer.BYTES);
+    if (maxEntries > Integer.MAX_VALUE) {
+      maxEntries = Integer.MAX_VALUE;
     }
-
-    /**
-     * @param key
-     * @return value for key or Integer.MIN_VALUE if not found
-     */
-    public int get(long key) {
-        final int hash = getHash(key);
-        if (entries[hash].key == key) { // hash hit
-            return entries[hash].value;
-        }
-        // cache miss or collision
-        return Integer.MIN_VALUE;
+    // create buckets for hash table
+    entries = new Entry[maxEntries];
+    // initialize
+    for (int i = 0; i < maxEntries; i++) {
+      entries[i] = new Entry();
     }
+  }
 
-    private int getHash(long key) {
-        return (int) (key%_max_entries);
+  /**
+   * @param key
+   * @param value
+   */
+  public void put(long key, int value) {
+    final int hash = getHash(key);
+    if (entries[hash].key == 0) { // new value
+      numberOfEntries++;
+    } else { // collision
+      numberOfCollisions++;
     }
+    entries[hash].key = key;
+    entries[hash].value = value;
+  }
 
-    /**
-     * Clears all entry by resetting the to key=0 and
-     * value=Integer-MIN_VALUE
-     */
-    public void clear() {
-        // initialize
-        for (int i=0; i<_max_entries; i++) {
-            entries[i].key = 0;
-            entries[i].value = Integer.MIN_VALUE;
-        }
-        _numberOfEntries = 0;
-        _numberOfCollisions = 0;
+  /**
+   * @param key
+   * @return value for key or Integer.MIN_VALUE if not found
+   */
+  public int get(long key) {
+    final int hash = getHash(key);
+    if (entries[hash].key == key) { // hash hit
+      return entries[hash].value;
     }
+    // cache miss or collision
+    return Integer.MIN_VALUE;
+  }
 
-    /**
-     * @return the numberOfEntries
-     */
-    public int getNumberOfEntries() {
-        return this._numberOfEntries;
+  private int getHash(long key) {
+    return (int) (key % maxEntries);
+  }
+
+  /**
+   * Clears all entry by resetting the to key=0 and
+   * value=Integer-MIN_VALUE
+   */
+  public void clear() {
+    // initialize
+    for (int i = 0; i < maxEntries; i++) {
+      entries[i].key = 0;
+      entries[i].value = Integer.MIN_VALUE;
     }
+    numberOfEntries = 0;
+    numberOfCollisions = 0;
+  }
 
-    /**
-     * @return the size in MB
-     */
-    public int getSize() {
-        return this._size;
-    }
+  /**
+   * @return the numberOfEntries
+   */
+  public int getNumberOfEntries() {
+    return this.numberOfEntries;
+  }
 
-    /**
-     * @return the max_entries
-     */
-    public int getMaxEntries() {
-        return this._max_entries;
-    }
+  /**
+   * @return the sizeInBytes in KB
+   */
+  public long getSizeInBytes() {
+    return this.sizeInBytes;
+  }
 
-    /**
-     * @return the numberOfCollisions
-     */
-    public long getNumberOfCollisions() {
-        return _numberOfCollisions;
-    }
+  /**
+   * @return the max_entries
+   */
+  public int getMaxEntries() {
+    return this.maxEntries;
+  }
 
-    private static final class Entry {
-        static final int SIZE = (Long.BYTES+Integer.BYTES) *2;
-        long key   = 0L;
-        int  value = Integer.MIN_VALUE;
-    }
+  /**
+   * @return the numberOfCollisions
+   */
+  public long getNumberOfCollisions() {
+    return numberOfCollisions;
+  }
 
+  private static final class Entry {
+    static final int SIZE = (Long.BYTES + Integer.BYTES) * 2;
+    long key   = 0L;
+    int  value = Integer.MIN_VALUE;
+  }
 
 
 }

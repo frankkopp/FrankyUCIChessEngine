@@ -50,7 +50,7 @@ public class TestEvaluationCache {
     public final void test_Cache() {
         EvaluationCache cache = new EvaluationCache(32);
         assertEquals(1198372, cache.getMaxEntries());
-        assertEquals(33554432, cache.getSize());
+        assertEquals(33554432, cache.getSizeInBytes());
         cache.put(123412341234L, 999);
         assertEquals(1, cache.getNumberOfEntries());
         assertEquals(999,cache.get(123412341234L));
@@ -68,7 +68,7 @@ public class TestEvaluationCache {
     @Test
     public void testSize() {
         System.out.println("Testing Transposition Table size:");
-        int[] megabytes = {0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512};
+        int[] megabytes = {0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 20048};
         for (int i : megabytes) {
             System.gc();
             long usedMemoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
