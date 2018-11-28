@@ -160,7 +160,7 @@ public class MyEngine implements IUCIEngine {
 
   @Override
   public void setPosition(final String fen) {
-    LOG.info("Engine got Position command: " + fen);
+    LOG.info("Engine got Position command: {}", fen);
     boardPosition = new BoardPosition(fen);
   }
 
@@ -213,7 +213,7 @@ public class MyEngine implements IUCIEngine {
     }
 
     this.uciSearchMode = uciSearchMode;
-    LOG.info("Engine Search start with " + this.uciSearchMode.toString());
+    LOG.info("Engine got Start Search Command with " + this.uciSearchMode.toString());
 
     searchMode = new SearchMode(uciSearchMode.getWhiteTime(), uciSearchMode.getBlackTime(),
                                 uciSearchMode.getWhiteInc(), uciSearchMode.getBlackInc(),
@@ -233,20 +233,19 @@ public class MyEngine implements IUCIEngine {
 
   @Override
   public void stopSearch() {
-    LOG.info("Engine Stop");
+    LOG.info("Engine got Stop Search Command");
     search.stopSearch();
   }
 
   @Override
   public void ponderHit() {
-    // TODO ponderHit
-    LOG.info("Ponderhit!");
+    LOG.info("Engine got Ponderhit Command");
     search.ponderHit();
   }
 
   @Override
   public void sendResult(int bestMove, int ponderMove) {
-    LOG.info("Best Move: " + Move.toSimpleString(bestMove) + " [Ponder " +
+    LOG.info("Engine got Best Move: " + Move.toSimpleString(bestMove) + " [Ponder " +
              Move.toSimpleString(ponderMove) + "]");
 
     if (ponderMove == Move.NOMOVE) {
@@ -263,8 +262,8 @@ public class MyEngine implements IUCIEngine {
 
   @Override
   public void sendInfoToUCI(String s) {
-    LOG.info(">>>> " + s);
     if (uciProtocolHandler != null) uciProtocolHandler.sendInfoToUCI(s);
+    else LOG.info("Engine >>>> " + s);
   }
 
 }

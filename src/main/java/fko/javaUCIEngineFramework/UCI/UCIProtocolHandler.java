@@ -44,6 +44,8 @@ import java.util.concurrent.Semaphore;
 public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(UCIProtocolHandler.class);
+  private static final Logger COMLOG = LoggerFactory.getLogger("ComLog");
+
 
   // back reference to the engine
   private final IUCIEngine uciEngine;
@@ -129,7 +131,7 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
 
         // wait until a line is ready to be read
         final String readLine = in.readLine();
-        LOG.debug("Received: " + readLine);
+        COMLOG.debug("<<<<< {}", readLine);
 
         // Scanner parses the line to tokenize it
         Scanner scanner = new Scanner(readLine);
@@ -207,7 +209,6 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
     }
 
     send("uciok");
-    LOG.info("UCI Protocol confirmed");
   }
 
   private void commandIsReady(final Scanner scanner) {
@@ -374,16 +375,6 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
     stopHandler();
   }
 
-  private void send(final String msg) {
-    LOG.debug("Send: " + msg);
-    outputStreamPrinter.println(msg);
-  }
-
-  @Override
-  public void setWaiterForProcessing(Waiter waiter) {
-    this.waiter = waiter;
-  }
-
   private void waiterResume() {
     if (waiter != null) {
       waiter.resume();
@@ -391,8 +382,18 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   }
 
   @Override
+  public void setWaiterForProcessing(Waiter waiter) {
+    this.waiter = waiter;
+  }
+
+  @Override
   public boolean isRunning() {
     return running;
+  }
+
+  private void send(final String msg) {
+    COMLOG.debug(">>>>> {}", msg);
+    outputStreamPrinter.println(msg);
   }
 
   @Override

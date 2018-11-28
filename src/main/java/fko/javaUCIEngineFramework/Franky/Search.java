@@ -29,7 +29,6 @@ import fko.javaUCIEngineFramework.UCI.IUCIEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.CountDownLatch;
@@ -237,7 +236,8 @@ public class Search implements Runnable {
     lastSearchResult = iterativeSearch(currentBoardPosition);
 
     if (!searchMode.isPonder()) {
-      LOG.info("Search result was: " + lastSearchResult.toString() + " Value: " + lastSearchResult.resultValue + " PV: " + principalVariation[0].toNotationString());
+      LOG.info("Search result was: {} Value {} PV {}", lastSearchResult.toString(),
+               lastSearchResult.resultValue, principalVariation[0].toNotationString());
       engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
     } else {
       LOG.info("Ponder Miss!");
@@ -297,13 +297,13 @@ public class Search implements Runnable {
     int depth = searchMode.getStartDepth();
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Searching in Position: " + position.toFENString());
-      LOG.debug("Searching these moves: " + rootMoves.toString());
-      LOG.debug("Search Mode: " + searchMode.toString());
-      LOG.debug("Time Management: " + (searchMode.isTimeControl() ? "ON" : "OFF") + " soft: " +
-                softTimeLimit + " hard: " + hardTimeLimit);
-      LOG.debug("Start Depth: " + depth);
-      LOG.debug("Max Depth: " + searchMode.getMaxDepth());
+      LOG.debug("Searching in Position: {}", position.toFENString());
+      LOG.debug("Searching these moves: {}", rootMoves.toString());
+      LOG.debug("Search Mode: {}", searchMode.toString());
+      LOG.debug("Time Management: {} soft: {} hard: {}",
+                (searchMode.isTimeControl() ? "ON" : "OFF"), softTimeLimit, hardTimeLimit);
+      LOG.debug("Start Depth: {}", depth);
+      LOG.debug("Max Depth: {}", searchMode.getMaxDepth());
       LOG.debug("");
     }
 
@@ -360,13 +360,15 @@ public class Search implements Runnable {
     }
 
     if (LOG.isInfoEnabled()) {
-      LOG.info(String.format(
+      LOG.info("{}", String.format(
         "Search complete. " + "Nodes visited: %d " + "Boards Evaluated: %d " + "Captures: %d " +
-        "EP: %d " + "Checks: %d " + "Mates: %d ", searchCounter.nodesVisited, searchCounter.boardsEvaluated, searchCounter.captureCounter, searchCounter.enPassantCounter,
+        "EP: %d " + "Checks: %d " + "Mates: %d ", searchCounter.nodesVisited,
+        searchCounter.boardsEvaluated, searchCounter.captureCounter, searchCounter.enPassantCounter,
         searchCounter.checkCounter, searchCounter.checkMateCounter));
-      LOG.info("Search Depth was " + searchCounter.currentIterationDepth + " (" + searchCounter.currentExtraSearchDepth + ")");
-      LOG.info("Search took " + elapsedTime());
-      LOG.info("Speed: " + String.format("%,d", (int) (searchCounter.boardsEvaluated /
+      LOG.info("Search Depth was {} ({})", searchCounter.currentIterationDepth,
+               searchCounter.currentExtraSearchDepth);
+      LOG.info("Search took {}", elapsedTime());
+      LOG.info("Speed: {}", String.format("%,d", (int) (searchCounter.boardsEvaluated /
                                                        (elapsedTime().toMillis() / 1e3))) + " N/s");
     }
 
