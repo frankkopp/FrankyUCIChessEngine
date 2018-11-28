@@ -193,7 +193,7 @@ public class TestSearch {
     String fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
-    SearchMode searchMode = new SearchMode(300, 300, 0, 0, 0,
+    SearchMode searchMode = new SearchMode(300000, 300000, 0, 0, 0,
                                            0, 0, 0, 0,
                                            null, false, false, false);
 
@@ -216,7 +216,7 @@ public class TestSearch {
     String fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
-    SearchMode searchMode = new SearchMode(300, 300, 2, 2, 0,
+    SearchMode searchMode = new SearchMode(300000, 300000, 2000, 2000, 0,
                                            0, 0, 0, 0,
                                            null, false, false, false);
 
@@ -366,6 +366,83 @@ public class TestSearch {
 
     assertTrue(search.getSearchCounter().boardsEvaluated > 0);
     assertEquals("h2h4", Move.toUCINotation(boardPosition, search.getLastSearchResult().bestMove));
+  }
+
+  @Test
+  public void testPonderMissSearch() throws InterruptedException {
+    String fen = BoardPosition.START_FEN;
+    BoardPosition boardPosition = new BoardPosition(fen);
+    boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
+
+    SearchMode searchMode = new SearchMode(295000, 300000, 0, 0, 0,
+                                           0, 0, 0, 0,
+                                           null, true, false, false);
+
+    // set last ponder move
+    boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e7e5"));
+
+    // Start pondering
+    search.startSearch(boardPosition, searchMode);
+
+    // wait a bit
+    Thread.sleep(3000);
+
+    // ponder miss
+    // stop search
+    search.stopSearch();
+    boardPosition = new BoardPosition(fen);
+    boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
+    boardPosition.makeMove(Move.fromUCINotation(boardPosition,"c7c5"));
+    searchMode = new SearchMode(295000, 295000, 0, 0, 0,
+                                           0, 0, 0, 0,
+                                           null, false, false, false);
+
+    // Start search after miss
+    search.startSearch(boardPosition, searchMode);
+
+    // stop search
+    search.stopSearch();
+    // wait a bit
+    Thread.sleep(3000);
+
+//    assertTrue(search.getSearchCounter().boardsEvaluated > 0);
+//    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+//    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+  }
+
+  @Test
+  public void testPonderHitSearch() throws InterruptedException {
+    String fen = BoardPosition.START_FEN;
+    BoardPosition boardPosition = new BoardPosition(fen);
+    boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
+
+    SearchMode searchMode = new SearchMode(295000, 300000, 0, 0, 0,
+                                           0, 0, 0, 0,
+                                           null, true, false, false);
+
+    // set last ponder move
+    boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e7e5"));
+
+    // Start pondering
+    search.startSearch(boardPosition, searchMode);
+
+    // wait a bit
+    Thread.sleep(3000);
+
+    // ponder miss
+    // stop search
+    search.ponderHit();
+
+    // test search
+    while (search.isSearching()) {
+      try {
+        Thread.sleep(200);
+      } catch (InterruptedException ignored) { }
+    }
+
+    //    assertTrue(search.getSearchCounter().boardsEvaluated > 0);
+    //    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+    //    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
   }
 
 }

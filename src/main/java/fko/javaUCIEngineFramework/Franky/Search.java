@@ -29,6 +29,7 @@ import fko.javaUCIEngineFramework.UCI.IUCIEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.CountDownLatch;
@@ -72,7 +73,6 @@ public class Search implements Runnable {
 
   // time variables
   private Instant startTime;
-  private Instant ponderStartTime;
   private long    hardTimeLimit;
   private long    softTimeLimit;
 
@@ -187,6 +187,25 @@ public class Search implements Runnable {
     searchThread = null;
   }
 
+  /**
+   * Is called when our last ponder suggestion has been executed by opponent.
+   * If we are already pondering just continue the search but switch to time control.
+   * If we were not pondering start searching.
+   */
+  public void ponderHit() {
+    if (isSearching() && searchMode.isPonder()) {
+      LOG.info("****** PONDERHIT *******");
+      startTime = Instant.now();
+      searchMode.ponderHit();
+      // if time based game setup the time soft and hard time limits
+      if (searchMode.isTimeControl()) {
+        configureTimeLimits();
+      }
+    } else {
+      LOG.warn("Ponderhit when not pondering!");
+    }
+  }
+
   @Override
   public void run() {
 
@@ -217,10 +236,12 @@ public class Search implements Runnable {
     // run the search itself
     lastSearchResult = iterativeSearch(currentBoardPosition);
 
-    LOG.info("Search result was: " + lastSearchResult.toString() + " Value: " +
-             lastSearchResult.resultValue + " PV: " + principalVariation[0].toNotationString());
-
-    engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
+    if (!searchMode.isPonder()) {
+      LOG.info("Search result was: " + lastSearchResult.toString() + " Value: " + lastSearchResult.resultValue + " PV: " + principalVariation[0].toNotationString());
+      engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
+    } else {
+      LOG.info("Ponder Miss!");
+    }
 
   }
 
@@ -234,7 +255,6 @@ public class Search implements Runnable {
 
     // remember the start of the search
     startTime = Instant.now();
-    ponderStartTime = Instant.now();
 
     // generate all root moves
     MoveList legalMoves = moveGenerators[0].getLegalMoves(position, false);
@@ -276,14 +296,16 @@ public class Search implements Runnable {
 
     int depth = searchMode.getStartDepth();
 
-    LOG.debug("Searching in Position: " + position.toFENString());
-    LOG.debug("Searching these moves: " + rootMoves.toString());
-    LOG.debug("Search Mode: " + searchMode.toString());
-    LOG.debug("Time Management: " + (searchMode.isTimeControl() ? "ON" : "OFF") + " soft: " +
-              softTimeLimit + " hard: " + hardTimeLimit);
-    LOG.debug("Start Depth: " + depth);
-    LOG.debug("Max Depth: " + searchMode.getMaxDepth());
-    LOG.debug("");
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Searching in Position: " + position.toFENString());
+      LOG.debug("Searching these moves: " + rootMoves.toString());
+      LOG.debug("Search Mode: " + searchMode.toString());
+      LOG.debug("Time Management: " + (searchMode.isTimeControl() ? "ON" : "OFF") + " soft: " +
+                softTimeLimit + " hard: " + hardTimeLimit);
+      LOG.debug("Start Depth: " + depth);
+      LOG.debug("Max Depth: " + searchMode.getMaxDepth());
+      LOG.debug("");
+    }
 
     // #############################
     // ### BEGIN Iterative Deepening
@@ -322,7 +344,7 @@ public class Search implements Runnable {
     // #############################
 
     // we should have a sorted rootMoves list here
-    // create searchRestult here
+    // create searchResult here
     searchResult.bestMove = searchCounter.currentBestRootMove;
     searchResult.resultValue = searchCounter.currentBestRootValue;
     searchResult.depth = searchCounter.currentIterationDepth;
@@ -337,16 +359,16 @@ public class Search implements Runnable {
       searchResult.ponderMove = Move.NOMOVE;
     }
 
-    LOG.info(String.format(
-      "Search complete. " + "Nodes visited: %d " + "Boards Evaluated: %d " + "Captures: %d " +
-      "EP: %d " + "Checks: %d " + "Mates: %d ", searchCounter.nodesVisited,
-      searchCounter.boardsEvaluated, searchCounter.captureCounter, searchCounter.enPassantCounter,
-      searchCounter.checkCounter, searchCounter.checkMateCounter));
-    LOG.info("Search Depth was " + searchCounter.currentIterationDepth + " (" +
-             searchCounter.currentExtraSearchDepth + ")");
-    LOG.info("Search took " + elapsedTime());
-    LOG.info("Speed: " + String.format("%,d", (int) (searchCounter.boardsEvaluated /
-                                                     (elapsedTime().toMillis() / 1e3))) + " N/s");
+    if (LOG.isInfoEnabled()) {
+      LOG.info(String.format(
+        "Search complete. " + "Nodes visited: %d " + "Boards Evaluated: %d " + "Captures: %d " +
+        "EP: %d " + "Checks: %d " + "Mates: %d ", searchCounter.nodesVisited, searchCounter.boardsEvaluated, searchCounter.captureCounter, searchCounter.enPassantCounter,
+        searchCounter.checkCounter, searchCounter.checkMateCounter));
+      LOG.info("Search Depth was " + searchCounter.currentIterationDepth + " (" + searchCounter.currentExtraSearchDepth + ")");
+      LOG.info("Search took " + elapsedTime());
+      LOG.info("Speed: " + String.format("%,d", (int) (searchCounter.boardsEvaluated /
+                                                       (elapsedTime().toMillis() / 1e3))) + " N/s");
+    }
 
     return searchResult;
   }
@@ -737,7 +759,6 @@ public class Search implements Runnable {
     return searchCounter;
   }
 
-
   /**
    * Parameter class for the search result
    */
@@ -799,7 +820,6 @@ public class Search implements Runnable {
       nodeCache_Hits = 0;
       nodeCache_Misses = 0;
       movesFromCache = 0;
-      movesGenerated = 0;
       movesGenerated = 0;
       checkCounter = 0;
       checkMateCounter = 0;

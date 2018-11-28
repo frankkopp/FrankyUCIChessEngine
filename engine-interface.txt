@@ -137,15 +137,15 @@ These are all the command the engine gets from the interface.
 		restrict search to this moves only
 		Example: After "position startpos" and "go infinite searchmoves e2e4 d2d4"
 		the engine should only search the two moves e2e4 and d2d4 in the initial position.
-	* ponderOption
+	* ponder
 		start searching in pondering mode.
-		Do not exit the search in ponderOption mode, even if it's mate!
-		This means that the last move sent in in the position string is the ponderOption move.
+		Do not exit the search in ponder mode, even if it's mate!
+		This means that the last move sent in in the position string is the ponder move.
 		The engine can do what it wants to do, but after a "ponderhit" command
-		it should execute the suggested move to ponderOption on. This means that the ponderOption move sent by
-		the GUI can be interpreted as a recommendation about which move to ponderOption. However, if the
-		engine decides to ponderOption on a different move, it should not display any mainlines as they are
-		likely to be misinterpreted by the GUI because the GUI expects the engine to ponderOption
+		it should execute the suggested move to ponder on. This means that the pondern move sent by
+		the GUI can be interpreted as a recommendation about which move to ponder. However, if the
+		engine decides to ponder on a different move, it should not display any mainlines as they are
+		likely to be misinterpreted by the GUI because the GUI expects the engine to ponder
 	   on the suggested move.
 	* wtime <x>
 		white has x msec left on the clock

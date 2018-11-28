@@ -240,7 +240,8 @@ public class MyEngine implements IUCIEngine {
   @Override
   public void ponderHit() {
     // TODO ponderHit
-    LOG.info("Engine PonderHit start with " + this.uciSearchMode.toString());
+    LOG.info("Ponderhit!");
+    search.ponderHit();
   }
 
   @Override
@@ -249,16 +250,21 @@ public class MyEngine implements IUCIEngine {
              Move.toSimpleString(ponderMove) + "]");
 
     if (ponderMove == Move.NOMOVE) {
-      uciProtocolHandler.resultToUCI(Move.toUCINotation(boardPosition, bestMove));
+      if (uciProtocolHandler != null) {
+        uciProtocolHandler.resultToUCI(Move.toUCINotation(boardPosition, bestMove));
+      }
     } else {
-      uciProtocolHandler.resultToUCI(Move.toUCINotation(boardPosition, bestMove),
-                                     Move.toUCINotation(boardPosition, ponderMove));
+      if (uciProtocolHandler != null) {
+        uciProtocolHandler.resultToUCI(Move.toUCINotation(boardPosition, bestMove),
+                                       Move.toUCINotation(boardPosition, ponderMove));
+      }
     }
   }
 
   @Override
   public void sendInfoToUCI(String s) {
-    uciProtocolHandler.sendInfoToUCI(s);
+    LOG.info(">>>> " + s);
+    if (uciProtocolHandler != null) uciProtocolHandler.sendInfoToUCI(s);
   }
 
 }

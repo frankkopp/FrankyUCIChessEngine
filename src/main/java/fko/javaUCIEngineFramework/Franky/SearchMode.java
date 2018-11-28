@@ -104,7 +104,11 @@ public class SearchMode {
     if (this.moves == null) {
       this.moves = new ArrayList<>();
     }
+    setupLimits();
 
+  }
+
+  private void setupLimits() {
     // time management necessary and set start and max depth?
     if (this.perft){
       // no limits
@@ -116,7 +120,7 @@ public class SearchMode {
       timeControl = false;
       startDepth = 1;
       maxDepth = MAX_SEARCH_DEPTH;
-    } else if (this.ponder ) {
+    } else if (this.ponder) {
       // limits per depth only, start with 1
       timeControl = false;
       startDepth = 1;
@@ -158,6 +162,11 @@ public class SearchMode {
       LOG.error(msg, e);
       throw e;
     }
+  }
+
+  public void ponderHit() {
+    ponder = false;
+    setupLimits();
   }
 
   public Duration getRemainingTime(Color color) {
@@ -253,4 +262,5 @@ public class SearchMode {
            ", timeControl=" + timeControl + ", startDepth=" + startDepth + ", maxDepth=" +
            maxDepth + '}';
   }
+
 }

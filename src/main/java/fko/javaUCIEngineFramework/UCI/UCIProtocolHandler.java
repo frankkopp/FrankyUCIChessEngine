@@ -25,6 +25,7 @@
 
 package fko.javaUCIEngineFramework.UCI;
 
+import net.jodah.concurrentunit.Waiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +55,10 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   // -- the handler runs in a separate thread --
   private Thread myThread = null;
 
-  private Semaphore semaphore = new Semaphore(1, true);
+  private Waiter waiter;
   private boolean   running   = false;
   private PrintStream outputStreamPrinter;
+
 
   /**
    * Default contructor
@@ -123,8 +125,6 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
 
       try {
 
-        semaphore.acquire();
-
         LOG.debug("Listening...");
 
         // wait until a line is ready to be read
@@ -177,13 +177,11 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
               break;
           }
         }
-        semaphore.release();
+        waiterResume();
         LOG.debug("Finished processing.");
       } catch (IOException ex) {
         LOG.error("IO Exception at buffered read!!", ex);
         System.exit(-1);
-      } catch (InterruptedException e) {
-        // ignore
       }
     }
     LOG.debug("Quitting");
@@ -382,15 +380,14 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   }
 
   @Override
-  public void waitUntilProcessed() {
-    try {
-      LOG.debug("Waiting on finish processing of last command");
-      semaphore.acquire();
-    } catch (InterruptedException e) {
-      // ignore
+  public void setWaiterForProcessing(Waiter waiter) {
+    this.waiter = waiter;
+  }
+
+  private void waiterResume() {
+    if (waiter != null) {
+      waiter.resume();
     }
-    semaphore.release();
-    LOG.debug("Continue");
   }
 
   @Override
