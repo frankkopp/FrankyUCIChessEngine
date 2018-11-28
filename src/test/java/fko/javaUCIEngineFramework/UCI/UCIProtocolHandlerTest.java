@@ -29,12 +29,16 @@ import fko.javaUCIEngineFramework.MyEngine;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UCIProtocolHandlerTest {
+
+  private static final Logger LOG = LoggerFactory.getLogger(UCIProtocolHandlerTest.class);
 
   private UCIProtocolHandler handler;
 
@@ -62,6 +66,7 @@ class UCIProtocolHandlerTest {
 
   @AfterEach
   void tearDown() throws InterruptedException {
+    toHandlerPrinter.println("quit");
     while (handler.isRunning()) {
       Thread.sleep(100);
     }
@@ -340,11 +345,16 @@ class UCIProtocolHandlerTest {
     handler.waitUntilProcessed();
 
     while (engine.isSearching()) {
-      Thread.sleep(50);
       while (fromHandlerReader.ready()) {
-        assertTrue(fromHandlerReader.readLine().startsWith("info depth "));
+        final String line = fromHandlerReader.readLine();
+        LOG.debug(" Received: "+line);
+        assertTrue(line.startsWith("info depth ") || line.startsWith("bestmove "));
       }
     }
+
+    toHandlerPrinter.println("stop");
+    handler.waitUntilProcessed();
+    assertFalse(engine.isSearching());
 
     toHandlerPrinter.println("quit");
   }

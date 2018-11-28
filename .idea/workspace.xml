@@ -2,12 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1a1dfe46-855b-412a-bfcd-658d3bc6f910" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/MyEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/MyEngine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/IUCIEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/IUCIEngine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/IUCIProtocolHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/IUCIProtocolHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandlerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandlerTest.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -109,8 +103,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="287">
-                  <caret line="203" selection-start-line="203" selection-end-line="203" />
+                <state relative-caret-position="521">
+                  <caret line="216" column="28" selection-start-line="216" selection-start-column="28" selection-end-line="216" selection-end-column="28" />
                   <folding>
                     <element signature="e#21985#21986#0" expanded="true" />
                     <element signature="e#22845#22846#0" expanded="true" />
@@ -141,8 +135,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandlerTest.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="450">
-                  <caret line="348" lean-forward="true" selection-start-line="348" selection-end-line="348" />
+                <state relative-caret-position="228">
+                  <caret line="349" column="20" selection-start-line="349" selection-start-column="20" selection-end-line="349" selection-end-column="20" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -580,7 +574,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1543364652219" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1543365548701" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="JAVA" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
@@ -810,34 +804,34 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="UCIProtocolHandlerTest_perftCommand - 2018.11.28 at 01h 15m 07s.xml">
-      <configuration name="UCIProtocolHandlerTest.perftCommand" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_perftCommand - 2018.11.28 at 01h 16m 11s.xml">
-      <configuration name="UCIProtocolHandlerTest.perftCommand" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_perftCommand - 2018.11.28 at 01h 17m 30s.xml">
-      <configuration name="UCIProtocolHandlerTest.perftCommand" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_perftCommand - 2018.11.28 at 01h 17m 34s.xml">
-      <configuration name="UCIProtocolHandlerTest.perftCommand" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_perftCommand - 2018.11.28 at 01h 17m 46s.xml">
-      <configuration name="UCIProtocolHandlerTest.perftCommand" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_perftCommand - 2018.11.28 at 01h 19m 18s.xml">
-      <configuration name="UCIProtocolHandlerTest.perftCommand" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_perftCommand - 2018.11.28 at 01h 19m 34s.xml">
-      <configuration name="UCIProtocolHandlerTest.perftCommand" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_perftCommand - 2018.11.28 at 01h 19m 40s.xml">
-      <configuration name="UCIProtocolHandlerTest.perftCommand" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_sendInfoToUCI - 2018.11.28 at 01h 21m 35s.xml">
+    <history-entry file="UCIProtocolHandlerTest_sendInfoToUCI - 2018.11.28 at 01h 22m 08s.xml">
       <configuration name="UCIProtocolHandlerTest.sendInfoToUCI" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="UCIProtocolHandlerTest_sendInfoToUCI - 2018.11.28 at 01h 22m 08s.xml">
+    <history-entry file="UCIProtocolHandlerTest_sendInfoToUCI - 2018.11.28 at 01h 30m 27s.xml">
+      <configuration name="UCIProtocolHandlerTest.sendInfoToUCI" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="UCIProtocolHandlerTest_sendInfoToUCI - 2018.11.28 at 01h 31m 14s.xml">
+      <configuration name="UCIProtocolHandlerTest.sendInfoToUCI" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="UCIProtocolHandlerTest_sendInfoToUCI - 2018.11.28 at 01h 33m 47s.xml">
+      <configuration name="UCIProtocolHandlerTest.sendInfoToUCI" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="UCIProtocolHandlerTest_sendInfoToUCI - 2018.11.28 at 01h 34m 06s.xml">
+      <configuration name="UCIProtocolHandlerTest.sendInfoToUCI" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="UCIProtocolHandlerTest_sendInfoToUCI - 2018.11.28 at 01h 35m 30s.xml">
+      <configuration name="UCIProtocolHandlerTest.sendInfoToUCI" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="UCIProtocolHandlerTest_sendInfoToUCI - 2018.11.28 at 01h 36m 51s.xml">
+      <configuration name="UCIProtocolHandlerTest.sendInfoToUCI" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="UCIProtocolHandlerTest_sendInfoToUCI - 2018.11.28 at 01h 37m 12s.xml">
+      <configuration name="UCIProtocolHandlerTest.sendInfoToUCI" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="UCIProtocolHandlerTest_sendInfoToUCI - 2018.11.28 at 01h 39m 08s.xml">
+      <configuration name="UCIProtocolHandlerTest.sendInfoToUCI" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="UCIProtocolHandlerTest_sendInfoToUCI - 2018.11.28 at 01h 39m 27s.xml">
       <configuration name="UCIProtocolHandlerTest.sendInfoToUCI" configurationId="JUnit" />
     </history-entry>
   </component>
@@ -1404,8 +1398,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="287">
-          <caret line="203" selection-start-line="203" selection-end-line="203" />
+        <state relative-caret-position="521">
+          <caret line="216" column="28" selection-start-line="216" selection-start-column="28" selection-end-line="216" selection-end-column="28" />
           <folding>
             <element signature="e#21985#21986#0" expanded="true" />
             <element signature="e#22845#22846#0" expanded="true" />
@@ -1418,8 +1412,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandlerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="348" lean-forward="true" selection-start-line="348" selection-end-line="348" />
+        <state relative-caret-position="228">
+          <caret line="349" column="20" selection-start-line="349" selection-start-column="20" selection-end-line="349" selection-end-column="20" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
