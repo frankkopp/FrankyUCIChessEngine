@@ -240,6 +240,9 @@ public class Search implements Runnable {
                lastSearchResult.resultValue, principalVariation[0].toNotationString());
       engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
     } else {
+      LOG.info("Search result was: {} Value {} PV {}", lastSearchResult.toString(),
+               lastSearchResult.resultValue, principalVariation[0].toNotationString());
+      engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
       LOG.info("Ponder Miss!");
     }
 
