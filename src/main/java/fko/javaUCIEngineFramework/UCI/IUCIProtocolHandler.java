@@ -29,9 +29,17 @@ public interface IUCIProtocolHandler {
 
   String START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
+  void startHandler();
+  void stopHandler();
+
+  boolean isRunning();
+  void waitUntilProcessed();
+
   void sendInfoToUCI(String msg);
   void sendInfoStringToUCI(String msg);
 
   void resultToUCI(String result);
   void resultToUCI(String result, String ponder);
+
+
 }

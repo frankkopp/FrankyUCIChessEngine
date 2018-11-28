@@ -52,7 +52,7 @@ class UCIProtocolHandlerTest {
 
     final PipedInputStream fromHandler = new PipedInputStream();
     final PipedOutputStream handlerOutput = new PipedOutputStream(fromHandler);
-    fromHandlerReader = new BufferedReader(new InputStreamReader(fromHandler));
+    fromHandlerReader = new BufferedReader(new InputStreamReader(fromHandler), 1000000);
 
     engine = new MyEngine();
     handler = new UCIProtocolHandler(engine, handlerInput, handlerOutput);
@@ -158,47 +158,145 @@ class UCIProtocolHandlerTest {
   }
 
   @Test
-  void goCommand() {
+  void goCommand() throws IOException {
 
-    // TODO: add asserts when board and do move works
     toHandlerPrinter.println("go infinite");
     handler.waitUntilProcessed();
+    assertTrue(engine.getSearchMode().isInfinite());
+    assertTrue(engine.isSearching());
+    toHandlerPrinter.println("stop");
+    handler.waitUntilProcessed();
+    assertFalse(engine.isSearching());
+
+    // clear buffer
+    while (fromHandlerReader.ready()) { fromHandlerReader.readLine(); };
 
     toHandlerPrinter.println("go ponder");
     handler.waitUntilProcessed();
+    assertTrue(engine.getSearchMode().isPonder());
+    assertTrue(engine.isSearching());
+    toHandlerPrinter.println("stop");
+    handler.waitUntilProcessed();
+    assertFalse(engine.isSearching());
+
+    // clear buffer
+    while (fromHandlerReader.ready()) { fromHandlerReader.readLine(); };
 
     toHandlerPrinter.println("go infinite searchmoves e2e4 d2d4");
     handler.waitUntilProcessed();
-
-    toHandlerPrinter.println("go wtime 120 btime 110 movestogo 25");
+    assertTrue(engine.getSearchMode().isInfinite());
+    assertTrue(engine.isSearching());
+    toHandlerPrinter.println("stop");
     handler.waitUntilProcessed();
+    assertFalse(engine.isSearching());
 
-    toHandlerPrinter.println("go wtime 120 btime 110 movestogo 5");
-    handler.waitUntilProcessed();
+    // clear buffer
+    while (fromHandlerReader.ready()) { fromHandlerReader.readLine(); };
 
-    toHandlerPrinter.println("go wtime 120 btime 110");
+    toHandlerPrinter.println("go wtime 300000 btime 300000 movestogo 20");
     handler.waitUntilProcessed();
+    assertTrue(engine.getSearchMode().isTimeControl());
+    assertEquals(300, engine.getSearchMode().getWhiteTime().getSeconds());
+    assertEquals(20, engine.getSearchMode().getMovesToGo());
+    assertTrue(engine.isSearching());
+    toHandlerPrinter.println("stop");
+    handler.waitUntilProcessed();
+    assertFalse(engine.isSearching());
 
-    toHandlerPrinter.println("go wtime 120 btime 110 winc 2 binc 2");
-    handler.waitUntilProcessed();
+    // clear buffer
+    while (fromHandlerReader.ready()) { fromHandlerReader.readLine(); };
 
-    toHandlerPrinter.println("go movetime 10");
+    toHandlerPrinter.println("go wtime 300000 btime 300000 movestogo 5");
     handler.waitUntilProcessed();
+    assertTrue(engine.getSearchMode().isTimeControl());
+    assertEquals(300, engine.getSearchMode().getWhiteTime().getSeconds());
+    assertEquals(5, engine.getSearchMode().getMovesToGo());
+    assertTrue(engine.isSearching());
+    toHandlerPrinter.println("stop");
+    handler.waitUntilProcessed();
+    assertFalse(engine.isSearching());
+
+    // clear buffer
+    while (fromHandlerReader.ready()) { fromHandlerReader.readLine(); };
+
+    toHandlerPrinter.println("go wtime 500000 btime 500000");
+    handler.waitUntilProcessed();
+    assertTrue(engine.getSearchMode().isTimeControl());
+    assertEquals(500, engine.getSearchMode().getWhiteTime().getSeconds());
+    assertEquals(0, engine.getSearchMode().getMovesToGo());
+    assertTrue(engine.isSearching());
+    toHandlerPrinter.println("stop");
+    handler.waitUntilProcessed();
+    assertFalse(engine.isSearching());
+
+    // clear buffer
+    while (fromHandlerReader.ready()) { fromHandlerReader.readLine(); };
+
+    toHandlerPrinter.println("go wtime 300000 btime 300000 winc 2000 binc 2000");
+    handler.waitUntilProcessed();
+    assertEquals(300, engine.getSearchMode().getWhiteTime().getSeconds());
+    assertEquals(2, engine.getSearchMode().getWhiteInc().getSeconds());
+    assertEquals(2, engine.getSearchMode().getBlackInc().getSeconds());
+    assertTrue(engine.isSearching());
+    toHandlerPrinter.println("stop");
+    handler.waitUntilProcessed();
+    assertFalse(engine.isSearching());
+
+    // clear buffer
+    while (fromHandlerReader.ready()) { fromHandlerReader.readLine(); };
+
+    toHandlerPrinter.println("go movetime 10000");
+    handler.waitUntilProcessed();
+    assertEquals(10, engine.getSearchMode().getMoveTime().getSeconds());
+    assertTrue(engine.isSearching());
+    toHandlerPrinter.println("stop");
+    handler.waitUntilProcessed();
+    assertFalse(engine.isSearching());
+
+    // clear buffer
+    while (fromHandlerReader.ready()) { fromHandlerReader.readLine(); };
 
     toHandlerPrinter.println("go mate 5");
     handler.waitUntilProcessed();
+    assertFalse(engine.getSearchMode().isTimeControl());
+    assertEquals(5, engine.getSearchMode().getMate());
+    assertTrue(engine.isSearching());
+    toHandlerPrinter.println("stop");
+    handler.waitUntilProcessed();
+    assertFalse(engine.isSearching());
+
+    // clear buffer
+    while (fromHandlerReader.ready()) { fromHandlerReader.readLine(); };
 
     toHandlerPrinter.println("go nodes 1000000000");
     handler.waitUntilProcessed();
+    assertFalse(engine.getSearchMode().isTimeControl());
+    assertEquals(1000000000, engine.getSearchMode().getNodes());
+    assertTrue(engine.isSearching());
+    toHandlerPrinter.println("stop");
+    handler.waitUntilProcessed();
+    assertFalse(engine.isSearching());
+
+    // clear buffer
+    while (fromHandlerReader.ready()) { fromHandlerReader.readLine(); };
 
     toHandlerPrinter.println("go depth 10");
     handler.waitUntilProcessed();
+    assertFalse(engine.getSearchMode().isTimeControl());
+    assertEquals(10, engine.getSearchMode().getDepth());
+    assertTrue(engine.isSearching());
+    toHandlerPrinter.println("stop");
+    handler.waitUntilProcessed();
+    assertFalse(engine.isSearching());
+
+    // clear buffer
+    while (fromHandlerReader.ready()) { fromHandlerReader.readLine(); };
 
     toHandlerPrinter.println("quit");
   }
 
   @Test
-  void perftCommand() {
+  void perftCommand() throws IOException {
     // @formatter:off
     /*
     //N  Nodes      Captures EP     Checks  Mates
@@ -212,10 +310,19 @@ class UCIProtocolHandlerTest {
     { 7, 3195901860L, 108329926, 319617, 33103848, 435816 }
     */
     // @formatter:on
-    toHandlerPrinter.println("go perft 3");
+    toHandlerPrinter.println("go perft 5");
     handler.waitUntilProcessed();
+    assertTrue(engine.getSearchMode().isPerft());
+    assertEquals(5, engine.getSearchMode().getDepth());
+    assertTrue(engine.isSearching());
+    toHandlerPrinter.println("stop");
+    handler.waitUntilProcessed();
+    assertFalse(engine.isSearching());
 
-    //toHandlerPrinter.println("quit");
+    // clear buffer
+    while (fromHandlerReader.ready()) { fromHandlerReader.readLine(); };
+
+    toHandlerPrinter.println("quit");
   }
 
   @Test
@@ -226,11 +333,19 @@ class UCIProtocolHandlerTest {
     toHandlerPrinter.println("quit");
   }
 
-  @Test
-  void stopCommand() {
-    // TODO: add asserts when board and do move works
-    toHandlerPrinter.println("stop");
+    @Test
+  void sendInfoToUCI() throws IOException, InterruptedException {
+
+    toHandlerPrinter.println("go movetime 15000");
     handler.waitUntilProcessed();
+
+    while (engine.isSearching()) {
+      Thread.sleep(50);
+      while (fromHandlerReader.ready()) {
+        assertTrue(fromHandlerReader.readLine().startsWith("info depth "));
+      }
+    }
+
     toHandlerPrinter.println("quit");
   }
 }

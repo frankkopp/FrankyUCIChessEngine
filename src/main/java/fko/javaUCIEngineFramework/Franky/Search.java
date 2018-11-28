@@ -157,11 +157,6 @@ public class Search implements Runnable {
     searchThread.setDaemon(true);
     searchThread.start();
 
-    if (isPerftSearch()) LOG.info("****** PERFT SEARCH *******");
-    if (searchMode.isPonder()) LOG.info("****** PONDER SEARCH *******");
-    if (searchMode.isInfinite()) LOG.info("****** INFINITE SEARCH *******");
-    if (searchMode.getMate() > 0) LOG.info("****** MATE SEARCH *******");
-
     // Wait for initialization in run() before returning from call
     try {
       waitForInitializationLatch.await();
@@ -201,6 +196,11 @@ public class Search implements Runnable {
       LOG.error(s, e);
       throw e;
     }
+
+    if (isPerftSearch()) LOG.info("****** PERFT SEARCH *******");
+    if (searchMode.isPonder()) LOG.info("****** PONDER SEARCH *******");
+    if (searchMode.isInfinite()) LOG.info("****** INFINITE SEARCH *******");
+    if (searchMode.getMate() > 0) LOG.info("****** MATE SEARCH *******");
 
     // reset lastSearchResult
     lastSearchResult = new SearchResult();
@@ -299,6 +299,18 @@ public class Search implements Runnable {
         //System.err.println("Already found Mate: "+position.toFENString());
         stopSearch = true;
       }
+
+      // send info to UCI
+      // @formatter:off
+      engine.sendInfoToUCI("depth " + searchCounter.currentSearchDepth
+                           + " seldepth " + searchCounter.currentExtraSearchDepth
+                           + " multipv 1 "
+                           + " score cp " + (searchCounter.currentBestRootValue / 100f)
+                           + " nodes " + searchCounter.nodesVisited
+                           + " nps " + 1000 * (searchCounter.nodesVisited / (elapsedTime().toMillis()+1))
+                           + " time " + elapsedTime().toMillis()
+                           + " pv " + principalVariation[0].toNotationString());
+      // @formatter:on
 
       // check if we need to stop search - could be external or time.
       if (stopSearch || softTimeLimitReached() || hardTimeLimitReached()) {
@@ -431,7 +443,7 @@ public class Search implements Runnable {
     // first call to this the previous alpha beta.
     searchCounter.nodesVisited++;
     if (searchMode.getNodes() > 0 && searchCounter.nodesVisited >= searchMode.getNodes()) {
-      stopSearch=true;
+      stopSearch = true;
     }
 
     // Initialize best values
@@ -478,6 +490,7 @@ public class Search implements Runnable {
     //    }
 
     // moves to search recursively
+    Instant tick = Instant.now();
     for (int i = 0; i < moves.size(); i++) {
       int move = moves.get(i);
       int value = bestValue;
@@ -493,6 +506,22 @@ public class Search implements Runnable {
 
         // keep track of current variation
         currentVariation.add(move);
+
+        // send current root move info to UCI
+        if (Duration.between(tick, Instant.now()).toMillis() > 500) {
+          // @formatter:off
+          engine.sendInfoToUCI("depth " + searchCounter.currentSearchDepth
+                               + " seldepth " + searchCounter.currentExtraSearchDepth
+                               + " nodes " + searchCounter.nodesVisited
+                               + " nps " + 1000 * (searchCounter.nodesVisited / elapsedTime().toMillis())
+                               + " time " + elapsedTime().toMillis()
+                               + " currmove " + Move.toUCINotation(position, searchCounter.currentRootMove)
+                               + " currmovenumber " + searchCounter.currentRootMoveNumber
+                               + " currline " + currentVariation.toNotationString()
+                              );
+          // @formatter:on
+          tick = Instant.now();
+        }
 
         // go one ply deeper into the search tree
         // if (!_omegaEngine._CONFIGURATION._USE_PVS ||

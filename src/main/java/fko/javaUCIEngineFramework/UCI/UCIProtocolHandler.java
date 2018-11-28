@@ -56,6 +56,7 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
 
   private Semaphore semaphore = new Semaphore(1, true);
   private boolean   running   = false;
+  private PrintStream outputStreamPrinter;
 
   /**
    * Default contructor
@@ -65,11 +66,7 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
    * @param uciEngine
    */
   public UCIProtocolHandler(final IUCIEngine uciEngine) {
-    this.uciEngine = uciEngine;
-    this.inputStream = System.in;
-    this.outputStream = System.out;
-
-    uciEngine.registerProtocolHandler(this);
+    this(uciEngine, System.in, System.out);
   }
 
   /**
@@ -83,12 +80,16 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
     this.uciEngine = uciEngine;
     this.inputStream = in;
     this.outputStream = out;
+
+    uciEngine.registerProtocolHandler(this);
+    outputStreamPrinter = new PrintStream(outputStream);
   }
 
   /**
    * Start a new thread to handle protocol<br>
    * The thread then calls run() to actually do the work.
    */
+  @Override
   public void startHandler() {
     running = true;
     // Now start the thread
@@ -101,6 +102,7 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   }
 
   /** Stops the playroom thread and the running game.<br> */
+  @Override
   public void stopHandler() {
     if (myThread == null || !myThread.isAlive() || !running) {
       throw new IllegalStateException("stopHandler(): Handler thread is not running");
@@ -371,15 +373,15 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
 
   private void commandQuit(final Scanner scanner) {
     LOG.info("Received quit command");
-    running = false;
+    stopHandler();
   }
 
   private void send(final String msg) {
     LOG.debug("Send: " + msg);
-    final PrintStream outputStreamPrinter = new PrintStream(outputStream);
     outputStreamPrinter.println(msg);
   }
 
+  @Override
   public void waitUntilProcessed() {
     try {
       LOG.debug("Waiting on finish processing of last command");
@@ -391,13 +393,14 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
     LOG.debug("Continue");
   }
 
+  @Override
   public boolean isRunning() {
     return running;
   }
 
   @Override
   public void sendInfoToUCI(String msg) {
-    send(msg);
+    send("info "+msg);
   }
 
   @Override

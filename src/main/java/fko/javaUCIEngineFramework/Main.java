@@ -26,6 +26,7 @@
 package fko.javaUCIEngineFramework;
 
 import fko.javaUCIEngineFramework.UCI.IUCIEngine;
+import fko.javaUCIEngineFramework.UCI.IUCIProtocolHandler;
 import fko.javaUCIEngineFramework.UCI.UCIProtocolHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +49,9 @@ public class Main {
 
     LOG.debug("Start UCI Engine Framework" + Instant.now());
 
-    IUCIEngine uciEngine = new MyEngine();
-    final UCIProtocolHandler handler = new UCIProtocolHandler(uciEngine);
+    final IUCIEngine uciEngine = new MyEngine();
+    final IUCIProtocolHandler handler = new UCIProtocolHandler(uciEngine);
+
     handler.startHandler();
 
     LOG.debug("Started UCI Engine Framework" + Instant.now());

@@ -44,7 +44,7 @@ public class MyEngine implements IUCIEngine {
   private static final Logger LOG = LoggerFactory.getLogger(MyEngine.class);
 
   // back reference to the uci protocol handler for sending messages to the UCI UI
-  private UCIProtocolHandler uciProtocolHandler = null;
+  private IUCIProtocolHandler uciProtocolHandler = null;
 
   // the current search instance
   private Search search;
@@ -63,6 +63,8 @@ public class MyEngine implements IUCIEngine {
   // engine state
   private BoardPosition  boardPosition;
   private IUCISearchMode uciSearchMode = new UCISearchMode();
+
+  private SearchMode searchMode;
 
   /**
    * Default Constructor
@@ -163,7 +165,7 @@ public class MyEngine implements IUCIEngine {
   }
 
   @Override
-  public void registerProtocolHandler(UCIProtocolHandler uciProtocolHandler) {
+  public void registerProtocolHandler(IUCIProtocolHandler uciProtocolHandler) {
     this.uciProtocolHandler = uciProtocolHandler;
   }
 
@@ -198,6 +200,11 @@ public class MyEngine implements IUCIEngine {
   }
 
   @Override
+  public SearchMode getSearchMode() {
+    return searchMode;
+  }
+
+  @Override
   public void startSearch(final IUCISearchMode uciSearchMode) {
 
     if (search.isSearching()) {
@@ -208,15 +215,20 @@ public class MyEngine implements IUCIEngine {
     this.uciSearchMode = uciSearchMode;
     LOG.info("Engine Search start with " + this.uciSearchMode.toString());
 
-    SearchMode searchMode =
-      new SearchMode(uciSearchMode.getWhiteTime(), uciSearchMode.getBlackTime(),
-                     uciSearchMode.getWhiteInc(), uciSearchMode.getBlackInc(),
-                     uciSearchMode.getMovesToGo(), uciSearchMode.getDepth(),
-                     uciSearchMode.getNodes(), uciSearchMode.getMate(), uciSearchMode.getMoveTime(),
-                     uciSearchMode.getMoves(), uciSearchMode.isPonder(), uciSearchMode.isInfinite(),
-                     uciSearchMode.isPerft());
+    searchMode = new SearchMode(uciSearchMode.getWhiteTime(), uciSearchMode.getBlackTime(),
+                                uciSearchMode.getWhiteInc(), uciSearchMode.getBlackInc(),
+                                uciSearchMode.getMovesToGo(), uciSearchMode.getDepth(),
+                                uciSearchMode.getNodes(), uciSearchMode.getMate(),
+                                uciSearchMode.getMoveTime(), uciSearchMode.getMoves(),
+                                uciSearchMode.isPonder(), uciSearchMode.isInfinite(),
+                                uciSearchMode.isPerft());
 
     search.startSearch(boardPosition, searchMode);
+  }
+
+  @Override
+  public boolean isSearching() {
+    return search.isSearching();
   }
 
   @Override
@@ -242,6 +254,11 @@ public class MyEngine implements IUCIEngine {
       uciProtocolHandler.resultToUCI(Move.toUCINotation(boardPosition, bestMove),
                                      Move.toUCINotation(boardPosition, ponderMove));
     }
+  }
+
+  @Override
+  public void sendInfoToUCI(String s) {
+    uciProtocolHandler.sendInfoToUCI(s);
   }
 
 }

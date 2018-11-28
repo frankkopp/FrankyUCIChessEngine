@@ -26,13 +26,14 @@
 package fko.javaUCIEngineFramework.UCI;
 
 import fko.javaUCIEngineFramework.Franky.BoardPosition;
+import fko.javaUCIEngineFramework.Franky.SearchMode;
 
 import java.util.List;
 
 /** Interface for UCI Engines */
 public interface IUCIEngine {
 
-  void registerProtocolHandler(UCIProtocolHandler uciProtocolHandler);
+  void registerProtocolHandler(IUCIProtocolHandler uciProtocolHandler);
 
   BoardPosition getBoardPosition();
 
@@ -63,12 +64,17 @@ public interface IUCIEngine {
   boolean getDebugOption();
 
   void startSearch(IUCISearchMode searchMode);
-
+  boolean isSearching();
   void stopSearch();
 
   void ponderHit();
 
   void sendResult(int bestMove, int ponderMove);
+
+  void sendInfoToUCI(String s);
+
+  SearchMode getSearchMode();
+
 
   /**
    * An Option for a MyEngine
