@@ -25,6 +25,7 @@
 
 package fko.javaUCIEngineFramework.UCI;
 
+import fko.javaUCIEngineFramework.UCI.IUCIEngine.UCIOptionType;
 import net.jodah.concurrentunit.Waiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.Semaphore;
 
 /**
  * UCIProtocolHandler
@@ -43,7 +43,7 @@ import java.util.concurrent.Semaphore;
  */
 public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
 
-  private static final Logger LOG = LoggerFactory.getLogger(UCIProtocolHandler.class);
+  private static final Logger LOG    = LoggerFactory.getLogger(UCIProtocolHandler.class);
   private static final Logger COMLOG = LoggerFactory.getLogger("ComLog");
 
 
@@ -51,14 +51,14 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   private final IUCIEngine uciEngine;
 
   // input and outputStream of command stream
-  private final InputStream inputStream;
+  private final InputStream  inputStream;
   private final OutputStream outputStream;
 
   // -- the handler runs in a separate thread --
   private Thread myThread = null;
 
-  private Waiter waiter;
-  private boolean   running   = false;
+  private Waiter      waiter;
+  private boolean     running = false;
   private PrintStream outputStreamPrinter;
 
 
@@ -105,7 +105,9 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
     }
   }
 
-  /** Stops the playroom thread and the running game.<br> */
+  /**
+   * Stops the playroom thread and the running game.<br>
+   */
   @Override
   public void stopHandler() {
     if (myThread == null || !myThread.isAlive() || !running) {
@@ -216,47 +218,36 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   }
 
   private void commandSetOption(final Scanner scanner) {
-    final String keyName = scanner.next();
-    if (keyName.equals("name")) {
-      final String token = scanner.next();
-      switch (token) {
-        case "Hash":
-          optionHash(scanner);
-          break;
-        case "Ponder":
-          optionPonder(scanner);
-          break;
-        default:
-          LOG.error("Command setoption is malformed - expected known option but received " + token);
-          break;
+    // setoption name Hash value 32
+
+    String token = "";
+    String name;
+    if (scanner.hasNext() && (token=scanner.next()).equals("name")) {
+      if (scanner.hasNext()) {
+        name = scanner.next();
+      } else {
+        LOG.error("Command setoption is malformed - expected name");
+        return;
       }
     } else {
-      LOG.error("Command setoption is malformed - expected name received: " + keyName);
+      LOG.error("Command setoption is malformed - expected token name received: " + token);
+      return;
     }
-  }
 
-  private void optionHash(final Scanner scanner) {
-    final String keyValue = scanner.next();
-    if (keyValue.equals("value")) {
-      try {
-        int hashSize = Integer.valueOf(scanner.next());
-        uciEngine.setHashSizeOption(hashSize);
-      } catch (NumberFormatException e) {
-        LOG.error("Command setoption Hash is malformed", e);
+    String value;
+    if (scanner.hasNext() && (token=scanner.next()).equals("value")) {
+      if (scanner.hasNext()) {
+        value = scanner.next();
+      } else {
+        LOG.error("Command setoption is malformed - expected value");
+        return;
       }
     } else {
-      LOG.error("Command setoption Hash is malformed - expected key value received: " + keyValue);
+      LOG.error("Command setoption is malformed - expected token value received: " + token);
+      return;
     }
-  }
 
-  private void optionPonder(final Scanner scanner) {
-    final String keyValue = scanner.next();
-    if (keyValue.equals("value")) {
-      boolean ponder = Boolean.valueOf(scanner.next());
-      uciEngine.setPonderOption(ponder);
-    } else {
-      LOG.error("Command setoption Ponder is malformed - expected key value received: " + keyValue);
-    }
+    uciEngine.setOption(name, value);
   }
 
   private void commandUciNewGame(final Scanner scanner) {
@@ -266,11 +257,11 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   private void commandDebug(final Scanner scanner) {
     final String keyValue = scanner.next();
     if (keyValue.equals("on")) {
-      uciEngine.setDebugOption(true);
+      uciEngine.setDebugMode(true);
     } else if (keyValue.equals("off")) {
-      uciEngine.setDebugOption(false);
+      uciEngine.setDebugMode(false);
     } else {
-      LOG.error("Command setoption Debug is malformed - expected key value received: " + keyValue);
+      LOG.error("Command debug is malformed - expected key value received: " + keyValue);
     }
   }
 
@@ -290,7 +281,7 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
       startFen = IUCIProtocolHandler.START_FEN;
     }
     List<String> moves = new ArrayList<>();
-    if (token.equals("moves") || (scanner.hasNext() &&(token=scanner.next()).equals("moves"))) {
+    if (token.equals("moves") || (scanner.hasNext() && (token = scanner.next()).equals("moves"))) {
       while (scanner.hasNext()) {
         token = scanner.next();
         moves.add(token);
@@ -392,13 +383,13 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   }
 
   private void send(final String msg) {
-    COMLOG.debug("<< {}", msg);
+    COMLOG.debug(">> {}", msg);
     outputStreamPrinter.println(msg);
   }
 
   @Override
   public void sendInfoToUCI(String msg) {
-    send("info "+msg);
+    send("info " + msg);
   }
 
   @Override
@@ -413,6 +404,6 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
 
   @Override
   public void resultToUCI(String result, String ponder) {
-    send("bestmove " + result+" ponder "+ponder);
+    send("bestmove " + result + " ponder " + ponder);
   }
 }

@@ -25,7 +25,7 @@
 
 package fko.javaUCIEngineFramework.UCI;
 
-import fko.javaUCIEngineFramework.MyEngine;
+import fko.javaUCIEngineFramework.FrankyEngine;
 import net.jodah.concurrentunit.Waiter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +47,7 @@ class UCIProtocolHandlerTest {
   private PrintStream    toHandlerPrinter;
   private BufferedReader fromHandlerReader;
 
-  private IUCIEngine engine;
+  private FrankyEngine engine;
   private Waiter     waiter;
 
   @BeforeEach
@@ -65,7 +65,7 @@ class UCIProtocolHandlerTest {
     final PipedOutputStream handlerOutput = new PipedOutputStream(fromHandler);
     fromHandlerReader = new BufferedReader(new InputStreamReader(fromHandler), 1000000);
 
-    engine = new MyEngine();
+    engine = new FrankyEngine();
     handler = new UCIProtocolHandler(engine, handlerInput, handlerOutput);
     engine.registerProtocolHandler(handler);
     handler.setWaiterForProcessing(waiter);
@@ -109,12 +109,12 @@ class UCIProtocolHandlerTest {
 
     assertEquals(16, engine.getHashSizeOption());
     toHandlerPrinter.println("setoption name Hash value 4096");
-    waiter.await(2000);
+    waiter.await();
     assertEquals(4096, engine.getHashSizeOption());
 
     assertTrue(engine.getPonderOption());
     toHandlerPrinter.println("setoption name Ponder value false");
-    waiter.await(2000);
+    waiter.await();
     assertFalse(engine.getPonderOption());
 
     toHandlerPrinter.println("quit");
@@ -129,17 +129,17 @@ class UCIProtocolHandlerTest {
   }
 
   @Test
-  void debugCommand() throws InterruptedException, TimeoutException {
-    assertFalse(engine.getDebugOption());
+  void debugCommand() throws TimeoutException {
+    assertFalse(engine.getDebugMode());
     toHandlerPrinter.println("debug on");
     waiter.await(2000);
-    assertTrue(engine.getDebugOption());
+    assertTrue(engine.getDebugMode());
     toHandlerPrinter.println("quit");
     waiter.await(2000);
   }
 
   @Test
-  void positionCommand() throws InterruptedException, TimeoutException {
+  void positionCommand() throws  TimeoutException {
 
     // promotion
     toHandlerPrinter.println("position fen 8/3P4/6K1/8/8/1k6/8/8 w - - 0 0 moves d7d8q");

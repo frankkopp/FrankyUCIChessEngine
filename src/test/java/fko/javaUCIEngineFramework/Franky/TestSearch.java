@@ -26,7 +26,7 @@
 package fko.javaUCIEngineFramework.Franky;
 
 
-import fko.javaUCIEngineFramework.MyEngine;
+import fko.javaUCIEngineFramework.FrankyEngine;
 import fko.javaUCIEngineFramework.UCI.IUCIEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,7 +52,7 @@ public class TestSearch {
   @BeforeEach
   void setUp() {
 
-    engine = new MyEngine();
+    engine = new FrankyEngine();
     search = new Search(engine, 64);
 
   }

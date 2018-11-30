@@ -35,8 +35,52 @@ public class Configuration {
   /** test the search without any pruning and count perft value **/
   boolean PERFT = false;
 
+
+  /** Use Ponderer while waiting for opponents move - fills node_cache */
+  boolean _USE_PONDERER = true;
+
   /** null evaluation **/
   boolean DO_NULL_EVALUATION = false;
+
+  /** Use AlphaBeta Pruning */
+  boolean _USE_PRUNING = true;
+
+  /** Do quiescence evaluation and search extension for non quiet positions */
+  boolean _USE_QUIESCENCE = true;
+
+
+
+
+  /** If set to true we will use the opening book */
+  boolean _USE_BOOK = true;
+
+  /** Use Transposition Tables for visited nodes  (needs extra memory) */
+  boolean _USE_NODE_CACHE = true;
+
+  /** Use Transposition Tables to store move list (needs extra memory)
+   *  Very expensive as it creates many int[] arrays - worth it?*/
+  boolean _USE_MOVE_CACHE = true;
+
+  /** Use Cache for Board evaluations - very expensive, only worth
+   * with expensive evaluation - (needs extra memory)                  */
+  boolean _USE_BOARD_CACHE = true;
+
+  /** Principal Variation Search */
+  boolean _USE_PVS = true;
+
+  /** Mate Distance Pruning */
+  boolean _USE_MDP = true;
+
+  /** Minor Promotion Pruning */
+  boolean _USE_MPP = true;
+
+  /** Null Move Pruning */
+  boolean _USE_NMP = true;
+  boolean _USE_VERIFY_NMP = true;
+
+
+
+
 
   // Verbose
   /** If set to true this object will produce info output to System.out */
@@ -51,41 +95,6 @@ public class Configuration {
   /** verbose variation **/
   boolean VERBOSE_STATS = true;
 
-  /** If set to true we will use the opening book */
-  boolean _USE_BOOK = true;
-
-  /** Use Ponderer while waiting for opponents move - fills node_cache */
-  boolean _USE_PONDERER = true;
-
-  /** Use Transposition Tables for visited nodes  (needs extra memory) */
-  boolean _USE_NODE_CACHE = true;
-
-  /** Use Transposition Tables to store move list (needs extra memory)
-   *  Very expensive as it creates many int[] arrays - worth it?*/
-  boolean _USE_MOVE_CACHE = true;
-
-  /** Use Cache for Board evaluations - very expensive, only worth
-   * with expensive evaluation - (needs extra memory)                  */
-  boolean _USE_BOARD_CACHE = true;
-
-  /** Do quiescence evaluation and search extension for non quiet positions */
-  boolean _USE_QUIESCENCE = true;
-
-  /** Use AlphaBeta Pruning */
-  boolean _USE_PRUNING = true;
-
-  /** Principal Variation Search */
-  boolean _USE_PVS = true;
-
-  /** Mate Distance Pruning */
-  boolean _USE_MDP = true;
-
-  /** Minor Promotion Pruning */
-  boolean _USE_MPP = true;
-
-  /** Null Move Pruning */
-  boolean _USE_NMP = true;
-  boolean _USE_VERIFY_NMP = true;
 
 
   /** value for folder to books */

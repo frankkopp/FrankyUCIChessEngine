@@ -33,8 +33,8 @@ public interface IUCIProtocolHandler {
 
   void startHandler();
   void stopHandler();
-
   boolean isRunning();
+
   void setWaiterForProcessing(Waiter waiter);
 
   void sendInfoToUCI(String msg);

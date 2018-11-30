@@ -113,21 +113,21 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 "",
                 ""));
-    iUciOptions.add(
-        new UCIOption(
-            "OwnBook",
-                UCIOptionType.check,
-                useOwnBookOption ? "true" : "false",
-                "",
-                "",
-                ""));
-    iUciOptions.add( // DUMMY for testing
-        new UCIOption(
-            "Style",
-                UCIOptionType.combo,
-                "Normal", "",
-                "",
-                "Solid Normal Risky"));
+//    iUciOptions.add( // DUMMY for testing
+//        new UCIOption(
+//            "OwnBook",
+//                UCIOptionType.check,
+//                useOwnBookOption ? "true" : "false",
+//                "",
+//                "",
+//                ""));
+//    iUciOptions.add( // DUMMY for testing
+//        new UCIOption(
+//            "Style",
+//                UCIOptionType.combo,
+//                "Normal", "",
+//                "",
+//                "Solid Normal Risky"));
    // @formatter:on
   }
 
@@ -147,35 +147,23 @@ public class FrankyEngine implements IUCIEngine {
   }
 
   @Override
+  public void setOption(String name, String value) {
+    switch (name.toLowerCase()) {
+      case "hash":
+        setHashSizeOption(value);
+        break;
+      case "ponder":
+        setPonderOption(value);
+        break;
+      default:
+        LOG.error("Unknown option: {}", name);
+        break;
+    }
+  }
+
+  @Override
   public List<IUCIOption> getOptions() {
     return iUciOptions;
-  }
-
-  @Override
-  public void setHashSizeOption(final int hashSizeOption) {
-    this.hashSizeOption = hashSizeOption;
-    final String msg = "Hash Size set to " + this.hashSizeOption;
-    LOG.info(msg);
-    search.setHashSize(hashSizeOption);
-    uciProtocolHandler.sendInfoStringToUCI(msg);
-  }
-
-  @Override
-  public int getHashSizeOption() {
-    return hashSizeOption;
-  }
-
-  @Override
-  public void setPonderOption(final boolean ponderOption) {
-    this.ponderOption = ponderOption;
-    final String msg = "Engine Ponder set to " + (this.ponderOption ? "On" : "Off");
-    LOG.info(msg);
-    uciProtocolHandler.sendInfoStringToUCI(msg);
-  }
-
-  @Override
-  public boolean getPonderOption() {
-    return ponderOption;
   }
 
   @Override
@@ -204,7 +192,7 @@ public class FrankyEngine implements IUCIEngine {
   }
 
   @Override
-  public void setDebugOption(final boolean debugOption) {
+  public void setDebugMode(final boolean debugOption) {
     this.debugOption = debugOption;
     final String msg = "Engine Debug set to " + (this.debugOption ? "On" : "Off");
     LOG.info(msg);
@@ -212,7 +200,7 @@ public class FrankyEngine implements IUCIEngine {
   }
 
   @Override
-  public boolean getDebugOption() {
+  public boolean getDebugMode() {
     return debugOption;
   }
 
@@ -277,5 +265,29 @@ public class FrankyEngine implements IUCIEngine {
     if (uciProtocolHandler != null) uciProtocolHandler.sendInfoToUCI(s);
     else LOG.info("Engine >>>> " + s);
   }
+
+  private void setHashSizeOption(final String value) {
+    this.hashSizeOption = Integer.valueOf(value);
+    final String msg = "Hash Size set to " + this.hashSizeOption;
+    LOG.info(msg);
+    search.setHashSize(this.hashSizeOption);
+    uciProtocolHandler.sendInfoStringToUCI(msg);
+  }
+
+  public int getHashSizeOption() {
+    return hashSizeOption;
+  }
+
+  private void setPonderOption(final String value) {
+    this.ponderOption = Boolean.valueOf(value);
+    final String msg = "Engine Ponder set to " + (this.ponderOption ? "On" : "Off");
+    LOG.info(msg);
+    uciProtocolHandler.sendInfoStringToUCI(msg);
+  }
+
+  public boolean getPonderOption() {
+    return ponderOption;
+  }
+
 
 }

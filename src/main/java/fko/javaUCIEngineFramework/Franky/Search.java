@@ -354,9 +354,6 @@ public class Search implements Runnable {
     int p_move;
     if (principalVariation[0].size() > 1 &&
         (p_move = principalVariation[0].get(1)) != Move.NOMOVE) {
-      //      System.out.println("Best Move: " + Move.toString(searchResult.bestMove) + " Ponder Move: " +
-      //                         Move.toString(p_move) + " (" + principalVariation[0].toNotationString() +
-      //                         ")");
       searchResult.ponderMove = p_move;
     } else {
       searchResult.ponderMove = Move.NOMOVE;

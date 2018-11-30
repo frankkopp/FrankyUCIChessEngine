@@ -40,6 +40,8 @@ public class UCIOption implements IUCIEngine.IUCIOption {
   final String maxValue;
   final String varValue;
 
+  String chosenValue;
+
   public UCIOption(
       final String nameID,
       final IUCIEngine.UCIOptionType type,
@@ -54,6 +56,7 @@ public class UCIOption implements IUCIEngine.IUCIOption {
     this.minValue = minValue;
     this.maxValue = maxValue;
     this.varValue = varValue;
+    this.chosenValue = "";
   }
 
   @Override
@@ -85,4 +88,17 @@ public class UCIOption implements IUCIEngine.IUCIOption {
   public String getVarValue() {
     return varValue;
   }
+
+  @Override
+  public String getChosenValue() {
+    return chosenValue;
+  }
+
+  @Override
+  public void setChosenValue(String chosenValue) {
+    this.chosenValue = chosenValue;
+  }
+
+
+
 }

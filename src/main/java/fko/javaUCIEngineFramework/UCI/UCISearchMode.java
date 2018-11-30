@@ -32,27 +32,67 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * UCISearchMode
+ * UCISearchModes
+ *
+ * <p>start calculating on the current position set up with the "position" command.<br>
+ * There are a number of commands that can follow this command, all will be sent in the same string.<br>
+ * If one command is not sent its value should be interpreted as it would not influence the search.<br>
+ * * searchmoves <move1> .... <movei><br>
+ * restrict search to this moves only<br>
+ * Example: After "position startpos" and "go infinite searchmoves e2e4 d2d4"<br>
+ * the engine should only search the two moves e2e4 and d2d4 in the initial position.<br>
+ * * ponder<br>
+ * start searching in pondering mode.<br>
+ * Do not exit the search in ponder mode, even if it's mate!<br>
+ * This means that the last move sent in in the position string is the ponder move.<br>
+ * The engine can do what it wants to do, but after a "ponderhit" command<br>
+ * it should execute the suggested move to ponder on. This means that the pondern move sent by<br>
+ * the GUI can be interpreted as a recommendation about which move to ponder. However, if the<br>
+ * engine decides to ponder on a different move, it should not display any mainlines as they are<br>
+ * likely to be misinterpreted by the GUI because the GUI expects the engine to ponder<br>
+ * on the suggested move.<br>
+ * * wtime <x><br>
+ * white has x msec left on the clock<br>
+ * * btime <x><br>
+ * black has x msec left on the clock<br>
+ * * winc <x><br>
+ * white increment per move in mseconds if x > 0<br>
+ * * binc <x><br>
+ * black increment per move in mseconds if x > 0<br>
+ * * movestogo <x><br>
+ * there are x moves to the next time control,<br>
+ * this will only be sent if x > 0,<br>
+ * if you don't get this and get the wtime and btime it's sudden death<br>
+ * * depth <x><br>
+ * search x plies only.<br>
+ * * nodes <x><br>
+ * search x nodes only,<br>
+ * * mate <x><br>
+ * search for a mate in x moves<br>
+ * * moveTime <x><br>
+ * search exactly x mseconds<br>
+ * * infinite<br>
+ * search until the "stop" command. Do not exit the search without being told so in this mode!</p>
  */
 public class UCISearchMode implements IUCISearchMode {
 
   private static final Logger LOG = LoggerFactory.getLogger(UCISearchMode.class);
 
   // defaults
-  private int whiteTime = 0;
-  private int blackTime = 0;
-  private int whiteInc = 0;
-  private int blackInc = 0;
-  private int movesToGo;
-  private int depth = 0;
-  private long nodes = 0;
-  private int mate = 0;
-  private int movetime = 0;
-  private List<String> moves = new ArrayList<>();
+  private int          whiteTime = 0;
+  private int          blackTime = 0;
+  private int          whiteInc  = 0;
+  private int          blackInc  = 0;
+  private int          movesToGo;
+  private int          depth     = 0;
+  private long         nodes     = 0;
+  private int          mate      = 0;
+  private int          movetime  = 0;
+  private List<String> moves     = new ArrayList<>();
 
-  private boolean ponder = false;
+  private boolean ponder   = false;
   private boolean infinite = false;
-  private boolean perft = false;
+  private boolean perft    = false;
 
   @Override
   public int getWhiteTime() {
@@ -186,20 +226,10 @@ public class UCISearchMode implements IUCISearchMode {
 
   @Override
   public String toString() {
-    return "UCISearchMode{" +
-            "whiteTime=" + whiteTime +
-            ", blackTime=" + blackTime +
-            ", whiteInc=" + whiteInc +
-            ", blackInc=" + blackInc +
-            ", movesToGo=" + movesToGo +
-            ", depth=" + depth +
-            ", nodes=" + nodes +
-            ", mate=" + mate +
-            ", movetime=" + movetime +
-            ", moves=" + moves +
-            ", ponder=" + ponder +
-            ", infinite=" + infinite +
-            '}';
+    return "UCISearchMode{" + "whiteTime=" + whiteTime + ", blackTime=" + blackTime +
+           ", whiteInc=" + whiteInc + ", blackInc=" + blackInc + ", movesToGo=" + movesToGo +
+           ", depth=" + depth + ", nodes=" + nodes + ", mate=" + mate + ", movetime=" + movetime +
+           ", moves=" + moves + ", ponder=" + ponder + ", infinite=" + infinite + '}';
   }
 
 
