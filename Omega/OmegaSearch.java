@@ -773,9 +773,12 @@ public class OmegaSearch implements Runnable {
 
             if (value >= beta) {
               if (_omegaEngine._CONFIGURATION._USE_PRUNING && !OmegaConfiguration.PERFT) {
-                tt_Type = TT_EntryType.BETA; bestValue = beta; // same as return beta
-                printCurrentVariation(i, ply, moves.size(), value); _currentVariation.removeLast();
-                position.undoMove(); _prunings++; break;
+                tt_Type = TT_EntryType.BETA;
+                bestValue = beta; // same as return beta
+                printCurrentVariation(i, ply, moves.size(), value);
+                _currentVariation.removeLast();
+                position.undoMove();
+                _prunings++; break;
               }
             }
           }

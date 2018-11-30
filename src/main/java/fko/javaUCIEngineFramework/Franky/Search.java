@@ -321,7 +321,6 @@ public class Search implements Runnable {
       // sure mate value found?
       if (searchCounter.currentBestRootValue >= Evaluation.Value.CHECKMATE - depth ||
           searchCounter.currentBestRootValue <= -Evaluation.Value.CHECKMATE + depth) {
-        //System.err.println("Already found Mate: "+position.toFENString());
         stopSearch = true;
       }
 
@@ -351,6 +350,8 @@ public class Search implements Runnable {
     searchResult.bestMove = searchCounter.currentBestRootMove;
     searchResult.resultValue = searchCounter.currentBestRootValue;
     searchResult.depth = searchCounter.currentIterationDepth;
+
+    // retrieved ponder move from pv
     int p_move;
     if (principalVariation[0].size() > 1 &&
         (p_move = principalVariation[0].get(1)) != Move.NOMOVE) {
@@ -384,10 +385,6 @@ public class Search implements Runnable {
   private void rootMovesSearch(BoardPosition position, int depth) {
 
     final int rootPly = 0;
-
-    // some stats for iteration
-    long boardsCounter = -searchCounter.boardsEvaluated;
-    Instant iterationStart = Instant.now();
 
     int bestValue = Evaluation.Value.NOVALUE;
 
@@ -427,7 +424,6 @@ public class Search implements Runnable {
       }
 
       position.undoMove();
-      //TODO printCurrentVariation(i, 0, rootMoves.size(), value);
       currentVariation.removeLast();
       // #### END - Commit move and go deeper into recursion
 
@@ -445,9 +441,6 @@ public class Search implements Runnable {
     if (principalVariation[0].size() != 0) {
       rootMoves.pushToHead(principalVariation[0].get(0));
     }
-
-    boardsCounter += searchCounter.boardsEvaluated;
-
   }
 
   /**
@@ -471,7 +464,6 @@ public class Search implements Runnable {
     }
 
     // Initialize best values
-    int bestMove = Move.NOMOVE;
     int bestValue = Evaluation.Value.NOVALUE;
 
     // current search depth
@@ -491,33 +483,22 @@ public class Search implements Runnable {
 
     // on leaf node call quiescence
     if (depthLeft <= 0) {
-      if (isPerftSearch()) {
-        return evaluate(position);
-      }
       return quiescence(position, ply, alpha, beta);
     }
-
-    // Initialize best values
-    int myBestMove = Move.NOMOVE;
-    int myBbestValue = Evaluation.Value.NOVALUE;
 
     // needed to remember if we even had a legal move
     boolean hadLegaMove = false;
 
-    // generate moves or get them from cache
+    // generate moves
     MoveList moves;
-    //    if (engine._CONFIGURATION._USE_MOVE_CACHE && tt_moves != null) {
-    //      moves = tt_moves; _MovesFromCache++;
-    //    } else {
     moves = moveGenerators[ply].getPseudoLegalMoves(position, false);
     searchCounter.movesGenerated++;
-    //    }
 
     // moves to search recursively
     Instant tick = Instant.now();
     for (int i = 0; i < moves.size(); i++) {
       int move = moves.get(i);
-      int value = bestValue;
+      int value;
 
       position.makeMove(move);
       // Check if legal move before going into recursion
@@ -548,28 +529,25 @@ public class Search implements Runnable {
         }
 
         // go one ply deeper into the search tree
-        // if (!_omegaEngine._CONFIGURATION._USE_PVS ||
         if (isPerftSearch()) {
           value = -negamax(position, depthLeft - 1, ply + 1, -beta, -alpha, false, false);
         } else {
+          // TODO if not PERFT add PV etc.
           value = -negamax(position, depthLeft - 1, ply + 1, -beta, -alpha, false, doNullMove);
         }
 
         // PRUNING START
         if (value > bestValue) {
           bestValue = value;
-          bestMove = move;
 
           if (value > alpha) {
             alpha = value;
-            //            tt_Type = TT_EntryType.EXACT;
             MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
 
+            // AlphaBeta Pruning
             if (value >= beta) {
-              if (!isPerftSearch()) {
-                // tt_Type = TT_EntryType.BETA;
+              if (config.USE_ALPHABETA_PRUNING && !isPerftSearch()) {
                 bestValue = beta; // same as return beta
-                // printCurrentVariation(i, ply, moves.size(), value);
                 currentVariation.removeLast();
                 position.undoMove();
                 searchCounter.prunings++;
@@ -605,10 +583,27 @@ public class Search implements Runnable {
   }
 
   private int quiescence(BoardPosition position, int ply, int alpha, int beta) {
-    if (moveGenerators[ply].hasLegalMove(position)) {
-      // TODO if (!_omegaEngine._CONFIGURATION._USE_QUIESCENCE) {
+
+    if (isPerftSearch()) {
       return evaluate(position);
-      // }
+    }
+
+    // do we even have legal moves?
+    if (moveGenerators[ply].hasLegalMove(position)) {
+
+      if (!config.USE_QUIESCENCE) {
+        return evaluate(position);
+      }
+
+      // ##############################################################
+      // START QUIESCENCE
+
+      // TODO QUIESCENCE
+      return evaluate(position);
+
+      // END QUIESCENCE
+      // ##############################################################
+
     } // no moves - mate position?
     else {
       if (position.hasCheck()) {

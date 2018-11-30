@@ -35,21 +35,16 @@ public class Configuration {
   /** test the search without any pruning and count perft value **/
   boolean PERFT = false;
 
+  /** Use AlphaBeta Pruning */
+  boolean USE_ALPHABETA_PRUNING = true;
 
-  /** Use Ponderer while waiting for opponents move - fills node_cache */
-  boolean _USE_PONDERER = true;
+  /** Do quiescence evaluation and search extension for non quiet positions */
+  boolean USE_QUIESCENCE = true;
+
+
 
   /** null evaluation **/
   boolean DO_NULL_EVALUATION = false;
-
-  /** Use AlphaBeta Pruning */
-  boolean _USE_PRUNING = true;
-
-  /** Do quiescence evaluation and search extension for non quiet positions */
-  boolean _USE_QUIESCENCE = true;
-
-
-
 
   /** If set to true we will use the opening book */
   boolean _USE_BOOK = true;

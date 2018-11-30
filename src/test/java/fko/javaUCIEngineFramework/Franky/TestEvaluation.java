@@ -26,7 +26,8 @@
 package fko.javaUCIEngineFramework.Franky;
 
 import fko.javaUCIEngineFramework.UCI.IUCIProtocolHandler;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -40,19 +41,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestEvaluation {
 
 
-    static private String        fenStandard;
-    static private BoardPosition boardPosition;
-    static private MoveGenerator mg;
-    static private Evaluation    evaluation;
+    private String        fenStandard;
+    private BoardPosition boardPosition;
+    private Evaluation    evaluation;
 
-    /**
-     * @throws Exception
-     */
-    @BeforeAll
-    static public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp()  {
         fenStandard = IUCIProtocolHandler.START_FEN;
         boardPosition = new BoardPosition(fenStandard);
-        mg = new MoveGenerator();
         evaluation = new Evaluation();
     }
 
@@ -80,8 +76,7 @@ public class TestEvaluation {
     @Test
     public final void testMaterial_OfStartPosition() {
         boardPosition = new BoardPosition(fenStandard);
-        int value = evaluation.material(boardPosition); // 1 == white
-        //System.out.println(value);
+        int value = evaluation.material(boardPosition);
         assertEquals(0, value);
     }
 
@@ -130,6 +125,7 @@ public class TestEvaluation {
     }
 
     @Test
+    @Disabled
     public void testTiming() {
 
         int ROUNDS = 5;

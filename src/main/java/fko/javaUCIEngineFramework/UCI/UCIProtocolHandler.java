@@ -369,10 +369,13 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
     }
   }
 
-  public void setSemaphoreForSynchronization(Semaphore waiter) {
+  void setSemaphoreForSynchronization(Semaphore waiter) {
     this.semaphore = waiter;
   }
 
+  /**
+   * @return true if handler is running the protocol loop
+   */
   public boolean isRunning() {
     return running;
   }
