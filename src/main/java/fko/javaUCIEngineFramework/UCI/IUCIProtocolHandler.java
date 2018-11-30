@@ -25,23 +25,30 @@
 
 package fko.javaUCIEngineFramework.UCI;
 
-import net.jodah.concurrentunit.Waiter;
-
 public interface IUCIProtocolHandler {
 
   String START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-  void startHandler();
-  void stopHandler();
-  boolean isRunning();
-
-  void setWaiterForProcessing(Waiter waiter);
-
+  /**
+   * @param msg
+   */
   void sendInfoToUCI(String msg);
+
+  /**
+   * @param msg
+   */
   void sendInfoStringToUCI(String msg);
 
-  void resultToUCI(String result);
-  void resultToUCI(String result, String ponder);
+  /**
+   * @param result
+   */
+  void sendResultToUCI(String result);
+
+  /**
+   * @param result
+   * @param ponder
+   */
+  void sendResultToUCI(String result, String ponder);
 
 
 }

@@ -104,7 +104,7 @@ public class FrankyEngine implements IUCIEngine {
                 UCIOptionType.spin,
                 "" + hashSizeOption,
                 "1",
-                "4096",
+                "512",
                 ""));
     iUciOptions.add(
         new UCIOption("Ponder",
@@ -250,12 +250,12 @@ public class FrankyEngine implements IUCIEngine {
 
     if (ponderMove == Move.NOMOVE) {
       if (uciProtocolHandler != null) {
-        uciProtocolHandler.resultToUCI(Move.toUCINotation(boardPosition, bestMove));
+        uciProtocolHandler.sendResultToUCI(Move.toUCINotation(boardPosition, bestMove));
       }
     } else {
       if (uciProtocolHandler != null) {
-        uciProtocolHandler.resultToUCI(Move.toUCINotation(boardPosition, bestMove),
-                                       Move.toUCINotation(boardPosition, ponderMove));
+        uciProtocolHandler.sendResultToUCI(Move.toUCINotation(boardPosition, bestMove),
+                                           Move.toUCINotation(boardPosition, ponderMove));
       }
     }
   }
@@ -274,6 +274,9 @@ public class FrankyEngine implements IUCIEngine {
     uciProtocolHandler.sendInfoStringToUCI(msg);
   }
 
+  /**
+   * @return the current hash size setting of the engine
+   */
   public int getHashSizeOption() {
     return hashSizeOption;
   }
@@ -285,6 +288,9 @@ public class FrankyEngine implements IUCIEngine {
     uciProtocolHandler.sendInfoStringToUCI(msg);
   }
 
+  /**
+   * @return the current ponder option of the engine
+   */
   public boolean getPonderOption() {
     return ponderOption;
   }

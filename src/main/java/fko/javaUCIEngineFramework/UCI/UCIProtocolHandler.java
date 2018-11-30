@@ -25,8 +25,6 @@
 
 package fko.javaUCIEngineFramework.UCI;
 
-import fko.javaUCIEngineFramework.UCI.IUCIEngine.UCIOptionType;
-import net.jodah.concurrentunit.Waiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +32,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.Semaphore;
 
 /**
  * UCIProtocolHandler
@@ -57,7 +56,7 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   // -- the handler runs in a separate thread --
   private Thread myThread = null;
 
-  private Waiter      waiter;
+  private Semaphore   semaphore;
   private boolean     running = false;
   private PrintStream outputStreamPrinter;
 
@@ -93,7 +92,6 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
    * Start a new thread to handle protocol<br>
    * The thread then calls run() to actually do the work.
    */
-  @Override
   public void startHandler() {
     running = true;
     // Now start the thread
@@ -108,7 +106,6 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   /**
    * Stops the playroom thread and the running game.<br>
    */
-  @Override
   public void stopHandler() {
     if (myThread == null || !myThread.isAlive() || !running) {
       throw new IllegalStateException("stopHandler(): Handler thread is not running");
@@ -367,17 +364,15 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   }
 
   private void waiterResume() {
-    if (waiter != null) {
-      waiter.resume();
+    if (semaphore != null) {
+      semaphore.release();
     }
   }
 
-  @Override
-  public void setWaiterForProcessing(Waiter waiter) {
-    this.waiter = waiter;
+  public void setSemaphoreForSynchronization(Semaphore waiter) {
+    this.semaphore = waiter;
   }
 
-  @Override
   public boolean isRunning() {
     return running;
   }
@@ -398,12 +393,12 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   }
 
   @Override
-  public void resultToUCI(String result) {
+  public void sendResultToUCI(String result) {
     send("bestmove " + result);
   }
 
   @Override
-  public void resultToUCI(String result, String ponder) {
+  public void sendResultToUCI(String result, String ponder) {
     send("bestmove " + result + " ponder " + ponder);
   }
 }

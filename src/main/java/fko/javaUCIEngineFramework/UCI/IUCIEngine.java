@@ -402,9 +402,6 @@ public interface IUCIEngine {
 
     String getVarValue();
 
-    String getChosenValue();
-
-    void setChosenValue(String chosenValue);
   }
 
   /**

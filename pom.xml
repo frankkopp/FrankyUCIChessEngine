@@ -23,12 +23,6 @@
             <version>RELEASE</version>
         </dependency>
 
-        <dependency>
-            <groupId>net.jodah</groupId>
-            <artifactId>concurrentunit</artifactId>
-            <version>0.4.3</version>
-        </dependency>
-
         <!-- LOGGING -->
         <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
         <dependency>

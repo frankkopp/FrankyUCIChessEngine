@@ -89,16 +89,4 @@ public class UCIOption implements IUCIEngine.IUCIOption {
     return varValue;
   }
 
-  @Override
-  public String getChosenValue() {
-    return chosenValue;
-  }
-
-  @Override
-  public void setChosenValue(String chosenValue) {
-    this.chosenValue = chosenValue;
-  }
-
-
-
 }

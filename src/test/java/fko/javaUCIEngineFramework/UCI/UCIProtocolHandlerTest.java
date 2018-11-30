@@ -26,7 +26,6 @@
 package fko.javaUCIEngineFramework.UCI;
 
 import fko.javaUCIEngineFramework.FrankyEngine;
-import net.jodah.concurrentunit.Waiter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,14 +48,10 @@ class UCIProtocolHandlerTest {
   private BufferedReader fromHandlerReader;
 
   private FrankyEngine engine;
-  private Waiter     waiter;
+  private Semaphore    semaphore;
 
   @BeforeEach
   void setUp() throws IOException {
-
-    System.out.println("SETUP");
-
-    waiter = new Waiter();
 
     final PipedOutputStream toHandler = new PipedOutputStream();
     final InputStream handlerInput = new PipedInputStream(toHandler);
@@ -68,24 +64,23 @@ class UCIProtocolHandlerTest {
     engine = new FrankyEngine();
     handler = new UCIProtocolHandler(engine, handlerInput, handlerOutput);
     engine.registerProtocolHandler(handler);
-    handler.setWaiterForProcessing(waiter);
+
+    semaphore = new Semaphore(0, true);
+    handler.setSemaphoreForSynchronization(semaphore);
+
     handler.startHandler();
+
   }
 
   @AfterEach
-  void tearDown() throws InterruptedException {
-    //    toHandlerPrinter.println("quit");
-    //    while (handler.isRunning()) {
-    //      Thread.sleep(100);
-    //    }
-    System.out.println("TEAR_DOWN");
+  void tearDown()  {
   }
 
   @Test
-  void uciCommand() throws IOException, TimeoutException {
+  void uciCommand() throws IOException, InterruptedException {
 
     toHandlerPrinter.println("uci");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
 
     // check id
     String line = fromHandlerReader.readLine();
@@ -105,84 +100,96 @@ class UCIProtocolHandlerTest {
   }
 
   @Test
-  void setoptionCommand() throws TimeoutException {
+  void setoptionCommand() throws InterruptedException {
 
     assertEquals(16, engine.getHashSizeOption());
     toHandlerPrinter.println("setoption name Hash value 4096");
-    waiter.await();
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
     assertEquals(4096, engine.getHashSizeOption());
 
     assertTrue(engine.getPonderOption());
     toHandlerPrinter.println("setoption name Ponder value false");
-    waiter.await();
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
     assertFalse(engine.getPonderOption());
 
     toHandlerPrinter.println("quit");
   }
 
   @Test
-  void newGameCommand() throws TimeoutException {
+  void newGameCommand() throws InterruptedException {
     toHandlerPrinter.println("ucinewgame");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     toHandlerPrinter.println("quit");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
   }
 
   @Test
-  void debugCommand() throws TimeoutException {
+  void debugCommand() throws InterruptedException {
     assertFalse(engine.getDebugMode());
     toHandlerPrinter.println("debug on");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertTrue(engine.getDebugMode());
     toHandlerPrinter.println("quit");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
   }
 
   @Test
-  void positionCommand() throws  TimeoutException {
+  void positionCommand() throws  InterruptedException {
 
     // promotion
     toHandlerPrinter.println("position fen 8/3P4/6K1/8/8/1k6/8/8 w - - 0 0 moves d7d8q");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertEquals("3Q4/8/6K1/8/8/1k6/8/8 b - - 0 1", engine.getBoardPosition().toFENString());
 
     // castling
     toHandlerPrinter.println(
       "position fen r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 0 moves e1g1");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertEquals("r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 1 1",
                  engine.getBoardPosition().toFENString());
 
     // normal
     toHandlerPrinter.println("position startpos moves e2e4 e7e5");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertEquals("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
                  engine.getBoardPosition().toFENString());
 
     toHandlerPrinter.println("position moves e2e4 e7e5");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertEquals("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
                  engine.getBoardPosition().toFENString());
 
     toHandlerPrinter.println(
       "position fen rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1 moves e1e2 e8e7");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertEquals("rnbq1bnr/4k3/8/8/8/8/4K3/RNBQ1BNR w - - 2 2",
                  engine.getBoardPosition().toFENString());
 
     toHandlerPrinter.println("quit");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
   }
 
   @Test
-  void goCommand() throws IOException, TimeoutException {
+  void goCommand() throws IOException, InterruptedException {
 
     toHandlerPrinter.println("go infinite");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertTrue(engine.getSearchMode().isInfinite());
     assertTrue(engine.isSearching());
     toHandlerPrinter.println("stop");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.isSearching());
 
     // clear buffer
@@ -191,11 +198,13 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("go ponder");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertTrue(engine.getSearchMode().isPonder());
     assertTrue(engine.isSearching());
     toHandlerPrinter.println("stop");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.isSearching());
 
     // clear buffer
@@ -204,11 +213,13 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("go infinite searchmoves e2e4 d2d4");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertTrue(engine.getSearchMode().isInfinite());
     assertTrue(engine.isSearching());
     toHandlerPrinter.println("stop");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.isSearching());
 
     // clear buffer
@@ -217,13 +228,15 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("go wtime 300000 btime 300000 movestogo 20");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertTrue(engine.getSearchMode().isTimeControl());
     assertEquals(300, engine.getSearchMode().getWhiteTime().getSeconds());
     assertEquals(20, engine.getSearchMode().getMovesToGo());
     assertTrue(engine.isSearching());
     toHandlerPrinter.println("stop");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.isSearching());
 
     // clear buffer
@@ -232,13 +245,15 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("go wtime 300000 btime 300000 movestogo 5");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertTrue(engine.getSearchMode().isTimeControl());
     assertEquals(300, engine.getSearchMode().getWhiteTime().getSeconds());
     assertEquals(5, engine.getSearchMode().getMovesToGo());
     assertTrue(engine.isSearching());
     toHandlerPrinter.println("stop");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.isSearching());
 
     // clear buffer
@@ -247,13 +262,15 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("go wtime 500000 btime 500000");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertTrue(engine.getSearchMode().isTimeControl());
     assertEquals(500, engine.getSearchMode().getWhiteTime().getSeconds());
     assertEquals(0, engine.getSearchMode().getMovesToGo());
     assertTrue(engine.isSearching());
     toHandlerPrinter.println("stop");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.isSearching());
 
     // clear buffer
@@ -262,13 +279,15 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("go wtime 300000 btime 300000 winc 2000 binc 2000");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertEquals(300, engine.getSearchMode().getWhiteTime().getSeconds());
     assertEquals(2, engine.getSearchMode().getWhiteInc().getSeconds());
     assertEquals(2, engine.getSearchMode().getBlackInc().getSeconds());
     assertTrue(engine.isSearching());
     toHandlerPrinter.println("stop");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.isSearching());
 
     // clear buffer
@@ -277,11 +296,13 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("go movetime 10000");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertEquals(10, engine.getSearchMode().getMoveTime().getSeconds());
     assertTrue(engine.isSearching());
     toHandlerPrinter.println("stop");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.isSearching());
 
     // clear buffer
@@ -290,12 +311,14 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("go mate 5");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.getSearchMode().isTimeControl());
     assertEquals(5, engine.getSearchMode().getMate());
     assertTrue(engine.isSearching());
     toHandlerPrinter.println("stop");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.isSearching());
 
     // clear buffer
@@ -304,12 +327,14 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("go nodes 1000000000");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.getSearchMode().isTimeControl());
     assertEquals(1000000000, engine.getSearchMode().getNodes());
     assertTrue(engine.isSearching());
     toHandlerPrinter.println("stop");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.isSearching());
 
     // clear buffer
@@ -318,12 +343,14 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("go depth 10");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.getSearchMode().isTimeControl());
     assertEquals(10, engine.getSearchMode().getDepth());
     assertTrue(engine.isSearching());
     toHandlerPrinter.println("stop");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.isSearching());
 
     // clear buffer
@@ -332,11 +359,11 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("quit");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
   }
 
   @Test
-  void perftCommand() throws IOException, TimeoutException {
+  void perftCommand() throws IOException, InterruptedException {
     // @formatter:off
     /*
     //N  Nodes      Captures EP     Checks  Mates
@@ -351,12 +378,14 @@ class UCIProtocolHandlerTest {
     */
     // @formatter:on
     toHandlerPrinter.println("go perft 5");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertTrue(engine.getSearchMode().isPerft());
     assertEquals(5, engine.getSearchMode().getDepth());
     assertTrue(engine.isSearching());
     toHandlerPrinter.println("stop");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.isSearching());
 
     // clear buffer
@@ -365,27 +394,31 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("quit");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
   }
 
   @Test
-  void ponderHitCommand() throws TimeoutException, IOException, InterruptedException {
+  void ponderHitCommand() throws InterruptedException, IOException, InterruptedException {
 
     // normal
     toHandlerPrinter.println("position startpos moves e2e4 e7e5");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertEquals("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
                  engine.getBoardPosition().toFENString());
 
     toHandlerPrinter.println("go ponder wtime 300000 btime 300000");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertTrue(engine.getSearchMode().isPonder());
     assertTrue(engine.isSearching());
 
     Thread.sleep(500);
 
     toHandlerPrinter.println("ponderhit");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
 
     // clear buffer
     while (fromHandlerReader.ready()) {
@@ -401,14 +434,16 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("quit");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
   }
 
   @Test
-  void sendInfoToUCI() throws IOException, TimeoutException {
+  void sendInfoToUCI() throws IOException, InterruptedException {
 
     toHandlerPrinter.println("go movetime 15000");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
 
     while (engine.isSearching()) {
       while (fromHandlerReader.ready()) {
@@ -419,10 +454,12 @@ class UCIProtocolHandlerTest {
     }
 
     toHandlerPrinter.println("stop");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     assertFalse(engine.isSearching());
 
     toHandlerPrinter.println("quit");
-    waiter.await(2000);
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
   }
 }
