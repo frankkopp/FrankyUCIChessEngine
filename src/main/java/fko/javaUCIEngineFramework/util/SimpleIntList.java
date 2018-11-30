@@ -73,22 +73,7 @@ public class SimpleIntList implements Iterable<Integer> {
      * @param old
      */
     public SimpleIntList(SimpleIntList old) {
-        _list = old._list.clone(); // clone is faster as Array copy - see unit tests
-        this._arraySize = old._arraySize;
-        this._head = 0;
-        this._tail = old._tail-old._head;
-    }
-
-    /**
-     * Only for unit testing
-     * @param old
-     */
-    SimpleIntList(SimpleIntList old, boolean clone) {
-        if (clone) {
-            this._list = old._list.clone();
-        } else {
-            this._list = Arrays.copyOfRange(old._list, old._head, old._list.length);
-        }
+        _list = Arrays.copyOfRange(old._list, old._head, old._list.length);
         this._arraySize = old._arraySize;
         this._head = 0;
         this._tail = old._tail-old._head;
