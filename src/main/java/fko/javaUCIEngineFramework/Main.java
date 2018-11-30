@@ -49,7 +49,7 @@ public class Main {
 
     LOG.debug("Start UCI Engine Framework" + Instant.now());
 
-    final IUCIEngine uciEngine = new MyEngine();
+    final IUCIEngine uciEngine = new FrankyEngine();
     final IUCIProtocolHandler handler = new UCIProtocolHandler(uciEngine);
 
     handler.startHandler();

@@ -29,7 +29,10 @@ import fko.javaUCIEngineFramework.Franky.BoardPosition;
 import fko.javaUCIEngineFramework.Franky.Move;
 import fko.javaUCIEngineFramework.Franky.Search;
 import fko.javaUCIEngineFramework.Franky.SearchMode;
-import fko.javaUCIEngineFramework.UCI.*;
+import fko.javaUCIEngineFramework.UCI.IUCIEngine;
+import fko.javaUCIEngineFramework.UCI.IUCIProtocolHandler;
+import fko.javaUCIEngineFramework.UCI.IUCISearchMode;
+import fko.javaUCIEngineFramework.UCI.UCIOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,11 +40,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * MyEngine
+ * Franky Engine for UCI GUIs
  */
-public class MyEngine implements IUCIEngine {
+public class FrankyEngine implements IUCIEngine {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MyEngine.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FrankyEngine.class);
 
   // back reference to the uci protocol handler for sending messages to the UCI UI
   private IUCIProtocolHandler uciProtocolHandler = null;
@@ -58,24 +61,43 @@ public class MyEngine implements IUCIEngine {
   private boolean ponderOption     = true;
   private boolean useOwnBookOption = false;
   private boolean debugOption      = false;
-  List<IUCIEngine.IUCIOption> iUciOptions = new ArrayList<>();
+  private List<IUCIEngine.IUCIOption> iUciOptions;
 
   // engine state
   private BoardPosition  boardPosition;
-  private IUCISearchMode uciSearchMode = new UCISearchMode();
+  private IUCISearchMode uciSearchMode;
 
   private SearchMode searchMode;
 
   /**
    * Default Constructor
    */
-  public MyEngine() {
+  public FrankyEngine() {
     initOptions();
     search = new Search(this, hashSizeOption);
     boardPosition = new BoardPosition(); // default is standard start board
   }
 
+  /**
+   * Return the last board position the engine has received through <code>setPosition</code>.
+   * Used for Unit testing.
+   * @return the last position the engine has received through <code>setPosition</code>
+   */
+  public BoardPosition getBoardPosition() {
+    return boardPosition;
+  }
+
+  /**
+   * Return the last search mode the engine has received through <code>startSearch</code>.
+   * Used for Unit testing.
+   * @return last search mode
+   */
+  public SearchMode getSearchMode() {
+    return searchMode;
+  }
+
   private void initOptions() {
+    iUciOptions = new ArrayList<>();
     // @formatter:off
     iUciOptions.add(
         new UCIOption("Hash",
@@ -107,6 +129,11 @@ public class MyEngine implements IUCIEngine {
                 "",
                 "Solid Normal Risky"));
    // @formatter:on
+  }
+
+  @Override
+  public void registerProtocolHandler(IUCIProtocolHandler uciProtocolHandler) {
+    this.uciProtocolHandler = uciProtocolHandler;
   }
 
   @Override
@@ -165,16 +192,6 @@ public class MyEngine implements IUCIEngine {
   }
 
   @Override
-  public void registerProtocolHandler(IUCIProtocolHandler uciProtocolHandler) {
-    this.uciProtocolHandler = uciProtocolHandler;
-  }
-
-  @Override
-  public BoardPosition getBoardPosition() {
-    return boardPosition;
-  }
-
-  @Override
   public void doMove(final String move) {
     LOG.info("Engine got doMove command: " + move);
     final int omegaMove = Move.fromUCINotation(boardPosition, move);
@@ -197,11 +214,6 @@ public class MyEngine implements IUCIEngine {
   @Override
   public boolean getDebugOption() {
     return debugOption;
-  }
-
-  @Override
-  public SearchMode getSearchMode() {
-    return searchMode;
   }
 
   @Override
