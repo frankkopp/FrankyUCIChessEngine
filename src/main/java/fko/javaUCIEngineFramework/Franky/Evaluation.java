@@ -168,8 +168,7 @@ public class Evaluation {
   private static int mobilityForPiece(BoardPosition board, Color color, PieceType type,
                                       Square square, int[] pieceDirections) {
     int numberOfMoves = 0;
-    int[] directions = pieceDirections;
-    for (int d : directions) {
+    for (int d : pieceDirections) {
       int to = square.ordinal() + d;
       while ((to & 0x88) == 0) { // slide while valid square
         final Piece target = board._x88Board[to];

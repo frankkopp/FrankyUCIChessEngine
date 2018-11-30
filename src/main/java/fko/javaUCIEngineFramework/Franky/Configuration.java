@@ -32,69 +32,110 @@ package fko.javaUCIEngineFramework.Franky;
  */
 public class Configuration {
 
-  /** test the search without any pruning and count perft value **/
-  boolean PERFT = false;
+  /**
+   * test the search without any pruning and count perft value
+   **/
+  public boolean PERFT = false;
 
-  /** Use AlphaBeta Pruning */
-  boolean USE_ALPHABETA_PRUNING = true;
+  /**
+   * Use AlphaBeta Pruning
+   */
+  public boolean USE_ALPHABETA_PRUNING = true;
 
-  /** Do quiescence evaluation and search extension for non quiet positions */
-  boolean USE_QUIESCENCE = true;
+  /**
+   * Do quiescence evaluation and search extension for non quiet positions
+   */
+  public boolean USE_QUIESCENCE = true;
+
+  /** Hash Size */
+  public int HASH_SIZE = 16;
+
+  /** Ponder */
+  public boolean PONDER = true;
+
+  /** Ponder */
+  public boolean DEBUG = false;
 
 
-
-  /** null evaluation **/
+  // TODO vvvvvvvv
+  /**
+   * null evaluation
+   **/
   boolean DO_NULL_EVALUATION = false;
 
-  /** If set to true we will use the opening book */
+  /**
+   * If set to true we will use the opening book
+   */
   boolean _USE_BOOK = true;
 
-  /** Use Transposition Tables for visited nodes  (needs extra memory) */
+  /**
+   * Use Transposition Tables for visited nodes  (needs extra memory)
+   */
   boolean _USE_NODE_CACHE = true;
 
-  /** Use Transposition Tables to store move list (needs extra memory)
-   *  Very expensive as it creates many int[] arrays - worth it?*/
+  /**
+   * Use Transposition Tables to store move list (needs extra memory)
+   * Very expensive as it creates many int[] arrays - worth it?
+   */
   boolean _USE_MOVE_CACHE = true;
 
-  /** Use Cache for Board evaluations - very expensive, only worth
-   * with expensive evaluation - (needs extra memory)                  */
+  /**
+   * Use Cache for Board evaluations - very expensive, only worth
+   * with expensive evaluation - (needs extra memory)
+   */
   boolean _USE_BOARD_CACHE = true;
 
-  /** Principal Variation Search */
+  /**
+   * Principal Variation Search
+   */
   boolean _USE_PVS = true;
 
-  /** Mate Distance Pruning */
+  /**
+   * Mate Distance Pruning
+   */
   boolean _USE_MDP = true;
 
-  /** Minor Promotion Pruning */
+  /**
+   * Minor Promotion Pruning
+   */
   boolean _USE_MPP = true;
 
-  /** Null Move Pruning */
-  boolean _USE_NMP = true;
+  /**
+   * Null Move Pruning
+   */
+  boolean _USE_NMP        = true;
   boolean _USE_VERIFY_NMP = true;
 
 
-
-
-
   // Verbose
-  /** If set to true this object will produce info output to System.out */
+  /**
+   * If set to true this object will produce info output to System.out
+   */
   boolean VERBOSE_TO_SYSOUT = false;
 
-  /** verbose alphabeta search **/
+  /**
+   * verbose alphabeta search
+   **/
   boolean VERBOSE_ALPHABETA = false;
 
-  /** verbose variation **/
+  /**
+   * verbose variation
+   **/
   boolean VERBOSE_VARIATION = false;
 
-  /** verbose variation **/
+  /**
+   * verbose variation
+   **/
   boolean VERBOSE_STATS = true;
 
 
-
-  /** value for folder to books */
-  String _OB_FolderPath = "/book/";
-  /** opening book file */
+  /**
+   * value for folder to books
+   */
+  String _OB_FolderPath    = "/book/";
+  /**
+   * opening book file
+   */
   String _OB_fileNamePlain = "8moves_GM_LB.pgn";
   //String _OB_fileNamePlain = "book_graham.txt";
   //String _OB_fileNamePlain = "book.txt";

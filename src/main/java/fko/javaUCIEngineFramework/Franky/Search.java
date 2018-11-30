@@ -34,7 +34,11 @@ import java.time.Instant;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Search
+ * Search implements the actual search for best move of a given position.
+ * <p>
+ * Search runs in a separate thread when the actual search is started. When
+ * the search is finished it calls <code>engine.sendResult</code> ith the best move and a ponder
+ * move if it has one.
  */
 public class Search implements Runnable {
 
@@ -42,14 +46,12 @@ public class Search implements Runnable {
 
   private static final int MAX_SEARCH_DEPTH = 100;
 
-  // configuration parameters
-  private final Configuration config = new Configuration();
-
   // search counters
   private final SearchCounter searchCounter = new SearchCounter();
 
   // back reference to the engine
   private IUCIEngine engine;
+  private final Configuration config;
 
   // the thread in which we will do the actual search
   private Thread searchThread = null;
@@ -82,24 +84,24 @@ public class Search implements Runnable {
   private SearchResult  lastSearchResult;
 
   // running search global variables
-  private RootMoveList rootMoves = new RootMoveList();
+  private RootMoveList rootMoves          = new RootMoveList();
   // current variation of the search
-  MoveList   currentVariation   = new MoveList(MAX_SEARCH_DEPTH);
-  MoveList[] principalVariation = new MoveList[MAX_SEARCH_DEPTH];
+  private MoveList     currentVariation   = new MoveList(MAX_SEARCH_DEPTH);
+  private MoveList[]   principalVariation = new MoveList[MAX_SEARCH_DEPTH];
 
   /**
    * /**
    * Creates a search object and stores a back reference to the engine object.<br>
    * Hash is setup up to the given hash size.
-   *
-   * @param engine
-   * @param hashSize
+   *  @param engine
+   * @param config
    */
-  public Search(IUCIEngine engine, int hashSize) {
+  public Search(IUCIEngine engine, Configuration config) {
     this.engine = engine;
+    this.config = config;
 
     // set hash sizes
-    setHashSize(hashSize);
+    setHashSize(this.config.HASH_SIZE);
 
     // Move Generators - each depth in search gets it own
     // to avoid object creation during search
@@ -235,17 +237,16 @@ public class Search implements Runnable {
     // run the search itself
     lastSearchResult = iterativeSearch(currentBoardPosition);
 
-    if (!searchMode.isPonder()) {
-      LOG.info("Search result was: {} Value {} PV {}", lastSearchResult.toString(),
-               lastSearchResult.resultValue, principalVariation[0].toNotationString());
-      engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
-    } else {
-      LOG.info("Search result was: {} Value {} PV {}", lastSearchResult.toString(),
-               lastSearchResult.resultValue, principalVariation[0].toNotationString());
-      engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
+    // if the mode still is ponder at this point we have a ponder miss
+    if (searchMode.isPonder()) {
       LOG.info("Ponder Miss!");
     }
 
+    LOG.info("Search result was: {} Value {} PV {}", lastSearchResult.toString(),
+             lastSearchResult.resultValue, principalVariation[0].toNotationString());
+
+    // send result to engine
+    engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
   }
 
   /**
@@ -328,7 +329,7 @@ public class Search implements Runnable {
       // @formatter:off
       engine.sendInfoToUCI("depth " + searchCounter.currentSearchDepth
                            + " seldepth " + searchCounter.currentExtraSearchDepth
-                           + " multipv 1 "
+                           + " multipv 1"
                            + " score cp " + (searchCounter.currentBestRootValue / 100f)
                            + " nodes " + searchCounter.nodesVisited
                            + " nps " + 1000 * (searchCounter.nodesVisited / (elapsedTime().toMillis()+1))
@@ -370,7 +371,8 @@ public class Search implements Runnable {
                searchCounter.currentExtraSearchDepth);
       LOG.info("Search took {}", elapsedTime());
       LOG.info("Speed: {}", String.format("%,d", (int) (searchCounter.boardsEvaluated /
-                                                       (elapsedTime().toMillis() / 1e3))) + " N/s");
+                                                        (elapsedTime().toMillis() / 1e3))) +
+                            " N/s");
     }
 
     return searchResult;
@@ -622,26 +624,13 @@ public class Search implements Runnable {
     searchCounter.boardsEvaluated++;
 
     // special cases for testing
-    //    if (_omegaEngine._CONFIGURATION.DO_NULL_EVALUATION) return 0;
     if (isPerftSearch()) {
       perftUpdateCounter(position);
       return 1;
     }
 
-    // retrieve evaluation value from evaluation cache
-    //    if (_cacheEnabled && _omegaEngine._CONFIGURATION._USE_BOARD_CACHE) {
-    //      final int value = _evalCache.get(position.getZobristKey()); if (value > Integer.MIN_VALUE) {
-    //        _evalCache_Hits++; return value;
-    //      } _evalCache_Misses++;
-    //    }
-
     // call the evaluation
     final int value = evaluator.evaluate(position);
-
-    // store evaluation value in evaluation cache
-    //    if (_cacheEnabled && _omegaEngine._CONFIGURATION._USE_BOARD_CACHE) {
-    //      _evalCache.put(position.getZobristKey(), value);
-    //    }
 
     return value;
   }

@@ -25,10 +25,7 @@
 
 package fko.javaUCIEngineFramework;
 
-import fko.javaUCIEngineFramework.Franky.BoardPosition;
-import fko.javaUCIEngineFramework.Franky.Move;
-import fko.javaUCIEngineFramework.Franky.Search;
-import fko.javaUCIEngineFramework.Franky.SearchMode;
+import fko.javaUCIEngineFramework.Franky.*;
 import fko.javaUCIEngineFramework.UCI.IUCIEngine;
 import fko.javaUCIEngineFramework.UCI.IUCIProtocolHandler;
 import fko.javaUCIEngineFramework.UCI.IUCISearchMode;
@@ -49,6 +46,9 @@ public class FrankyEngine implements IUCIEngine {
   // back reference to the uci protocol handler for sending messages to the UCI UI
   private IUCIProtocolHandler uciProtocolHandler = null;
 
+  // configuration parameters
+  private final Configuration config = new Configuration();
+
   // the current search instance
   private Search search;
 
@@ -57,16 +57,10 @@ public class FrankyEngine implements IUCIEngine {
   private String iDAuthor = "Frank Kopp";
 
   // options of engine
-  private int     hashSizeOption   = 16;
-  private boolean ponderOption     = true;
-  private boolean useOwnBookOption = false;
-  private boolean debugOption      = false;
   private List<IUCIEngine.IUCIOption> iUciOptions;
 
   // engine state
-  private BoardPosition  boardPosition;
-  private IUCISearchMode uciSearchMode;
-
+  private BoardPosition boardPosition;
   private SearchMode searchMode;
 
   /**
@@ -74,13 +68,14 @@ public class FrankyEngine implements IUCIEngine {
    */
   public FrankyEngine() {
     initOptions();
-    search = new Search(this, hashSizeOption);
+    search = new Search(this, config);
     boardPosition = new BoardPosition(); // default is standard start board
   }
 
   /**
    * Return the last board position the engine has received through <code>setPosition</code>.
    * Used for Unit testing.
+   *
    * @return the last position the engine has received through <code>setPosition</code>
    */
   public BoardPosition getBoardPosition() {
@@ -90,6 +85,7 @@ public class FrankyEngine implements IUCIEngine {
   /**
    * Return the last search mode the engine has received through <code>startSearch</code>.
    * Used for Unit testing.
+   *
    * @return last search mode
    */
   public SearchMode getSearchMode() {
@@ -102,14 +98,14 @@ public class FrankyEngine implements IUCIEngine {
     iUciOptions.add(
         new UCIOption("Hash",
                 UCIOptionType.spin,
-                "" + hashSizeOption,
+                "" + config.HASH_SIZE,
                 "1",
                 "512",
                 ""));
     iUciOptions.add(
         new UCIOption("Ponder",
                 UCIOptionType.check,
-                ponderOption ? "true" : "false",
+                Boolean.toString(config.PONDER),
                 "",
                 "",
                 ""));
@@ -193,15 +189,15 @@ public class FrankyEngine implements IUCIEngine {
 
   @Override
   public void setDebugMode(final boolean debugOption) {
-    this.debugOption = debugOption;
-    final String msg = "Engine Debug set to " + (this.debugOption ? "On" : "Off");
+    this.config.DEBUG = debugOption;
+    final String msg = "Engine Debug set to " + (this.config.DEBUG ? "On" : "Off");
     LOG.info(msg);
     uciProtocolHandler.sendInfoStringToUCI(msg);
   }
 
   @Override
   public boolean getDebugMode() {
-    return debugOption;
+    return config.DEBUG;
   }
 
   @Override
@@ -212,8 +208,8 @@ public class FrankyEngine implements IUCIEngine {
       search.stopSearch();
     }
 
-    this.uciSearchMode = uciSearchMode;
-    LOG.info("Engine got Start Search Command with " + this.uciSearchMode.toString());
+    IUCISearchMode uciSearchMode1 = uciSearchMode;
+    LOG.info("Engine got Start Search Command with " + uciSearchMode1.toString());
 
     searchMode = new SearchMode(uciSearchMode.getWhiteTime(), uciSearchMode.getBlackTime(),
                                 uciSearchMode.getWhiteInc(), uciSearchMode.getBlackInc(),
@@ -262,15 +258,18 @@ public class FrankyEngine implements IUCIEngine {
 
   @Override
   public void sendInfoToUCI(String s) {
-    if (uciProtocolHandler != null) uciProtocolHandler.sendInfoToUCI(s);
-    else LOG.info("Engine >>>> " + s);
+    if (uciProtocolHandler != null) {
+      uciProtocolHandler.sendInfoToUCI(s);
+    } else {
+      LOG.info("Engine >>>> " + s);
+    }
   }
 
   private void setHashSizeOption(final String value) {
-    this.hashSizeOption = Integer.valueOf(value);
-    final String msg = "Hash Size set to " + this.hashSizeOption;
+    this.config.HASH_SIZE = Integer.valueOf(value);
+    final String msg = "Hash Size set to " + this.config.HASH_SIZE;
     LOG.info(msg);
-    search.setHashSize(this.hashSizeOption);
+    search.setHashSize(this.config.HASH_SIZE);
     uciProtocolHandler.sendInfoStringToUCI(msg);
   }
 
@@ -278,12 +277,12 @@ public class FrankyEngine implements IUCIEngine {
    * @return the current hash size setting of the engine
    */
   public int getHashSizeOption() {
-    return hashSizeOption;
+    return this.config.HASH_SIZE;
   }
 
   private void setPonderOption(final String value) {
-    this.ponderOption = Boolean.valueOf(value);
-    final String msg = "Engine Ponder set to " + (this.ponderOption ? "On" : "Off");
+    config.PONDER = Boolean.valueOf(value);
+    final String msg = "Engine Ponder set to " + (config.PONDER ? "On" : "Off");
     LOG.info(msg);
     uciProtocolHandler.sendInfoStringToUCI(msg);
   }
@@ -292,7 +291,7 @@ public class FrankyEngine implements IUCIEngine {
    * @return the current ponder option of the engine
    */
   public boolean getPonderOption() {
-    return ponderOption;
+    return config.PONDER;
   }
 
 

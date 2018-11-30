@@ -36,8 +36,8 @@ import java.util.concurrent.Semaphore;
 
 /**
  * UCIProtocolHandler
- *
- * <p>Handles all communication related to the UCI protocol and interacts with a IUCIEngine to
+ *<p>
+ * Handles all communication related to the UCI protocol and interacts with a IUCIEngine to
  * handle engine searches
  */
 public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {

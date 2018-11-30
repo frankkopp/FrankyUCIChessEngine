@@ -53,7 +53,7 @@ public class TestSearch {
   void setUp() {
 
     engine = new FrankyEngine();
-    search = new Search(engine, 64);
+    search = new Search(engine, new Configuration());
 
   }
 
