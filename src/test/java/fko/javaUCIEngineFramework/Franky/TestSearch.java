@@ -26,7 +26,6 @@
 package fko.javaUCIEngineFramework.Franky;
 
 
-import fko.javaUCIEngineFramework.FrankyEngine;
 import fko.javaUCIEngineFramework.UCI.IUCIEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

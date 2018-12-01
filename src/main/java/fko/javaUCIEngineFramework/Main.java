@@ -25,8 +25,8 @@
 
 package fko.javaUCIEngineFramework;
 
+import fko.javaUCIEngineFramework.Franky.FrankyEngine;
 import fko.javaUCIEngineFramework.UCI.IUCIEngine;
-import fko.javaUCIEngineFramework.UCI.IUCIProtocolHandler;
 import fko.javaUCIEngineFramework.UCI.UCIProtocolHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

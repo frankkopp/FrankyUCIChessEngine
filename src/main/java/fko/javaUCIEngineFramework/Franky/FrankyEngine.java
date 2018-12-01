@@ -23,9 +23,8 @@
  *
  */
 
-package fko.javaUCIEngineFramework;
+package fko.javaUCIEngineFramework.Franky;
 
-import fko.javaUCIEngineFramework.Franky.*;
 import fko.javaUCIEngineFramework.UCI.IUCIEngine;
 import fko.javaUCIEngineFramework.UCI.IUCIProtocolHandler;
 import fko.javaUCIEngineFramework.UCI.IUCISearchMode;
