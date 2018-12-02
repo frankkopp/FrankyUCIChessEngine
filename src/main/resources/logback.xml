@@ -40,7 +40,7 @@
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>log/app.log</file>
-        <append>false</append>
+        <append>true</append>
         <immediateFlush>true</immediateFlush>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%-20.-20thread] %-5.5level %-15.15logger{0} > %msg%n</pattern>
@@ -49,7 +49,7 @@
 
     <appender name="COMLOG" class="ch.qos.logback.core.FileAppender">
         <file>log/com.log</file>
-        <append>false</append>
+        <append>true</append>
         <immediateFlush>true</immediateFlush>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} %msg%n</pattern>

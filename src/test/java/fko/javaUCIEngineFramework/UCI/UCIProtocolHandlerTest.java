@@ -462,4 +462,42 @@ class UCIProtocolHandlerTest {
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
 
   }
+
+  @Test
+  void testSetTest() throws IOException, InterruptedException {
+    //    ucinewgame
+    //    position fen 3rkb1r/1p3p2/p1n1p3/q5pp/2PpP3/1P4P1/P1Q1BPKP/R2N3R b k - 0 0
+    //    go infinite
+
+    toHandlerPrinter.println("ucinewgame");
+    toHandlerPrinter.println(
+      "position fen 3rkb1r/1p3p2/p1n1p3/q5pp/2PpP3/1P4P1/P1Q1BPKP/R2N3R b k - 0 0");
+    toHandlerPrinter.println("go infinite");
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
+    Thread.sleep(2000);
+
+    assertTrue(engine.getSearchMode().isInfinite());
+    assertTrue(engine.isSearching());
+
+    Thread.sleep(2000);
+
+    toHandlerPrinter.println("stop");
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
+    while (engine.isSearching()) {
+      Thread.sleep(20);
+      // clear buffer
+      while (fromHandlerReader.ready()) {
+        fromHandlerReader.readLine();
+      }
+    }
+    assertFalse(engine.isSearching());
+
+    // clear buffer
+    while (fromHandlerReader.ready()) {
+      fromHandlerReader.readLine();
+    }
+  }
+
 }

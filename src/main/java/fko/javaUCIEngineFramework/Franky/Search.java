@@ -47,8 +47,6 @@ import java.util.concurrent.CountDownLatch;
  * TODO: - Mate Distance Pruning (https://www.chessprogramming.org/Mate_Distance_Pruning)
  * TODO: - MTDf (http://people.csail.mit.edu/plaat/mtdf.html)
  *
- *
- *
  */
 public class Search implements Runnable {
 

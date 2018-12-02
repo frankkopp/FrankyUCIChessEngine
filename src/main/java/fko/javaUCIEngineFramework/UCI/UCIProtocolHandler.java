@@ -271,7 +271,7 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
     String token = scanner.next();
     if (token.equals("fen")) {
       startFen = "";
-      while (!(token = scanner.next()).equals("moves")) {
+      while (scanner.hasNext() && !(token = scanner.next()).equals("moves")) {
         startFen += token + " ";
       }
     } else if (token.equals("startpos")) {
@@ -381,7 +381,7 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   }
 
   private void send(final String msg) {
-    COMLOG.debug(">> {}", msg);
+    COMLOG.debug("<< {}", msg);
     outputStreamPrinter.println(msg);
   }
 

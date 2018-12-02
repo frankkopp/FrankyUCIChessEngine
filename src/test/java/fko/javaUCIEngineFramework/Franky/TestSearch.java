@@ -505,7 +505,7 @@ public class TestSearch {
 
   @Test
   @Disabled
-  public void testInifinteSearch() throws InterruptedException {
+  public void testInifinteSearch() {
     BoardPosition boardPosition = new BoardPosition();
 
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 0, null, false, true, false);
@@ -516,5 +516,6 @@ public class TestSearch {
     waitWhileSearching();
 
   }
+
 
 }

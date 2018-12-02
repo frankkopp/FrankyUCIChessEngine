@@ -31,10 +31,10 @@ package fko.javaUCIEngineFramework.Franky;
  * Features/Ideas:
  * DONE: Material
  * DONE: Mobility
+ * TODO: Game Phase
  * TODO: Development (http://archive.gamedev.net/archive/reference/articles/article1208.html)
  * TODO: Piece Tables (http://www.chessbin.com/post/Chess-Board-Evaluation)
- * TODO: Game Phase
- * TODO: Tapered Eval
+ * TODO: Tapered Eval (https://www.chessprogramming.org/Tapered_Eval)
  * TODO: Lazy Evaluation
  * TODO: Bishop Pair
  * TODO: Bishop vs. Knight
