@@ -73,9 +73,7 @@ public class TranspositionTable {
 
     // size in byte divided by entry size plus size for array bucket
     maxNumberOfEntries = (int) (sizeInByte / (TT_Entry.SIZE + Integer.BYTES));
-    if (maxNumberOfEntries > Integer.MAX_VALUE) {
-      maxNumberOfEntries = Integer.MAX_VALUE;
-    }
+
     // create buckets for hash table
     entries = new TT_Entry[maxNumberOfEntries];
     // initialize
@@ -86,15 +84,12 @@ public class TranspositionTable {
 
   /**
    * Stores the node value and the depth it has been calculated at.
-   *
-   * @param position TODO
+   *  @param position
    * @param value
    * @param type
    * @param depth
-   * @param moveList
    */
-  public void put(BoardPosition position, int value, TT_EntryType type, int depth,
-                  MoveList moveList) {
+  public void put(BoardPosition position, int value, TT_EntryType type, int depth) {
 
     final int hash = getHash(position._zobristKey);
 
@@ -106,8 +101,6 @@ public class TranspositionTable {
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
-      entries[hash].move_list = moveList;
-      //entries[hash].move_list = new SoftReference<MoveList>(moveList);
 
     }
     // different position - overwrite
@@ -119,8 +112,6 @@ public class TranspositionTable {
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
-      entries[hash].move_list = moveList;
-      //entries[hash].move_list = new SoftReference<MoveList>(moveList);
     }
     // Collision or update
     else if (position._zobristKey == entries[hash].key  // same position
@@ -132,8 +123,6 @@ public class TranspositionTable {
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
-      entries[hash].move_list = moveList;
-      //entries[hash].move_list = new SoftReference<MoveList>(moveList);
     }
     // ignore new values for cache
   }
@@ -210,18 +199,18 @@ public class TranspositionTable {
    * Contains a key, value and an entry type.
    */
   public static final class TT_Entry {
+
     static final int SIZE = (Long.BYTES // key
                              + Integer.BYTES // value
                              + Integer.BYTES // depth
                             ) * 2 // 64bit?
-                            + 8; // enum // +40; // SoftReference
+                            + 8; // enum
+
     long         key       = 0L;
     //String fen = "";
     int          value     = Integer.MIN_VALUE;
     int          depth     = 0;
     TT_EntryType type      = TT_EntryType.ALPHA;
-    MoveList     move_list = null;
-    //SoftReference<MoveList> move_list = new SoftReference<MoveList>(null);
   }
 
   /**

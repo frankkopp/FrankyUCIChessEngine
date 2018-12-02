@@ -32,29 +32,46 @@ package fko.javaUCIEngineFramework.Franky;
  */
 public class Configuration {
 
-  /**
-   * test the search without any pruning and count perft value
-   **/
+  /** test the search without any pruning and count perft value */
   public boolean PERFT = false;
 
-  /**
-   * Use AlphaBeta Pruning
-   */
-  public boolean USE_ALPHABETA_PRUNING = true;
-
-  /**
-   * Do quiescence evaluation and search extension for non quiet positions
-   */
-  public boolean USE_QUIESCENCE = true;
+  /** Do quiescence evaluation and search extension for non quiet positions */
+  public boolean USE_QUIESCENCE = false;
 
   /** Hash Size */
-  public int HASH_SIZE = 16;
+  public int HASH_SIZE = 512;
 
   /** Ponder */
   public boolean PONDER = true;
 
-  /** Ponder */
+  /** Debug */
   public boolean DEBUG = false;
+
+  /** ##################################################
+   * OPTIMIZATIONS
+   * ###################################################*/
+
+  /** Sort root moves after iterations. */
+  public boolean USE_ROOT_MOVES_SORT = true;
+
+  /** Use AlphaBeta Pruning */
+  public boolean USE_ALPHABETA_PRUNING = true;
+
+  /** Principal Variation Search */
+  boolean USE_PVS = true;
+
+  /** Use Transposition Tables for visited nodes (needs extra memory) */
+  boolean TRANSPOSITION_TABLE = true;
+
+  /** Use Cache for Board evaluations - very expensive, only worth
+   * with expensive evaluation - (needs extra memory) */
+  boolean USE_EVALUATION_CACHE = true;
+
+  /** Mate Distance Pruning */
+  boolean MATE_DISTANCE_PRUNING = true;
+
+  /** Minor Promotion Pruning */
+  boolean USE_MINOR_PROMOTION_PRUNING = true;
 
 
   // TODO vvvvvvvv
@@ -66,50 +83,22 @@ public class Configuration {
   /**
    * If set to true we will use the opening book
    */
-  boolean _USE_BOOK = true;
+  boolean _USE_BOOK = false;
 
-  /**
-   * Use Transposition Tables for visited nodes  (needs extra memory)
-   */
-  boolean _USE_NODE_CACHE = true;
 
-  /**
-   * Use Transposition Tables to store move list (needs extra memory)
-   * Very expensive as it creates many int[] arrays - worth it?
-   */
-  boolean _USE_MOVE_CACHE = true;
 
-  /**
-   * Use Cache for Board evaluations - very expensive, only worth
-   * with expensive evaluation - (needs extra memory)
-   */
-  boolean _USE_BOARD_CACHE = true;
 
-  /**
-   * Principal Variation Search
-   */
-  boolean _USE_PVS = true;
-
-  /**
-   * Mate Distance Pruning
-   */
-  boolean _USE_MDP = true;
-
-  /**
-   * Minor Promotion Pruning
-   */
-  boolean _USE_MPP = true;
 
   /**
    * Null Move Pruning
    */
-  boolean _USE_NMP        = true;
-  boolean _USE_VERIFY_NMP = true;
+  boolean _USE_NMP        = false;
+  boolean _USE_VERIFY_NMP = false;
 
 
   // Verbose
   /**
-   * If set to true this object will produce info output to System.out
+   * If set to false this object will produce info output to System.out
    */
   boolean VERBOSE_TO_SYSOUT = false;
 
@@ -126,7 +115,7 @@ public class Configuration {
   /**
    * verbose variation
    **/
-  boolean VERBOSE_STATS = true;
+  boolean VERBOSE_STATS = false;
 
 
   /**

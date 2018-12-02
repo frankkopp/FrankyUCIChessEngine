@@ -114,12 +114,12 @@ public class SearchMode {
       // no limits
       timeControl = false;
       startDepth = this.depth;
-      maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;;
+      maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
     } else if (this.infinite) {
       // no limits
       timeControl = false;
       startDepth = 1;
-      maxDepth = MAX_SEARCH_DEPTH;
+      maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
     } else if (this.ponder) {
       // limits per depth only, start with 1
       timeControl = false;

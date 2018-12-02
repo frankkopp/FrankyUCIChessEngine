@@ -29,8 +29,12 @@ import java.util.Comparator;
 import java.util.stream.IntStream;
 
 /**
- * The move generator for Omega Engine.<br>
- * It generates pseudo legal and legal moves for a given position.<br>
+ * The move generator for Omega Engine.
+ *
+ * It generates pseudo legal and legal moves for a given position.
+ *
+ * Moves are generated captures first with Most Valuable Victim - Least Valuable Aggressor order
+ *
  * <b>This class is not thread safe as it uses static variables to avoid generating them during each
  * object creation.</b><br>
  *
@@ -309,7 +313,7 @@ public class MoveGenerator {
     /*
      * call the move generators
      * TODO: if check we might be able to implement a faster generation with
-     * only evasion moves
+     * TODO: only evasion moves
      */
     generatePseudoLegaMoves();
 
@@ -342,7 +346,7 @@ public class MoveGenerator {
     generateQueenMoves();
     generateKingMoves();
 
-    // sort the capturing moves for mvvlva order
+    // sort the capturing moves for mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
     if (SORT) _capturingMoves.sort(_mvvlva_comparator);
 
     // now we have all capturing moves

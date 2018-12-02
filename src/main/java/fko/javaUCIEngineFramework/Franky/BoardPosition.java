@@ -957,7 +957,7 @@ public class BoardPosition {
 
   /** @return true if current position has check for next player */
   public boolean hasCheck() {
-    if (_hasCheck != Flag.TBD) return _hasCheck == Flag.TRUE ? true : false;
+    if (_hasCheck != Flag.TBD) return _hasCheck == Flag.TRUE;
     boolean check = isAttacked(_nextPlayer.getInverseColor(), _kingSquares[_nextPlayer.ordinal()]);
     _hasCheck = check ? Flag.TRUE : Flag.FALSE;
     return check;
@@ -971,7 +971,7 @@ public class BoardPosition {
    */
   public boolean hasCheckMate() {
     if (!hasCheck()) return false;
-    if (_hasMate != Flag.TBD) return _hasMate == Flag.TRUE ? true : false;
+    if (_hasMate != Flag.TBD) return _hasMate == Flag.TRUE;
     if (!_mateCheckMG.hasLegalMove(this)) {
       _hasMate = Flag.TRUE;
       return true;

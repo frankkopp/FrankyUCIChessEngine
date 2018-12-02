@@ -28,11 +28,14 @@ package fko.javaUCIEngineFramework.Franky;
 
 import fko.javaUCIEngineFramework.UCI.IUCIEngine;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -65,20 +68,14 @@ public class TestSearch {
     BoardPosition boardPosition = new BoardPosition(fen);
     //boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0,
-                                           4, 0, 0, 0,
-                                           null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 4, 0, 0, 0, null, false, false, false);
 
     search.startSearch(boardPosition, searchMode);
 
     // test search
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) { }
-    }
+    waitWhileSearching();
 
-    assertTrue(search.getSearchCounter().boardsEvaluated > 0);
+    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
   }
 
@@ -91,22 +88,17 @@ public class TestSearch {
     BoardPosition boardPosition = new BoardPosition(fen);
     //boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0,
-                                           0, 5000000, 0, 0,
-                                           null, false, false, false);
+    SearchMode searchMode =
+      new SearchMode(0, 0, 0, 0, 0, 0, 5000000, 0, 0, null, false, false, false);
 
     search.startSearch(boardPosition, searchMode);
 
     // test search
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) { }
-    }
+    waitWhileSearching();
 
-    assertTrue(search.getSearchCounter().boardsEvaluated > 0);
+    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    assertEquals(5000000,search.getSearchCounter().nodesVisited);
+    assertEquals(5000000, search.getSearchCounter().nodesVisited);
   }
 
   @Test
@@ -116,96 +108,41 @@ public class TestSearch {
     BoardPosition boardPosition = new BoardPosition(fen);
     //boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0,
-                                           0, 0, 0, 0,
-                                           null, true, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 0, null, true, false, false);
 
     // test search
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) { }
-    }
+    waitWhileSearching();
 
     // Test start and stop search
     for (int i = 0; i < 20; i++) {
       search.startSearch(boardPosition, searchMode);
       try {
         Thread.sleep(new Random().nextInt(1000));
-      } catch (InterruptedException ignored) { }
+      } catch (InterruptedException ignored) {
+      }
 
       search.stopSearch();
 
-      assertTrue(search.getSearchCounter().boardsEvaluated > 0);
+      assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
       assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
     }
   }
 
 
   @Test
-  public void perftTest() {
-
-    LOG.info("Start PERFT Test for depth 5");
-
-    String fen = BoardPosition.START_FEN;
-    BoardPosition boardPosition = new BoardPosition(fen);
-    //boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
-
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0,
-                                           5, 0, 0, 0,
-                                           null, false, false, true);
-
-    search.startSearch(boardPosition, searchMode);
-
-    // test search
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) { }
-    }
-
-    assertEquals(4865609, search.getSearchCounter().boardsEvaluated);
-    assertEquals(82719, search.getSearchCounter().captureCounter);
-    assertEquals(258, search.getSearchCounter().enPassantCounter);
-    assertEquals(27351, search.getSearchCounter().checkCounter);
-    assertEquals(347, search.getSearchCounter().checkMateCounter);
-
-    LOG.info("PERFT Test for depth 5 successful.");
-
-    // @formatter:off
-    /*
-    //N  Nodes      Captures EP     Checks  Mates
-    { 0, 1,         0,       0,     0,      0},
-    { 1, 20,        0,       0,     0,      0},
-    { 2, 400,       0,       0,     0,      0},
-    { 3, 8902,      34,      0,     12,     0},
-    { 4, 197281,    1576,    0,     469,    8},
-    { 5, 4865609,   82719,   258,   27351,  347},
-    { 6, 119060324, 2812008, 5248,  809099, 10828},
-    { 7, 3195901860L, 108329926, 319617, 33103848, 435816 }
-    */
-    // @formatter:on
-  }
-
-  @Test
   public void testBasicTimeControl_RemainingTime() {
     String fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
-    SearchMode searchMode = new SearchMode(300000, 300000, 0, 0, 0,
-                                           0, 0, 0, 0,
-                                           null, false, false, false);
+    SearchMode searchMode =
+      new SearchMode(300000, 300000, 0, 0, 0, 0, 0, 0, 0, null, false, false, false);
 
     search.startSearch(boardPosition, searchMode);
 
     // test search
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) { }
-    }
+    waitWhileSearching();
 
-    assertTrue(search.getSearchCounter().boardsEvaluated > 0);
+    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
   }
@@ -215,22 +152,17 @@ public class TestSearch {
     String fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
-    SearchMode searchMode = new SearchMode(300000, 300000, 2000, 2000, 0,
-                                           0, 0, 0, 0,
-                                           null, false, false, false);
+    SearchMode searchMode =
+      new SearchMode(300000, 300000, 2000, 2000, 0, 0, 0, 0, 0, null, false, false, false);
 
     search.startSearch(boardPosition, searchMode);
 
     // test search
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) { }
-    }
+    waitWhileSearching();
 
     // TODO: Inc not implemented in search time estimations yet - so this is similar to non inc time control
 
-    assertTrue(search.getSearchCounter().boardsEvaluated > 0);
+    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
   }
@@ -243,20 +175,14 @@ public class TestSearch {
     String fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0,
-                                           0, 0, 0, 5,
-                                           null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 5, null, false, false, false);
 
     search.startSearch(boardPosition, searchMode);
 
     // test search
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) { }
-    }
+    waitWhileSearching();
 
-    assertTrue(search.getSearchCounter().boardsEvaluated > 0);
+    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
   }
@@ -298,50 +224,41 @@ public class TestSearch {
     // 1r1r2k1/2p1qp1p/6p1/ppQB1b2/5Pn1/2R1P1P1/PP5P/R1B3K1 b ;bm Qe4
 
     // mate in 2 (4 plys)
-    String fen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1"; // BoardPosition.START_FEN;
+    String fen =
+      "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1"; // BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0,
-                                           0, 0, 2, 0,
-                                           null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 2, 0, null, false, false, false);
 
     search.startSearch(boardPosition, searchMode);
 
     // test search
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) { }
-    }
+    waitWhileSearching();
 
     search.stopSearch();
 
-    assertTrue(search.getSearchCounter().boardsEvaluated > 0);
+    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    assertEquals(search.getLastSearchResult().resultValue, Evaluation.Value.CHECKMATE - (2*2 - 1));
+    assertEquals(search.getLastSearchResult().resultValue,
+                 Evaluation.Value.CHECKMATE - (2 * 2 - 1));
 
     // mate in 4 (8 plys)
     fen = "r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - - 0 1";
     boardPosition = new BoardPosition(fen);
 
-    searchMode = new SearchMode(0, 0, 0, 0, 0,
-                                           0, 0, 4, 0,
-                                           null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
 
     search.startSearch(boardPosition, searchMode);
 
     // test search
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) { }
-    }
+    waitWhileSearching();
 
-    assertTrue(search.getSearchCounter().boardsEvaluated > 0);
+    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    assertEquals(search.getLastSearchResult().resultValue, Evaluation.Value.CHECKMATE - (2*4 - 1));
+    assertEquals(search.getLastSearchResult().resultValue,
+                 Evaluation.Value.CHECKMATE - (2 * 4 - 1));
   }
 
   @Test
@@ -350,20 +267,15 @@ public class TestSearch {
     String fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0,
-                                           0, 0, 0, 2,
-                                           Arrays.asList("h2h4"), false, false, false);
+    SearchMode searchMode =
+      new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 2, Arrays.asList("h2h4"), false, false, false);
 
     search.startSearch(boardPosition, searchMode);
 
     // test search
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) { }
-    }
+    waitWhileSearching();
 
-    assertTrue(search.getSearchCounter().boardsEvaluated > 0);
+    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertEquals("h2h4", Move.toUCINotation(boardPosition, search.getLastSearchResult().bestMove));
   }
 
@@ -371,14 +283,13 @@ public class TestSearch {
   public void testPonderMissSearch() throws InterruptedException {
     String fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
-    boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
+    boardPosition.makeMove(Move.fromUCINotation(boardPosition, "e2e4"));
 
-    SearchMode searchMode = new SearchMode(295000, 300000, 0, 0, 0,
-                                           0, 0, 0, 0,
-                                           null, true, false, false);
+    SearchMode searchMode =
+      new SearchMode(295000, 300000, 0, 0, 0, 0, 0, 0, 0, null, true, false, false);
 
     // set last ponder move
-    boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e7e5"));
+    boardPosition.makeMove(Move.fromUCINotation(boardPosition, "e7e5"));
 
     // Start pondering
     search.startSearch(boardPosition, searchMode);
@@ -390,11 +301,9 @@ public class TestSearch {
     // stop search
     search.stopSearch();
     boardPosition = new BoardPosition(fen);
-    boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
-    boardPosition.makeMove(Move.fromUCINotation(boardPosition,"c7c5"));
-    searchMode = new SearchMode(295000, 295000, 0, 0, 0,
-                                           0, 0, 0, 0,
-                                           null, false, false, false);
+    boardPosition.makeMove(Move.fromUCINotation(boardPosition, "e2e4"));
+    boardPosition.makeMove(Move.fromUCINotation(boardPosition, "c7c5"));
+    searchMode = new SearchMode(295000, 295000, 0, 0, 0, 0, 0, 0, 0, null, false, false, false);
 
     // Start search after miss
     search.startSearch(boardPosition, searchMode);
@@ -404,23 +313,22 @@ public class TestSearch {
     // wait a bit
     Thread.sleep(3000);
 
-//    assertTrue(search.getSearchCounter().boardsEvaluated > 0);
-//    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
-//    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+    //    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+    //    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+    //    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
   }
 
   @Test
   public void testPonderHitSearch() throws InterruptedException {
     String fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
-    boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
+    boardPosition.makeMove(Move.fromUCINotation(boardPosition, "e2e4"));
 
-    SearchMode searchMode = new SearchMode(295000, 300000, 0, 0, 0,
-                                           0, 0, 0, 0,
-                                           null, true, false, false);
+    SearchMode searchMode =
+      new SearchMode(295000, 300000, 0, 0, 0, 0, 0, 0, 0, null, true, false, false);
 
     // set last ponder move
-    boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e7e5"));
+    boardPosition.makeMove(Move.fromUCINotation(boardPosition, "e7e5"));
 
     // Start pondering
     search.startSearch(boardPosition, searchMode);
@@ -433,16 +341,180 @@ public class TestSearch {
     search.ponderHit();
 
     // test search
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) { }
-    }
+    waitWhileSearching();
 
-    //    assertTrue(search.getSearchCounter().boardsEvaluated > 0);
+    //    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     //    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     //    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
   }
 
-}
+  @Test
+  public void perftTest() {
 
+    LOG.info("Start PERFT Test for depth 5");
+
+    String fen = BoardPosition.START_FEN;
+    BoardPosition boardPosition = new BoardPosition(fen);
+    //boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
+
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 5, 0, 0, 0, null, false, false, true);
+
+    search.startSearch(boardPosition, searchMode);
+
+    // test search
+    waitWhileSearching();
+
+    assertEquals(4865609, search.getSearchCounter().leafPositionsEvaluated -
+                          search.getSearchCounter().nonLeafPositionsEvaluated);
+    assertEquals(82719, search.getSearchCounter().captureCounter);
+    assertEquals(258, search.getSearchCounter().enPassantCounter);
+    assertEquals(27351, search.getSearchCounter().checkCounter);
+    assertEquals(347, search.getSearchCounter().checkMateCounter);
+
+    LOG.info("BOARDS: {}", String.format("%,d", search.getSearchCounter().leafPositionsEvaluated));
+    LOG.info("PERFT Test for depth 5 successful.");
+
+    // @formatter:off
+    /*
+    //N  Nodes      Captures EP     Checks  Mates
+    { 0, 1,         0,       0,     0,      0},
+    { 1, 20,        0,       0,     0,      0},
+    { 2, 400,       0,       0,     0,      0},
+    { 3, 8902,      34,      0,     12,     0},
+    { 4, 197281,    1576,    0,     469,    8},
+    { 5, 4865609,   82719,   258,   27351,  347},
+    { 6, 119060324, 2812008, 5248,  809099, 10828},
+    { 7, 3195901860L, 108329926, 319617, 33103848, 435816 }
+    */
+    // @formatter:on
+  }
+
+  @Test
+  public void sizeOfSearchTreeTest() {
+
+    final int depth = 5;
+
+    LOG.info("Start SIZE Test for depth {}", depth);
+
+    String fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+    //fen = BoardPosition.START_FEN;
+    BoardPosition boardPosition = new BoardPosition(fen);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
+    List<String> values = new ArrayList<>();
+
+    // turn off all optimizations to get a reference value of the search tree size
+    search.config.USE_ALPHABETA_PRUNING = false;
+    search.config.USE_ROOT_MOVES_SORT = false;
+    search.config.USE_PVS = false;
+    search.config.TRANSPOSITION_TABLE = false;
+    search.config.USE_EVALUATION_CACHE = false;
+    search.config.MATE_DISTANCE_PRUNING = false;
+    search.config.USE_MINOR_PROMOTION_PRUNING = false;
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    values.add(String.format("SIZE REFERENCE  : %,14d >> %s",
+                             search.getSearchCounter().leafPositionsEvaluated,
+                             search.getSearchCounter().toString()));
+
+    // turn on optimizations to get a compare value of the search tree size
+    search.config.USE_ALPHABETA_PRUNING = true;
+    search.clearHashtables();
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    values.add(String.format("SIZE AlphaBeta  : %,14d >> %s",
+                             search.getSearchCounter().leafPositionsEvaluated,
+                             search.getSearchCounter().toString()));
+
+    // turn on optimizations to get a compare value of the search tree size
+    search.config.USE_ROOT_MOVES_SORT = true;
+    search.clearHashtables();
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    values.add(String.format("SIZE RootSort   : %,14d >> %s",
+                             search.getSearchCounter().leafPositionsEvaluated,
+                             search.getSearchCounter().toString()));
+
+
+    // turn on optimizations to get a compare value of the search tree size
+    search.config.USE_PVS = true;
+    search.clearHashtables();
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    values.add(String.format("SIZE PVS        : %,14d >> %s",
+                             search.getSearchCounter().leafPositionsEvaluated,
+                             search.getSearchCounter().toString()));
+
+
+    // turn on optimizations to get a compare value of the search tree size
+    search.config.USE_EVALUATION_CACHE = true;
+    search.clearHashtables();
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    values.add(String.format("SIZE PVS+EC     : %,14d >> %s",
+                             search.getSearchCounter().leafPositionsEvaluated,
+                             search.getSearchCounter().toString()));
+
+    // turn on optimizations to get a compare value of the search tree size
+    search.config.TRANSPOSITION_TABLE = true;
+    search.clearHashtables();
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    values.add(String.format("SIZE PVS+TT     : %,14d >> %s",
+                             search.getSearchCounter().leafPositionsEvaluated,
+                             search.getSearchCounter().toString()));
+
+    // turn on optimizations to get a compare value of the search tree size
+    search.config.MATE_DISTANCE_PRUNING = true;
+    search.clearHashtables();
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    values.add(String.format("SIZE MDP        : %,14d >> %s",
+                             search.getSearchCounter().leafPositionsEvaluated,
+                             search.getSearchCounter().toString()));
+
+    search.config.USE_MINOR_PROMOTION_PRUNING = true;
+    search.clearHashtables();
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    values.add(String.format("SIZE MPP        : %,14d >> %s",
+                             search.getSearchCounter().leafPositionsEvaluated,
+                             search.getSearchCounter().toString()));
+
+    // REPEAT
+    // search.clearHashtables();
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    values.add(String.format("SIZE REPEAT w TT: %,14d >> %s",
+                             search.getSearchCounter().leafPositionsEvaluated,
+                             search.getSearchCounter().toString()));
+
+    LOG.info("");
+    for (String value : values) {
+      LOG.info(value);
+    }
+  }
+
+  private void waitWhileSearching() {
+    while (search.isSearching()) {
+      try {
+        Thread.sleep(200);
+      } catch (InterruptedException ignored) {
+      }
+    }
+  }
+
+  @Test
+  @Disabled
+  public void testInifinteSearch() throws InterruptedException {
+    BoardPosition boardPosition = new BoardPosition();
+
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 0, null, false, true, false);
+
+    search.startSearch(boardPosition, searchMode);
+
+    // test search
+    waitWhileSearching();
+
+  }
+
+}

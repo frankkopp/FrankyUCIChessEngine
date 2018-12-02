@@ -26,7 +26,6 @@
 package fko.javaUCIEngineFramework.Franky;
 
 import fko.javaUCIEngineFramework.Franky.TranspositionTable.TT_EntryType;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,11 +45,11 @@ public class TestTranspositionTable {
         BoardPosition position = new BoardPosition();
         assertEquals(762600, cache.getMaxEntries());
         assertEquals(32*1024*1024, cache.getSize());
-        cache.put(position, 999, TT_EntryType.EXACT, 5, null);
+        cache.put(position, 999, TT_EntryType.EXACT, 5);
         assertEquals(1, cache.getNumberOfEntries());
         assertEquals(999,cache.get(position).value);
         assertEquals(999,cache.get(position).value);
-        cache.put(position, 1111, TT_EntryType.EXACT, 15, null);
+        cache.put(position, 1111, TT_EntryType.EXACT, 15);
         assertEquals(1111,cache.get(position).value);
         assertEquals(1, cache.getNumberOfEntries());
         cache.clear();

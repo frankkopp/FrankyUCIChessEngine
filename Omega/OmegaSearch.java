@@ -139,7 +139,8 @@ public class OmegaSearch implements Runnable {
   int  _currentBestRootValue    = OmegaEvaluation.Value.NOVALUE; // value of the current best move
   int  _currentIterationDepth   = 0; // how deep will the search go in the current iteration
   int  _currentSearchDepth      = 0; // how deep did the search go this iteration
-  int  _currentExtraSearchDepth = 0; // how deep did we search including quiescence depth this iteration
+  int  _currentExtraSearchDepth = 0;
+    // how deep did we search including quiescence depth this iteration
   int  _currentRootMove         = 0; // current root move that is searched
   int  _currentRootMoveNumber   = 0; // number of the current root move in the list of root moves
   long _nodesVisited            = 0; // how many times a node has been visited (negamax calls)
@@ -155,19 +156,29 @@ public class OmegaSearch implements Runnable {
   long _MovesGenerated          = 0;
 
   private void resetCounter() {
-    _currentIterationDepth = 0; _currentSearchDepth = 0; _currentExtraSearchDepth = 0;
-    _currentRootMove = 0; _currentRootMoveNumber = 0; _nodesVisited = 0; _boardsEvaluated = 0;
-    _boardsNonQuiet = 0; _prunings = 0; _pv_researches = 0; _evalCache_Hits = 0;
-    _evalCache_Misses = 0; _nodeCache_Hits = 0; _nodeCache_Misses = 0; _MovesFromCache = 0;
+    _currentIterationDepth = 0;
+    _currentSearchDepth = 0;
+    _currentExtraSearchDepth = 0;
+    _currentRootMove = 0;
+    _currentRootMoveNumber = 0;
+    _nodesVisited = 0;
+    _boardsEvaluated = 0;
+    _boardsNonQuiet = 0;
+    _prunings = 0;
+    _pv_researches = 0;
+    _evalCache_Hits = 0;
+    _evalCache_Misses = 0;
+    _nodeCache_Hits = 0;
+    _nodeCache_Misses = 0;
+    _MovesFromCache = 0;
     _MovesGenerated = 0;
   }
 
   /*
    * Caches
-   */
-  Boolean _cacheEnabled;
-  OmegaEvaluationCache    _evalCache;
-  OmegaTranspositionTable _transpositionTable;
+   */ Boolean                 _cacheEnabled;
+      OmegaEvaluationCache    _evalCache;
+      OmegaTranspositionTable _transpositionTable;
 
   /**
    * Creates a search object and stores a back reference to the engine object.<br>
@@ -195,7 +206,8 @@ public class OmegaSearch implements Runnable {
 
     // cache setup
     // TODO: use UCI settings for Hash
-    _cacheEnabled = true; if (_cacheEnabled) {
+    _cacheEnabled = true;
+    if (_cacheEnabled) {
       initializeCacheTables(); // create a cache
     }
 
@@ -215,7 +227,8 @@ public class OmegaSearch implements Runnable {
   public void configureRemainingTime(long remainingTime, int maxDepth) {
     _timedControlMode = TimeControlMode.REMAINING_TIME;
     _remainingTime = Duration.ofSeconds(remainingTime);
-    updateSearchDepth(); _isConfigured = true;
+    updateSearchDepth();
+    _isConfigured = true;
   }
 
   /**
@@ -403,7 +416,8 @@ public class OmegaSearch implements Runnable {
     }
 
     // create _rootMoves list
-    _rootMoves.clear(); for (int i = 0; i < rootMoves.size(); i++) {
+    _rootMoves.clear();
+    for (int i = 0; i < rootMoves.size(); i++) {
       _rootMoves.add(rootMoves.get(i), OmegaEvaluation.Value.NOVALUE);
     }
 
@@ -443,13 +457,16 @@ public class OmegaSearch implements Runnable {
     // ### ENDOF Iterative Deepening
 
     if (_timer != null) {
-      _timer.stop(); _timer = null;
+      _timer.stop();
+      _timer = null;
     }
 
     // we should have a sorted _rootMoves list here
     // create searchRestult here
-    searchResult.bestMove = _currentBestRootMove; searchResult.resultValue = _currentBestRootValue;
-    searchResult.depth = _currentIterationDepth; int p_move;
+    searchResult.bestMove = _currentBestRootMove;
+    searchResult.resultValue = _currentBestRootValue;
+    searchResult.depth = _currentIterationDepth;
+    int p_move;
     if (_principalVariation[0].size() > 1 &&
         (p_move = _principalVariation[0].get(1)) != OmegaMove.NOMOVE) {
       //System.out.println("Best Move: "+OmegaMove.toString(searchResult.bestMove)+" Ponder Move: "+OmegaMove.toString(p_move)+" ("+_principalVariation[0].toNotationString()+")");
@@ -607,7 +624,8 @@ public class OmegaSearch implements Runnable {
     if (depthLeft <= 0) {
       if (OmegaConfiguration.PERFT) {
         return evaluate(position);
-      } return quiescence(position, ply, alpha, beta);
+      }
+      return quiescence(position, ply, alpha, beta);
     }
 
     // ## BEGIN Mate Distance Pruning
@@ -615,14 +633,19 @@ public class OmegaSearch implements Runnable {
       int mate_value = -OmegaEvaluation.Value.CHECKMATE + ply;
       // lower bound
       if (mate_value > alpha) {
-        alpha = mate_value; if (mate_value >= beta) {
-          _prunings++; return mate_value;
+        alpha = mate_value;
+        if (mate_value >= beta) {
+          _prunings++;
+          return mate_value;
         }
       }
       // upper bound
-      mate_value = OmegaEvaluation.Value.CHECKMATE - ply; if (mate_value < beta) {
-        beta = mate_value; if (mate_value <= alpha) {
-          _prunings++; return mate_value;
+      mate_value = OmegaEvaluation.Value.CHECKMATE - ply;
+      if (mate_value < beta) {
+        beta = mate_value;
+        if (mate_value <= alpha) {
+          _prunings++;
+          return mate_value;
         }
       }
     }
@@ -642,13 +665,21 @@ public class OmegaSearch implements Runnable {
         if (entry.depth >= depthLeft) { // only if tt depth was equal or deeper
           switch (entry.type) {
             case EXACT:
-              _nodeCache_Hits++; return entry.value; case ALPHA:
+              _nodeCache_Hits++;
+              return entry.value;
+            case ALPHA:
               if (entry.value <= alpha) {
-                _nodeCache_Hits++; return alpha;
-              } break; case BETA:
+                _nodeCache_Hits++;
+                return alpha;
+              }
+              break;
+            case BETA:
               if (entry.value >= beta) {
-                _nodeCache_Hits++; return beta;
-              } break; default:
+                _nodeCache_Hits++;
+                return beta;
+              }
+              break;
+            default:
               break;
           }
         }
@@ -688,14 +719,17 @@ public class OmegaSearch implements Runnable {
             value =
               negamax(position, depthLeft - NULLMOVE_REDUCTION_VERIFICATION, ply + 1, alpha, beta,
                       true, false);
-          } if (value >= beta) {
-            _prunings++; return value;
+          }
+          if (value >= beta) {
+            _prunings++;
+            return value;
           }
         }
 
         // pruning
         if (value >= beta) {
-          _prunings++; return beta;
+          _prunings++;
+          return beta;
         }
       }
     }
@@ -711,15 +745,19 @@ public class OmegaSearch implements Runnable {
     boolean hadLegaMove = false;
 
     // generate moves or get them from cache
-    OmegaMoveList moves; if (_omegaEngine._CONFIGURATION._USE_MOVE_CACHE && tt_moves != null) {
-      moves = tt_moves; _MovesFromCache++;
+    OmegaMoveList moves;
+    if (_omegaEngine._CONFIGURATION._USE_MOVE_CACHE && tt_moves != null) {
+      moves = tt_moves;
+      _MovesFromCache++;
     } else {
-      moves = _omegaMoveGenerator[ply].getPseudoLegalMoves(position, false); _MovesGenerated++;
+      moves = _omegaMoveGenerator[ply].getPseudoLegalMoves(position, false);
+      _MovesGenerated++;
     }
 
     // moves to search recursively
     for (int i = 0; i < moves.size(); i++) {
-      int move = moves.get(i); int value = bestValue;
+      int move = moves.get(i);
+      int value = bestValue;
 
       // Minor Promotion Pruning
       if (_omegaEngine._CONFIGURATION._USE_MPP && !OmegaConfiguration.PERFT) {
@@ -765,10 +803,12 @@ public class OmegaSearch implements Runnable {
 
         // PRUNING START
         if (value > bestValue) {
-          bestValue = value; bestMove = move;
+          bestValue = value;
+          bestMove = move;
 
           if (value > alpha) {
-            alpha = value; tt_Type = TT_EntryType.EXACT;
+            alpha = value;
+            tt_Type = TT_EntryType.EXACT;
             OmegaMoveList.savePV(move, _principalVariation[ply + 1], _principalVariation[ply]);
 
             if (value >= beta) {
@@ -778,7 +818,8 @@ public class OmegaSearch implements Runnable {
                 printCurrentVariation(i, ply, moves.size(), value);
                 _currentVariation.removeLast();
                 position.undoMove();
-                _prunings++; break;
+                _prunings++;
+                break;
               }
             }
           }
@@ -814,8 +855,11 @@ public class OmegaSearch implements Runnable {
       // We create a minimal copy of the list to not waste space - list will not change any more
       // Still this creates a lot of new objects in the tree search and will use much memory and
       // causes lots of GC activity.
-      OmegaMoveList m = null; if (_omegaEngine._CONFIGURATION._USE_MOVE_CACHE) {
-        m = new OmegaMoveList(moves.size()); m.add(moves); m.pushToHead(bestMove);
+      OmegaMoveList m = null;
+      if (_omegaEngine._CONFIGURATION._USE_MOVE_CACHE) {
+        m = new OmegaMoveList(moves.size());
+        m.add(moves);
+        m.pushToHead(bestMove);
       }
 
       // now store to tt
@@ -856,14 +900,19 @@ public class OmegaSearch implements Runnable {
         int mate_value = -OmegaEvaluation.Value.CHECKMATE + ply;
         // lower bound
         if (mate_value > alpha) {
-          alpha = mate_value; if (mate_value >= beta) {
-            _prunings++; return mate_value;
+          alpha = mate_value;
+          if (mate_value >= beta) {
+            _prunings++;
+            return mate_value;
           }
         }
         // upper bound
-        mate_value = OmegaEvaluation.Value.CHECKMATE - ply; if (mate_value < beta) {
-          beta = mate_value; if (mate_value <= alpha) {
-            _prunings++; return mate_value;
+        mate_value = OmegaEvaluation.Value.CHECKMATE - ply;
+        if (mate_value < beta) {
+          beta = mate_value;
+          if (mate_value <= alpha) {
+            _prunings++;
+            return mate_value;
           }
         }
       }
@@ -881,13 +930,21 @@ public class OmegaSearch implements Runnable {
         if (entry != null) { // possible TT Hit
           switch (entry.type) {
             case EXACT:
-              _nodeCache_Hits++; return entry.value; case ALPHA:
+              _nodeCache_Hits++;
+              return entry.value;
+            case ALPHA:
               if (entry.value <= alpha) {
-                _nodeCache_Hits++; return alpha;
-              } break; case BETA:
+                _nodeCache_Hits++;
+                return alpha;
+              }
+              break;
+            case BETA:
               if (entry.value >= beta) {
-                _nodeCache_Hits++; return beta;
-              } break; default:
+                _nodeCache_Hits++;
+                return beta;
+              }
+              break;
+            default:
               break;
           }
         } else {
@@ -898,14 +955,18 @@ public class OmegaSearch implements Runnable {
       // *****************************************************
 
       // get a fall back evaluation value - called stand-pat
-      int stand_pat = evaluate(position); if (stand_pat >= beta) {
+      int stand_pat = evaluate(position);
+      if (stand_pat >= beta) {
         tt_Type = TT_EntryType.BETA;
         // TT Store
         if (_cacheEnabled && _omegaEngine._CONFIGURATION._USE_NODE_CACHE) {
           _transpositionTable.put(position, alpha, tt_Type, 0, null);
-        } return beta;
-      } if (alpha < stand_pat) {
-        tt_Type = TT_EntryType.EXACT; alpha = stand_pat;
+        }
+        return beta;
+      }
+      if (alpha < stand_pat) {
+        tt_Type = TT_EntryType.EXACT;
+        alpha = stand_pat;
       }
 
       int value;
@@ -919,14 +980,15 @@ public class OmegaSearch implements Runnable {
 
         // check if good captures
 
-        position.makeMove(move); if (!position.isAttacked(  // is this a legal move?
-                                                            position._nextPlayer,
-                                                            position._kingSquares[position._nextPlayer
-                                                              .getInverseColor()
-                                                              .ordinal()])) {
+        position.makeMove(move);
+        if (!position.isAttacked(  // is this a legal move?
+                                   position._nextPlayer,
+                                   position._kingSquares[position._nextPlayer.getInverseColor()
+                                                                             .ordinal()])) {
 
           // count as non quiet board
-          _nodesVisited++; _boardsNonQuiet++;
+          _nodesVisited++;
+          _boardsNonQuiet++;
 
           // needed to remember if we even had a legal move
           _currentVariation.add(move);
@@ -945,15 +1007,19 @@ public class OmegaSearch implements Runnable {
 
           // PRUNING START
           if (value >= alpha) {
-            alpha = value; if (value >= beta) {
-              _prunings++; i = moves.size(); // like break but executes the rest
+            alpha = value;
+            if (value >= beta) {
+              _prunings++;
+              i = moves.size(); // like break but executes the rest
             }
           }
           // PRUNING END
 
-          printCurrentVariation(i, ply, moves.size(), value); _currentVariation.removeLast();
+          printCurrentVariation(i, ply, moves.size(), value);
+          _currentVariation.removeLast();
 
-        } position.undoMove();
+        }
+        position.undoMove();
       }
 
       // END QUIESCENCE
@@ -997,9 +1063,12 @@ public class OmegaSearch implements Runnable {
 
     // retrieve evaluation value from evaluation cache
     if (_cacheEnabled && _omegaEngine._CONFIGURATION._USE_BOARD_CACHE) {
-      final int value = _evalCache.get(position.getZobristKey()); if (value > Integer.MIN_VALUE) {
-        _evalCache_Hits++; return value;
-      } _evalCache_Misses++;
+      final int value = _evalCache.get(position.getZobristKey());
+      if (value > Integer.MIN_VALUE) {
+        _evalCache_Hits++;
+        return value;
+      }
+      _evalCache_Misses++;
     }
 
     // call the evaluation
@@ -1083,14 +1152,16 @@ public class OmegaSearch implements Runnable {
 
     // no explicit level set
     // TODO: use UCI SearchModes
-    int maxDepth; if (_omegaEngine.getPlayer().getColor().isBlack()) {
+    int maxDepth;
+    if (_omegaEngine.getPlayer().getColor().isBlack()) {
       maxDepth = Playroom.getInstance().getCurrentEngineLevelBlack();
     } else if (_omegaEngine.getPlayer().getColor().isWhite()) {
       maxDepth = Playroom.getInstance().getCurrentEngineLevelWhite();
     } else {
       throw new RuntimeException(
         "Invalid next player color. Was " + _omegaEngine.getPlayer().getColor());
-    } return maxDepth;
+    }
+    return maxDepth;
   }
 
   /**
@@ -1114,18 +1185,21 @@ public class OmegaSearch implements Runnable {
    */
   private void configureTimeControl() {
 
-    long hardLimit = _timePerMove.toMillis(); long softLimit = (long) (hardLimit * 0.8f);
+    long hardLimit = _timePerMove.toMillis();
+    long softLimit = (long) (hardLimit * 0.8f);
 
     // limits for very short available time
     if (hardLimit < 100) {
-      hardLimit = (long) (hardLimit * 0.9f); softLimit = (long) (hardLimit * 0.8f);
+      hardLimit = (long) (hardLimit * 0.9f);
+      softLimit = (long) (hardLimit * 0.8f);
     }
     // limits for higher available time
     else if (hardLimit > 10000) {
       softLimit = hardLimit;
     }
 
-    _timer = new TimeKeeper(softLimit, hardLimit); _timer.start();
+    _timer = new TimeKeeper(softLimit, hardLimit);
+    _timer.start();
   }
 
   /**
@@ -1169,9 +1243,11 @@ public class OmegaSearch implements Runnable {
     // TODO use UCI settings for Hash
     if (_omegaEngine._CONFIGURATION._USE_NODE_CACHE) {
       _transpositionTable = new OmegaTranspositionTable(32);
-    } if (_omegaEngine._CONFIGURATION._USE_BOARD_CACHE) {
+    }
+    if (_omegaEngine._CONFIGURATION._USE_BOARD_CACHE) {
       _evalCache = new OmegaEvaluationCache(32);
-    } System.gc();
+    }
+    System.gc();
   }
 
   /**
@@ -1229,7 +1305,8 @@ public class OmegaSearch implements Runnable {
      * @param hardLimit in ms
      */
     public TimeKeeper(long softLimit, long hardLimit) {
-      this.soft = softLimit; this.hard = hardLimit;
+      this.soft = softLimit;
+      this.hard = hardLimit;
     }
 
     /**

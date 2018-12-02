@@ -31,7 +31,8 @@ package fko.javaUCIEngineFramework.Franky;
  * Features/Ideas:
  * DONE: Material
  * DONE: Mobility
- * TODO: Piece Tables
+ * TODO: Development (http://archive.gamedev.net/archive/reference/articles/article1208.html)
+ * TODO: Piece Tables (http://www.chessbin.com/post/Chess-Board-Evaluation)
  * TODO: Game Phase
  * TODO: Tapered Eval
  * TODO: Lazy Evaluation
@@ -88,7 +89,9 @@ public class Evaluation {
 
     // bonus/malus for bishop pair
     if (board._bishopSquares[board._nextPlayer.ordinal()].size() >= 2) material += 50;
-    if (board._bishopSquares[board._nextPlayer.getInverseColor().ordinal()].size() >= 2) material -= 50;
+    if (board._bishopSquares[board._nextPlayer.getInverseColor().ordinal()].size() >= 2) {
+      material -= 50;
+    }
 
     return material;
   }
@@ -109,31 +112,38 @@ public class Evaluation {
     // knights
     factor = 2;
     mobility += factor * mobilityForPieces(board, activePlayer, PieceType.KNIGHT,
-                                           board._knightSquares[activePlayer.ordinal()], Square.knightDirections);
+                                           board._knightSquares[activePlayer.ordinal()],
+                                           Square.knightDirections);
     mobility -= factor * mobilityForPieces(board, passivePlayer, PieceType.KNIGHT,
-                                           board._knightSquares[passivePlayer.ordinal()], Square.knightDirections);
+                                           board._knightSquares[passivePlayer.ordinal()],
+                                           Square.knightDirections);
 
     // bishops
     factor = 2;
     mobility += factor * mobilityForPieces(board, activePlayer, PieceType.BISHOP,
-                                           board._bishopSquares[activePlayer.ordinal()], Square.bishopDirections);
+                                           board._bishopSquares[activePlayer.ordinal()],
+                                           Square.bishopDirections);
     mobility -= factor * mobilityForPieces(board, passivePlayer, PieceType.BISHOP,
-                                           board._bishopSquares[passivePlayer.ordinal()], Square.bishopDirections);
+                                           board._bishopSquares[passivePlayer.ordinal()],
+                                           Square.bishopDirections);
 
     // rooks
     factor = 2;
-    mobility += factor *
-                mobilityForPieces(board, activePlayer, PieceType.ROOK, board._rookSquares[activePlayer.ordinal()],
-                                  Square.rookDirections);
+    mobility += factor * mobilityForPieces(board, activePlayer, PieceType.ROOK,
+                                           board._rookSquares[activePlayer.ordinal()],
+                                           Square.rookDirections);
     mobility -= factor * mobilityForPieces(board, passivePlayer, PieceType.ROOK,
-                                           board._rookSquares[passivePlayer.ordinal()], Square.rookDirections);
+                                           board._rookSquares[passivePlayer.ordinal()],
+                                           Square.rookDirections);
 
     // queens
     factor = 1;
     mobility += factor * mobilityForPieces(board, activePlayer, PieceType.QUEEN,
-                                           board._queenSquares[activePlayer.ordinal()], Square.queenDirections);
+                                           board._queenSquares[activePlayer.ordinal()],
+                                           Square.queenDirections);
     mobility -= factor * mobilityForPieces(board, passivePlayer, PieceType.QUEEN,
-                                           board._queenSquares[passivePlayer.ordinal()], Square.queenDirections);
+                                           board._queenSquares[passivePlayer.ordinal()],
+                                           Square.queenDirections);
 
     return mobility;
   }
