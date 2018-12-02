@@ -36,7 +36,7 @@ public class Configuration {
   public boolean PERFT = false;
 
   /** Do quiescence evaluation and search extension for non quiet positions */
-  public boolean USE_QUIESCENCE = false;
+  public boolean USE_QUIESCENCE = true;
 
   /** Hash Size */
   public int HASH_SIZE = 512;
