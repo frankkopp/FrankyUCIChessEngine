@@ -74,6 +74,8 @@ public class Configuration {
   boolean USE_MINOR_PROMOTION_PRUNING = true;
 
 
+
+
   // TODO vvvvvvvv
   /**
    * null evaluation
@@ -85,16 +87,11 @@ public class Configuration {
    */
   boolean _USE_BOOK = false;
 
-
-
-
-
   /**
    * Null Move Pruning
    */
   boolean _USE_NMP        = false;
   boolean _USE_VERIFY_NMP = false;
-
 
   // Verbose
   /**

@@ -496,6 +496,7 @@ public class Search implements Runnable {
     searchCounter.nodesVisited++;
     if (searchMode.getNodes() > 0 && searchCounter.nodesVisited >= searchMode.getNodes()) {
       stopSearch = true;
+      return alpha;
     }
 
     // check draw through 50-moves-rule, 3-fold-repetition, insufficient material
@@ -983,7 +984,7 @@ public class Search implements Runnable {
 
     @Override
     public String toString() {
-      return "SearchCounter{" + "nodesVisited=" + nodesVisited+ ", lastSearchTime=" +
+      return "SearchCounter{" + "nodesVisited=" + nodesVisited + ", lastSearchTime=" +
              DurationFormatUtils.formatDurationHMS(lastSearchTime) + ", currentBestRootMove=" +
              currentBestRootMove + ", currentBestRootValue=" + currentBestRootValue +
              ", currentIterationDepth=" + currentIterationDepth + ", currentSearchDepth=" +

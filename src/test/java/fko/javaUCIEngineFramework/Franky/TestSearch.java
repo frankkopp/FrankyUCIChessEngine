@@ -392,7 +392,7 @@ public class TestSearch {
   @Test
   public void sizeOfSearchTreeTest() {
 
-    final int depth = 5;
+    final int depth = 4;
 
     LOG.info("Start SIZE Test for depth {}", depth);
 
