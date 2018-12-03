@@ -355,7 +355,11 @@ public class TestSearch {
     BoardPosition boardPosition = new BoardPosition(fen);
     //boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 5, 0, 0, 0, null, false, false, true);
+    SearchMode searchMode = new SearchMode(0, 0, 0,
+                                           0, 0, 5,
+                                           0, 0, 0,
+                                           null, false,
+                                           false, true);
 
     search.startSearch(boardPosition, searchMode);
 
@@ -394,24 +398,31 @@ public class TestSearch {
     LOG.info("Start SIZE Test for depth {}", depth);
 
     String fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
-    fen = BoardPosition.START_FEN;
+//    fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0,
+                                           0, 0, depth,
+                                           0, 0, 0,
+                                           null, false,
+                                           true, false);
+
     List<String> values = new ArrayList<>();
 
     // turn off all optimizations to get a reference value of the search tree size
     search.config.USE_ROOT_MOVES_SORT = false;
     search.config.USE_ALPHABETA_PRUNING = false;
     search.config.USE_PVS = false;
-    search.config.TRANSPOSITION_TABLE = false;
+    search.config.USE_TRANSPOSITION_TABLE = false;
     search.config.USE_EVALUATION_CACHE = false;
     search.config.MATE_DISTANCE_PRUNING = false;
     search.config.USE_MINOR_PROMOTION_PRUNING = false;
+    search.config.USE_QUIESCENCE = false;
     search.startSearch(boardPosition, searchMode);
     waitWhileSearching();
     values.add(String.format("SIZE REFERENCE  : %,14d >> %s",
                              search.getSearchCounter().leafPositionsEvaluated,
                              search.getSearchCounter().toString()));
+
 
     // turn on optimizations to get a compare value of the search tree size
     search.config.USE_ALPHABETA_PRUNING = true;
@@ -441,7 +452,6 @@ public class TestSearch {
                              search.getSearchCounter().leafPositionsEvaluated,
                              search.getSearchCounter().toString()));
 
-
     // turn on optimizations to get a compare value of the search tree size
     search.config.USE_EVALUATION_CACHE = true;
     search.clearHashtables();
@@ -452,7 +462,7 @@ public class TestSearch {
                              search.getSearchCounter().toString()));
 
     // turn on optimizations to get a compare value of the search tree size
-    search.config.TRANSPOSITION_TABLE = true;
+    search.config.USE_TRANSPOSITION_TABLE = true;
     search.clearHashtables();
     search.startSearch(boardPosition, searchMode);
     waitWhileSearching();
@@ -476,6 +486,27 @@ public class TestSearch {
     values.add(String.format("SIZE MPP        : %,14d >> %s",
                              search.getSearchCounter().leafPositionsEvaluated,
                              search.getSearchCounter().toString()));
+
+    search.config.USE_TRANSPOSITION_TABLE = false;
+    search.config.USE_EVALUATION_CACHE = false;
+    search.config.USE_QUIESCENCE = true;
+    search.clearHashtables();
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    values.add(String.format("SIZE QS-TT-EC   : %,14d >> %s",
+                             search.getSearchCounter().leafPositionsEvaluated,
+                             search.getSearchCounter().toString()));
+
+    search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_EVALUATION_CACHE = true;
+    search.config.USE_QUIESCENCE = true;
+    search.clearHashtables();
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    values.add(String.format("SIZE QS+TT+EC   : %,14d >> %s",
+                             search.getSearchCounter().leafPositionsEvaluated,
+                             search.getSearchCounter().toString()));
+
 
     // REPEAT
     // search.clearHashtables();

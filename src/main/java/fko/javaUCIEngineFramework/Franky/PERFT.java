@@ -79,7 +79,7 @@ public class PERFT {
 
         long startTime = System.currentTimeMillis();
         result = mg[0]
-                .streamLegalMoves(board, false)
+                .streamLegalMoves(board)
                 .mapToLong((move) -> dividePerft(depth, mg, board, move))
                 .sum();
         long endTime = System.currentTimeMillis();
@@ -120,7 +120,7 @@ public class PERFT {
         // some convenience fields
         Color _activePlayer = board._nextPlayer;
         Color _passivePlayer = board._nextPlayer.getInverseColor();
-        MoveList moves = mg[ply].getPseudoLegalMoves(board, false);
+        MoveList moves = mg[ply].getPseudoLegalMoves(board);
         for(int i = 0; i < moves.size(); i++) {
             int move = moves.get(i);
             board.makeMove(move);

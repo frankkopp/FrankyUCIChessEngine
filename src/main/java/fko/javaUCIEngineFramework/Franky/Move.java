@@ -220,7 +220,7 @@ public class Move {
     // to find the move type it is easiest to generate all legal moves and then look
     // for a move with the same from and to
     MoveGenerator omg = new MoveGenerator();
-    MoveList moves = omg.getLegalMoves(position, false);
+    MoveList moves = omg.getLegalMoves(position);
 
     for (int m : moves) {
       Square f = Move.getStart(m);

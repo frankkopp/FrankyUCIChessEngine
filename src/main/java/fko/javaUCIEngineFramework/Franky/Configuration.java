@@ -61,7 +61,7 @@ public class Configuration {
   boolean USE_PVS = true;
 
   /** Use Transposition Tables for visited nodes (needs extra memory) */
-  boolean TRANSPOSITION_TABLE = true;
+  boolean USE_TRANSPOSITION_TABLE = true;
 
   /** Use Cache for Board evaluations - very expensive, only worth
    * with expensive evaluation - (needs extra memory) */

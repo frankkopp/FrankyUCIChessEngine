@@ -229,17 +229,17 @@ public class TestBoardPosition {
     BoardPosition omegaBoard = new BoardPosition(fen);
     MoveGenerator omg = new MoveGenerator();
 
-    MoveList moves = omg.getLegalMoves(omegaBoard, false);
+    MoveList moves = omg.getLegalMoves(omegaBoard);
     assertEquals(81, moves.size());
 
     omegaBoard.makeNullMove();
 
-    moves = omg.getLegalMoves(omegaBoard, false);
+    moves = omg.getLegalMoves(omegaBoard);
     assertEquals(26, moves.size());
 
     omegaBoard.undoNullMove();
 
-    moves = omg.getLegalMoves(omegaBoard, false);
+    moves = omg.getLegalMoves(omegaBoard);
     assertEquals(81, moves.size());
   }
 
