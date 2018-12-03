@@ -44,7 +44,7 @@ import java.io.IOException;
  * TODO: Implement test set testing
  * TODO: Implement reading test sets from file - Extended Position Description (EPD)
  * https://www.chessprogramming.org/Extended_Position_Description
- * 
+ *
  */
 public class TestSuiteTest {
 

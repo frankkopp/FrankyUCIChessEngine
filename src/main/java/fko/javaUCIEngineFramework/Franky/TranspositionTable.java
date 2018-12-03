@@ -207,7 +207,6 @@ public class TranspositionTable {
                             + 8; // enum
 
     long         key       = 0L;
-    //String fen = "";
     int          value     = Integer.MIN_VALUE;
     int          depth     = 0;
     TT_EntryType type      = TT_EntryType.ALPHA;

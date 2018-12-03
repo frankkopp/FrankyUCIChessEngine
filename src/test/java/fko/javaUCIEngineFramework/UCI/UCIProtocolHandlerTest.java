@@ -102,7 +102,6 @@ class UCIProtocolHandlerTest {
   @Test
   void setoptionCommand() throws InterruptedException {
 
-    assertEquals(16, engine.getHashSizeOption());
     toHandlerPrinter.println("setoption name Hash value 4096");
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
     assertEquals(4096, engine.getHashSizeOption());
@@ -122,7 +121,6 @@ class UCIProtocolHandlerTest {
 
     toHandlerPrinter.println("quit");
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
-
   }
 
   @Test
@@ -134,7 +132,6 @@ class UCIProtocolHandlerTest {
     assertTrue(engine.getDebugMode());
     toHandlerPrinter.println("quit");
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
-
   }
 
   @Test
@@ -176,7 +173,6 @@ class UCIProtocolHandlerTest {
 
     toHandlerPrinter.println("quit");
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
-
   }
 
   @Test
@@ -395,7 +391,6 @@ class UCIProtocolHandlerTest {
 
     toHandlerPrinter.println("quit");
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
-
   }
 
   @Test
@@ -435,7 +430,6 @@ class UCIProtocolHandlerTest {
 
     toHandlerPrinter.println("quit");
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
-
   }
 
   @Test
@@ -460,7 +454,6 @@ class UCIProtocolHandlerTest {
 
     toHandlerPrinter.println("quit");
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
-
   }
 
   @Test
@@ -499,5 +492,4 @@ class UCIProtocolHandlerTest {
       fromHandlerReader.readLine();
     }
   }
-
 }
