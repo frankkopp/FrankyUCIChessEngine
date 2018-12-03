@@ -41,12 +41,11 @@ import java.util.concurrent.CountDownLatch;
  * Search runs in a separate thread when the actual search is started. When
  * the search is finished it calls <code>engine.sendResult</code> ith the best move and a ponder
  * move if it has one.
- *
+ * <p>
  * TODO: - QUIESCENE (https://www.chessprogramming.org/Quiescence_Search)
  * TODO: - SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: - Mate Distance Pruning (https://www.chessprogramming.org/Mate_Distance_Pruning)
  * TODO: - MTDf (http://people.csail.mit.edu/plaat/mtdf.html)
- *
  */
 public class Search implements Runnable {
 
@@ -252,8 +251,7 @@ public class Search implements Runnable {
       LOG.info("Ponder Miss!");
     }
 
-    LOG.info("Search result was: {} Value {} PV {}", lastSearchResult.toString(),
-             lastSearchResult.resultValue, principalVariation[0].toNotationString());
+    LOG.info("Search result was: {} PV {}", lastSearchResult.toString(), principalVariation[0].toNotationString());
 
     // send result to engine
     engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
@@ -361,7 +359,8 @@ public class Search implements Runnable {
     // create searchResult here
     searchResult.bestMove = searchCounter.currentBestRootMove;
     searchResult.resultValue = searchCounter.currentBestRootValue;
-    searchResult.depth = searchCounter.currentIterationDepth;
+    searchResult.depth = searchCounter.currentSearchDepth;
+    searchResult.extraDepth = searchCounter.currentExtraSearchDepth;
 
     // retrieved ponder move from pv
     int p_move;
@@ -377,12 +376,12 @@ public class Search implements Runnable {
 
     if (LOG.isInfoEnabled()) {
       LOG.info("{}", String.format(
-        "Search complete. " + "Nodes visited: %,d " + "Boards Evaluated: %,d " + "Captures: %,d " +
+        "Search complete. " + "Nodes visited: %,d " + "Boards Evaluated: %,d (+%,d) " + "Captures: %,d " +
         "EP: %,d " + "Checks: %,d " + "Mates: %,d ", searchCounter.nodesVisited,
-        searchCounter.leafPositionsEvaluated, searchCounter.captureCounter,
+        searchCounter.leafPositionsEvaluated, searchCounter.nonLeafPositionsEvaluated, searchCounter.captureCounter,
         searchCounter.enPassantCounter, searchCounter.checkCounter,
         searchCounter.checkMateCounter));
-      LOG.info("Search Depth was {} ({})", searchCounter.currentIterationDepth,
+      LOG.info("Search Depth was {} ({})", searchCounter.currentSearchDepth,
                searchCounter.currentExtraSearchDepth);
       LOG.info("Search took {}", DurationFormatUtils.formatDurationHMS(elapsedTime(stopTime)));
       LOG.info("Speed: {}", String.format("%,d", (int) (searchCounter.leafPositionsEvaluated /
@@ -400,7 +399,11 @@ public class Search implements Runnable {
    */
   private void rootMovesSearch(BoardPosition position, int depth) {
 
-    final int rootPly = 0;
+    final int rootPly = 1;
+
+    // current search depth
+    searchCounter.currentSearchDepth = 1;
+    searchCounter.currentExtraSearchDepth = 1;
 
     int bestValue = Evaluation.Value.NOVALUE;
 
@@ -499,9 +502,8 @@ public class Search implements Runnable {
 
     // check draw through 50-moves-rule, 3-fold-repetition, insufficient material
     if (!isPerftSearch()) {
-      if (position.check50Moves()
-          || position.check3Repetitions()
-          || position.checkInsufficientMaterial()) {
+      if (position.check50Moves() || position.check3Repetitions() ||
+          position.checkInsufficientMaterial()) {
         return Evaluation.Value.DRAW;
       }
     }
@@ -658,12 +660,13 @@ public class Search implements Runnable {
           bestValue = value;
 
           if (value > alpha) {
-            alpha = value;
-            ttType = TT_EntryType.EXACT;
             MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
 
             // AlphaBeta Pruning
-            if (value >= beta) {
+            if (value < beta) {
+              alpha = value;
+              ttType = TT_EntryType.EXACT;
+            } else { // Fail High
               if (config.USE_ALPHABETA_PRUNING && !isPerftSearch()) {
                 bestValue = beta; // same as return beta
                 ttType = TT_EntryType.BETA;
@@ -689,7 +692,6 @@ public class Search implements Runnable {
     // if we did not have a legal move then we have a mate
     if (!hadLegaMove && !stopSearch) {
       // as we will not enter evaluation we count it here
-      searchCounter.leafPositionsEvaluated++;
       searchCounter.nonLeafPositionsEvaluated++;
       if (position.hasCheck()) {
         // We have a check mate. Return a -CHECKMATE.
@@ -714,9 +716,16 @@ public class Search implements Runnable {
 
   private int quiescence(BoardPosition position, int ply, int alpha, int beta) {
 
+    // evaluate the position and use it a standing pat (lower bound)
+    final int bestValue = evaluate(position);
+
     if (isPerftSearch() || !config.USE_QUIESCENCE) {
-      return evaluate(position);
+      return bestValue;
     }
+
+    // Standing Pat
+    if (bestValue >= beta) return beta;
+    if (alpha < bestValue) alpha = bestValue;
 
     // do we even have legal moves?
     if (moveGenerators[ply].hasLegalMove(position)) {
@@ -734,10 +743,10 @@ public class Search implements Runnable {
     else {
       // as we will not enter evaluation we count it here
       searchCounter.leafPositionsEvaluated++;
-
       if (position.hasCheck()) {
         // We have a check mate. Return a -CHECKMATE.
         alpha = -Evaluation.Value.CHECKMATE + ply;
+        searchCounter.checkMateCounter++;
       } else {
         // We have a stale mate. Return the draw value.
         alpha = Evaluation.Value.DRAW;
@@ -907,17 +916,19 @@ public class Search implements Runnable {
    * Parameter class for the search result
    */
   static final class SearchResult {
-    int  bestMove    = Move.NOMOVE;
+
+    int bestMove = Move.NOMOVE;
     int  ponderMove  = Move.NOMOVE;
-    int  bound       = 0;
     int  resultValue = 0;
     long time        = -1;
-    int  moveNumber  = 0;
     int  depth       = 0;
+    int extraDepth = 0;
 
     @Override
     public String toString() {
-      return "Best Move: " + Move.toString(bestMove) + " Ponder Move: " + Move.toString(ponderMove);
+      return "Best Move: " + Move.toString(bestMove) + " ("+ resultValue+") "
+             + " Ponder Move: " + Move.toString(ponderMove)
+             + " Depth: " +depth + "/" + extraDepth;
     }
   }
 

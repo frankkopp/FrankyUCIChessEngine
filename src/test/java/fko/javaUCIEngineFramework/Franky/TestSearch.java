@@ -240,8 +240,7 @@ public class TestSearch {
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    assertEquals(search.getLastSearchResult().resultValue,
-                 Evaluation.Value.CHECKMATE - (2 * 2 - 1));
+    assertEquals(Evaluation.Value.CHECKMATE - (2 * 2), search.getLastSearchResult().resultValue);
 
     // mate in 4 (8 plys)
     fen = "r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - - 0 1";
@@ -257,8 +256,7 @@ public class TestSearch {
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    assertEquals(search.getLastSearchResult().resultValue,
-                 Evaluation.Value.CHECKMATE - (2 * 4 - 1));
+    assertEquals(Evaluation.Value.CHECKMATE - (2 * 4), search.getLastSearchResult().resultValue);
   }
 
   @Test
@@ -364,8 +362,7 @@ public class TestSearch {
     // test search
     waitWhileSearching();
 
-    assertEquals(4865609, search.getSearchCounter().leafPositionsEvaluated -
-                          search.getSearchCounter().nonLeafPositionsEvaluated);
+    assertEquals(4865609, search.getSearchCounter().leafPositionsEvaluated);
     assertEquals(82719, search.getSearchCounter().captureCounter);
     assertEquals(258, search.getSearchCounter().enPassantCounter);
     assertEquals(27351, search.getSearchCounter().checkCounter);
@@ -397,14 +394,14 @@ public class TestSearch {
     LOG.info("Start SIZE Test for depth {}", depth);
 
     String fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
-    //fen = BoardPosition.START_FEN;
+    fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
     List<String> values = new ArrayList<>();
 
     // turn off all optimizations to get a reference value of the search tree size
-    search.config.USE_ALPHABETA_PRUNING = false;
     search.config.USE_ROOT_MOVES_SORT = false;
+    search.config.USE_ALPHABETA_PRUNING = false;
     search.config.USE_PVS = false;
     search.config.TRANSPOSITION_TABLE = false;
     search.config.USE_EVALUATION_CACHE = false;
