@@ -456,7 +456,7 @@ public class Search implements Runnable {
         bestValue = value;
         searchCounter.currentBestRootValue = value;
         searchCounter.currentBestRootMove = move;
-        MoveList.savePV(move, principalVariation[rootPly + 1], principalVariation[rootPly]);
+        MoveList.savePV(move, principalVariation[rootPly], principalVariation[rootPly-1]);
       }
 
       position.undoMove();
@@ -577,7 +577,7 @@ public class Search implements Runnable {
     if (searchCounter.currentExtraSearchDepth < ply) searchCounter.currentExtraSearchDepth = ply;
 
     // clear principal Variation for this depth
-    principalVariation[ply].clear();
+    principalVariation[ply-1].clear();
 
     // needed to remember if we even had a legal move
     boolean hadLegaMove = false;
@@ -661,7 +661,7 @@ public class Search implements Runnable {
           bestValue = value;
 
           if (value > alpha) {
-            MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
+            MoveList.savePV(move, principalVariation[ply], principalVariation[ply-1]);
 
             // AlphaBeta Pruning
             if (value < beta) {

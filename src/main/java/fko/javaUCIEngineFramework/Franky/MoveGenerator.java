@@ -35,9 +35,6 @@ import java.util.stream.IntStream;
  * <p>
  * Moves are generated captures first with Most Valuable Victim - Least Valuable Aggressor order
  *
- * <b>This class is not thread safe as it uses static variables to avoid generating them during each
- * object creation.</b><br>
- *
  * @author Frank Kopp
  */
 @SuppressWarnings("unused")
@@ -67,7 +64,7 @@ public class MoveGenerator {
   private final MoveList capturingMoves    = new MoveList(); // only capturing moves
   private final MoveList nonCapturingMoves = new MoveList(); // only non capturing moves
   private final MoveList castlingMoves     = new MoveList(); // only non castling moves
-  private final MoveList _evasionMoves     = new MoveList(); // only evasion moves
+  private final MoveList evasionMoves      = new MoveList(); // only evasion moves
 
   // These fields control the on demand generation of moves.
   private OnDemandState _generationCycleState = OnDemandState.NEW;
@@ -338,9 +335,10 @@ public class MoveGenerator {
     this.position = position;
     activePlayer = this.position._nextPlayer;
 
-    // TODO improve qsearch extensions by selectiong only relevant moves
+    // TODO improve qsearch extensions by selecting only relevant moves
     if (position.hasCheck()) {
-      // when in check generate all moves
+      // when in check generate all moves- they will be later filtered for these
+      // moves which evade the check anyway.
       captureMovesOnly = false;
     } else {
       // when no check only generate captures
@@ -357,8 +355,17 @@ public class MoveGenerator {
     // call the move generators
     generatePseudoLegaMoves();
 
+    // Filter good qsearch captures
+    MoveList qSearchMoves = new MoveList();
+    for (int move : pseudoLegalMoves) {
+      // when value of capturing piece is lower or equal it is a good capture
+      if (Move.getPiece(move).getType().getValue() <= Move.getTarget(move).getType().getValue()) {
+        qSearchMoves.add(move);
+      }
+    }
+
     // return a clone of the list as we will continue to reuse
-    return pseudoLegalMoves;
+    return qSearchMoves;
   }
 
   /**
@@ -950,7 +957,7 @@ public class MoveGenerator {
     _onDemandMoveList.clear();
     _legalMoves.clear();
     pseudoLegalMoves.clear();
-    _evasionMoves.clear();
+    evasionMoves.clear();
     capturingMoves.clear();
     nonCapturingMoves.clear();
     castlingMoves.clear();

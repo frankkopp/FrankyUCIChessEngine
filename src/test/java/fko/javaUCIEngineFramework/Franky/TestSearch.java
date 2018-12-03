@@ -532,8 +532,33 @@ public class TestSearch {
   }
 
   @Test
+  public void evaluationTest() {
+    final int depth = 28;
+
+    LOG.info("Start SIZE Test for depth {}", depth);
+
+    String fen = "k7/8/8/8/8/8/7P/K7 w - - 0 9";
+    //    fen = BoardPosition.START_FEN;
+    BoardPosition boardPosition = new BoardPosition(fen);
+    SearchMode searchMode = new SearchMode(0, 0, 0,
+                                           0, 0, depth,
+                                           0, 0, 0,
+                                           null, false,
+                                           true, false);
+
+    search.startSearch(boardPosition, searchMode);
+
+    waitWhileSearching();
+
+    LOG.info("Best Move: {} Value: {} Ponder {}",
+             Move.toSimpleString(search.getLastSearchResult().bestMove),
+             search.getLastSearchResult().resultValue/100f,
+             Move.toSimpleString(search.getLastSearchResult().ponderMove));
+  }
+
+  @Test
   @Disabled
-  public void testInifinteSearch() {
+  public void testInfiniteSearch() {
     BoardPosition boardPosition = new BoardPosition();
 
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 0, null, false, true, false);

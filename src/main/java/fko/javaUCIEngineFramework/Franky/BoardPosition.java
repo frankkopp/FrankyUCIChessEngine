@@ -836,14 +836,14 @@ public class BoardPosition {
    * the square.
    *
    * @param attackerColor
-   * @param kingPosition
+   * @param square
    * @return true if under attack
    */
-  public boolean isAttacked(Color attackerColor, Square kingPosition) {
-    assert (kingPosition != Square.NOSQUARE);
+  public boolean isAttacked(Color attackerColor, Square square) {
+    assert (square != Square.NOSQUARE);
     assert (!attackerColor.isNone());
 
-    final int os_Index = kingPosition.ordinal();
+    final int os_Index = square.ordinal();
     final boolean isWhite = attackerColor.isWhite();
 
     /*
@@ -931,7 +931,7 @@ public class BoardPosition {
           && _x88Board[_enPassantSquare.getSouth().ordinal()]
              == Piece.BLACK_PAWN // black is target
           && this._enPassantSquare.getSouth()
-              == kingPosition) { // this is indeed the en passant attacked square
+              == square) { // this is indeed the en passant attacked square
         // left
         int i = os_Index + Square.W;
         if ((i & 0x88) == 0 && _x88Board[i] == Piece.WHITE_PAWN) return true;
@@ -942,7 +942,7 @@ public class BoardPosition {
                  && _x88Board[_enPassantSquare.getNorth().ordinal()]
                     == Piece.WHITE_PAWN // white is target
                  && this._enPassantSquare.getNorth()
-              == kingPosition) { // this is indeed the en passant attacked square
+              == square) { // this is indeed the en passant attacked square
         // attack from left
         int i = os_Index + Square.W;
         if ((i & 0x88) == 0 && _x88Board[i] == Piece.BLACK_PAWN) return true;
