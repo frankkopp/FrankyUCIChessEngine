@@ -340,7 +340,7 @@ public class Search implements Runnable {
       engine.sendInfoToUCI("depth " + searchCounter.currentSearchDepth
                            + " seldepth " + searchCounter.currentExtraSearchDepth
                            + " multipv 1"
-                           + " score cp " + (searchCounter.currentBestRootValue / 100f)
+                           + " score cp " + searchCounter.currentBestRootValue
                            + " nodes " + searchCounter.nodesVisited
                            + " nps " + 1000 * (searchCounter.nodesVisited / (elapsedTime()+2L))
                            + " time " + elapsedTime()
