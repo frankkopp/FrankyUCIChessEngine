@@ -522,24 +522,24 @@ public class TestSearch {
     }
   }
 
-  private void waitWhileSearching() {
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) {
-      }
-    }
-  }
-
   @Test
   public void evaluationTest() {
-    final int depth = 28;
+    final int depth = 4;
 
     LOG.info("Start SIZE Test for depth {}", depth);
 
-    String fen = "k7/8/8/8/8/8/7P/K7 w - - 0 9";
+    String fen = "7k/8/8/8/8/8/P7/K7 b - - 0 1";
     //    fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
+
+    search.config.USE_ROOT_MOVES_SORT = false;
+    search.config.USE_ALPHABETA_PRUNING = false;
+    search.config.USE_PVS = false;
+    search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_EVALUATION_CACHE = false;
+    search.config.MATE_DISTANCE_PRUNING = false;
+    search.config.USE_MINOR_PROMOTION_PRUNING = false;
+    search.config.USE_QUIESCENCE = false;
     SearchMode searchMode = new SearchMode(0, 0, 0,
                                            0, 0, depth,
                                            0, 0, 0,
@@ -554,6 +554,12 @@ public class TestSearch {
              Move.toSimpleString(search.getLastSearchResult().bestMove),
              search.getLastSearchResult().resultValue/100f,
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
+
+    if (search.config.USE_TRANSPOSITION_TABLE) {
+      if (search.getTranspositionTable().getNumberOfEntries() > 0) {
+        LOG.info("TT Objects: {}", search.getTranspositionTable().getNumberOfEntries());
+      }
+    }
   }
 
   @Test
@@ -568,6 +574,15 @@ public class TestSearch {
     // test search
     waitWhileSearching();
 
+  }
+
+  private void waitWhileSearching() {
+    while (search.isSearching()) {
+      try {
+        Thread.sleep(200);
+      } catch (InterruptedException ignored) {
+      }
+    }
   }
 
 

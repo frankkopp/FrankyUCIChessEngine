@@ -103,6 +103,26 @@ public class TestEvaluation {
         assertEquals(0, value);
     }
 
+
+
+    @Test
+    public final void testNeutralPosition() {
+        boardPosition = new BoardPosition("7k/7p/8/8/8/8/P7/K7 w - - 0 1");
+        int mat = evaluation.material(boardPosition);
+        int mob = evaluation.mobility(boardPosition);
+        System.out.println("Material: "+mat);
+        System.out.println("Mobility: "+mob);
+
+        boardPosition = new BoardPosition("7k/7p/8/8/8/8/P7/K7 b - - 0 1");
+        mat = evaluation.material(boardPosition);
+        mob = evaluation.mobility(boardPosition);
+        System.out.println("Material: "+mat);
+        System.out.println("Mobility: "+mob);
+
+//        assertEquals(0, value);
+    }
+
+
     @Test
     public final void testMobility_otherPositions() {
         String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";

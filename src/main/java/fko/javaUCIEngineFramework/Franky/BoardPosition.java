@@ -73,7 +73,7 @@ public class BoardPosition {
    * The zobrist key to use as a hash key in transposition tables
    * The zobrist key will be updated incrementally every time one of the the state variables change.
    */
-  long _zobristKey = 0;
+  long   zobristKey          = 0;
   long[] _zobristKey_History = new long[MAX_HISTORY];
 
   // history counter
@@ -214,7 +214,7 @@ public class BoardPosition {
     // game state
     this._nextHalfMoveNumber = op._nextHalfMoveNumber;
     this._nextPlayer = op._nextPlayer;
-    this._zobristKey = op._zobristKey;
+    this.zobristKey = op.zobristKey;
 
     this._castlingWK = op._castlingWK;
     this._castlingWQ = op._castlingWQ;
@@ -317,7 +317,7 @@ public class BoardPosition {
     _castlingBQ_history[_historyCounter] = _castlingBQ;
     _enPassantSquare_History[_historyCounter] = _enPassantSquare;
     _halfMoveClock_History[_historyCounter] = _halfMoveClock;
-    _zobristKey_History[_historyCounter] = _zobristKey;
+    _zobristKey_History[_historyCounter] = zobristKey;
     _hasCheckFlag_History[_historyCounter] = _hasCheck;
     _hasMateFlag_History[_historyCounter] = _hasMate;
     _historyCounter++;
@@ -333,7 +333,7 @@ public class BoardPosition {
         makeNormalMove(fromSquare, toSquare, piece, target);
         // clear en passant
         if (_enPassantSquare != Square.NOSQUARE) {
-          _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
+          zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
           _enPassantSquare = Square.NOSQUARE;
         }
         break;
@@ -343,11 +343,11 @@ public class BoardPosition {
         movePiece(fromSquare, toSquare, piece);
         // clear old en passant
         if (_enPassantSquare != Square.NOSQUARE) {
-          _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // in
+          zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // in
         }
         // set new en passant target field - always one "behind" the toSquare
         _enPassantSquare = piece.getColor().isWhite() ? toSquare.getSouth() : toSquare.getNorth();
-        _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // in
+        zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // in
         _halfMoveClock = 0; // reset half move clock because of pawn move
         break;
       case ENPASSANT:
@@ -360,7 +360,7 @@ public class BoardPosition {
         movePiece(fromSquare, toSquare, piece);
         // clear en passant
         if (_enPassantSquare != Square.NOSQUARE) {
-          _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
+          zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
           _enPassantSquare = Square.NOSQUARE;
         }
         _halfMoveClock = 0; // reset half move clock because of pawn move
@@ -369,7 +369,7 @@ public class BoardPosition {
         makeCastlingMove(fromSquare, toSquare, piece);
         // clear en passant
         if (_enPassantSquare != Square.NOSQUARE) {
-          _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
+          zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
           _enPassantSquare = Square.NOSQUARE;
         }
         _halfMoveClock++;
@@ -381,7 +381,7 @@ public class BoardPosition {
         putPiece(toSquare, promotion);
         // clear en passant
         if (_enPassantSquare != Square.NOSQUARE) {
-          _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
+          zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
           _enPassantSquare = Square.NOSQUARE;
         }
         _halfMoveClock = 0; // reset half move clock because of pawn move
@@ -396,7 +396,7 @@ public class BoardPosition {
 
     // change color (active player)
     _nextPlayer = _nextPlayer.getInverseColor();
-    _zobristKey ^= _nextPlayer_Zobrist;
+    zobristKey ^= _nextPlayer_Zobrist;
   }
 
   /** Takes back the last move from the board */
@@ -467,7 +467,7 @@ public class BoardPosition {
     _nextPlayer = _nextPlayer.getInverseColor();
 
     // zobristKey - just overwrite - should be the same as before the move
-    _zobristKey = _zobristKey_History[_historyCounter];
+    zobristKey = _zobristKey_History[_historyCounter];
 
     // get the check and mate flag from history
     _hasCheck = _hasCheckFlag_History[_historyCounter];
@@ -504,32 +504,32 @@ public class BoardPosition {
     // no else here - combination of these can occur! BIG BUG before :)
     if (fromSquare == Square.e1 || toSquare == Square.e1) {
       // only take out zobrist if the castling was true before.
-      if (_castlingWK) _zobristKey ^= _castlingWK_Zobrist;
+      if (_castlingWK) zobristKey ^= _castlingWK_Zobrist;
       _castlingWK = false;
-      if (_castlingWQ) _zobristKey ^= _castlingWQ_Zobrist;
+      if (_castlingWQ) zobristKey ^= _castlingWQ_Zobrist;
       _castlingWQ = false;
     }
     if (fromSquare == Square.e8 || toSquare == Square.e8) {
       // only take out zobrist if the castling was true before.
-      if (_castlingBK) _zobristKey ^= _castlingBK_Zobrist;
+      if (_castlingBK) zobristKey ^= _castlingBK_Zobrist;
       _castlingBK = false;
-      if (_castlingBQ) _zobristKey ^= _castlingBQ_Zobrist;
+      if (_castlingBQ) zobristKey ^= _castlingBQ_Zobrist;
       _castlingBQ = false;
     }
     if (fromSquare == Square.a1 || toSquare == Square.a1) {
-      if (_castlingWQ) _zobristKey ^= _castlingWQ_Zobrist;
+      if (_castlingWQ) zobristKey ^= _castlingWQ_Zobrist;
       _castlingWQ = false;
     }
     if (fromSquare == Square.h1 || toSquare == Square.h1) {
-      if (_castlingWK) _zobristKey ^= _castlingWK_Zobrist;
+      if (_castlingWK) zobristKey ^= _castlingWK_Zobrist;
       _castlingWK = false;
     }
     if (fromSquare == Square.a8 || toSquare == Square.a8) {
-      if (_castlingBQ) _zobristKey ^= _castlingBQ_Zobrist;
+      if (_castlingBQ) zobristKey ^= _castlingBQ_Zobrist;
       _castlingBQ = false;
     }
     if (fromSquare == Square.h8 || toSquare == Square.h8) {
-      if (_castlingBK) _zobristKey ^= _castlingBK_Zobrist;
+      if (_castlingBK) zobristKey ^= _castlingBK_Zobrist;
       _castlingBK = false;
     }
   }
@@ -646,7 +646,7 @@ public class BoardPosition {
     _castlingBQ_history[_historyCounter] = _castlingBQ;
     _enPassantSquare_History[_historyCounter] = _enPassantSquare;
     _halfMoveClock_History[_historyCounter] = _halfMoveClock;
-    _zobristKey_History[_historyCounter] = _zobristKey;
+    _zobristKey_History[_historyCounter] = zobristKey;
     _hasCheckFlag_History[_historyCounter] = _hasCheck;
     _hasMateFlag_History[_historyCounter] = _hasMate;
     _historyCounter++;
@@ -657,7 +657,7 @@ public class BoardPosition {
 
     // clear en passant
     if (_enPassantSquare != Square.NOSQUARE) {
-      _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
+      zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
       _enPassantSquare = Square.NOSQUARE;
     }
 
@@ -669,7 +669,7 @@ public class BoardPosition {
 
     // change color (active player)
     _nextPlayer = _nextPlayer.getInverseColor();
-    _zobristKey ^= _nextPlayer_Zobrist;
+    zobristKey ^= _nextPlayer_Zobrist;
   }
 
   /** Undo a null move. Essentially switches back sides within same position. */
@@ -696,7 +696,7 @@ public class BoardPosition {
     _nextPlayer = _nextPlayer.getInverseColor();
 
     // zobristKey - just overwrite - should be the same as before the move
-    _zobristKey = _zobristKey_History[_historyCounter];
+    zobristKey = _zobristKey_History[_historyCounter];
 
     // get the check and mate flag from history
     _hasCheck = _hasCheckFlag_History[_historyCounter];
@@ -721,13 +721,13 @@ public class BoardPosition {
     // no need to update counters when moving
     // remove
     _x88Board[fromSquare.ordinal()] = Piece.NOPIECE;
-    _zobristKey ^= _piece_Zobrist[piece.ordinal()][fromSquare.ordinal()]; // out
+    zobristKey ^= _piece_Zobrist[piece.ordinal()][fromSquare.ordinal()]; // out
     // update piece lists
     final int color = piece.getColor().ordinal();
     removeFromPieceLists(fromSquare, piece, color);
     // put
     _x88Board[toSquare.ordinal()] = piece;
-    _zobristKey ^= _piece_Zobrist[piece.ordinal()][toSquare.ordinal()]; // in
+    zobristKey ^= _piece_Zobrist[piece.ordinal()][toSquare.ordinal()]; // in
     // update piece lists
     addToPieceLists(toSquare, piece, color);
   }
@@ -742,7 +742,7 @@ public class BoardPosition {
     assert _x88Board[square.ordinal()] == Piece.NOPIECE; // should be empty
     // put
     _x88Board[square.ordinal()] = piece;
-    _zobristKey ^= _piece_Zobrist[piece.ordinal()][square.ordinal()]; // in
+    zobristKey ^= _piece_Zobrist[piece.ordinal()][square.ordinal()]; // in
     // update piece lists
     final int color = piece.getColor().ordinal();
     addToPieceLists(square, piece, color);
@@ -759,7 +759,7 @@ public class BoardPosition {
     // remove
     Piece old = _x88Board[square.ordinal()];
     _x88Board[square.ordinal()] = Piece.NOPIECE;
-    _zobristKey ^= _piece_Zobrist[piece.ordinal()][square.ordinal()]; // out
+    zobristKey ^= _piece_Zobrist[piece.ordinal()][square.ordinal()]; // out
     // update piece lists
     final int color = piece.getColor().ordinal();
     removeFromPieceLists(square, piece, color);
@@ -1017,7 +1017,7 @@ public class BoardPosition {
     int counter = 0;
     int i = _historyCounter - 4;
     while (i >= 0) {
-      if (_zobristKey == _zobristKey_History[i]) counter++;
+      if (zobristKey == _zobristKey_History[i]) counter++;
       if (counter >= 2) return true;
       i -= 4;
     }
@@ -1106,7 +1106,7 @@ public class BoardPosition {
 
   /** @return the zobristKey */
   public long getZobristKey() {
-    return this._zobristKey;
+    return this.zobristKey;
   }
 
   /**
@@ -1144,7 +1144,7 @@ public class BoardPosition {
 
   /** @param fen */
   private void setupFromFEN(String fen) {
-    assert _zobristKey == 0;
+    assert zobristKey == 0;
 
     if (fen.isEmpty()) throw new IllegalArgumentException("FEN Syntax not valid - empty string");
 
@@ -1230,7 +1230,7 @@ public class BoardPosition {
       if (s.equals("w")) _nextPlayer = Color.WHITE;
       else if (s.equals("b")) {
         _nextPlayer = Color.BLACK;
-        _zobristKey ^= _nextPlayer_Zobrist; // only when black to have the right in/out rhythm
+        zobristKey ^= _nextPlayer_Zobrist; // only when black to have the right in/out rhythm
       } else throw new IllegalArgumentException("FEN Syntax not valid - expected w or b");
     } else { // default "w"
       _nextPlayer = Color.WHITE;
@@ -1245,19 +1245,19 @@ public class BoardPosition {
         switch (s) {
           case "K":
             _castlingWK = true;
-            _zobristKey ^= _castlingWK_Zobrist;
+            zobristKey ^= _castlingWK_Zobrist;
             break;
           case "Q":
             _castlingWQ = true;
-            _zobristKey ^= _castlingWQ_Zobrist;
+            zobristKey ^= _castlingWQ_Zobrist;
             break;
           case "k":
             _castlingBK = true;
-            _zobristKey ^= _castlingBK_Zobrist;
+            zobristKey ^= _castlingBK_Zobrist;
             break;
           case "q":
             _castlingBQ = true;
-            _zobristKey ^= _castlingBQ_Zobrist;
+            zobristKey ^= _castlingBQ_Zobrist;
             break;
           case "-":
           default:
@@ -1278,7 +1278,7 @@ public class BoardPosition {
     }
     // set en passant if not NOSQUARE
     if (_enPassantSquare != Square.NOSQUARE) {
-      _zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // in
+      zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // in
     }
 
     // half move clock
@@ -1445,7 +1445,7 @@ public class BoardPosition {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + (int) (this._zobristKey ^ (this._zobristKey >>> 32));
+    result = prime * result + (int) (this.zobristKey ^ (this.zobristKey >>> 32));
     return result;
   }
 
@@ -1462,7 +1462,7 @@ public class BoardPosition {
       return false;
     }
     BoardPosition other = (BoardPosition) obj;
-    if (this._zobristKey != other._zobristKey) {
+    if (this.zobristKey != other.zobristKey) {
       return false;
     }
     return true;

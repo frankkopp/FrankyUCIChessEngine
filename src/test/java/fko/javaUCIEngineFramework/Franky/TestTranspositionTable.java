@@ -26,56 +26,163 @@
 package fko.javaUCIEngineFramework.Franky;
 
 import fko.javaUCIEngineFramework.Franky.TranspositionTable.TT_EntryType;
+import fko.javaUCIEngineFramework.UCI.IUCIEngine;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Frank
- *
  */
 public class TestTranspositionTable {
 
-    /**
-     *
-     */
-    @Test
-    public final void test_Cache() {
-        TranspositionTable cache = new TranspositionTable(32);
-        BoardPosition position = new BoardPosition();
-        assertEquals(762600, cache.getMaxEntries());
-        assertEquals(32*1024*1024, cache.getSize());
-        cache.put(position, 999, TT_EntryType.EXACT, 5);
-        assertEquals(1, cache.getNumberOfEntries());
-        assertEquals(999,cache.get(position).value);
-        assertEquals(999,cache.get(position).value);
-        cache.put(position, 1111, TT_EntryType.EXACT, 15);
-        assertEquals(1111,cache.get(position).value);
-        assertEquals(1, cache.getNumberOfEntries());
-        cache.clear();
-        assertEquals(0, cache.getNumberOfEntries());
+  private static final Logger LOG = LoggerFactory.getLogger(TestTranspositionTable.class);
+
+  private IUCIEngine engine;
+  private Search     search;
+
+  @BeforeEach
+  void setUp() {
+  }
+
+  /**
+   *
+   */
+  @Test
+  public final void test_Cache() {
+    TranspositionTable cache = new TranspositionTable(32);
+    BoardPosition position = new BoardPosition();
+    assertEquals(762600, cache.getMaxEntries());
+    assertEquals(32 * 1024 * 1024, cache.getSize());
+    cache.put(position, 999, TT_EntryType.EXACT, 5);
+    assertEquals(1, cache.getNumberOfEntries());
+    assertEquals(999, cache.get(position).value);
+    assertEquals(999, cache.get(position).value);
+    cache.put(position, 1111, TT_EntryType.EXACT, 15);
+    assertEquals(1111, cache.get(position).value);
+    assertEquals(1, cache.getNumberOfEntries());
+    cache.clear();
+    assertEquals(0, cache.getNumberOfEntries());
+  }
+
+  /**
+   *
+   */
+  @Test
+  public void testSize() {
+    System.out.println("Testing Transposition Table size:");
+    int[] megabytes = {0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 2048};
+    for (int i : megabytes) {
+      System.gc();
+      long usedMemoryBefore =
+        Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+      TranspositionTable tt = new TranspositionTable(i);
+      System.gc();
+      long usedMemoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+      long hashAllocation = (usedMemoryAfter - usedMemoryBefore) / (1024 * 1024);
+      System.out.format("TT Size (config): %dMB = %dMB real size - Nodes: %d%n", i, hashAllocation,
+                        tt.getMaxEntries());
+      tt = null;
     }
 
-    /**
-     *
-     */
-    @Test
-    public void testSize() {
-        System.out.println("Testing Transposition Table size:");
-        int[] megabytes = {0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 2048};
-        for (int i : megabytes) {
-            System.gc();
-            long usedMemoryBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-            TranspositionTable tt = new TranspositionTable(i);
-            System.gc();
-            long usedMemoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-            long hashAllocation = (usedMemoryAfter - usedMemoryBefore) / (1024 * 1024);
-            System.out.format("TT Size (config): %dMB = %dMB real size - Nodes: %d%n", i, hashAllocation, tt.getMaxEntries());
-            tt = null;
-        }
+  }
 
+  @Test
+  public void collisionTest() {
+    engine = new FrankyEngine();
+    search = new Search(engine, new Configuration());
+
+    final int depth = 16;
+
+    LOG.info("Start SIZE Test for depth {}", depth);
+
+    String fen = "7k/8/8/8/8/8/P7/K7 b - - 0 1";
+    //    fen = BoardPosition.START_FEN;
+    BoardPosition boardPosition = new BoardPosition(fen);
+
+    search.config.USE_ROOT_MOVES_SORT = false;
+    search.config.USE_ALPHABETA_PRUNING = false;
+    search.config.USE_PVS = false;
+    search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_EVALUATION_CACHE = false;
+    search.config.MATE_DISTANCE_PRUNING = false;
+    search.config.USE_MINOR_PROMOTION_PRUNING = false;
+    search.config.USE_QUIESCENCE = false;
+    SearchMode searchMode =
+      new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, false, false);
+
+    search.startSearch(boardPosition, searchMode);
+
+    waitWhileSearching();
+
+    LOG.info("Best Move: {} Value: {} Ponder {}",
+             Move.toSimpleString(search.getLastSearchResult().bestMove),
+             search.getLastSearchResult().resultValue / 100f,
+             Move.toSimpleString(search.getLastSearchResult().ponderMove));
+
+    if (search.config.USE_TRANSPOSITION_TABLE) {
+      if (search.getTranspositionTable().getNumberOfEntries() > 0) {
+        LOG.info("TT Objects: {} ({})", search.getTranspositionTable().getNumberOfEntries(),
+                 search.getTranspositionTable().getMaxEntries());
+        LOG.info("TT Collisions: {} Updates: {}",
+                 search.getTranspositionTable().getNumberOfCollisions(),
+                 search.getTranspositionTable().getNumberOfUpdates());
+      }
     }
+  }
 
+  @Test
+  public void TTUsageTest() {
 
+    engine = new FrankyEngine();
+    search = new Search(engine, new Configuration());
+
+    final int depth = 4;
+
+    LOG.info("Start SIZE Test for depth {}", depth);
+
+    String fen = "7k/8/8/8/8/8/P7/K7 b - - 0 1";
+    //    fen = BoardPosition.START_FEN;
+    BoardPosition boardPosition = new BoardPosition(fen);
+
+    search.config.USE_ROOT_MOVES_SORT = false;
+    search.config.USE_ALPHABETA_PRUNING = false;
+    search.config.USE_PVS = false;
+    search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_EVALUATION_CACHE = false;
+    search.config.MATE_DISTANCE_PRUNING = false;
+    search.config.USE_MINOR_PROMOTION_PRUNING = false;
+    search.config.USE_QUIESCENCE = false;
+    SearchMode searchMode =
+      new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, false, false);
+
+    search.startSearch(boardPosition, searchMode);
+
+    waitWhileSearching();
+
+    LOG.info("Best Move: {} Value: {} Ponder {}",
+             Move.toSimpleString(search.getLastSearchResult().bestMove),
+             search.getLastSearchResult().resultValue / 100f,
+             Move.toSimpleString(search.getLastSearchResult().ponderMove));
+
+    if (search.config.USE_TRANSPOSITION_TABLE) {
+      if (search.getTranspositionTable().getNumberOfEntries() > 0) {
+        LOG.info("TT Objects: {}", search.getTranspositionTable().getNumberOfEntries());
+        LOG.info("TT Collisions: {}", search.getTranspositionTable().getNumberOfCollisions());
+      }
+    }
+  }
+
+  private void waitWhileSearching() {
+    while (search.isSearching()) {
+      try {
+        Thread.sleep(200);
+      } catch (InterruptedException ignored) {
+      }
+    }
+  }
 
 }

@@ -1046,6 +1046,20 @@ public class Search implements Runnable {
   }
 
   /**
+   * @return
+   */
+  public TranspositionTable getTranspositionTable() {
+    return transpositionTable;
+  }
+
+  /**
+   * @return
+   */
+  public EvaluationCache getEvaluationCache() {
+    return evaluationCache;
+  }
+
+  /**
    * Clears the hashtables
    */
   public void clearHashtables() {

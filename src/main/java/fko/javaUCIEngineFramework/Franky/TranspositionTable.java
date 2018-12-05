@@ -46,8 +46,12 @@ public class TranspositionTable {
 
   private int  numberOfEntries    = 0;
   private long numberOfCollisions = 0L;
+  private long numberOfUpdates = 0L;
 
   private final TT_Entry[] entries;
+
+  
+
 
   /**
    * Creates a hash table with a approximated number of entries calculated by
@@ -84,19 +88,20 @@ public class TranspositionTable {
 
   /**
    * Stores the node value and the depth it has been calculated at.
-   *  @param position
+   *
+   * @param position
    * @param value
    * @param type
    * @param depth
    */
   public void put(BoardPosition position, int value, TT_EntryType type, int depth) {
 
-    final int hash = getHash(position._zobristKey);
+    final int hash = getHash(position.zobristKey);
 
     // new value
     if (entries[hash].key == 0) {
       numberOfEntries++;
-      entries[hash].key = position._zobristKey;
+      entries[hash].key = position.zobristKey;
       //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
@@ -104,21 +109,21 @@ public class TranspositionTable {
 
     }
     // different position - overwrite
-    else if (position._zobristKey != entries[hash].key) {
+    else if (position.zobristKey != entries[hash].key) {
 
       numberOfCollisions++;
-      entries[hash].key = position._zobristKey;
+      entries[hash].key = position.zobristKey;
       //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
     }
-    // Collision or update
-    else if (position._zobristKey == entries[hash].key  // same position
-             && depth >= entries[hash].depth) { // Overwrite only when new value from deeper search
+    // Update
+    else if (position.zobristKey == entries[hash].key  // same position
+             && depth > entries[hash].depth) { // Overwrite only when new value from deeper search
 
-      numberOfCollisions++;
-      entries[hash].key = position._zobristKey;
+      numberOfUpdates++;
+      entries[hash].key = position.zobristKey;
       //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
@@ -132,12 +137,12 @@ public class TranspositionTable {
    * cached value has been calculated at a depth equal or deeper as the
    * depth value provided.
    *
-   * @param position TODO
+   * @param position
    * @return value for key or <tt>Integer.MIN_VALUE</tt> if not found
    */
   public TT_Entry get(BoardPosition position) {
-    final int hash = getHash(position._zobristKey);
-    if (entries[hash].key == position._zobristKey) { // hash hit
+    final int hash = getHash(position.zobristKey);
+    if (entries[hash].key == position.zobristKey) { // hash hit
       return entries[hash];
     }
     // cache miss or collision
@@ -145,6 +150,11 @@ public class TranspositionTable {
   }
 
 
+  /**
+   * TODO: better hash function?
+   * @param key
+   * @return returns a hash key
+   */
   private int getHash(long key) {
     return (int) (key % maxNumberOfEntries);
   }
@@ -194,6 +204,14 @@ public class TranspositionTable {
     return numberOfCollisions;
   }
 
+
+  /**
+   * @return number of entry updates of same position but deeper search
+   */
+  public long getNumberOfUpdates() {
+    return numberOfUpdates;
+  }
+
   /**
    * Entry for transposition table.
    * Contains a key, value and an entry type.
@@ -206,10 +224,10 @@ public class TranspositionTable {
                             ) * 2 // 64bit?
                             + 8; // enum
 
-    long         key       = 0L;
-    int          value     = Integer.MIN_VALUE;
-    int          depth     = 0;
-    TT_EntryType type      = TT_EntryType.ALPHA;
+    long         key   = 0L;
+    int          value = Integer.MIN_VALUE;
+    int          depth = 0;
+    TT_EntryType type  = TT_EntryType.ALPHA;
   }
 
   /**
