@@ -293,5 +293,12 @@ public class FrankyEngine implements IUCIEngine {
     return config.PONDER;
   }
 
+  /**
+   * @return the search object of this engine
+   */
+  public Search getSearch() {
+    return search;
+  }
+
 
 }
