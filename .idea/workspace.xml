@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="1a1dfe46-855b-412a-bfcd-658d3bc6f910" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/FrankyEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/FrankyEngine.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TranspositionTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TranspositionTable.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestTranspositionTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestTranspositionTable.java" afterDir="false" />
     </list>
@@ -29,7 +27,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Configuration.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="531">
+                <state relative-caret-position="612">
                   <caret line="57" column="46" selection-start-line="57" selection-start-column="46" selection-end-line="57" selection-end-column="46" />
                 </state>
               </provider>
@@ -38,14 +36,10 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="178">
+                <state relative-caret-position="17568">
                   <caret line="1013" selection-start-line="1013" selection-end-line="1013" />
                   <folding>
                     <element signature="imports" expanded="true" />
-                    <element signature="e#35858#35859#0" expanded="true" />
-                    <element signature="e#35893#35894#0" expanded="true" />
-                    <element signature="e#35942#35943#0" expanded="true" />
-                    <element signature="e#35974#35975#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -54,12 +48,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/FrankyEngine.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="283">
+                <state relative-caret-position="4392">
                   <caret line="295" column="5" selection-start-line="295" selection-start-column="5" selection-end-line="295" selection-end-column="5" />
-                  <folding>
-                    <element signature="e#8600#8601#0" expanded="true" />
-                    <element signature="e#8623#8624#0" expanded="true" />
-                  </folding>
                 </state>
               </provider>
             </entry>
@@ -67,7 +57,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Move.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="360">
+                <state relative-caret-position="4050">
                   <caret line="248" selection-start-line="248" selection-end-line="248" />
                 </state>
               </provider>
@@ -85,17 +75,20 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TranspositionTable.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="377">
-                  <caret line="165" column="4" selection-start-line="165" selection-start-column="4" selection-end-line="165" selection-end-column="4" />
+                <state relative-caret-position="279">
+                  <caret line="86" column="38" lean-forward="true" selection-start-line="86" selection-start-column="38" selection-end-line="86" selection-end-column="38" />
                   <folding>
                     <element signature="imports" expanded="true" />
-                    <element signature="e#5701#5702#0" expanded="true" />
-                    <element signature="e#5750#5751#0" expanded="true" />
-                    <element signature="e#6291#6292#0" expanded="true" />
-                    <element signature="e#6390#6391#0" expanded="true" />
-                    <element signature="e#6503#6504#0" expanded="true" />
-                    <element signature="e#6627#6628#0" expanded="true" />
-                    <element signature="e#6782#6783#0" expanded="true" />
+                    <element signature="e#6196#6197#0" expanded="true" />
+                    <element signature="e#6233#6234#0" expanded="true" />
+                    <element signature="e#6300#6301#0" expanded="true" />
+                    <element signature="e#6332#6333#0" expanded="true" />
+                    <element signature="e#6405#6406#0" expanded="true" />
+                    <element signature="e#6445#6446#0" expanded="true" />
+                    <element signature="e#6534#6535#0" expanded="true" />
+                    <element signature="e#6569#6570#0" expanded="true" />
+                    <element signature="e#6692#6693#0" expanded="true" />
+                    <element signature="e#6724#6725#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -104,7 +97,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="jar://C:/Program Files/Java/jdk-11.0.1/lib/src.zip!/java.base/java/io/PrintStream.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="683">
+                <state relative-caret-position="12960">
                   <caret line="771" selection-start-line="771" selection-end-line="771" />
                   <folding>
                     <element signature="e#27497#27498#0" expanded="true" />
@@ -116,7 +109,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/BoardPosition.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="189">
+                <state relative-caret-position="16776">
                   <caret line="958" column="17" selection-start-line="958" selection-start-column="17" selection-end-line="958" selection-end-column="17" />
                 </state>
               </provider>
@@ -140,7 +133,7 @@
               <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/pom.xml">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="360">
+                    <state relative-caret-position="738">
                       <caret line="41" column="36" selection-start-line="41" selection-start-column="21" selection-end-line="41" selection-end-column="36" />
                     </state>
                   </provider>
@@ -149,7 +142,7 @@
               <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandlerTest.java">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state>
+                    <state relative-caret-position="180">
                       <caret line="44" column="33" selection-start-line="44" selection-start-column="33" selection-end-line="44" selection-end-column="33" />
                       <folding>
                         <element signature="imports" expanded="true" />
@@ -161,7 +154,7 @@
               <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="513">
+                    <state relative-caret-position="9756">
                       <caret line="578" selection-start-line="578" selection-end-line="585" selection-end-column="3" />
                     </state>
                   </provider>
@@ -171,7 +164,7 @@
                 <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestTranspositionTable.java">
                   <provider selected="true" editor-type-id="text-editor">
                     <state relative-caret-position="288">
-                      <caret line="142" selection-start-line="142" selection-end-line="142" />
+                      <caret line="82" selection-start-line="80" selection-end-line="82" />
                     </state>
                   </provider>
                 </entry>
@@ -196,7 +189,7 @@
               <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="1548">
+                    <state relative-caret-position="1404">
                       <caret line="109" column="75" selection-start-line="109" selection-start-column="7" selection-end-line="109" selection-end-column="75" />
                       <folding>
                         <element signature="imports" expanded="true" />
@@ -208,7 +201,7 @@
               <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluationCache.java">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="505">
+                    <state relative-caret-position="1674">
                       <caret line="124" column="7" selection-start-line="124" selection-start-column="7" selection-end-line="124" selection-end-column="7" />
                     </state>
                   </provider>
@@ -239,7 +232,7 @@
               <file pinned="false" current-in-tab="true">
                 <entry file="file://$PROJECT_DIR$/Omega/OmegaSearch.java">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="-4411">
+                    <state relative-caret-position="18">
                       <caret line="531" column="39" selection-start-line="531" selection-start-column="39" selection-end-line="531" selection-end-column="39" />
                       <folding>
                         <element signature="imports" expanded="true" />
@@ -411,10 +404,10 @@
     <option name="skipTests" value="true" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-5" />
-    <option name="y" value="4" />
-    <option name="width" value="3449" />
-    <option name="height" value="1408" />
+    <option name="x" value="-7" />
+    <option name="y" value="2" />
+    <option name="width" value="3452" />
+    <option name="height" value="1410" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -425,6 +418,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -606,12 +601,10 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1544054672035" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1544133495695" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="JAVA" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
@@ -672,7 +665,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.TestTranspositionTable.collisionTest">
+  <component name="RunManager" selected="JUnit.TestTranspositionTable.testSize">
     <configuration default="true" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
@@ -820,17 +813,17 @@
     <list>
       <item itemvalue="JUnit.fko.javaUCIEngineFramework in JavaUCIEngineFramework" />
       <item itemvalue="JUnit.UCIProtocolHandlerTest.uciCommand" />
-      <item itemvalue="Maven.Install_EXE" />
       <item itemvalue="JUnit.TestTranspositionTable.TTUsageTest" />
       <item itemvalue="JUnit.TestTranspositionTable.collisionTest" />
       <item itemvalue="JUnit.TTHashTableTest.createHashTable" />
       <item itemvalue="JUnit.TestTranspositionTable.test_Cache" />
       <item itemvalue="JUnit.TestTranspositionTable.testSize" />
+      <item itemvalue="Maven.Install_EXE" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.TestTranspositionTable.collisionTest" />
         <item itemvalue="JUnit.TestTranspositionTable.testSize" />
+        <item itemvalue="JUnit.TestTranspositionTable.collisionTest" />
         <item itemvalue="JUnit.TestTranspositionTable.test_Cache" />
         <item itemvalue="JUnit.TestTranspositionTable.TTUsageTest" />
         <item itemvalue="JUnit.TTHashTableTest.createHashTable" />
@@ -848,24 +841,6 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="TestTranspositionTable_collisionTest - 2018.12.06 at 00h 30m 04s.xml">
-      <configuration name="TestTranspositionTable.collisionTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestTranspositionTable_collisionTest - 2018.12.06 at 00h 34m 22s.xml">
-      <configuration name="TestTranspositionTable.collisionTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestTranspositionTable_collisionTest - 2018.12.06 at 00h 34m 42s.xml">
-      <configuration name="TestTranspositionTable.collisionTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestTranspositionTable_collisionTest - 2018.12.06 at 00h 38m 57s.xml">
-      <configuration name="TestTranspositionTable.collisionTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestTranspositionTable_collisionTest - 2018.12.06 at 01h 00m 20s.xml">
-      <configuration name="TestTranspositionTable.collisionTest" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestTranspositionTable_collisionTest - 2018.12.06 at 01h 01m 56s.xml">
-      <configuration name="TestTranspositionTable.collisionTest" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="TestTranspositionTable_collisionTest - 2018.12.06 at 01h 02m 30s.xml">
       <configuration name="TestTranspositionTable.collisionTest" configurationId="JUnit" />
     </history-entry>
@@ -878,6 +853,24 @@
     <history-entry file="TestTranspositionTable_collisionTest - 2018.12.06 at 01h 03m 48s.xml">
       <configuration name="TestTranspositionTable.collisionTest" configurationId="JUnit" />
     </history-entry>
+    <history-entry file="TestTranspositionTable_testSize - 2018.12.06 at 22h 41m 35s.xml">
+      <configuration name="TestTranspositionTable.testSize" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestTranspositionTable_collisionTest - 2018.12.06 at 22h 41m 36s.xml">
+      <configuration name="TestTranspositionTable.collisionTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestTranspositionTable_testSize - 2018.12.06 at 22h 43m 25s.xml">
+      <configuration name="TestTranspositionTable.testSize" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestTranspositionTable_testSize - 2018.12.06 at 22h 49m 58s.xml">
+      <configuration name="TestTranspositionTable.testSize" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestTranspositionTable_testSize - 2018.12.06 at 22h 51m 28s.xml">
+      <configuration name="TestTranspositionTable.testSize" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestTranspositionTable_testSize - 2018.12.06 at 22h 55m 28s.xml">
+      <configuration name="TestTranspositionTable.testSize" configurationId="JUnit" />
+    </history-entry>
   </component>
   <component name="TodoView" selected-index="1">
     <todo-panel id="selected-file">
@@ -889,21 +882,20 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="4" width="3010" height="1228" extended-state="0" />
-    <editor active="true" />
+    <frame x="-5" y="3" width="3011" height="1229" extended-state="0" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.5534884" visible="true" weight="0.101763904" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.55263156" visible="true" weight="0.1024076" />
       <window_info id="Designer" order="1" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="UI Designer" order="4" />
       <window_info id="Learn" order="5" weight="0.3299373" />
-      <window_info id="Structure" order="6" sideWeight="0.44651163" side_tool="true" visible="true" weight="0.101763904" />
+      <window_info id="Structure" order="6" sideWeight="0.4473684" side_tool="true" visible="true" weight="0.1024076" />
       <window_info id="Favorites" order="7" sideWeight="0.43962264" side_tool="true" weight="0.14733543" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32737535" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32645404" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49960783" weight="0.32488263" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49941972" visible="true" weight="0.3943662" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49941972" visible="true" weight="0.39399624" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3298872" />
@@ -924,7 +916,7 @@
       <window_info anchor="right" id="Theme Preview" order="5" />
       <window_info anchor="right" id="Palette&#9;" order="6" />
       <window_info anchor="right" id="Maven Projects" order="7" visible="true" weight="0.08614565" />
-      <window_info anchor="right" id="Maven" order="8" visible="true" weight="0.09226594" />
+      <window_info anchor="right" id="Maven" order="8" visible="true" weight="0.092234656" />
     </layout>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -986,6 +978,12 @@
           <line>142</line>
           <properties />
           <option name="timeStamp" value="20" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TranspositionTable.java</url>
+          <line>99</line>
+          <properties />
+          <option name="timeStamp" value="24" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -1280,10 +1278,43 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://C:/Program Files/Java/jdk-11.0.1/lib/src.zip!/java.base/java/util/IdentityHashMap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4968">
+          <caret line="222" column="11" selection-start-line="222" selection-start-column="11" selection-end-line="222" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TTHashTableTest.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TTHashTable.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Configuration.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="531">
+        <state relative-caret-position="612">
           <caret line="57" column="46" selection-start-line="57" selection-start-column="46" selection-end-line="57" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17568">
+          <caret line="1013" selection-start-line="1013" selection-end-line="1013" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/FrankyEngine.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4392">
+          <caret line="295" column="5" selection-start-line="295" selection-start-column="5" selection-end-line="295" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Move.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4050">
+          <caret line="248" selection-start-line="248" selection-end-line="248" />
         </state>
       </provider>
     </entry>
@@ -1294,6 +1325,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://C:/Program Files/Java/jdk-11.0.1/lib/src.zip!/java.base/java/io/PrintStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="12960">
+          <caret line="771" selection-start-line="771" selection-end-line="771" />
+          <folding>
+            <element signature="e#27497#27498#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/BoardPosition.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="16776">
+          <caret line="958" column="17" selection-start-line="958" selection-start-column="17" selection-end-line="958" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Evaluation.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="234">
@@ -1301,13 +1349,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="738">
+          <caret line="41" column="36" selection-start-line="41" selection-start-column="21" selection-end-line="41" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandlerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
+        <state relative-caret-position="180">
           <caret line="44" column="33" selection-start-line="44" selection-start-column="33" selection-end-line="44" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="9756">
+          <caret line="578" selection-start-line="578" selection-end-line="585" selection-end-column="3" />
         </state>
       </provider>
     </entry>
@@ -1324,33 +1386,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Omega/OmegaEngine.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3150">
-          <caret line="216" selection-start-line="216" selection-end-line="216" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Move.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="248" selection-start-line="248" selection-end-line="248" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Omega/OmegaSearch.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4411">
-          <caret line="531" column="39" selection-start-line="531" selection-start-column="39" selection-end-line="531" selection-end-column="39" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1548">
+        <state relative-caret-position="1404">
           <caret line="109" column="75" selection-start-line="109" selection-start-column="7" selection-end-line="109" selection-end-column="75" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -1358,24 +1396,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluationCache.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="513">
-          <caret line="578" selection-start-line="578" selection-end-line="585" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk-11.0.1/lib/src.zip!/java.base/java/util/IdentityHashMap.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4968">
-          <caret line="222" column="11" selection-start-line="222" selection-start-column="11" selection-end-line="222" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TTHashTableTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="369">
-          <caret line="51" column="26" selection-start-line="51" selection-start-column="26" selection-end-line="51" selection-end-column="26" />
+        <state relative-caret-position="1674">
+          <caret line="124" column="7" selection-start-line="124" selection-start-column="7" selection-end-line="124" selection-end-column="7" />
         </state>
       </provider>
     </entry>
@@ -1386,86 +1410,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TTHashTable.java">
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaEngine.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="39" column="48" selection-start-line="39" selection-start-column="48" selection-end-line="39" selection-end-column="48" />
-          <folding>
-            <element signature="e#2992#2993#0" expanded="true" />
-            <element signature="e#3008#3009#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="3150">
+          <caret line="216" selection-start-line="216" selection-end-line="216" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/BoardPosition.java">
+    <entry file="file://$PROJECT_DIR$/Omega/OmegaSearch.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="189">
-          <caret line="958" column="17" selection-start-line="958" selection-start-column="17" selection-end-line="958" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="41" column="36" selection-start-line="41" selection-start-column="21" selection-end-line="41" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluationCache.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="505">
-          <caret line="124" column="7" selection-start-line="124" selection-start-column="7" selection-end-line="124" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="1013" selection-start-line="1013" selection-end-line="1013" />
+        <state relative-caret-position="18">
+          <caret line="531" column="39" selection-start-line="531" selection-start-column="39" selection-end-line="531" selection-end-column="39" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#35858#35859#0" expanded="true" />
-            <element signature="e#35893#35894#0" expanded="true" />
-            <element signature="e#35942#35943#0" expanded="true" />
-            <element signature="e#35974#35975#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/FrankyEngine.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="283">
-          <caret line="295" column="5" selection-start-line="295" selection-start-column="5" selection-end-line="295" selection-end-column="5" />
-          <folding>
-            <element signature="e#8600#8601#0" expanded="true" />
-            <element signature="e#8623#8624#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk-11.0.1/lib/src.zip!/java.base/java/io/PrintStream.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="683">
-          <caret line="771" selection-start-line="771" selection-end-line="771" />
-          <folding>
-            <element signature="e#27497#27498#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TranspositionTable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="377">
-          <caret line="165" column="4" selection-start-line="165" selection-start-column="4" selection-end-line="165" selection-end-column="4" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#5701#5702#0" expanded="true" />
-            <element signature="e#5750#5751#0" expanded="true" />
-            <element signature="e#6291#6292#0" expanded="true" />
-            <element signature="e#6390#6391#0" expanded="true" />
-            <element signature="e#6503#6504#0" expanded="true" />
-            <element signature="e#6627#6628#0" expanded="true" />
-            <element signature="e#6782#6783#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1473,7 +1430,27 @@
     <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestTranspositionTable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
-          <caret line="142" selection-start-line="142" selection-end-line="142" />
+          <caret line="82" selection-start-line="80" selection-end-line="82" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TranspositionTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="279">
+          <caret line="86" column="38" lean-forward="true" selection-start-line="86" selection-start-column="38" selection-end-line="86" selection-end-column="38" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#6196#6197#0" expanded="true" />
+            <element signature="e#6233#6234#0" expanded="true" />
+            <element signature="e#6300#6301#0" expanded="true" />
+            <element signature="e#6332#6333#0" expanded="true" />
+            <element signature="e#6405#6406#0" expanded="true" />
+            <element signature="e#6445#6446#0" expanded="true" />
+            <element signature="e#6534#6535#0" expanded="true" />
+            <element signature="e#6569#6570#0" expanded="true" />
+            <element signature="e#6692#6693#0" expanded="true" />
+            <element signature="e#6724#6725#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
