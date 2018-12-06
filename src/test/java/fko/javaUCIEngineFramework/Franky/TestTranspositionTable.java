@@ -29,12 +29,8 @@ import fko.javaUCIEngineFramework.Franky.TranspositionTable.TT_EntryType;
 import fko.javaUCIEngineFramework.UCI.IUCIEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openjdk.jol.info.ClassLayout;
-import org.openjdk.jol.vm.VM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.instrument.Instrumentation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -59,7 +55,7 @@ public class TestTranspositionTable {
   public final void test_Cache() {
     TranspositionTable cache = new TranspositionTable(32);
     BoardPosition position = new BoardPosition();
-//    assertEquals(762600, cache.getMaxEntries());
+    //    assertEquals(762600, cache.getMaxEntries());
     assertEquals(32 * 1024 * 1024, cache.getSize());
     cache.put(position, 999, TT_EntryType.EXACT, 5);
     assertEquals(1, cache.getNumberOfEntries());
@@ -78,8 +74,9 @@ public class TestTranspositionTable {
   @Test
   public void testSize() {
 
-//    System.out.println(VM.current().details());
-//    System.out.println(ClassLayout.parseClass(TranspositionTable.TT_Entry.class).toPrintable());
+    //    System.out.println(VM.current().details());
+    //    System.out.println(ClassLayout.parseClass(TranspositionTable.TT_Entry.class).toPrintable());
+    //    System.out.println(ClassLayout.parseClass(TranspositionTable.class).toPrintable());
 
     System.out.println("Testing Transposition Table size:");
     int[] megabytes = {0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 2048};
@@ -103,7 +100,7 @@ public class TestTranspositionTable {
     engine = new FrankyEngine();
     search = ((FrankyEngine) engine).getSearch();
 
-    final int depth = 12;
+    final int depth = 15;
 
     LOG.info("Start SIZE Test for depth {}", depth);
 
@@ -119,8 +116,7 @@ public class TestTranspositionTable {
     search.config.MATE_DISTANCE_PRUNING = false;
     search.config.USE_MINOR_PROMOTION_PRUNING = false;
     search.config.USE_QUIESCENCE = false;
-    SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
 
     search.startSearch(boardPosition, searchMode);
 
@@ -147,7 +143,7 @@ public class TestTranspositionTable {
   public void TTUsageTest() {
 
     engine = new FrankyEngine();
-    search = new Search(engine, new Configuration());
+    search = ((FrankyEngine) engine).getSearch();
 
     final int depth = 6;
 
@@ -177,12 +173,13 @@ public class TestTranspositionTable {
              search.getLastSearchResult().resultValue / 100f,
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
 
-    if (search.config.USE_TRANSPOSITION_TABLE) {
-      if (search.getTranspositionTable().getNumberOfEntries() > 0) {
-        LOG.info("TT Objects: {}", search.getTranspositionTable().getNumberOfEntries());
-        LOG.info("TT Collisions: {}", search.getTranspositionTable().getNumberOfCollisions());
-      }
+    if (search.getTranspositionTable().getNumberOfEntries() > 0) {
+      LOG.info("TT Objects: {} ({})", search.getTranspositionTable().getNumberOfEntries(),
+               search.getTranspositionTable().getMaxEntries());
+      LOG.info("TT Collisions: {}", search.getTranspositionTable().getNumberOfCollisions());
     }
+    LOG.info(search.getSearchCounter().toString());
+
   }
 
   private void waitWhileSearching() {

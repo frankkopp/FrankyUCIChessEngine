@@ -50,15 +50,12 @@ public class TranspositionTable {
 
   private final TT_Entry[] entries;
 
-  
-
-
   /**
    * Creates a hash table with a approximated number of entries calculated by
    * the size in KB divided by the entry size.<br>
    * The hash function is very simple using the modulo of number of entries on the key
    *
-   * @param size in MB (1024^2)
+   * @param size in MB (1024B^2)
    */
   public TranspositionTable(int size) {
     sizeInByte = (long) size * KB * KB;
@@ -80,10 +77,13 @@ public class TranspositionTable {
 
     // create buckets for hash table
     entries = new TT_Entry[maxNumberOfEntries];
-    // initialize
+    // initialize to not create objects during usage
     for (int i = 0; i < maxNumberOfEntries; i++) {
       entries[i] = new TT_Entry();
     }
+
+    LOG.info("Transposition Table Size: {}MB",
+             String.format("%,d", freeMemory * percentage / 100 / (KB * KB)));
   }
 
   /**
@@ -106,11 +106,9 @@ public class TranspositionTable {
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
-
     }
     // different position - overwrite
     else if (position.zobristKey != entries[hash].key) {
-
       numberOfCollisions++;
       entries[hash].key = position.zobristKey;
       //entries[hash].fen = position.toFENString();
@@ -121,7 +119,6 @@ public class TranspositionTable {
     // Update
     else if (position.zobristKey == entries[hash].key  // same position
              && depth > entries[hash].depth) { // Overwrite only when new value from deeper search
-
       numberOfUpdates++;
       entries[hash].key = position.zobristKey;
       //entries[hash].fen = position.toFENString();
@@ -174,6 +171,7 @@ public class TranspositionTable {
     }
     numberOfEntries = 0;
     numberOfCollisions = 0;
+    numberOfUpdates = 0;
   }
 
   /**
@@ -218,11 +216,17 @@ public class TranspositionTable {
    */
   public static final class TT_Entry {
 
-    static final int SIZE = (Long.BYTES // key
-                             + Integer.BYTES // value
-                             + Integer.BYTES // depth
-                            ) * 2 // 64bit?
-                            + 8; // enum
+    /**
+     * fko.javaUCIEngineFramework.Franky.TranspositionTable$TT_Entry object internals:
+     *  OFFSET  SIZE                                                                TYPE DESCRIPTION                               VALUE
+     *       0    12                                                                     (object header)                           N/A
+     *      12     4                                                                 int TT_Entry.value                            N/A
+     *      16     8                                                                long TT_Entry.key                              N/A
+     *      24     4                                                                 int TT_Entry.depth                            N/A
+     *      28     4   fko.javaUCIEngineFramework.Franky.TranspositionTable.TT_EntryType TT_Entry.type                             N/A
+     * Instance size: 32 bytes
+     */
+    static final int SIZE = 32;
 
     long         key   = 0L;
     int          value = Integer.MIN_VALUE;
