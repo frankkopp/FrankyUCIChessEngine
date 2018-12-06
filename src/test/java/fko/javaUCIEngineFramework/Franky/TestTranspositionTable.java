@@ -145,11 +145,11 @@ public class TestTranspositionTable {
     engine = new FrankyEngine();
     search = ((FrankyEngine) engine).getSearch();
 
-    final int depth = 6;
+    final int depth = 10;
 
     LOG.info("Start SIZE Test for depth {}", depth);
 
-    String fen = "7k/8/8/8/8/8/P7/K7 b - - 0 1";
+    String fen = "7k/8/8/8/8/8/P7/K7 w - - 0 1";
     //    fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
@@ -162,7 +162,9 @@ public class TestTranspositionTable {
     search.config.USE_MINOR_PROMOTION_PRUNING = false;
     search.config.USE_QUIESCENCE = false;
     SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, false, false);
+      new SearchMode(0, 0, 0, 0, 0,
+                     depth, 0, 0, 0, null,
+                     false, true, false);
 
     search.startSearch(boardPosition, searchMode);
 
