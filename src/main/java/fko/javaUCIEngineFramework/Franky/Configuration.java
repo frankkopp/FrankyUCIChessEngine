@@ -39,13 +39,16 @@ public class Configuration {
   public boolean USE_QUIESCENCE = true;
 
   /** Hash Size */
-  public int HASH_SIZE = 512;
+  public int HASH_SIZE = 128;
 
   /** Ponder */
   public boolean PONDER = true;
 
   /** Debug */
   public boolean DEBUG = false;
+
+  /** UCI Options */
+  public boolean UCI_ShowCurrLine = true;
 
   /** ##################################################
    * OPTIMIZATIONS
@@ -65,7 +68,7 @@ public class Configuration {
 
   /** Use Cache for Board evaluations - very expensive, only worth
    * with expensive evaluation - (needs extra memory) */
-  boolean USE_EVALUATION_CACHE = true;
+  boolean USE_EVALUATION_CACHE = false;
 
   /** Mate Distance Pruning */
   boolean MATE_DISTANCE_PRUNING = true;

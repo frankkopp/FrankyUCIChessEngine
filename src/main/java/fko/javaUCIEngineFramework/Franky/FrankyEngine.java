@@ -108,6 +108,13 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 "",
                 ""));
+        iUciOptions.add(
+        new UCIOption("UCI_ShowCurrLine",
+                UCIOptionType.check,
+                Boolean.toString(config.UCI_ShowCurrLine),
+                "",
+                "",
+                ""));
 //    iUciOptions.add( // DUMMY for testing
 //        new UCIOption(
 //            "OwnBook",

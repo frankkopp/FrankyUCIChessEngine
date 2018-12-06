@@ -83,7 +83,7 @@ public class TranspositionTable {
     }
 
     LOG.info("Transposition Table Size: {}MB",
-             String.format("%,d", freeMemory * percentage / 100 / (KB * KB)));
+             String.format("%,d", sizeInByte / (KB * KB)));
   }
 
   /**

@@ -64,9 +64,6 @@ public class MoveList extends SimpleIntList {
         super(old);
     }
 
-    /* (non-Javadoc)
-     * @see fko.chessly.player.computer.Omega.OmegaIntegerList#add(int)
-     */
     @Override
     public void add(int move) {
         if (!Move.isValid(move))
@@ -74,9 +71,6 @@ public class MoveList extends SimpleIntList {
         super.add(move);
     }
 
-    /* (non-Javadoc)
-     * @see fko.chessly.player.computer.Omega.OmegaIntegerList#add(fko.chessly.player.computer.Omega.OmegaIntegerList)
-     */
     @Override
     public void add(SimpleIntList newList) {
         if (!(newList instanceof MoveList))
@@ -84,9 +78,6 @@ public class MoveList extends SimpleIntList {
         super.add(newList);
     }
 
-    /* (non-Javadoc)
-     * @see fko.chessly.util.SimpleIntList#sort(java.util.Comparator)
-     */
     @Override
     public void sort(Comparator<Integer> comparator) {
         int temp;
@@ -102,9 +93,6 @@ public class MoveList extends SimpleIntList {
         }
     }
 
-    /* (non-Javadoc)
-     * @see fko.chessly.player.computer.Omega.OmegaIntegerList#toString()
-     */
     @Override
     public String toString() {
         String s = "MoveList size="+size()+" available capacity="+getAvailableCapacity()+" [";

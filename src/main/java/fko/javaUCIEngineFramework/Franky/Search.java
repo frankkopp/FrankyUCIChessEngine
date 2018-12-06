@@ -456,7 +456,7 @@ public class Search implements Runnable {
         bestValue = value;
         searchCounter.currentBestRootValue = value;
         searchCounter.currentBestRootMove = move;
-        MoveList.savePV(move, principalVariation[rootPly], principalVariation[rootPly-1]);
+        MoveList.savePV(move, principalVariation[rootPly], principalVariation[rootPly - 1]);
       }
 
       position.undoMove();
@@ -577,7 +577,7 @@ public class Search implements Runnable {
     if (searchCounter.currentExtraSearchDepth < ply) searchCounter.currentExtraSearchDepth = ply;
 
     // clear principal Variation for this depth
-    principalVariation[ply-1].clear();
+    principalVariation[ply - 1].clear();
 
     // needed to remember if we even had a legal move
     boolean hadLegaMove = false;
@@ -618,17 +618,23 @@ public class Search implements Runnable {
         currentVariation.add(move);
 
         // send current root move info to UCI every x milli seconds
-        if (System.currentTimeMillis() - ticker >= 500) {
+        if (System.currentTimeMillis() - ticker >= 250) {
           // @formatter:off
           engine.sendInfoToUCI("depth " + searchCounter.currentSearchDepth
                                + " seldepth " + searchCounter.currentExtraSearchDepth
                                + " nodes " + searchCounter.nodesVisited
                                + " nps " + 1000 * searchCounter.nodesVisited / elapsedTime()
                                + " time " + elapsedTime()
-                               + " currmove " + Move.toUCINotation(position, searchCounter.currentRootMove)
-                               + " currmovenumber " + searchCounter.currentRootMoveNumber
-                               + " currline " + currentVariation.toNotationString()
+                               + " hashfull " + (1000*transpositionTable.getNumberOfEntries()
+                                                 / transpositionTable.getMaxEntries())
                               );
+          engine.sendInfoToUCI("currmove " + Move.toUCINotation(position,
+                                                                searchCounter.currentRootMove)
+                               + "currmovenumber " + searchCounter.currentRootMoveNumber
+                              );
+          if (config.UCI_ShowCurrLine) {
+            engine.sendInfoToUCI("currline " + currentVariation.toNotationString());
+          }
           // @formatter:on
           ticker = System.currentTimeMillis();
         }
@@ -661,7 +667,7 @@ public class Search implements Runnable {
           bestValue = value;
 
           if (value > alpha) {
-            MoveList.savePV(move, principalVariation[ply], principalVariation[ply-1]);
+            MoveList.savePV(move, principalVariation[ply], principalVariation[ply - 1]);
 
             // AlphaBeta Pruning
             if (value < beta) {
@@ -984,7 +990,8 @@ public class Search implements Runnable {
     } else { // remaining time - estimated time per move
       // reset flags
       long timeLeft = searchMode.getRemainingTime(myColor).toMillis();
-      // Give some overhead time so that in games with very low available time we do not run out of time
+      // Give some overhead time so that in games with very low available time we do not run out
+      // of time
       timeLeft -= 1000; // this should do
       // when we know the move to go (until next time control) use them otherwise assume 40
       final int movesLeft = searchMode.getMovesToGo() > 0 ? searchMode.getMovesToGo() : 40;
@@ -1011,12 +1018,13 @@ public class Search implements Runnable {
    * @param hashSize
    */
   public void setHashSize(int hashSize) {
-    transpositionTable = new TranspositionTable(hashSize / 2);
-    evaluationCache = new EvaluationCache(hashSize / 2);
+    transpositionTable = new TranspositionTable(hashSize);
+    evaluationCache = new EvaluationCache(0);
   }
 
   /**
-   * Called when the state of this search is no longer valid as the last call to startSearch is not from
+   * Called when the state of this search is no longer valid as the last call to startSearch is
+   * not from
    * the same game as the next.
    */
   public void newGame() {

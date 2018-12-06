@@ -55,7 +55,7 @@ public class TestSearch {
   void setUp() {
 
     engine = new FrankyEngine();
-    search = new Search(engine, new Configuration());
+    search = ((FrankyEngine) engine).getSearch();
 
   }
 
@@ -160,7 +160,8 @@ public class TestSearch {
     // test search
     waitWhileSearching();
 
-    // TODO: Inc not implemented in search time estimations yet - so this is similar to non inc time control
+    // TODO: Inc not implemented in search time estimations yet - so this is similar to non inc
+    //  time control
 
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
@@ -225,7 +226,8 @@ public class TestSearch {
 
     // mate in 2 (4 plys)
     String fen =
-      "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1"; // BoardPosition.START_FEN;
+      "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1"; // BoardPosition
+    // .START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 2, 0, null, false, false, false);
@@ -355,11 +357,7 @@ public class TestSearch {
     BoardPosition boardPosition = new BoardPosition(fen);
     //boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
 
-    SearchMode searchMode = new SearchMode(0, 0, 0,
-                                           0, 0, 5,
-                                           0, 0, 0,
-                                           null, false,
-                                           false, true);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 5, 0, 0, 0, null, false, false, true);
 
     search.startSearch(boardPosition, searchMode);
 
@@ -398,13 +396,9 @@ public class TestSearch {
     LOG.info("Start SIZE Test for depth {}", depth);
 
     String fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
-//    fen = BoardPosition.START_FEN;
+    //    fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0,
-                                           0, 0, depth,
-                                           0, 0, 0,
-                                           null, false,
-                                           true, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
 
     List<String> values = new ArrayList<>();
 
@@ -528,7 +522,8 @@ public class TestSearch {
 
     LOG.info("Start SIZE Test for depth {}", depth);
 
-    String fen = "7k/8/8/8/8/8/P7/K7 b - - 0 1";
+    String fen = "7k/8/8/8/8/8/P7/K7 w - - 0 1";
+    fen = "r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - - 3 10";
     //    fen = BoardPosition.START_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
@@ -539,12 +534,8 @@ public class TestSearch {
     search.config.USE_EVALUATION_CACHE = false;
     search.config.MATE_DISTANCE_PRUNING = false;
     search.config.USE_MINOR_PROMOTION_PRUNING = false;
-    search.config.USE_QUIESCENCE = false;
-    SearchMode searchMode = new SearchMode(0, 0, 0,
-                                           0, 0, depth,
-                                           0, 0, 0,
-                                           null, false,
-                                           true, false);
+    search.config.USE_QUIESCENCE = true;
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
 
     search.startSearch(boardPosition, searchMode);
 
@@ -552,7 +543,7 @@ public class TestSearch {
 
     LOG.info("Best Move: {} Value: {} Ponder {}",
              Move.toSimpleString(search.getLastSearchResult().bestMove),
-             search.getLastSearchResult().resultValue/100f,
+             search.getLastSearchResult().resultValue / 100f,
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
 
     if (search.config.USE_TRANSPOSITION_TABLE) {

@@ -68,9 +68,7 @@ public class EvaluationCache {
 
     // sizeInBytes in byte divided by entry sizeInBytes plus sizeInBytes for array bucket
     maxEntries = (int) this.sizeInBytes / (Entry.SIZE + Integer.BYTES);
-    if (maxEntries > Integer.MAX_VALUE) {
-      maxEntries = Integer.MAX_VALUE;
-    }
+
     // create buckets for hash table
     entries = new Entry[maxEntries];
     // initialize
@@ -84,6 +82,7 @@ public class EvaluationCache {
    * @param value
    */
   public void put(long key, int value) {
+    if (maxEntries==0) return;
     final int hash = getHash(key);
     if (entries[hash].key == 0) { // new value
       numberOfEntries++;
@@ -99,6 +98,7 @@ public class EvaluationCache {
    * @return value for key or Integer.MIN_VALUE if not found
    */
   public int get(long key) {
+    if (maxEntries==0) return Integer.MIN_VALUE;
     final int hash = getHash(key);
     if (entries[hash].key == key) { // hash hit
       return entries[hash].value;

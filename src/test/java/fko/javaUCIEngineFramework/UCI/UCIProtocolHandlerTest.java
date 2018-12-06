@@ -443,7 +443,7 @@ class UCIProtocolHandlerTest {
       while (fromHandlerReader.ready()) {
         final String line = fromHandlerReader.readLine();
         LOG.debug(" Received: " + line);
-        assertTrue(line.startsWith("info depth ") || line.startsWith("bestmove "));
+        assertTrue(line.startsWith("info ") || line.startsWith("bestmove "));
       }
     }
 
