@@ -29,10 +29,10 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
- * This class represents the Omega board and its position.<br>
+ * This class represents the chess board and its position.<br>
  * It uses a x88 board, a stack for undo moves, zobrist keys for transposition tables, piece lists,
  * material counter.<br>
- * Can be created with any FEN notation and also from GameBoards or as a copy from another
+ * Can be created with any FEN notation and as a copy from another
  * BoardPosition.
  *
  * <p>x88 method
@@ -73,51 +73,51 @@ public class BoardPosition {
    * The zobrist key to use as a hash key in transposition tables
    * The zobrist key will be updated incrementally every time one of the the state variables change.
    */
-  long   zobristKey          = 0;
-  long[] _zobristKey_History = new long[MAX_HISTORY];
+  long   zobristKey        = 0;
+  long[] zobristKeyHistory = new long[MAX_HISTORY];
 
   // history counter
-  int _historyCounter = 0;
+  int historyCounter = 0;
 
   // **********************************************************
   // Board State START ----------------------------------------
   // unique chess position
   //
   // 0x88 Board
-  Piece[] _x88Board = new Piece[BOARDSIZE];
+  Piece[] x88Board = new Piece[BOARDSIZE];
   // hash for pieces - piece, board
-  static final long[][] _piece_Zobrist =
+  static final long[][] pieceZobrist =
       new long[Piece.values.length][Square.values.length];
 
   // Castling rights
-  boolean _castlingWK = true;
+  boolean   castlingWK          = true;
   boolean[] _castlingWK_history = new boolean[MAX_HISTORY];
-  static final long _castlingWK_Zobrist;
-  boolean _castlingWQ = true;
+  static final long castlingWK_Zobrist;
+  boolean   castlingWQ          = true;
   boolean[] _castlingWQ_history = new boolean[MAX_HISTORY];
-  static final long _castlingWQ_Zobrist;
-  boolean _castlingBK = true;
+  static final long castlingWQ_Zobrist;
+  boolean   castlingBK          = true;
   boolean[] _castlingBK_history = new boolean[MAX_HISTORY];
-  static final long _castlingBK_Zobrist;
-  boolean _castlingBQ = true;
+  static final long castlingBK_Zobrist;
+  boolean   castlingBQ          = true;
   boolean[] _castlingBQ_history = new boolean[MAX_HISTORY];
-  static final long _castlingBQ_Zobrist;
+  static final long castlingBQ_Zobrist;
 
   // en passant field - if NOSQUARE then we do not have an en passant option
-  Square   _enPassantSquare         = Square.NOSQUARE;
-  Square[] _enPassantSquare_History = new Square[MAX_HISTORY];
+  Square   enPassantSquare         = Square.NOSQUARE;
+  Square[] enPassantSquare_History = new Square[MAX_HISTORY];
   // hash for castling rights
-  static final long[] _enPassantSquare_Zobrist = new long[Square.values.length];
+  static final long[] enPassantSquare_Zobrist = new long[Square.values.length];
 
   // half move clock - number of half moves since last capture
-  int _halfMoveClock = 0;
-  int[] _halfMoveClock_History = new int[MAX_HISTORY];
+  int   halfMoveClock        = 0;
+  int[] halfMoveClockHistory = new int[MAX_HISTORY];
   // has no zobrist key
 
   // next player color
-  Color _nextPlayer = Color.WHITE;
+  Color nextPlayer = Color.WHITE;
   // hash for next player
-  static final long _nextPlayer_Zobrist;
+  static final long nextPlayer_Zobrist;
   //
   // Board State END ------------------------------------------
   // **********************************************************
@@ -127,31 +127,31 @@ public class BoardPosition {
   // not necessary for a unique position
 
   // we can recreate the board through the last move - no need for history of board itself
-  int[] _moveHistory = new int[MAX_HISTORY];
+  int[] moveHistory = new int[MAX_HISTORY];
 
   // half move number - the actual half move number to determine the full move number
-  int _nextHalfMoveNumber = 1;
+  int nextHalfMoveNumber = 1;
 
   /** Lists for all pieces */
-  final SquareList[] _pawnSquares = new SquareList[Color.values.length];
+  final SquareList[] pawnSquares = new SquareList[Color.values.length];
 
-  final SquareList[] _knightSquares = new SquareList[Color.values.length];
-  final SquareList[] _bishopSquares = new SquareList[Color.values.length];
-  final SquareList[] _rookSquares   = new SquareList[Color.values.length];
-  final SquareList[] _queenSquares  = new SquareList[Color.values.length];
-  final Square[]     _kingSquares   = new Square[Color.values.length];
+  final SquareList[] knightSquares = new SquareList[Color.values.length];
+  final SquareList[] bishopSquares = new SquareList[Color.values.length];
+  final SquareList[] rookSquares   = new SquareList[Color.values.length];
+  final SquareList[] queenSquares  = new SquareList[Color.values.length];
+  final Square[]     kingSquares   = new Square[Color.values.length];
 
   // Material value will always be up to date
-  int[] _material;
+  int[] material;
 
   // caches a hasCheck and hasMate Flag for the current position. Will be set after
   // a call to hasCheck() and reset to TBD every time a move is made or unmade.
-  private Flag _hasCheck = Flag.TBD;
-  Flag[] _hasCheckFlag_History = new Flag[MAX_HISTORY];
-  private Flag _hasMate = Flag.TBD;
-  Flag[] _hasMateFlag_History = new Flag[MAX_HISTORY];
+  private Flag hasCheck = Flag.TBD;
+  Flag[] hasCheckFlagHistory = new Flag[MAX_HISTORY];
+  private Flag hasMate = Flag.TBD;
+  Flag[] hasMateFlagHistory = new Flag[MAX_HISTORY];
 
-  private final MoveGenerator _mateCheckMG = new MoveGenerator();
+  private final MoveGenerator mateCheckMG = new MoveGenerator();
 
   private enum Flag {
     TBD,
@@ -165,22 +165,22 @@ public class BoardPosition {
     // all pieces on all squares
     for (Piece p : Piece.values) {
       for (Square s : Square.values) {
-        _piece_Zobrist[p.ordinal()][s.ordinal()] = Math.abs(random.nextLong());
+        pieceZobrist[p.ordinal()][s.ordinal()] = Math.abs(random.nextLong());
       }
     }
     // all castling combinations
-    _castlingWK_Zobrist = Math.abs(random.nextLong());
-    _castlingWQ_Zobrist = Math.abs(random.nextLong());
-    _castlingBK_Zobrist = Math.abs(random.nextLong());
-    _castlingBQ_Zobrist = Math.abs(random.nextLong());
+    castlingWK_Zobrist = Math.abs(random.nextLong());
+    castlingWQ_Zobrist = Math.abs(random.nextLong());
+    castlingBK_Zobrist = Math.abs(random.nextLong());
+    castlingBQ_Zobrist = Math.abs(random.nextLong());
 
     // all possible positions of the en passant square (easiest to use all fields and not just the
     // ones where en passant is indeed possible)
     for (Square s : Square.values) {
-      _enPassantSquare_Zobrist[s.ordinal()] = Math.abs(random.nextLong());
+      enPassantSquare_Zobrist[s.ordinal()] = Math.abs(random.nextLong());
     }
     // set or unset this for the two color options
-    _nextPlayer_Zobrist = Math.abs(random.nextLong());
+    nextPlayer_Zobrist = Math.abs(random.nextLong());
   }
 
   // Constructors START -----------------------------------------
@@ -209,61 +209,60 @@ public class BoardPosition {
     if (op == null) throw new NullPointerException("Parameter op may not be null");
 
     // x88 board
-    System.arraycopy(op._x88Board, 0, this._x88Board, 0, op._x88Board.length);
+    System.arraycopy(op.x88Board, 0, this.x88Board, 0, op.x88Board.length);
 
     // game state
-    this._nextHalfMoveNumber = op._nextHalfMoveNumber;
-    this._nextPlayer = op._nextPlayer;
+    this.nextHalfMoveNumber = op.nextHalfMoveNumber;
+    this.nextPlayer = op.nextPlayer;
     this.zobristKey = op.zobristKey;
 
-    this._castlingWK = op._castlingWK;
-    this._castlingWQ = op._castlingWQ;
-    this._castlingBK = op._castlingBK;
-    this._castlingBQ = op._castlingBQ;
-    this._enPassantSquare = op._enPassantSquare;
-    this._halfMoveClock = op._halfMoveClock;
+    this.castlingWK = op.castlingWK;
+    this.castlingWQ = op.castlingWQ;
+    this.castlingBK = op.castlingBK;
+    this.castlingBQ = op.castlingBQ;
+    this.enPassantSquare = op.enPassantSquare;
+    this.halfMoveClock = op.halfMoveClock;
 
-    this._hasCheck = op._hasCheck;
-    this._hasMate = op._hasMate;
+    this.hasCheck = op.hasCheck;
+    this.hasMate = op.hasMate;
 
     // history
-    this._historyCounter = op._historyCounter;
-    System.arraycopy(op._zobristKey_History, 0, _zobristKey_History, 0, _zobristKey_History.length);
+    this.historyCounter = op.historyCounter;
+    System.arraycopy(op.zobristKeyHistory, 0, zobristKeyHistory, 0, zobristKeyHistory.length);
 
     System.arraycopy(op._castlingWK_history, 0, _castlingWK_history, 0, _castlingWK_history.length);
     System.arraycopy(op._castlingWQ_history, 0, _castlingWQ_history, 0, _castlingWQ_history.length);
     System.arraycopy(op._castlingBK_history, 0, _castlingBK_history, 0, _castlingBK_history.length);
     System.arraycopy(op._castlingBQ_history, 0, _castlingBQ_history, 0, _castlingBQ_history.length);
     System.arraycopy(
-        op._enPassantSquare_History,
-        0,
-        _enPassantSquare_History,
-        0,
-        _enPassantSquare_History.length);
+      op.enPassantSquare_History,
+      0, enPassantSquare_History,
+      0,
+      enPassantSquare_History.length);
     System.arraycopy(
-        op._halfMoveClock_History, 0, _halfMoveClock_History, 0, _halfMoveClock_History.length);
+      op.halfMoveClockHistory, 0, halfMoveClockHistory, 0, halfMoveClockHistory.length);
 
     System.arraycopy(
-        op._hasCheckFlag_History, 0, _hasCheckFlag_History, 0, _hasCheckFlag_History.length);
+      op.hasCheckFlagHistory, 0, hasCheckFlagHistory, 0, hasCheckFlagHistory.length);
     System.arraycopy(
-        op._hasMateFlag_History, 0, _hasMateFlag_History, 0, _hasMateFlag_History.length);
+      op.hasMateFlagHistory, 0, hasMateFlagHistory, 0, hasMateFlagHistory.length);
 
     // move history
-    System.arraycopy(op._moveHistory, 0, _moveHistory, 0, op._moveHistory.length);
+    System.arraycopy(op.moveHistory, 0, moveHistory, 0, op.moveHistory.length);
 
     // initializeLists();
     // copy piece lists
     for (int i = 0; i <= 1; i++) { // foreach color
-      this._pawnSquares[i] = op._pawnSquares[i].clone();
-      this._knightSquares[i] = op._knightSquares[i].clone();
-      this._bishopSquares[i] = op._bishopSquares[i].clone();
-      this._rookSquares[i] = op._rookSquares[i].clone();
-      this._queenSquares[i] = op._queenSquares[i].clone();
-      this._kingSquares[i] = op._kingSquares[i];
+      this.pawnSquares[i] = op.pawnSquares[i].clone();
+      this.knightSquares[i] = op.knightSquares[i].clone();
+      this.bishopSquares[i] = op.bishopSquares[i].clone();
+      this.rookSquares[i] = op.rookSquares[i].clone();
+      this.queenSquares[i] = op.queenSquares[i].clone();
+      this.kingSquares[i] = op.kingSquares[i];
     }
-    _material = new int[2];
-    this._material[0] = op._material[0];
-    this._material[1] = op._material[1];
+    material = new int[2];
+    this.material[0] = op.material[0];
+    this.material[1] = op.material[1];
   }
 
   /**
@@ -279,14 +278,14 @@ public class BoardPosition {
   /** Initialize the lists for the pieces and the material counter */
   private void initializeLists() {
     for (int i = 0; i <= 1; i++) { // foreach color
-      _pawnSquares[i] = new SquareList();
-      _knightSquares[i] = new SquareList();
-      _bishopSquares[i] = new SquareList();
-      _rookSquares[i] = new SquareList();
-      _queenSquares[i] = new SquareList();
-      _kingSquares[i] = Square.NOSQUARE;
+      pawnSquares[i] = new SquareList();
+      knightSquares[i] = new SquareList();
+      bishopSquares[i] = new SquareList();
+      rookSquares[i] = new SquareList();
+      queenSquares[i] = new SquareList();
+      kingSquares[i] = Square.NOSQUARE;
     }
-    _material = new int[2];
+    material = new int[2];
   }
 
   /**
@@ -309,22 +308,22 @@ public class BoardPosition {
     Piece promotion = Move.getPromotion(move);
 
     // Save state for undoMove
-    _moveHistory[_historyCounter] = move;
+    moveHistory[historyCounter] = move;
 
-    _castlingWK_history[_historyCounter] = _castlingWK;
-    _castlingWQ_history[_historyCounter] = _castlingWQ;
-    _castlingBK_history[_historyCounter] = _castlingBK;
-    _castlingBQ_history[_historyCounter] = _castlingBQ;
-    _enPassantSquare_History[_historyCounter] = _enPassantSquare;
-    _halfMoveClock_History[_historyCounter] = _halfMoveClock;
-    _zobristKey_History[_historyCounter] = zobristKey;
-    _hasCheckFlag_History[_historyCounter] = _hasCheck;
-    _hasMateFlag_History[_historyCounter] = _hasMate;
-    _historyCounter++;
+    _castlingWK_history[historyCounter] = castlingWK;
+    _castlingWQ_history[historyCounter] = castlingWQ;
+    _castlingBK_history[historyCounter] = castlingBK;
+    _castlingBQ_history[historyCounter] = castlingBQ;
+    enPassantSquare_History[historyCounter] = enPassantSquare;
+    halfMoveClockHistory[historyCounter] = halfMoveClock;
+    zobristKeyHistory[historyCounter] = zobristKey;
+    hasCheckFlagHistory[historyCounter] = hasCheck;
+    hasMateFlagHistory[historyCounter] = hasMate;
+    historyCounter++;
 
     // reset check and mate flag
-    _hasCheck = Flag.TBD;
-    _hasMate = Flag.TBD;
+    hasCheck = Flag.TBD;
+    hasMate = Flag.TBD;
 
     // make move
     switch (Move.getMoveType(move)) {
@@ -332,9 +331,9 @@ public class BoardPosition {
         invalidateCastlingRights(fromSquare, toSquare);
         makeNormalMove(fromSquare, toSquare, piece, target);
         // clear en passant
-        if (_enPassantSquare != Square.NOSQUARE) {
-          zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
-          _enPassantSquare = Square.NOSQUARE;
+        if (enPassantSquare != Square.NOSQUARE) {
+          zobristKey ^= enPassantSquare_Zobrist[enPassantSquare.ordinal()]; // out
+          enPassantSquare = Square.NOSQUARE;
         }
         break;
       case PAWNDOUBLE:
@@ -342,13 +341,13 @@ public class BoardPosition {
         assert !piece.getColor().isNone();
         movePiece(fromSquare, toSquare, piece);
         // clear old en passant
-        if (_enPassantSquare != Square.NOSQUARE) {
-          zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // in
+        if (enPassantSquare != Square.NOSQUARE) {
+          zobristKey ^= enPassantSquare_Zobrist[enPassantSquare.ordinal()]; // in
         }
         // set new en passant target field - always one "behind" the toSquare
-        _enPassantSquare = piece.getColor().isWhite() ? toSquare.getSouth() : toSquare.getNorth();
-        zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // in
-        _halfMoveClock = 0; // reset half move clock because of pawn move
+        enPassantSquare = piece.getColor().isWhite() ? toSquare.getSouth() : toSquare.getNorth();
+        zobristKey ^= enPassantSquare_Zobrist[enPassantSquare.ordinal()]; // in
+        halfMoveClock = 0; // reset half move clock because of pawn move
         break;
       case ENPASSANT:
         assert target != Piece.NOPIECE;
@@ -359,20 +358,20 @@ public class BoardPosition {
         removePiece(targetSquare, target);
         movePiece(fromSquare, toSquare, piece);
         // clear en passant
-        if (_enPassantSquare != Square.NOSQUARE) {
-          zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
-          _enPassantSquare = Square.NOSQUARE;
+        if (enPassantSquare != Square.NOSQUARE) {
+          zobristKey ^= enPassantSquare_Zobrist[enPassantSquare.ordinal()]; // out
+          enPassantSquare = Square.NOSQUARE;
         }
-        _halfMoveClock = 0; // reset half move clock because of pawn move
+        halfMoveClock = 0; // reset half move clock because of pawn move
         break;
       case CASTLING:
         makeCastlingMove(fromSquare, toSquare, piece);
         // clear en passant
-        if (_enPassantSquare != Square.NOSQUARE) {
-          zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
-          _enPassantSquare = Square.NOSQUARE;
+        if (enPassantSquare != Square.NOSQUARE) {
+          zobristKey ^= enPassantSquare_Zobrist[enPassantSquare.ordinal()]; // out
+          enPassantSquare = Square.NOSQUARE;
         }
-        _halfMoveClock++;
+        halfMoveClock++;
         break;
       case PROMOTION:
         if (target != Piece.NOPIECE) removePiece(toSquare, target);
@@ -380,11 +379,11 @@ public class BoardPosition {
         removePiece(fromSquare, piece);
         putPiece(toSquare, promotion);
         // clear en passant
-        if (_enPassantSquare != Square.NOSQUARE) {
-          zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
-          _enPassantSquare = Square.NOSQUARE;
+        if (enPassantSquare != Square.NOSQUARE) {
+          zobristKey ^= enPassantSquare_Zobrist[enPassantSquare.ordinal()]; // out
+          enPassantSquare = Square.NOSQUARE;
         }
-        _halfMoveClock = 0; // reset half move clock because of pawn move
+        halfMoveClock = 0; // reset half move clock because of pawn move
         break;
       case NOMOVETYPE:
       default:
@@ -392,22 +391,22 @@ public class BoardPosition {
     }
 
     // update halfMoveNumber
-    _nextHalfMoveNumber++;
+    nextHalfMoveNumber++;
 
     // change color (active player)
-    _nextPlayer = _nextPlayer.getInverseColor();
-    zobristKey ^= _nextPlayer_Zobrist;
+    nextPlayer = nextPlayer.getInverseColor();
+    zobristKey ^= nextPlayer_Zobrist;
   }
 
   /** Takes back the last move from the board */
   public void undoMove() {
     // Get state for undoMove
-    _historyCounter--;
+    historyCounter--;
 
-    int move = _moveHistory[_historyCounter];
+    int move = moveHistory[historyCounter];
 
     // reset move history
-    _moveHistory[_historyCounter] = Move.NOMOVE;
+    moveHistory[historyCounter] = Move.NOMOVE;
 
     // undo piece move / restore board
     Square fromSquare = Move.getStart(move);
@@ -449,29 +448,29 @@ public class BoardPosition {
     }
 
     // restore castling rights
-    _castlingWK = _castlingWK_history[_historyCounter];
-    _castlingWQ = _castlingWQ_history[_historyCounter];
-    _castlingBK = _castlingBK_history[_historyCounter];
-    _castlingBQ = _castlingBQ_history[_historyCounter];
+    castlingWK = _castlingWK_history[historyCounter];
+    castlingWQ = _castlingWQ_history[historyCounter];
+    castlingBK = _castlingBK_history[historyCounter];
+    castlingBQ = _castlingBQ_history[historyCounter];
 
     // restore en passant square
-    _enPassantSquare = _enPassantSquare_History[_historyCounter];
+    enPassantSquare = enPassantSquare_History[historyCounter];
 
     // restore halfMoveClock
-    _halfMoveClock = _halfMoveClock_History[_historyCounter];
+    halfMoveClock = halfMoveClockHistory[historyCounter];
 
     // decrease _halfMoveNumber
-    _nextHalfMoveNumber--;
+    nextHalfMoveNumber--;
 
     // change back color
-    _nextPlayer = _nextPlayer.getInverseColor();
+    nextPlayer = nextPlayer.getInverseColor();
 
     // zobristKey - just overwrite - should be the same as before the move
-    zobristKey = _zobristKey_History[_historyCounter];
+    zobristKey = zobristKeyHistory[historyCounter];
 
     // get the check and mate flag from history
-    _hasCheck = _hasCheckFlag_History[_historyCounter];
-    _hasMate = _hasMateFlag_History[_historyCounter];
+    hasCheck = hasCheckFlagHistory[historyCounter];
+    hasMate = hasMateFlagHistory[historyCounter];
   }
 
   /**
@@ -485,11 +484,11 @@ public class BoardPosition {
 
     if (target != Piece.NOPIECE) {
       removePiece(toSquare, target);
-      _halfMoveClock = 0; // reset half move clock because of capture
+      halfMoveClock = 0; // reset half move clock because of capture
     } else if (piece.getType() == PieceType.PAWN) {
-      _halfMoveClock = 0; // reset half move clock because of pawn move
+      halfMoveClock = 0; // reset half move clock because of pawn move
     } else {
-      _halfMoveClock++;
+      halfMoveClock++;
     }
 
     movePiece(fromSquare, toSquare, piece);
@@ -504,33 +503,33 @@ public class BoardPosition {
     // no else here - combination of these can occur! BIG BUG before :)
     if (fromSquare == Square.e1 || toSquare == Square.e1) {
       // only take out zobrist if the castling was true before.
-      if (_castlingWK) zobristKey ^= _castlingWK_Zobrist;
-      _castlingWK = false;
-      if (_castlingWQ) zobristKey ^= _castlingWQ_Zobrist;
-      _castlingWQ = false;
+      if (castlingWK) zobristKey ^= castlingWK_Zobrist;
+      castlingWK = false;
+      if (castlingWQ) zobristKey ^= castlingWQ_Zobrist;
+      castlingWQ = false;
     }
     if (fromSquare == Square.e8 || toSquare == Square.e8) {
       // only take out zobrist if the castling was true before.
-      if (_castlingBK) zobristKey ^= _castlingBK_Zobrist;
-      _castlingBK = false;
-      if (_castlingBQ) zobristKey ^= _castlingBQ_Zobrist;
-      _castlingBQ = false;
+      if (castlingBK) zobristKey ^= castlingBK_Zobrist;
+      castlingBK = false;
+      if (castlingBQ) zobristKey ^= castlingBQ_Zobrist;
+      castlingBQ = false;
     }
     if (fromSquare == Square.a1 || toSquare == Square.a1) {
-      if (_castlingWQ) zobristKey ^= _castlingWQ_Zobrist;
-      _castlingWQ = false;
+      if (castlingWQ) zobristKey ^= castlingWQ_Zobrist;
+      castlingWQ = false;
     }
     if (fromSquare == Square.h1 || toSquare == Square.h1) {
-      if (_castlingWK) zobristKey ^= _castlingWK_Zobrist;
-      _castlingWK = false;
+      if (castlingWK) zobristKey ^= castlingWK_Zobrist;
+      castlingWK = false;
     }
     if (fromSquare == Square.a8 || toSquare == Square.a8) {
-      if (_castlingBQ) zobristKey ^= _castlingBQ_Zobrist;
-      _castlingBQ = false;
+      if (castlingBQ) zobristKey ^= castlingBQ_Zobrist;
+      castlingBQ = false;
     }
     if (fromSquare == Square.h8 || toSquare == Square.h8) {
-      if (_castlingBK) zobristKey ^= _castlingBK_Zobrist;
-      _castlingBK = false;
+      if (castlingBK) zobristKey ^= castlingBK_Zobrist;
+      castlingBK = false;
     }
   }
 
@@ -548,37 +547,37 @@ public class BoardPosition {
 
     switch (toSquare) {
       case g1: // white kingside
-        assert (_castlingWK);
+        assert (castlingWK);
         rook = Piece.WHITE_ROOK;
         rookFromSquare = Square.h1;
-        assert (_x88Board[rookFromSquare.ordinal()] == rook) // check if rook is indeed there
+        assert (x88Board[rookFromSquare.ordinal()] == rook) // check if rook is indeed there
             : "rook to castle not there";
         rookToSquare = Square.f1;
         invalidateCastlingRights(fromSquare, toSquare);
         break;
       case c1: // white queenside
-        assert (_castlingWQ);
+        assert (castlingWQ);
         rook = Piece.WHITE_ROOK;
         rookFromSquare = Square.a1;
-        assert (_x88Board[rookFromSquare.ordinal()] == rook) // check if rook is indeed there
+        assert (x88Board[rookFromSquare.ordinal()] == rook) // check if rook is indeed there
             : "rook to castle not there";
         rookToSquare = Square.d1;
         invalidateCastlingRights(fromSquare, toSquare);
         break;
       case g8: // black kingside
-        assert (_castlingBK);
+        assert (castlingBK);
         rook = Piece.BLACK_ROOK;
         rookFromSquare = Square.h8;
-        assert (_x88Board[rookFromSquare.ordinal()] == rook) // check if rook is indeed there
+        assert (x88Board[rookFromSquare.ordinal()] == rook) // check if rook is indeed there
             : "rook to castle not there";
         rookToSquare = Square.f8;
         invalidateCastlingRights(fromSquare, toSquare);
         break;
       case c8: // black queenside
-        assert (_castlingBQ);
+        assert (castlingBQ);
         rook = Piece.BLACK_ROOK;
         rookFromSquare = Square.a8;
-        assert (_x88Board[rookFromSquare.ordinal()] == rook) // check if rook is indeed there
+        assert (x88Board[rookFromSquare.ordinal()] == rook) // check if rook is indeed there
             : "rook to castle not there";
         rookToSquare = Square.d8;
         invalidateCastlingRights(fromSquare, toSquare);
@@ -640,67 +639,67 @@ public class BoardPosition {
   public void makeNullMove() {
 
     // Save state for undoMove
-    _castlingWK_history[_historyCounter] = _castlingWK;
-    _castlingWQ_history[_historyCounter] = _castlingWQ;
-    _castlingBK_history[_historyCounter] = _castlingBK;
-    _castlingBQ_history[_historyCounter] = _castlingBQ;
-    _enPassantSquare_History[_historyCounter] = _enPassantSquare;
-    _halfMoveClock_History[_historyCounter] = _halfMoveClock;
-    _zobristKey_History[_historyCounter] = zobristKey;
-    _hasCheckFlag_History[_historyCounter] = _hasCheck;
-    _hasMateFlag_History[_historyCounter] = _hasMate;
-    _historyCounter++;
+    _castlingWK_history[historyCounter] = castlingWK;
+    _castlingWQ_history[historyCounter] = castlingWQ;
+    _castlingBK_history[historyCounter] = castlingBK;
+    _castlingBQ_history[historyCounter] = castlingBQ;
+    enPassantSquare_History[historyCounter] = enPassantSquare;
+    halfMoveClockHistory[historyCounter] = halfMoveClock;
+    zobristKeyHistory[historyCounter] = zobristKey;
+    hasCheckFlagHistory[historyCounter] = hasCheck;
+    hasMateFlagHistory[historyCounter] = hasMate;
+    historyCounter++;
 
     // reset check and mate flag
-    _hasCheck = Flag.TBD;
-    _hasMate = Flag.TBD;
+    hasCheck = Flag.TBD;
+    hasMate = Flag.TBD;
 
     // clear en passant
-    if (_enPassantSquare != Square.NOSQUARE) {
-      zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // out
-      _enPassantSquare = Square.NOSQUARE;
+    if (enPassantSquare != Square.NOSQUARE) {
+      zobristKey ^= enPassantSquare_Zobrist[enPassantSquare.ordinal()]; // out
+      enPassantSquare = Square.NOSQUARE;
     }
 
     // increase half move clock
-    _halfMoveClock++;
+    halfMoveClock++;
 
     // increase halfMoveNumber
-    _nextHalfMoveNumber++;
+    nextHalfMoveNumber++;
 
     // change color (active player)
-    _nextPlayer = _nextPlayer.getInverseColor();
-    zobristKey ^= _nextPlayer_Zobrist;
+    nextPlayer = nextPlayer.getInverseColor();
+    zobristKey ^= nextPlayer_Zobrist;
   }
 
   /** Undo a null move. Essentially switches back sides within same position. */
   public void undoNullMove() {
     // Get state for undoMove
-    _historyCounter--;
+    historyCounter--;
 
     // restore castling rights
-    _castlingWK = _castlingWK_history[_historyCounter];
-    _castlingWQ = _castlingWQ_history[_historyCounter];
-    _castlingBK = _castlingBK_history[_historyCounter];
-    _castlingBQ = _castlingBQ_history[_historyCounter];
+    castlingWK = _castlingWK_history[historyCounter];
+    castlingWQ = _castlingWQ_history[historyCounter];
+    castlingBK = _castlingBK_history[historyCounter];
+    castlingBQ = _castlingBQ_history[historyCounter];
 
     // restore en passant square
-    _enPassantSquare = _enPassantSquare_History[_historyCounter];
+    enPassantSquare = enPassantSquare_History[historyCounter];
 
     // restore halfMoveClock
-    _halfMoveClock = _halfMoveClock_History[_historyCounter];
+    halfMoveClock = halfMoveClockHistory[historyCounter];
 
     // decrease _halfMoveNumber
-    _nextHalfMoveNumber--;
+    nextHalfMoveNumber--;
 
     // change back color
-    _nextPlayer = _nextPlayer.getInverseColor();
+    nextPlayer = nextPlayer.getInverseColor();
 
     // zobristKey - just overwrite - should be the same as before the move
-    zobristKey = _zobristKey_History[_historyCounter];
+    zobristKey = zobristKeyHistory[historyCounter];
 
     // get the check and mate flag from history
-    _hasCheck = _hasCheckFlag_History[_historyCounter];
-    _hasMate = _hasMateFlag_History[_historyCounter];
+    hasCheck = hasCheckFlagHistory[historyCounter];
+    hasMate = hasMateFlagHistory[historyCounter];
   }
 
   /**
@@ -713,21 +712,21 @@ public class BoardPosition {
     assert toSquare.isValidSquare();
     assert piece != Piece.NOPIECE;
     // assert
-    assert (_x88Board[fromSquare.ordinal()] == piece) // check if moved piece is indeed there
+    assert (x88Board[fromSquare.ordinal()] == piece) // check if moved piece is indeed there
         : "piece to move not there";
-    assert (_x88Board[toSquare.ordinal()] == Piece.NOPIECE) // // should be empty
+    assert (x88Board[toSquare.ordinal()] == Piece.NOPIECE) // // should be empty
         : "to square should be empty";
     // due to performance we do not call remove and put
     // no need to update counters when moving
     // remove
-    _x88Board[fromSquare.ordinal()] = Piece.NOPIECE;
-    zobristKey ^= _piece_Zobrist[piece.ordinal()][fromSquare.ordinal()]; // out
+    x88Board[fromSquare.ordinal()] = Piece.NOPIECE;
+    zobristKey ^= pieceZobrist[piece.ordinal()][fromSquare.ordinal()]; // out
     // update piece lists
     final int color = piece.getColor().ordinal();
     removeFromPieceLists(fromSquare, piece, color);
     // put
-    _x88Board[toSquare.ordinal()] = piece;
-    zobristKey ^= _piece_Zobrist[piece.ordinal()][toSquare.ordinal()]; // in
+    x88Board[toSquare.ordinal()] = piece;
+    zobristKey ^= pieceZobrist[piece.ordinal()][toSquare.ordinal()]; // in
     // update piece lists
     addToPieceLists(toSquare, piece, color);
   }
@@ -739,32 +738,32 @@ public class BoardPosition {
   private void putPiece(Square square, Piece piece) {
     assert square.isValidSquare();
     assert piece != Piece.NOPIECE;
-    assert _x88Board[square.ordinal()] == Piece.NOPIECE; // should be empty
+    assert x88Board[square.ordinal()] == Piece.NOPIECE; // should be empty
     // put
-    _x88Board[square.ordinal()] = piece;
-    zobristKey ^= _piece_Zobrist[piece.ordinal()][square.ordinal()]; // in
+    x88Board[square.ordinal()] = piece;
+    zobristKey ^= pieceZobrist[piece.ordinal()][square.ordinal()]; // in
     // update piece lists
     final int color = piece.getColor().ordinal();
     addToPieceLists(square, piece, color);
     // update material
-    _material[color] += piece.getType().getValue();
+    material[color] += piece.getType().getValue();
   }
 
   /** @return the removed piece */
   private Piece removePiece(Square square, Piece piece) {
     assert square.isValidSquare();
     assert piece != Piece.NOPIECE;
-    assert _x88Board[square.ordinal()] == piece // check if removed piece is indeed there
+    assert x88Board[square.ordinal()] == piece // check if removed piece is indeed there
         : "piece to be removed not there";
     // remove
-    Piece old = _x88Board[square.ordinal()];
-    _x88Board[square.ordinal()] = Piece.NOPIECE;
-    zobristKey ^= _piece_Zobrist[piece.ordinal()][square.ordinal()]; // out
+    Piece old = x88Board[square.ordinal()];
+    x88Board[square.ordinal()] = Piece.NOPIECE;
+    zobristKey ^= pieceZobrist[piece.ordinal()][square.ordinal()]; // out
     // update piece lists
     final int color = piece.getColor().ordinal();
     removeFromPieceLists(square, piece, color);
     // update material
-    _material[color] -= piece.getType().getValue();
+    material[color] -= piece.getType().getValue();
     // return the remove piece
     return old;
   }
@@ -777,22 +776,22 @@ public class BoardPosition {
   private void addToPieceLists(Square toSquare, Piece piece, final int color) {
     switch (piece.getType()) {
       case PAWN:
-        _pawnSquares[color].add(toSquare);
+        pawnSquares[color].add(toSquare);
         break;
       case KNIGHT:
-        _knightSquares[color].add(toSquare);
+        knightSquares[color].add(toSquare);
         break;
       case BISHOP:
-        _bishopSquares[color].add(toSquare);
+        bishopSquares[color].add(toSquare);
         break;
       case ROOK:
-        _rookSquares[color].add(toSquare);
+        rookSquares[color].add(toSquare);
         break;
       case QUEEN:
-        _queenSquares[color].add(toSquare);
+        queenSquares[color].add(toSquare);
         break;
       case KING:
-        _kingSquares[color] = toSquare;
+        kingSquares[color] = toSquare;
         break;
       default:
         break;
@@ -807,22 +806,22 @@ public class BoardPosition {
   private void removeFromPieceLists(Square fromSquare, Piece piece, final int color) {
     switch (piece.getType()) {
       case PAWN:
-        _pawnSquares[color].remove(fromSquare);
+        pawnSquares[color].remove(fromSquare);
         break;
       case KNIGHT:
-        _knightSquares[color].remove(fromSquare);
+        knightSquares[color].remove(fromSquare);
         break;
       case BISHOP:
-        _bishopSquares[color].remove(fromSquare);
+        bishopSquares[color].remove(fromSquare);
         break;
       case ROOK:
-        _rookSquares[color].remove(fromSquare);
+        rookSquares[color].remove(fromSquare);
         break;
       case QUEEN:
-        _queenSquares[color].remove(fromSquare);
+        queenSquares[color].remove(fromSquare);
         break;
       case KING:
-        _kingSquares[color] = Square.NOSQUARE;
+        kingSquares[color] = Square.NOSQUARE;
         break;
       default:
         break;
@@ -856,21 +855,21 @@ public class BoardPosition {
     final Piece attackerPawn = isWhite ? Piece.WHITE_PAWN : Piece.BLACK_PAWN;
     for (int d : Square.pawnAttackDirections) {
       final int i = os_Index + d * pawnDir;
-      if ((i & 0x88) == 0 && _x88Board[i] == attackerPawn) return true;
+      if ((i & 0x88) == 0 && x88Board[i] == attackerPawn) return true;
     }
 
     final int attackerColorIndex = attackerColor.ordinal();
 
     // check sliding horizontal (rook + queen) if there are any
-    if (!(_rookSquares[attackerColorIndex].isEmpty()
-        && _queenSquares[attackerColorIndex].isEmpty())) {
+    if (!(rookSquares[attackerColorIndex].isEmpty()
+          && queenSquares[attackerColorIndex].isEmpty())) {
       for (int d : Square.rookDirections) {
         int i = os_Index + d;
         while ((i & 0x88) == 0) { // slide while valid square
-          if (_x88Board[i] != Piece.NOPIECE) { // not empty
-            if (_x88Board[i].getColor() == attackerColor // attacker piece
-                && (_x88Board[i].getType() == PieceType.ROOK
-                    || _x88Board[i].getType() == PieceType.QUEEN)) {
+          if (x88Board[i] != Piece.NOPIECE) { // not empty
+            if (x88Board[i].getColor() == attackerColor // attacker piece
+                && (x88Board[i].getType() == PieceType.ROOK
+                    || x88Board[i].getType() == PieceType.QUEEN)) {
               return true;
             }
             break; // not an attacker color or attacker piece blocking the way.
@@ -881,15 +880,15 @@ public class BoardPosition {
     }
 
     // check sliding diagonal (bishop + queen) if there are any
-    if (!(_bishopSquares[attackerColorIndex].isEmpty()
-        && _queenSquares[attackerColorIndex].isEmpty())) {
+    if (!(bishopSquares[attackerColorIndex].isEmpty()
+          && queenSquares[attackerColorIndex].isEmpty())) {
       for (int d : Square.bishopDirections) {
         int i = os_Index + d;
         while ((i & 0x88) == 0) { // slide while valid square
-          if (_x88Board[i] != Piece.NOPIECE) { // not empty
-            if (_x88Board[i].getColor() == attackerColor // attacker piece
-                && (_x88Board[i].getType() == PieceType.BISHOP
-                    || _x88Board[i].getType() == PieceType.QUEEN)) {
+          if (x88Board[i] != Piece.NOPIECE) { // not empty
+            if (x88Board[i].getColor() == attackerColor // attacker piece
+                && (x88Board[i].getType() == PieceType.BISHOP
+                    || x88Board[i].getType() == PieceType.QUEEN)) {
               return true;
             }
             break; // not an attacker color or attacker piece blocking the way.
@@ -900,13 +899,13 @@ public class BoardPosition {
     }
 
     // check knights if there are any
-    if (!(_knightSquares[attackerColorIndex].isEmpty())) {
+    if (!(knightSquares[attackerColorIndex].isEmpty())) {
       for (int d : Square.knightDirections) {
         int i = os_Index + d;
         if ((i & 0x88) == 0) { // valid square
-          if (_x88Board[i] != Piece.NOPIECE // not empty
-              && _x88Board[i].getColor() == attackerColor // attacker piece
-              && (_x88Board[i].getType() == PieceType.KNIGHT)) {
+          if (x88Board[i] != Piece.NOPIECE // not empty
+              && x88Board[i].getColor() == attackerColor // attacker piece
+              && (x88Board[i].getType() == PieceType.KNIGHT)) {
             return true;
           }
         }
@@ -917,38 +916,38 @@ public class BoardPosition {
     for (int d : Square.kingDirections) {
       int i = os_Index + d;
       if ((i & 0x88) == 0) { // valid square
-        if (_x88Board[i] != Piece.NOPIECE // not empty
-            && _x88Board[i].getColor() == attackerColor // attacker piece
-            && (_x88Board[i].getType() == PieceType.KING)) {
+        if (x88Board[i] != Piece.NOPIECE // not empty
+            && x88Board[i].getColor() == attackerColor // attacker piece
+            && (x88Board[i].getType() == PieceType.KING)) {
           return true;
         }
       }
     }
 
     // check en passant
-    if (this._enPassantSquare != Square.NOSQUARE) {
+    if (this.enPassantSquare != Square.NOSQUARE) {
       if (isWhite // white is attacker
-          && _x88Board[_enPassantSquare.getSouth().ordinal()]
+          && x88Board[enPassantSquare.getSouth().ordinal()]
              == Piece.BLACK_PAWN // black is target
-          && this._enPassantSquare.getSouth()
+          && this.enPassantSquare.getSouth()
               == square) { // this is indeed the en passant attacked square
         // left
         int i = os_Index + Square.W;
-        if ((i & 0x88) == 0 && _x88Board[i] == Piece.WHITE_PAWN) return true;
+        if ((i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN) return true;
         // right
         i = os_Index + Square.E;
-        if ((i & 0x88) == 0 && _x88Board[i] == Piece.WHITE_PAWN) return true;
+        if ((i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN) return true;
       } else if (!isWhite // black is attacker (assume not noColor)
-                 && _x88Board[_enPassantSquare.getNorth().ordinal()]
+                 && x88Board[enPassantSquare.getNorth().ordinal()]
                     == Piece.WHITE_PAWN // white is target
-                 && this._enPassantSquare.getNorth()
+                 && this.enPassantSquare.getNorth()
               == square) { // this is indeed the en passant attacked square
         // attack from left
         int i = os_Index + Square.W;
-        if ((i & 0x88) == 0 && _x88Board[i] == Piece.BLACK_PAWN) return true;
+        if ((i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN) return true;
         // attack from right
         i = os_Index + Square.E;
-        if ((i & 0x88) == 0 && _x88Board[i] == Piece.BLACK_PAWN) return true;
+        if ((i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN) return true;
       }
     }
 
@@ -957,9 +956,9 @@ public class BoardPosition {
 
   /** @return true if current position has check for next player */
   public boolean hasCheck() {
-    if (_hasCheck != Flag.TBD) return _hasCheck == Flag.TRUE;
-    boolean check = isAttacked(_nextPlayer.getInverseColor(), _kingSquares[_nextPlayer.ordinal()]);
-    _hasCheck = check ? Flag.TRUE : Flag.FALSE;
+    if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
+    boolean check = isAttacked(nextPlayer.getInverseColor(), kingSquares[nextPlayer.ordinal()]);
+    hasCheck = check ? Flag.TRUE : Flag.FALSE;
     return check;
   }
 
@@ -971,12 +970,12 @@ public class BoardPosition {
    */
   public boolean hasCheckMate() {
     if (!hasCheck()) return false;
-    if (_hasMate != Flag.TBD) return _hasMate == Flag.TRUE;
-    if (!_mateCheckMG.hasLegalMove(this)) {
-      _hasMate = Flag.TRUE;
+    if (hasMate != Flag.TBD) return hasMate == Flag.TRUE;
+    if (!mateCheckMG.hasLegalMove(this)) {
+      hasMate = Flag.TRUE;
       return true;
     }
-    _hasMate = Flag.FALSE;
+    hasMate = Flag.FALSE;
     return false;
   }
 
@@ -988,7 +987,7 @@ public class BoardPosition {
    *     made
    */
   public boolean check50Moves() {
-    return this._halfMoveClock >= 100;
+    return this.halfMoveClock >= 100;
   }
 
   /**
@@ -1013,11 +1012,11 @@ public class BoardPosition {
     [8]     3185849660387886977 <<< 3rd REPETITION from current zobrist
      */
 
-    if (_historyCounter < 8) return false;
+    if (historyCounter < 8) return false;
     int counter = 0;
-    int i = _historyCounter - 4;
+    int i = historyCounter - 4;
     while (i >= 0) {
-      if (zobristKey == _zobristKey_History[i]) counter++;
+      if (zobristKey == zobristKeyHistory[i]) counter++;
       if (counter >= 2) return true;
       i -= 4;
     }
@@ -1037,52 +1036,52 @@ public class BoardPosition {
      * one side has two knights against the bare king
      * both sides have a king and a bishop, the bishops being the same color
      */
-    if (_pawnSquares[Color.WHITE.ordinal()].size() == 0
-        && _pawnSquares[Color.BLACK.ordinal()].size() == 0
-        && _rookSquares[Color.WHITE.ordinal()].size() == 0
-        && _rookSquares[Color.BLACK.ordinal()].size() == 0
-        && _queenSquares[Color.WHITE.ordinal()].size() == 0
-        && _queenSquares[Color.BLACK.ordinal()].size() == 0) {
+    if (pawnSquares[Color.WHITE.ordinal()].size() == 0
+        && pawnSquares[Color.BLACK.ordinal()].size() == 0
+        && rookSquares[Color.WHITE.ordinal()].size() == 0
+        && rookSquares[Color.BLACK.ordinal()].size() == 0
+        && queenSquares[Color.WHITE.ordinal()].size() == 0
+        && queenSquares[Color.BLACK.ordinal()].size() == 0) {
 
       // white king bare KK*
-      if (_knightSquares[Color.WHITE.ordinal()].size() == 0
-          && _bishopSquares[Color.WHITE.ordinal()].size() == 0) {
+      if (knightSquares[Color.WHITE.ordinal()].size() == 0
+          && bishopSquares[Color.WHITE.ordinal()].size() == 0) {
 
         // both kings bare KK, KKN, KKNN
-        if (_knightSquares[Color.BLACK.ordinal()].size() <= 2
-            && _bishopSquares[Color.BLACK.ordinal()].size() == 0) {
+        if (knightSquares[Color.BLACK.ordinal()].size() <= 2
+            && bishopSquares[Color.BLACK.ordinal()].size() == 0) {
           return true;
         }
 
         // KKB
-        if (_knightSquares[Color.BLACK.ordinal()].size() == 0
-            && _bishopSquares[Color.BLACK.ordinal()].size() == 1) {
+        if (knightSquares[Color.BLACK.ordinal()].size() == 0
+            && bishopSquares[Color.BLACK.ordinal()].size() == 1) {
           return true;
         }
 
       }
       // only black king bare K*K
-      else if (_knightSquares[Color.BLACK.ordinal()].size() == 0
-          && _bishopSquares[Color.BLACK.ordinal()].size() == 0) {
+      else if (knightSquares[Color.BLACK.ordinal()].size() == 0
+               && bishopSquares[Color.BLACK.ordinal()].size() == 0) {
 
         // both kings bare KK, KNK, KNNK
-        if (_knightSquares[Color.WHITE.ordinal()].size() <= 2
-            && _bishopSquares[Color.WHITE.ordinal()].size() == 0) {
+        if (knightSquares[Color.WHITE.ordinal()].size() <= 2
+            && bishopSquares[Color.WHITE.ordinal()].size() == 0) {
           return true;
         }
 
         // KBK
-        if (_knightSquares[Color.BLACK.ordinal()].size() == 0
-            && _bishopSquares[Color.BLACK.ordinal()].size() == 1) {
+        if (knightSquares[Color.BLACK.ordinal()].size() == 0
+            && bishopSquares[Color.BLACK.ordinal()].size() == 1) {
           return true;
         }
       }
 
       // KBKB - B same field color
-      else if (_knightSquares[Color.BLACK.ordinal()].size() == 0
-          && _bishopSquares[Color.BLACK.ordinal()].size() == 1
-          && _knightSquares[Color.WHITE.ordinal()].size() == 0
-          && _bishopSquares[Color.WHITE.ordinal()].size() == 1) {
+      else if (knightSquares[Color.BLACK.ordinal()].size() == 0
+               && bishopSquares[Color.BLACK.ordinal()].size() == 1
+               && knightSquares[Color.WHITE.ordinal()].size() == 0
+               && bishopSquares[Color.WHITE.ordinal()].size() == 1) {
 
         /*
          * Bishops are on the same field color if the sum of the
@@ -1090,10 +1089,10 @@ public class BoardPosition {
          * (file + rank) % 2 == 0 = black field
          * (file + rank) % 2 == 1 = white field
          */
-        final Square whiteBishop = _bishopSquares[Color.WHITE.ordinal()].get(0);
+        final Square whiteBishop = bishopSquares[Color.WHITE.ordinal()].get(0);
         int file_w = whiteBishop.getFile().get();
         int rank_w = whiteBishop.getRank().get();
-        final Square blackBishop = _bishopSquares[Color.BLACK.ordinal()].get(0);
+        final Square blackBishop = bishopSquares[Color.BLACK.ordinal()].get(0);
         int file_b = blackBishop.getFile().get();
         int rank_b = blackBishop.getRank().get();
         if (((file_w + rank_w) % 2) == ((file_b + rank_b) % 2)) {
@@ -1114,12 +1113,12 @@ public class BoardPosition {
    * @return the material value
    */
   public int getMaterial(Color c) {
-    return this._material[c.ordinal()];
+    return this.material[c.ordinal()];
   }
 
   /** @return color of next player */
   public Color getNextPlayer() {
-    return _nextPlayer;
+    return nextPlayer;
   }
 
   /**
@@ -1128,14 +1127,14 @@ public class BoardPosition {
    * @return int representing a move
    */
   public int getLastMove() {
-    if (_historyCounter == 0) return Move.NOMOVE;
-    return _moveHistory[_historyCounter - 1];
+    if (historyCounter == 0) return Move.NOMOVE;
+    return moveHistory[historyCounter - 1];
   }
 
   /** @param fen */
   private void initBoard(String fen) {
     // clear board
-    Arrays.fill(_x88Board, Piece.NOPIECE);
+    Arrays.fill(x88Board, Piece.NOPIECE);
     // Standard Start Board
     setupFromFEN(fen);
     // used for debugging
@@ -1224,40 +1223,40 @@ public class BoardPosition {
     }
 
     // next player
-    _nextPlayer = null;
+    nextPlayer = null;
     if (parts.length >= 2) {
       s = parts[1];
-      if (s.equals("w")) _nextPlayer = Color.WHITE;
+      if (s.equals("w")) nextPlayer = Color.WHITE;
       else if (s.equals("b")) {
-        _nextPlayer = Color.BLACK;
-        zobristKey ^= _nextPlayer_Zobrist; // only when black to have the right in/out rhythm
+        nextPlayer = Color.BLACK;
+        zobristKey ^= nextPlayer_Zobrist; // only when black to have the right in/out rhythm
       } else throw new IllegalArgumentException("FEN Syntax not valid - expected w or b");
     } else { // default "w"
-      _nextPlayer = Color.WHITE;
+      nextPlayer = Color.WHITE;
     }
 
     // castling
     // reset all castling first
-    _castlingWK = _castlingWQ = _castlingBK = _castlingBQ = false;
+    castlingWK = castlingWQ = castlingBK = castlingBQ = false;
     if (parts.length >= 3) { // default "-"
       for (i = 0; i < parts[2].length(); i++) {
         s = parts[2].substring(i, i + 1);
         switch (s) {
           case "K":
-            _castlingWK = true;
-            zobristKey ^= _castlingWK_Zobrist;
+            castlingWK = true;
+            zobristKey ^= castlingWK_Zobrist;
             break;
           case "Q":
-            _castlingWQ = true;
-            zobristKey ^= _castlingWQ_Zobrist;
+            castlingWQ = true;
+            zobristKey ^= castlingWQ_Zobrist;
             break;
           case "k":
-            _castlingBK = true;
-            zobristKey ^= _castlingBK_Zobrist;
+            castlingBK = true;
+            zobristKey ^= castlingBK_Zobrist;
             break;
           case "q":
-            _castlingBQ = true;
-            zobristKey ^= _castlingBQ_Zobrist;
+            castlingBQ = true;
+            zobristKey ^= castlingBQ_Zobrist;
             break;
           case "-":
           default:
@@ -1269,39 +1268,39 @@ public class BoardPosition {
     if (parts.length >= 4) { // default "-"
       s = parts[3];
       if (!s.equals("-")) {
-        _enPassantSquare = Square.fromUCINotation(s);
-        if (_enPassantSquare.equals(Square.NOSQUARE)) {
+        enPassantSquare = Square.fromUCINotation(s);
+        if (enPassantSquare.equals(Square.NOSQUARE)) {
           throw new IllegalArgumentException(
               "FEN Syntax not valid - expected valid en passant square");
         }
       }
     }
     // set en passant if not NOSQUARE
-    if (_enPassantSquare != Square.NOSQUARE) {
-      zobristKey ^= _enPassantSquare_Zobrist[_enPassantSquare.ordinal()]; // in
+    if (enPassantSquare != Square.NOSQUARE) {
+      zobristKey ^= enPassantSquare_Zobrist[enPassantSquare.ordinal()]; // in
     }
 
     // half move clock
     if (parts.length >= 5) { // default "0"
       s = parts[4];
-      _halfMoveClock = Integer.parseInt(s);
+      halfMoveClock = Integer.parseInt(s);
     } else {
-      _halfMoveClock = 0;
+      halfMoveClock = 0;
     }
 
     // full move number - mapping to half move number
     if (parts.length >= 6) { // default "1"
       s = parts[5];
-      _nextHalfMoveNumber = (2 * Integer.parseInt(s));
-      if (_nextHalfMoveNumber == 0) _nextHalfMoveNumber = 2;
+      nextHalfMoveNumber = (2 * Integer.parseInt(s));
+      if (nextHalfMoveNumber == 0) nextHalfMoveNumber = 2;
     } else {
-      _nextHalfMoveNumber = 2;
+      nextHalfMoveNumber = 2;
     }
-    if (_nextPlayer.isWhite()) _nextHalfMoveNumber--;
+    if (nextPlayer.isWhite()) nextHalfMoveNumber--;
 
     // double check correct numbering
-    assert ((_nextPlayer.isWhite() && _nextHalfMoveNumber % 2 == 1)
-        || _nextPlayer.isBlack() && _nextHalfMoveNumber % 2 == 0);
+    assert ((nextPlayer.isWhite() && nextHalfMoveNumber % 2 == 1)
+            || nextPlayer.isBlack() && nextHalfMoveNumber % 2 == 0);
   }
 
   @Override
@@ -1322,7 +1321,7 @@ public class BoardPosition {
       int emptySquares = 0;
       for (int file = 1; file <= 8; file++) {
 
-        Piece piece = _x88Board[Square.getSquare(file, rank).ordinal()];
+        Piece piece = x88Board[Square.getSquare(file, rank).ordinal()];
 
         if (piece == Piece.NOPIECE) {
           emptySquares++;
@@ -1348,24 +1347,24 @@ public class BoardPosition {
     fen += ' ';
 
     // Color
-    fen += this._nextPlayer.toChar();
+    fen += this.nextPlayer.toChar();
     fen += ' ';
 
     // Castling
     boolean castlingAvailable = false;
-    if (_castlingWK) {
+    if (castlingWK) {
       castlingAvailable = true;
       fen += "K";
     }
-    if (_castlingWQ) {
+    if (castlingWQ) {
       castlingAvailable = true;
       fen += "Q";
     }
-    if (_castlingBK) {
+    if (castlingBK) {
       castlingAvailable = true;
       fen += "k";
     }
-    if (_castlingBQ) {
+    if (castlingBQ) {
       castlingAvailable = true;
       fen += "q";
     }
@@ -1375,19 +1374,19 @@ public class BoardPosition {
     fen += ' ';
 
     // En passant
-    if (this._enPassantSquare != Square.NOSQUARE) {
-      fen += _enPassantSquare.toString();
+    if (this.enPassantSquare != Square.NOSQUARE) {
+      fen += enPassantSquare.toString();
     } else {
       fen += '-';
     }
     fen += ' ';
 
     // Half move clock
-    fen += this._halfMoveClock;
+    fen += this.halfMoveClock;
     fen += ' ';
 
     // Full move number
-    fen += (_nextHalfMoveNumber + 1) / 2;
+    fen += (nextHalfMoveNumber + 1) / 2;
 
     return fen;
   }
@@ -1412,7 +1411,7 @@ public class BoardPosition {
 
       // fields
       for (int file = 1; file <= 8; file++) {
-        Piece p = _x88Board[Square.getSquare(file, rank).ordinal()];
+        Piece p = x88Board[Square.getSquare(file, rank).ordinal()];
         if (p == Piece.NOPIECE) {
           boardString.append("   |");
         } else {
