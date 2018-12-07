@@ -90,17 +90,17 @@ public class BoardPosition {
       new long[Piece.values.length][Square.values.length];
 
   // Castling rights
-  boolean   castlingWK          = true;
-  boolean[] _castlingWK_history = new boolean[MAX_HISTORY];
+  boolean   castlingWK         = true;
+  boolean[] castlingWK_History = new boolean[MAX_HISTORY];
   static final long castlingWK_Zobrist;
-  boolean   castlingWQ          = true;
-  boolean[] _castlingWQ_history = new boolean[MAX_HISTORY];
+  boolean   castlingWQ         = true;
+  boolean[] castlingWQ_History = new boolean[MAX_HISTORY];
   static final long castlingWQ_Zobrist;
-  boolean   castlingBK          = true;
-  boolean[] _castlingBK_history = new boolean[MAX_HISTORY];
+  boolean   castlingBK         = true;
+  boolean[] castlingBK_History = new boolean[MAX_HISTORY];
   static final long castlingBK_Zobrist;
-  boolean   castlingBQ          = true;
-  boolean[] _castlingBQ_history = new boolean[MAX_HISTORY];
+  boolean   castlingBQ         = true;
+  boolean[] castlingBQ_History = new boolean[MAX_HISTORY];
   static final long castlingBQ_Zobrist;
 
   // en passant field - if NOSQUARE then we do not have an en passant option
@@ -230,10 +230,10 @@ public class BoardPosition {
     this.historyCounter = op.historyCounter;
     System.arraycopy(op.zobristKeyHistory, 0, zobristKeyHistory, 0, zobristKeyHistory.length);
 
-    System.arraycopy(op._castlingWK_history, 0, _castlingWK_history, 0, _castlingWK_history.length);
-    System.arraycopy(op._castlingWQ_history, 0, _castlingWQ_history, 0, _castlingWQ_history.length);
-    System.arraycopy(op._castlingBK_history, 0, _castlingBK_history, 0, _castlingBK_history.length);
-    System.arraycopy(op._castlingBQ_history, 0, _castlingBQ_history, 0, _castlingBQ_history.length);
+    System.arraycopy(op.castlingWK_History, 0, castlingWK_History, 0, castlingWK_History.length);
+    System.arraycopy(op.castlingWQ_History, 0, castlingWQ_History, 0, castlingWQ_History.length);
+    System.arraycopy(op.castlingBK_History, 0, castlingBK_History, 0, castlingBK_History.length);
+    System.arraycopy(op.castlingBQ_History, 0, castlingBQ_History, 0, castlingBQ_History.length);
     System.arraycopy(
       op.enPassantSquare_History,
       0, enPassantSquare_History,
@@ -310,10 +310,10 @@ public class BoardPosition {
     // Save state for undoMove
     moveHistory[historyCounter] = move;
 
-    _castlingWK_history[historyCounter] = castlingWK;
-    _castlingWQ_history[historyCounter] = castlingWQ;
-    _castlingBK_history[historyCounter] = castlingBK;
-    _castlingBQ_history[historyCounter] = castlingBQ;
+    castlingWK_History[historyCounter] = castlingWK;
+    castlingWQ_History[historyCounter] = castlingWQ;
+    castlingBK_History[historyCounter] = castlingBK;
+    castlingBQ_History[historyCounter] = castlingBQ;
     enPassantSquare_History[historyCounter] = enPassantSquare;
     halfMoveClockHistory[historyCounter] = halfMoveClock;
     zobristKeyHistory[historyCounter] = zobristKey;
@@ -448,10 +448,10 @@ public class BoardPosition {
     }
 
     // restore castling rights
-    castlingWK = _castlingWK_history[historyCounter];
-    castlingWQ = _castlingWQ_history[historyCounter];
-    castlingBK = _castlingBK_history[historyCounter];
-    castlingBQ = _castlingBQ_history[historyCounter];
+    castlingWK = castlingWK_History[historyCounter];
+    castlingWQ = castlingWQ_History[historyCounter];
+    castlingBK = castlingBK_History[historyCounter];
+    castlingBQ = castlingBQ_History[historyCounter];
 
     // restore en passant square
     enPassantSquare = enPassantSquare_History[historyCounter];
@@ -639,10 +639,10 @@ public class BoardPosition {
   public void makeNullMove() {
 
     // Save state for undoMove
-    _castlingWK_history[historyCounter] = castlingWK;
-    _castlingWQ_history[historyCounter] = castlingWQ;
-    _castlingBK_history[historyCounter] = castlingBK;
-    _castlingBQ_history[historyCounter] = castlingBQ;
+    castlingWK_History[historyCounter] = castlingWK;
+    castlingWQ_History[historyCounter] = castlingWQ;
+    castlingBK_History[historyCounter] = castlingBK;
+    castlingBQ_History[historyCounter] = castlingBQ;
     enPassantSquare_History[historyCounter] = enPassantSquare;
     halfMoveClockHistory[historyCounter] = halfMoveClock;
     zobristKeyHistory[historyCounter] = zobristKey;
@@ -677,10 +677,10 @@ public class BoardPosition {
     historyCounter--;
 
     // restore castling rights
-    castlingWK = _castlingWK_history[historyCounter];
-    castlingWQ = _castlingWQ_history[historyCounter];
-    castlingBK = _castlingBK_history[historyCounter];
-    castlingBQ = _castlingBQ_history[historyCounter];
+    castlingWK = castlingWK_History[historyCounter];
+    castlingWQ = castlingWQ_History[historyCounter];
+    castlingBK = castlingBK_History[historyCounter];
+    castlingBQ = castlingBQ_History[historyCounter];
 
     // restore en passant square
     enPassantSquare = enPassantSquare_History[historyCounter];
