@@ -106,7 +106,7 @@ public class testTimings_EvalVsCache {
      *
      */
     private void prepare() {
-        _cache.put(_omegaPosition.zobristKey, _evaluation.evaluate(_omegaPosition));
+        _cache.put(_omegaPosition.getZobristKey(), _evaluation.evaluate(_omegaPosition));
     }
 
     private void test1() {
@@ -114,8 +114,8 @@ public class testTimings_EvalVsCache {
     }
 
     private void test2() {
-        final int v = _cache.get(_omegaPosition.zobristKey);
-        _cache.put(_omegaPosition.zobristKey, v);
+        final int v = _cache.get(_omegaPosition.getZobristKey());
+        _cache.put(_omegaPosition.getZobristKey(), v);
     }
 
 

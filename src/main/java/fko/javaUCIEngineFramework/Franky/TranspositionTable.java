@@ -96,31 +96,31 @@ public class TranspositionTable {
    */
   public void put(BoardPosition position, int value, TT_EntryType type, int depth) {
 
-    final int hash = getHash(position.zobristKey);
+    final int hash = getHash(position.getZobristKey());
 
     // new value
     if (entries[hash].key == 0) {
       numberOfEntries++;
-      entries[hash].key = position.zobristKey;
+      entries[hash].key = position.getZobristKey();
       //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
     }
     // different position - overwrite
-    else if (position.zobristKey != entries[hash].key) {
+    else if (position.getZobristKey() != entries[hash].key) {
       numberOfCollisions++;
-      entries[hash].key = position.zobristKey;
+      entries[hash].key = position.getZobristKey();
       //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
     }
     // Update
-    else if (position.zobristKey == entries[hash].key  // same position
+    else if (position.getZobristKey() == entries[hash].key  // same position
              && depth > entries[hash].depth) { // Overwrite only when new value from deeper search
       numberOfUpdates++;
-      entries[hash].key = position.zobristKey;
+      entries[hash].key = position.getZobristKey();
       //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
@@ -138,8 +138,8 @@ public class TranspositionTable {
    * @return value for key or <tt>Integer.MIN_VALUE</tt> if not found
    */
   public TT_Entry get(BoardPosition position) {
-    final int hash = getHash(position.zobristKey);
-    if (entries[hash].key == position.zobristKey) { // hash hit
+    final int hash = getHash(position.getZobristKey());
+    if (entries[hash].key == position.getZobristKey()) { // hash hit
       return entries[hash];
     }
     // cache miss or collision
@@ -218,12 +218,12 @@ public class TranspositionTable {
 
     /**
      * fko.javaUCIEngineFramework.Franky.TranspositionTable$TT_Entry object internals:
-     *  OFFSET  SIZE                                                                TYPE DESCRIPTION                               VALUE
-     *       0    12                                                                     (object header)                           N/A
-     *      12     4                                                                 int TT_Entry.value                            N/A
-     *      16     8                                                                long TT_Entry.key                              N/A
-     *      24     4                                                                 int TT_Entry.depth                            N/A
-     *      28     4   fko.javaUCIEngineFramework.Franky.TranspositionTable.TT_EntryType TT_Entry.type                             N/A
+     *  OFFSET  SIZE TYPE DESCRIPTION
+     *       0    12                (object header)
+     *      12     4            int TT_Entry.value
+     *      16     8           long TT_Entry.key
+     *      24     4            int TT_Entry.depth
+     *      28     4   TT_EntryType TT_Entry.type
      * Instance size: 32 bytes
      */
     static final int SIZE = 32;

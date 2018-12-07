@@ -64,7 +64,7 @@ public class TestSearch {
 
     //fen = "k6n/7p/6P1/7K/8/8/8/8 w - - 0 1"; // white
     //fen = "8/8/8/8/k7/1p6/P7/N6K b - - 0 1"; // black
-    String fen = BoardPosition.START_FEN;
+    String fen = BoardPosition.STANDARD_BOARD_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
     //boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
 
@@ -84,12 +84,12 @@ public class TestSearch {
 
     //fen = "k6n/7p/6P1/7K/8/8/8/8 w - - 0 1"; // white
     //fen = "8/8/8/8/k7/1p6/P7/N6K b - - 0 1"; // black
-    String fen = BoardPosition.START_FEN;
+    String fen = BoardPosition.STANDARD_BOARD_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
     //boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
 
-    SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, 0, 5000000, 0, 0, null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 5000000, 0, 0, null, false, false,
+                                           false);
 
     search.startSearch(boardPosition, searchMode);
 
@@ -104,7 +104,7 @@ public class TestSearch {
   @Test
   public void testMultipleStartAndStopSearch() {
 
-    String fen = BoardPosition.START_FEN;
+    String fen = BoardPosition.STANDARD_BOARD_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
     //boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
 
@@ -131,11 +131,11 @@ public class TestSearch {
 
   @Test
   public void testBasicTimeControl_RemainingTime() {
-    String fen = BoardPosition.START_FEN;
+    String fen = BoardPosition.STANDARD_BOARD_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
-    SearchMode searchMode =
-      new SearchMode(300000, 300000, 0, 0, 0, 0, 0, 0, 0, null, false, false, false);
+    SearchMode searchMode = new SearchMode(300000, 300000, 0, 0, 0, 0, 0, 0, 0, null, false, false,
+                                           false);
 
     search.startSearch(boardPosition, searchMode);
 
@@ -149,11 +149,11 @@ public class TestSearch {
 
   @Test
   public void testBasicTimeControl_RemainingTimeInc() {
-    String fen = BoardPosition.START_FEN;
+    String fen = BoardPosition.STANDARD_BOARD_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
-    SearchMode searchMode =
-      new SearchMode(300000, 300000, 2000, 2000, 0, 0, 0, 0, 0, null, false, false, false);
+    SearchMode searchMode = new SearchMode(300000, 300000, 2000, 2000, 0, 0, 0, 0, 0, null, false,
+                                           false, false);
 
     search.startSearch(boardPosition, searchMode);
 
@@ -173,7 +173,7 @@ public class TestSearch {
    */
   @Test
   public void testBasicTimeControl_TimePerMove() {
-    String fen = BoardPosition.START_FEN;
+    String fen = BoardPosition.STANDARD_BOARD_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 5, null, false, false, false);
@@ -264,11 +264,11 @@ public class TestSearch {
   @Test
   public void testMovesSearch() {
 
-    String fen = BoardPosition.START_FEN;
+    String fen = BoardPosition.STANDARD_BOARD_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
-    SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 2, Arrays.asList("h2h4"), false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 2, Arrays.asList("h2h4"), false,
+                                           false, false);
 
     search.startSearch(boardPosition, searchMode);
 
@@ -281,12 +281,12 @@ public class TestSearch {
 
   @Test
   public void testPonderMissSearch() throws InterruptedException {
-    String fen = BoardPosition.START_FEN;
+    String fen = BoardPosition.STANDARD_BOARD_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
     boardPosition.makeMove(Move.fromUCINotation(boardPosition, "e2e4"));
 
-    SearchMode searchMode =
-      new SearchMode(295000, 300000, 0, 0, 0, 0, 0, 0, 0, null, true, false, false);
+    SearchMode searchMode = new SearchMode(295000, 300000, 0, 0, 0, 0, 0, 0, 0, null, true, false,
+                                           false);
 
     // set last ponder move
     boardPosition.makeMove(Move.fromUCINotation(boardPosition, "e7e5"));
@@ -320,12 +320,12 @@ public class TestSearch {
 
   @Test
   public void testPonderHitSearch() throws InterruptedException {
-    String fen = BoardPosition.START_FEN;
+    String fen = BoardPosition.STANDARD_BOARD_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
     boardPosition.makeMove(Move.fromUCINotation(boardPosition, "e2e4"));
 
-    SearchMode searchMode =
-      new SearchMode(295000, 300000, 0, 0, 0, 0, 0, 0, 0, null, true, false, false);
+    SearchMode searchMode = new SearchMode(295000, 300000, 0, 0, 0, 0, 0, 0, 0, null, true, false,
+                                           false);
 
     // set last ponder move
     boardPosition.makeMove(Move.fromUCINotation(boardPosition, "e7e5"));
@@ -353,7 +353,7 @@ public class TestSearch {
 
     LOG.info("Start PERFT Test for depth 5");
 
-    String fen = BoardPosition.START_FEN;
+    String fen = BoardPosition.STANDARD_BOARD_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
     //boardPosition.makeMove(Move.fromUCINotation(boardPosition,"e2e4"));
 
@@ -522,21 +522,21 @@ public class TestSearch {
 
     LOG.info("Start SIZE Test for depth {}", depth);
 
-    String fen = "7k/8/8/8/8/8/P7/K7 w - - 0 1";
+    String fen = BoardPosition.STANDARD_BOARD_FEN;
+    //fen = "7k/8/8/8/8/8/P7/K7 w - - 0 1";
     fen = "r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - - 3 10";
-    //    fen = BoardPosition.START_FEN;
+
     BoardPosition boardPosition = new BoardPosition(fen);
 
-    search.config.USE_ROOT_MOVES_SORT = false;
-    search.config.USE_ALPHABETA_PRUNING = false;
-    search.config.USE_PVS = false;
+    search.config.USE_ROOT_MOVES_SORT = true;
+    search.config.USE_ALPHABETA_PRUNING = true;
+    search.config.USE_PVS = true;
     search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.USE_EVALUATION_CACHE = false;
-    search.config.MATE_DISTANCE_PRUNING = false;
-    search.config.USE_MINOR_PROMOTION_PRUNING = false;
-    search.config.USE_QUIESCENCE = true;
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
+    search.config.MATE_DISTANCE_PRUNING = true;
+    search.config.USE_MINOR_PROMOTION_PRUNING = true;
+    search.config.USE_QUIESCENCE = false;
 
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
     search.startSearch(boardPosition, searchMode);
 
     waitWhileSearching();
@@ -546,11 +546,6 @@ public class TestSearch {
              search.getLastSearchResult().resultValue / 100f,
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
 
-    if (search.config.USE_TRANSPOSITION_TABLE) {
-      if (search.getTranspositionTable().getNumberOfEntries() > 0) {
-        LOG.info("TT Objects: {}", search.getTranspositionTable().getNumberOfEntries());
-      }
-    }
   }
 
   @Test

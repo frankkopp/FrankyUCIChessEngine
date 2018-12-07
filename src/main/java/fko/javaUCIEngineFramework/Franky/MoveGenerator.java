@@ -58,23 +58,23 @@ public class MoveGenerator {
 
   // these are are working lists as fields to avoid to have to
   // create them every time. Instead of creating the need to be cleared before use.
-  private final MoveList _legalMoves       = new MoveList();
+  private final MoveList legalMoves        = new MoveList();
   // these are all pseudo legal
   private final MoveList pseudoLegalMoves  = new MoveList(); // all moves
   private final MoveList capturingMoves    = new MoveList(); // only capturing moves
   private final MoveList nonCapturingMoves = new MoveList(); // only non capturing moves
-  private final MoveList castlingMoves     = new MoveList(); // only non castling moves
+  private final MoveList castlingMoves     = new MoveList(); // only castling moves
   private final MoveList evasionMoves      = new MoveList(); // only evasion moves
 
   // These fields control the on demand generation of moves.
-  private OnDemandState _generationCycleState = OnDemandState.NEW;
+  private OnDemandState generationCycleState = OnDemandState.NEW;
 
   private enum OnDemandState {
     NEW, PAWN, KNIGHTS, BISHOPS, ROOKS, QUEENS, KINGS, ALL
   }
 
-  private MoveList _onDemandMoveList = new MoveList();
-  private long     _onDemandZobristLastPosition;
+  private MoveList onDemandMoveList = new MoveList();
+  private long     onDemandZobristLastPosition;
 
   // Comparator for move value victim least value attacker
   private static final Comparator<Integer> mvvlvaComparator = Comparator.comparingInt(
@@ -102,17 +102,17 @@ public class MoveGenerator {
   public int getNextPseudoLegalMove(BoardPosition position, boolean capturingOnly) {
 
     // TODO zobrist could collide - then this will break.
-    if (position.getZobristKey() != _onDemandZobristLastPosition ||
+    if (position.getZobristKey() != onDemandZobristLastPosition ||
         captureMovesOnly != capturingOnly) {
-      _generationCycleState = OnDemandState.NEW;
+      generationCycleState = OnDemandState.NEW;
       clearLists();
       // remember the last position to see when it has changed
-      this._onDemandZobristLastPosition = position.getZobristKey();
+      this.onDemandZobristLastPosition = position.getZobristKey();
     }
 
     // update position
     this.position = position;
-    activePlayer = this.position._nextPlayer;
+    activePlayer = this.position.getNextPlayer();
 
     captureMovesOnly = capturingOnly;
 
@@ -126,55 +126,55 @@ public class MoveGenerator {
      * generate the next batch until we have new moves or all moves are generated
      * and there are no more moves to generate
      */
-    while (_onDemandMoveList.empty() && !(_generationCycleState == OnDemandState.ALL)) {
-      switch (_generationCycleState) {
+    while (onDemandMoveList.empty() && !(generationCycleState == OnDemandState.ALL)) {
+      switch (generationCycleState) {
         case NEW: // no moves yet generate pawn moves first
           // generate pawn moves
           generatePawnMoves();
           if (SORT) capturingMoves.sort(mvvlvaComparator);
-          _onDemandMoveList.add(capturingMoves);
-          _onDemandMoveList.add(nonCapturingMoves);
-          _generationCycleState = OnDemandState.PAWN;
+          onDemandMoveList.add(capturingMoves);
+          onDemandMoveList.add(nonCapturingMoves);
+          generationCycleState = OnDemandState.PAWN;
           break;
         case PAWN: // we have all moves but knight, bishop, rook, queen and king moves
           generateKnightMoves();
           if (SORT) capturingMoves.sort(mvvlvaComparator);
-          _onDemandMoveList.add(capturingMoves);
-          _onDemandMoveList.add(nonCapturingMoves);
-          _generationCycleState = OnDemandState.KNIGHTS;
+          onDemandMoveList.add(capturingMoves);
+          onDemandMoveList.add(nonCapturingMoves);
+          generationCycleState = OnDemandState.KNIGHTS;
           break;
         case KNIGHTS: // we have all moves but bishop, rook, queen and king moves
           generateBishopMoves();
           if (SORT) capturingMoves.sort(mvvlvaComparator);
-          _onDemandMoveList.add(capturingMoves);
-          _onDemandMoveList.add(nonCapturingMoves);
-          _generationCycleState = OnDemandState.BISHOPS;
+          onDemandMoveList.add(capturingMoves);
+          onDemandMoveList.add(nonCapturingMoves);
+          generationCycleState = OnDemandState.BISHOPS;
           break;
         case BISHOPS: // we have all moves but rook, queen and king moves
           generateRookMoves();
           if (SORT) capturingMoves.sort(mvvlvaComparator);
-          _onDemandMoveList.add(capturingMoves);
-          _onDemandMoveList.add(nonCapturingMoves);
-          _generationCycleState = OnDemandState.ROOKS;
+          onDemandMoveList.add(capturingMoves);
+          onDemandMoveList.add(nonCapturingMoves);
+          generationCycleState = OnDemandState.ROOKS;
           break;
         case ROOKS: // we have all moves but queen and king moves
           generateQueenMoves();
           if (SORT) capturingMoves.sort(mvvlvaComparator);
-          _onDemandMoveList.add(capturingMoves);
-          _onDemandMoveList.add(nonCapturingMoves);
-          _generationCycleState = OnDemandState.QUEENS;
+          onDemandMoveList.add(capturingMoves);
+          onDemandMoveList.add(nonCapturingMoves);
+          generationCycleState = OnDemandState.QUEENS;
           break;
         case QUEENS: // we have all moves but king moves
           generateKingMoves();
           if (SORT) capturingMoves.sort(mvvlvaComparator);
-          _onDemandMoveList.add(capturingMoves);
-          _onDemandMoveList.add(nonCapturingMoves);
-          _generationCycleState = OnDemandState.KINGS;
+          onDemandMoveList.add(capturingMoves);
+          onDemandMoveList.add(nonCapturingMoves);
+          generationCycleState = OnDemandState.KINGS;
           break;
         case KINGS: // we have all non capturing
           generateCastlingMoves();
-          _onDemandMoveList.add(castlingMoves);
-          _generationCycleState = OnDemandState.ALL;
+          onDemandMoveList.add(castlingMoves);
+          generationCycleState = OnDemandState.ALL;
           break;
         case ALL:
           // we have all moves - do nothing
@@ -184,8 +184,8 @@ public class MoveGenerator {
     }
 
     // return a move a delete it form the list
-    if (!_onDemandMoveList.empty()) {
-      return _onDemandMoveList.removeFirst();
+    if (!onDemandMoveList.empty()) {
+      return onDemandMoveList.removeFirst();
     }
 
     return Move.NOMOVE;
@@ -197,8 +197,8 @@ public class MoveGenerator {
    * manually.
    */
   public void resetOnDemand() {
-    _onDemandMoveList.clear();
-    _onDemandZobristLastPosition = 0;
+    onDemandMoveList.clear();
+    onDemandZobristLastPosition = 0;
   }
 
   /**
@@ -235,7 +235,7 @@ public class MoveGenerator {
 
     // update position
     this.position = position;
-    activePlayer = this.position._nextPlayer;
+    activePlayer = this.position.getNextPlayer();
 
     captureMovesOnly = false;
 
@@ -247,14 +247,14 @@ public class MoveGenerator {
     clearLists();
 
     // filter legal moves
-    assert _legalMoves.size() == 0;
+    assert legalMoves.size() == 0;
     getPseudoLegalMoves(position);
     for (int move : pseudoLegalMoves) {
-      if (isLegalMove(move)) _legalMoves.add(move);
+      if (isLegalMove(move)) legalMoves.add(move);
     }
 
     // return a clone of the list as we will continue to use the list as a static list
-    return _legalMoves;
+    return legalMoves;
   }
 
   /**
@@ -291,7 +291,7 @@ public class MoveGenerator {
 
     // update position
     this.position = position;
-    activePlayer = this.position._nextPlayer;
+    activePlayer = this.position.getNextPlayer();
 
     captureMovesOnly = false;
 
@@ -333,7 +333,7 @@ public class MoveGenerator {
 
     // update position
     this.position = position;
-    activePlayer = this.position._nextPlayer;
+    activePlayer = this.position.getNextPlayer();
 
     // TODO improve qsearch extensions by selecting only relevant moves
     if (position.hasCheck()) {
@@ -355,13 +355,12 @@ public class MoveGenerator {
     // call the move generators
     generatePseudoLegaMoves();
 
-    // Filter good qsearch captures
+    // TODO: Filter only "good" qsearch captures
     MoveList qSearchMoves = new MoveList();
     for (int move : pseudoLegalMoves) {
-      // when value of capturing piece is lower or equal it is a good capture
-      if (Move.getPiece(move).getType().getValue() <= Move.getTarget(move).getType().getValue()) {
+//      if (Move.getPiece(move).getType().getValue() <= Move.getTarget(move).getType().getValue()) {
         qSearchMoves.add(move);
-      }
+//      }
     }
 
     // return a clone of the list as we will continue to reuse
@@ -414,12 +413,12 @@ public class MoveGenerator {
     final int pawnDir = activePlayer.isBlack() ? -1 : 1;
 
     // iterate over all squares where we have a pawn
-    final SquareList squareList = position._pawnSquares[activePlayer.ordinal()];
+    final SquareList squareList = position.getPawnSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square square = squareList.get(i);
 
-      assert position._x88Board[square.ordinal()].getType() == PieceType.PAWN;
+      assert position.getX88Board()[square.ordinal()].getType() == PieceType.PAWN;
 
       // get all possible x88 index values for pawn moves
       // these are basically int values to add or subtract from the
@@ -436,7 +435,7 @@ public class MoveGenerator {
           final Square fromSquare = Square.getSquare(square.ordinal());
           final Square toSquare = Square.getSquare(to);
           final Piece piece = Piece.getPiece(PieceType.PAWN, activePlayer);
-          final Piece target = position._x88Board[to];
+          final Piece target = position.getX88Board()[to];
           final Piece promotion = Piece.NOPIECE;
 
           // capture
@@ -478,13 +477,13 @@ public class MoveGenerator {
                   Move.createMove(type, fromSquare, toSquare, piece, target, promotion));
               }
             } else { // empty but maybe en passant
-              if (toSquare == position._enPassantSquare) { //  en passant capture
+              if (toSquare == position.getEnPassantSquare()) { //  en passant capture
                 // which target?
                 final int t = activePlayer.isWhite()
-                              ? position._enPassantSquare.getSouth().ordinal()
-                              : position._enPassantSquare.getNorth().ordinal();
+                              ? position.getEnPassantSquare().getSouth().ordinal()
+                              : position.getEnPassantSquare().getNorth().ordinal();
                 capturingMoves.add(Move.createMove(MoveType.ENPASSANT, fromSquare, toSquare, piece,
-                                                   position._x88Board[t], promotion));
+                                                   position.getX88Board()[t], promotion));
               }
             }
           }
@@ -523,13 +522,13 @@ public class MoveGenerator {
               } else {
                 // pawndouble
                 if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow() &&
-                    (position._x88Board[fromSquare.ordinal() + (2 * Square.N)]) == Piece.NOPIECE) {
+                    (position.getX88Board()[fromSquare.ordinal() + (2 * Square.N)]) == Piece.NOPIECE) {
                   // on rank 2 && rank 4 is free(rank 3 already checked via target)
                   nonCapturingMoves.add(
                     Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getNorth(), piece,
                                     target, promotion));
                 } else if (activePlayer.isBlack() && fromSquare.isBlackPawnBaseRow() &&
-                           position._x88Board[fromSquare.ordinal() + (2 * Square.S)] ==
+                           position.getX88Board()[fromSquare.ordinal() + (2 * Square.S)] ==
                            Piece.NOPIECE) {
                   // on rank 7 && rank 5 is free(rank 6 already checked via target)
                   nonCapturingMoves.add(
@@ -551,11 +550,11 @@ public class MoveGenerator {
   private void generateKnightMoves() {
     PieceType type = PieceType.KNIGHT;
     // iterate over all squares where we have a piece
-    final SquareList squareList = position._knightSquares[activePlayer.ordinal()];
+    final SquareList squareList = position.getKnightSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square square = squareList.get(i);
-      assert position._x88Board[square.ordinal()].getType() == type;
+      assert position.getX88Board()[square.ordinal()].getType() == type;
       generateMoves(type, square, Square.knightDirections);
     }
   }
@@ -563,11 +562,11 @@ public class MoveGenerator {
   private void generateBishopMoves() {
     PieceType type = PieceType.BISHOP;
     // iterate over all squares where we have this piece type
-    final SquareList squareList = position._bishopSquares[activePlayer.ordinal()];
+    final SquareList squareList = position.getBishopSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square square = squareList.get(i);
-      assert position._x88Board[square.ordinal()].getType() == type;
+      assert position.getX88Board()[square.ordinal()].getType() == type;
       generateMoves(type, square, Square.bishopDirections);
     }
   }
@@ -575,11 +574,11 @@ public class MoveGenerator {
   private void generateRookMoves() {
     PieceType type = PieceType.ROOK;
     // iterate over all squares where we have this piece type
-    final SquareList squareList = position._rookSquares[activePlayer.ordinal()];
+    final SquareList squareList = position.getRookSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square square = squareList.get(i);
-      assert position._x88Board[square.ordinal()].getType() == type;
+      assert position.getX88Board()[square.ordinal()].getType() == type;
       generateMoves(type, square, Square.rookDirections);
     }
   }
@@ -587,19 +586,19 @@ public class MoveGenerator {
   private void generateQueenMoves() {
     PieceType type = PieceType.QUEEN;
     // iterate over all squares where we have this piece type
-    final SquareList squareList = position._queenSquares[activePlayer.ordinal()];
+    final SquareList squareList = position.getQueenSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square square = squareList.get(i);
-      assert position._x88Board[square.ordinal()].getType() == type;
+      assert position.getX88Board()[square.ordinal()].getType() == type;
       generateMoves(type, square, Square.queenDirections);
     }
   }
 
   private void generateKingMoves() {
     PieceType type = PieceType.KING;
-    Square square = position._kingSquares[activePlayer.ordinal()];
-    assert position._x88Board[square.ordinal()].getType() == type;
+    Square square = position.getKingSquares()[activePlayer.ordinal()];
+    assert position.getX88Board()[square.ordinal()].getType() == type;
     generateMoves(type, square, Square.kingDirections);
   }
 
@@ -617,7 +616,7 @@ public class MoveGenerator {
       int to = square.ordinal() + d;
 
       while ((to & 0x88) == 0) { // slide while valid square
-        final Piece target = position._x88Board[to];
+        final Piece target = position.getX88Board()[to];
 
         // free square - non capture
         if (target == Piece.NOPIECE) { // empty
@@ -652,29 +651,29 @@ public class MoveGenerator {
     if (position.hasCheck()) return; // no castling if we are in check
     // iterate over all available castlings at this position
     if (activePlayer.isWhite()) {
-      if (position._castlingWK) {
+      if (position.isCastlingWK()) {
         // f1 free, g1 free and f1 not attacked
         // we will not check if g1 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
-        if (position._x88Board[Square.f1.ordinal()] == Piece.NOPIECE // passing square free
+        if (position.getX88Board()[Square.f1.ordinal()] == Piece.NOPIECE // passing square free
             && !position.isAttacked(activePlayer.getInverseColor(), Square.f1)
             // passing square not attacked
-            && position._x88Board[Square.g1.ordinal()] == Piece.NOPIECE) // to square free
+            && position.getX88Board()[Square.g1.ordinal()] == Piece.NOPIECE) // to square free
         {
           castlingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e1, Square.g1, Piece.WHITE_KING,
                             Piece.NOPIECE, Piece.NOPIECE));
         }
       }
-      if (position._castlingWQ) {
+      if (position.isCastlingWQ()) {
         // d1 free, c1 free and d1 not attacked
         // we will not check if d1 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
-        if (position._x88Board[Square.d1.ordinal()] == Piece.NOPIECE // passing square free
-            && position._x88Board[Square.b1.ordinal()] == Piece.NOPIECE // rook passing square free
+        if (position.getX88Board()[Square.d1.ordinal()] == Piece.NOPIECE // passing square free
+            && position.getX88Board()[Square.b1.ordinal()] == Piece.NOPIECE// rook passing square free
             && !position.isAttacked(activePlayer.getInverseColor(), Square.d1)
             // passing square not attacked
-            && position._x88Board[Square.c1.ordinal()] == Piece.NOPIECE) // to square free
+            && position.getX88Board()[Square.c1.ordinal()] == Piece.NOPIECE) // to square free
         {
           castlingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e1, Square.c1, Piece.WHITE_KING,
@@ -682,29 +681,29 @@ public class MoveGenerator {
         }
       }
     } else {
-      if (position._castlingBK) {
+      if (position.isCastlingBK()) {
         // f8 free, g8 free and f8 not attacked
         // we will not check if g8 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
-        if (position._x88Board[Square.f8.ordinal()] == Piece.NOPIECE // passing square free
+        if (position.getX88Board()[Square.f8.ordinal()] == Piece.NOPIECE // passing square free
             && !position.isAttacked(activePlayer.getInverseColor(), Square.f8)
             // passing square not attacked
-            && position._x88Board[Square.g8.ordinal()] == Piece.NOPIECE) // to square free
+            && position.getX88Board()[Square.g8.ordinal()] == Piece.NOPIECE) // to square free
         {
           castlingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e8, Square.g8, Piece.BLACK_KING,
                             Piece.NOPIECE, Piece.NOPIECE));
         }
       }
-      if (position._castlingBQ) {
+      if (position.isCastlingBQ()) {
         // d8 free, c8 free and d8 not attacked
         // we will not check if d8 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
-        if (position._x88Board[Square.d8.ordinal()] == Piece.NOPIECE // passing square free
-            && position._x88Board[Square.b8.ordinal()] == Piece.NOPIECE // rook passing square free
+        if (position.getX88Board()[Square.d8.ordinal()] == Piece.NOPIECE // passing square free
+            && position.getX88Board()[Square.b8.ordinal()] == Piece.NOPIECE// rook passing square free
             && !position.isAttacked(activePlayer.getInverseColor(), Square.d8)
             // passing square not attacked
-            && position._x88Board[Square.c8.ordinal()] == Piece.NOPIECE) // to square free
+            && position.getX88Board()[Square.c8.ordinal()] == Piece.NOPIECE) // to square free
         {
           castlingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e8, Square.c8, Piece.BLACK_KING,
@@ -731,7 +730,7 @@ public class MoveGenerator {
 
     // update position
     this.position = position;
-    activePlayer = this.position._nextPlayer;
+    activePlayer = this.position.getNextPlayer();
 
     // clear all lists
     clearLists();
@@ -755,7 +754,7 @@ public class MoveGenerator {
    */
   private boolean findKingMove() {
     PieceType type = PieceType.KING;
-    Square square = position._kingSquares[activePlayer.ordinal()];
+    Square square = position.getKingSquares()[activePlayer.ordinal()];
     return findMove(type, square, Square.kingDirections);
   }
 
@@ -766,7 +765,7 @@ public class MoveGenerator {
    */
   private boolean findKnightMove() {
     PieceType type = PieceType.KNIGHT;
-    final SquareList squareList = position._knightSquares[activePlayer.ordinal()];
+    final SquareList squareList = position.getKnightSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square os = squareList.get(i);
@@ -782,7 +781,7 @@ public class MoveGenerator {
    */
   private boolean findQueenMove() {
     PieceType type = PieceType.QUEEN;
-    final SquareList squareList = position._queenSquares[activePlayer.ordinal()];
+    final SquareList squareList = position.getQueenSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square os = squareList.get(i);
@@ -799,7 +798,7 @@ public class MoveGenerator {
   private boolean findBishopMove() {
     PieceType type = PieceType.BISHOP;
     // iterate over all squares where we have this piece type
-    final SquareList squareList = position._bishopSquares[activePlayer.ordinal()];
+    final SquareList squareList = position.getBishopSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square os = squareList.get(i);
@@ -816,7 +815,7 @@ public class MoveGenerator {
   private boolean findRookMove() {
     PieceType type = PieceType.ROOK;
     // iterate over all squares where we have this piece type
-    final SquareList squareList = position._rookSquares[activePlayer.ordinal()];
+    final SquareList squareList = position.getRookSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square os = squareList.get(i);
@@ -840,7 +839,7 @@ public class MoveGenerator {
     for (int d : directions) {
       int to = square.ordinal() + d;
       while ((to & 0x88) == 0) { // slide while valid square
-        final Piece target = position._x88Board[to];
+        final Piece target = position.getX88Board()[to];
         // free square - non capture
         if (target == Piece.NOPIECE) { // empty
           move = Move.createMove(MoveType.NORMAL, Square.getSquare(square.ordinal()),
@@ -880,7 +879,7 @@ public class MoveGenerator {
     final int pawnDir = activePlayer.isBlack() ? -1 : 1;
 
     // iterate over all squares where we have a pawn
-    final SquareList squareList = position._pawnSquares[activePlayer.ordinal()];
+    final SquareList squareList = position.getPawnSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square square = squareList.get(i);
@@ -897,7 +896,7 @@ public class MoveGenerator {
           final Square fromSquare = Square.getSquare(square.ordinal());
           final Square toSquare = Square.getSquare(to);
           final Piece piece = Piece.getPiece(PieceType.PAWN, activePlayer);
-          final Piece target = position._x88Board[to];
+          final Piece target = position.getX88Board()[to];
           final Piece promotion = Piece.NOPIECE;
           // capture
           if (d != Square.N) { // not straight
@@ -906,13 +905,13 @@ public class MoveGenerator {
               move = Move.createMove(type, fromSquare, toSquare, piece, target, promotion);
               if (isLegalMove(move)) return true;
             } else { // empty but maybe en passant
-              if (toSquare == position._enPassantSquare) { //  en passant capture
+              if (toSquare == position.getEnPassantSquare()) { //  en passant capture
                 // which target?
                 final int t = activePlayer.isWhite()
-                              ? position._enPassantSquare.getSouth().ordinal()
-                              : position._enPassantSquare.getNorth().ordinal();
+                              ? position.getEnPassantSquare().getSouth().ordinal()
+                              : position.getEnPassantSquare().getNorth().ordinal();
                 move = Move.createMove(MoveType.ENPASSANT, fromSquare, toSquare, piece,
-                                       position._x88Board[t], promotion);
+                                       position.getX88Board()[t], promotion);
                 if (isLegalMove(move)) return true;
               }
             }
@@ -942,7 +941,7 @@ public class MoveGenerator {
     position.makeMove(move);
     // check if the move leaves the king in check
     if (!position.isAttacked(activePlayer.getInverseColor(),
-                             position._kingSquares[activePlayer.ordinal()])) {
+                             position.getKingSquares()[activePlayer.ordinal()])) {
       position.undoMove();
       return true;
     }
@@ -954,8 +953,8 @@ public class MoveGenerator {
    * Clears all lists
    */
   private void clearLists() {
-    _onDemandMoveList.clear();
-    _legalMoves.clear();
+    onDemandMoveList.clear();
+    legalMoves.clear();
     pseudoLegalMoves.clear();
     evasionMoves.clear();
     capturingMoves.clear();

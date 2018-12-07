@@ -40,7 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestEvaluation {
 
-
     private String        fenStandard;
     private BoardPosition boardPosition;
     private Evaluation    evaluation;
@@ -103,8 +102,6 @@ public class TestEvaluation {
         assertEquals(0, value);
     }
 
-
-
     @Test
     public final void testNeutralPosition() {
         boardPosition = new BoardPosition("7k/7p/8/8/8/8/P7/K7 w - - 0 1");
@@ -119,9 +116,9 @@ public class TestEvaluation {
         System.out.println("Material: "+mat);
         System.out.println("Mobility: "+mob);
 
-//        assertEquals(0, value);
+        assertEquals(0, mat);
+        assertEquals(0, mob);
     }
-
 
     @Test
     public final void testMobility_otherPositions() {

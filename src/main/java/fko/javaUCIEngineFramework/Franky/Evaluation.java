@@ -49,7 +49,6 @@ public class Evaluation {
   static private final boolean MOBILITY       = true;
   static private final boolean PIECE_POSITION = false;
 
-
   /**
    * Creates an instance of the OmegaEvaluator using a new Engine
    * and a new Move Generator.
@@ -85,11 +84,13 @@ public class Evaluation {
    */
   int material(final BoardPosition board) {
     int material =
-      board._nextPlayer.factor * (board.getMaterial(Color.WHITE) - board.getMaterial(Color.BLACK));
+      board.getNextPlayer().factor * (board.getMaterial(Color.WHITE) - board.getMaterial(Color.BLACK));
 
     // bonus/malus for bishop pair
-    if (board._bishopSquares[board._nextPlayer.ordinal()].size() >= 2) material += 50;
-    if (board._bishopSquares[board._nextPlayer.getInverseColor().ordinal()].size() >= 2) {
+    if (board.getBishopSquares()[board.getNextPlayer().ordinal()].size() >= 2) {
+      material += 50;
+    }
+    if (board.getBishopSquares()[board.getNextPlayer().getInverseColor().ordinal()].size() >= 2) {
       material -= 50;
     }
 
@@ -106,43 +107,43 @@ public class Evaluation {
     // to influence the weight of the piece type
     int factor = 1;
 
-    final Color activePlayer = board._nextPlayer;
+    final Color activePlayer = board.getNextPlayer();
     final Color passivePlayer = activePlayer.getInverseColor();
 
     // knights
     factor = 2;
     mobility += factor * mobilityForPieces(board, activePlayer, PieceType.KNIGHT,
-                                           board._knightSquares[activePlayer.ordinal()],
+                                           board.getKnightSquares()[activePlayer.ordinal()],
                                            Square.knightDirections);
     mobility -= factor * mobilityForPieces(board, passivePlayer, PieceType.KNIGHT,
-                                           board._knightSquares[passivePlayer.ordinal()],
+                                           board.getKnightSquares()[passivePlayer.ordinal()],
                                            Square.knightDirections);
 
     // bishops
     factor = 2;
     mobility += factor * mobilityForPieces(board, activePlayer, PieceType.BISHOP,
-                                           board._bishopSquares[activePlayer.ordinal()],
+                                           board.getBishopSquares()[activePlayer.ordinal()],
                                            Square.bishopDirections);
     mobility -= factor * mobilityForPieces(board, passivePlayer, PieceType.BISHOP,
-                                           board._bishopSquares[passivePlayer.ordinal()],
+                                           board.getBishopSquares()[passivePlayer.ordinal()],
                                            Square.bishopDirections);
 
     // rooks
     factor = 2;
     mobility += factor * mobilityForPieces(board, activePlayer, PieceType.ROOK,
-                                           board._rookSquares[activePlayer.ordinal()],
+                                           board.getRookSquares()[activePlayer.ordinal()],
                                            Square.rookDirections);
     mobility -= factor * mobilityForPieces(board, passivePlayer, PieceType.ROOK,
-                                           board._rookSquares[passivePlayer.ordinal()],
+                                           board.getRookSquares()[passivePlayer.ordinal()],
                                            Square.rookDirections);
 
     // queens
     factor = 1;
     mobility += factor * mobilityForPieces(board, activePlayer, PieceType.QUEEN,
-                                           board._queenSquares[activePlayer.ordinal()],
+                                           board.getQueenSquares()[activePlayer.ordinal()],
                                            Square.queenDirections);
     mobility -= factor * mobilityForPieces(board, passivePlayer, PieceType.QUEEN,
-                                           board._queenSquares[passivePlayer.ordinal()],
+                                           board.getQueenSquares()[passivePlayer.ordinal()],
                                            Square.queenDirections);
 
     return mobility;
@@ -181,7 +182,7 @@ public class Evaluation {
     for (int d : pieceDirections) {
       int to = square.ordinal() + d;
       while ((to & 0x88) == 0) { // slide while valid square
-        final Piece target = board._x88Board[to];
+        final Piece target = board.getX88Board()[to];
         // free square - non capture
         if (target == Piece.NOPIECE) {
           numberOfMoves++;

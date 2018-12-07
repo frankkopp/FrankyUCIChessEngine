@@ -118,13 +118,13 @@ public class PERFT {
 
         // moves to search recursively
         // some convenience fields
-        Color _activePlayer = board._nextPlayer;
-        Color _passivePlayer = board._nextPlayer.getInverseColor();
+        Color _activePlayer = board.getNextPlayer();
+        Color _passivePlayer = board.getNextPlayer().getInverseColor();
         MoveList moves = mg[ply].getPseudoLegalMoves(board);
         for(int i = 0; i < moves.size(); i++) {
             int move = moves.get(i);
             board.makeMove(move);
-            if (!board.isAttacked(_passivePlayer, board._kingSquares[_activePlayer.ordinal()])) {
+            if (!board.isAttacked(_passivePlayer, board.getKingSquares()[_activePlayer.ordinal()])) {
                 totalNodes += miniMax(depthleft-1, board, mg, ply+1);
             }
             board.undoMove();

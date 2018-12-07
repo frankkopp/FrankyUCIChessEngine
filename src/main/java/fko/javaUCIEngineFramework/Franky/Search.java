@@ -42,10 +42,9 @@ import java.util.concurrent.CountDownLatch;
  * the search is finished it calls <code>engine.sendResult</code> ith the best move and a ponder
  * move if it has one.
  * <p>
- * TODO: - QUIESCENCE (https://www.chessprogramming.org/Quiescence_Search)
+ * DONE: - QUIESCENCE (https://www.chessprogramming.org/Quiescence_Search)
  * TODO: - SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
- * TODO: - Mate Distance Pruning (https://www.chessprogramming.org/Mate_Distance_Pruning)
- * TODO: - MTDf (http://people.csail.mit.edu/plaat/mtdf.html)
+ * DONE: - Mate Distance Pruning (https://www.chessprogramming.org/Mate_Distance_Pruning)
  */
 public class Search implements Runnable {
 
@@ -58,7 +57,7 @@ public class Search implements Runnable {
 
   // back reference to the engine
   private final   IUCIEngine    engine;
-  protected final Configuration config;
+  final Configuration config;
 
   // the thread in which we will do the actual search
   private Thread searchThread = null;
@@ -125,7 +124,6 @@ public class Search implements Runnable {
 
     // create position evaluator
     evaluator = new Evaluation();
-
   }
 
   /**
@@ -572,6 +570,9 @@ public class Search implements Runnable {
     // Initialize best values
     int bestValue = Evaluation.Value.NOVALUE;
 
+    // debug
+    int bestMove = Move.NOMOVE;
+
     // current search depth
     if (searchCounter.currentSearchDepth < ply) searchCounter.currentSearchDepth = ply;
     if (searchCounter.currentExtraSearchDepth < ply) searchCounter.currentExtraSearchDepth = ply;
@@ -607,9 +608,9 @@ public class Search implements Runnable {
 
       position.makeMove(move);
       // Check if legal move before going into recursion
-      if (!position.isAttacked(position._nextPlayer,
-                               position._kingSquares[position._nextPlayer.getInverseColor()
-                                                                         .ordinal()])) {
+      if (!position.isAttacked(position.getNextPlayer(),
+                               position.getKingSquares()[position.getNextPlayer().getInverseColor()
+                                                                 .ordinal()])) {
 
         // needed to remember if we even had a legal move
         hadLegaMove = true;
@@ -630,7 +631,7 @@ public class Search implements Runnable {
                               );
           engine.sendInfoToUCI("currmove " + Move.toUCINotation(position,
                                                                 searchCounter.currentRootMove)
-                               + "currmovenumber " + searchCounter.currentRootMoveNumber
+                               + " currmovenumber " + searchCounter.currentRootMoveNumber
                               );
           if (config.UCI_ShowCurrLine) {
             engine.sendInfoToUCI("currline " + currentVariation.toNotationString());
@@ -828,9 +829,10 @@ public class Search implements Runnable {
 
         position.makeMove(move);
         // check for legal move
-        if (!position.isAttacked(position._nextPlayer,
-                                 position._kingSquares[position._nextPlayer.getInverseColor()
-                                                                           .ordinal()])) {
+        if (!position.isAttacked(position.getNextPlayer(),
+                                 position.getKingSquares()[position.getNextPlayer()
+                                                                   .getInverseColor()
+                                                                   .ordinal()])) {
 
           // count as non quiet board
           searchCounter.nodesVisited++;

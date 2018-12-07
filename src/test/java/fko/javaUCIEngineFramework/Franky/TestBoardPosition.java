@@ -587,10 +587,11 @@ public class TestBoardPosition {
   @Test
   public void testCopyContructor() {
     String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq e3 0 2";
-    BoardPosition obp = new BoardPosition(fen);
-    BoardPosition obp_copy = new BoardPosition(obp);
-    assertEquals(obp, obp_copy);
-    assertEquals(obp.toFENString(), obp_copy.toFENString());
+    BoardPosition position = new BoardPosition(fen);
+    BoardPosition positionCopy = new BoardPosition(position);
+    assertEquals(position, positionCopy);
+    assertEquals(position.toFENString(), positionCopy.toFENString());
+    assertEquals(position.getZobristKey(), positionCopy.getZobristKey());
   }
 
   /** */

@@ -71,7 +71,7 @@ public class TestMoveGenerator {
 
     assertEquals(49, pseudo_moves.size());
     assertEquals(48, legal_moves.size());
-    assertEquals(2, qsearch_moves.size());
+    assertEquals(4, qsearch_moves.size());
 
     for (int plMove : pseudo_moves) {
       boolean found = false;
@@ -108,22 +108,17 @@ public class TestMoveGenerator {
   @Disabled
   public void testCapturingMovesOnly() {
 
-    //        String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/pbp2PPP/1R4K1 b kq e3 0 113";
-    //        //String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq - 0 113";
-    //
-    //        BoardPosition board = new BoardPosition(testFen);
-    //        MoveGenerator moveGenerator = new MoveGenerator();
-    //        MoveList capturing_moves = moveGenerator.getLegalMoves(board, true).clone();
-    //        MoveList all_moves = moveGenerator.getLegalMoves(board, false).clone();
-    //
-    //        System.out.println(capturing_moves);
-    //        System.out.println(all_moves);
-    //
-    //        for (int i=0; i<all_moves.size(); i++) {
-    //            if (Move.getTarget(all_moves.get(i)) != Piece.NOPIECE) {
-    //                assertEquals(all_moves.get(i), capturing_moves.get(i));
-    //            }
-    //        }
+    String testFen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1";
+    BoardPosition board = new BoardPosition(testFen);
+
+    MoveGenerator moveGenerator = new MoveGenerator();
+    MoveList pseudo_moves = moveGenerator.getPseudoLegalMoves(board).clone();
+    MoveList legal_moves = moveGenerator.getLegalMoves(board).clone();
+    MoveList qsearch_moves = moveGenerator.getPseudoLegalQSearchMoves(board).clone();
+
+    assertEquals(49, pseudo_moves.size());
+    assertEquals(48, legal_moves.size());
+    assertEquals(4, qsearch_moves.size());
 
   }
 
