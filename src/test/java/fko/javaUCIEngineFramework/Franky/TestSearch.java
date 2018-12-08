@@ -176,7 +176,7 @@ public class TestSearch {
     String fen = BoardPosition.STANDARD_BOARD_FEN;
     BoardPosition boardPosition = new BoardPosition(fen);
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 5, null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 5000, null, false, false, false);
 
     search.startSearch(boardPosition, searchMode);
 
@@ -191,6 +191,67 @@ public class TestSearch {
   @Test
   public void testMateSearch() {
 
+    String fen;
+    BoardPosition boardPosition;
+    SearchMode searchMode;
+
+    search.config.USE_ASPIRATION_WINDOW = true;
+    search.config.USE_QUIESCENCE = true;
+    search.config.USE_MATE_DISTANCE_PRUNING = true;
+    search.config.USE_TRANSPOSITION_TABLE = true;
+
+    // mate in 2 (3 plys)
+    fen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1"; // BoardPosition
+    boardPosition = new BoardPosition(fen);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 2, 0, null, false, false, false);
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    search.stopSearch();
+    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+    assertEquals(Evaluation.Value.CHECKMATE - 3, search.getLastSearchResult().resultValue);
+
+    // mate in 3 (5 plys)
+    fen = "4rk2/p5p1/1p2P2N/7R/nP5P/5PQ1/b6K/q7 w - - 0 1";
+    boardPosition = new BoardPosition(fen);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 3, 0, null, false, false, false);
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+    assertEquals(Evaluation.Value.CHECKMATE - 5, search.getLastSearchResult().resultValue);
+
+
+    // mate in 4 (7 plys)
+    //    fen = "r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - - 0 1";
+    //    boardPosition = new BoardPosition(fen);
+    //
+    //    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
+    //
+    //    search.startSearch(boardPosition, searchMode);
+    //
+    //    // test search
+    //    waitWhileSearching();
+    //
+    //    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+    //    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+    //    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+    //    assertEquals(Evaluation.Value.CHECKMATE - 7, search.getLastSearchResult().resultValue);
+
+    // mate in 8 (15 plys)
+    //    fen = "8/7K/8/8/8/8/R7/7k w - - 0 1";
+    //    boardPosition = new BoardPosition(fen);
+    //    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, false, false);
+    //    search.startSearch(boardPosition, searchMode);
+    //    waitWhileSearching();
+    //    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+    //    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+    //    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+    //    assertEquals(Evaluation.Value.CHECKMATE - 5, search.getLastSearchResult().resultValue);
+
+     /*
     // Test - Mate in 2
     //setupFromFEN("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1");
 
@@ -223,42 +284,7 @@ public class TestSearch {
 
     // Test Pruning
     // 1r1r2k1/2p1qp1p/6p1/ppQB1b2/5Pn1/2R1P1P1/PP5P/R1B3K1 b ;bm Qe4
-
-    // mate in 2 (4 plys)
-    String fen =
-      "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1"; // BoardPosition
-    // .START_FEN;
-    BoardPosition boardPosition = new BoardPosition(fen);
-
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 2, 0, null, false, false, false);
-
-    search.startSearch(boardPosition, searchMode);
-
-    // test search
-    waitWhileSearching();
-
-    search.stopSearch();
-
-    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
-    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
-    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    assertEquals(Evaluation.Value.CHECKMATE - (2 * 2), search.getLastSearchResult().resultValue);
-
-    // mate in 4 (8 plys)
-    fen = "r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - - 0 1";
-    boardPosition = new BoardPosition(fen);
-
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
-
-    search.startSearch(boardPosition, searchMode);
-
-    // test search
-    waitWhileSearching();
-
-    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
-    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
-    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    assertEquals(Evaluation.Value.CHECKMATE - (2 * 4), search.getLastSearchResult().resultValue);
+    */
   }
 
   @Test
@@ -391,161 +417,147 @@ public class TestSearch {
   @Test
   public void sizeOfSearchTreeTest() {
 
-    final int depth = 4;
+    int depth = 4;
+    List<String> values = new ArrayList<>();
+    List<String> fens = new ArrayList<>();
 
     LOG.info("Start SIZE Test for depth {}", depth);
 
-    String fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
-    //    fen = BoardPosition.START_FEN;
-    BoardPosition boardPosition = new BoardPosition(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
+    fens.add(BoardPosition.STANDARD_BOARD_FEN);
+    fens.add("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    fens.add("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1");
+    fens.add("r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - - 3 10");
+    fens.add("1r1r2k1/2p1qp1p/6p1/ppQB1b2/5Pn1/2R1P1P1/PP5P/R1B3K1 b");
 
-    List<String> values = new ArrayList<>();
-
-    // turn off all optimizations to get a reference value of the search tree size
-    search.config.USE_ROOT_MOVES_SORT = false;
-    search.config.USE_ALPHABETA_PRUNING = false;
-    search.config.USE_PVS = false;
-    search.config.USE_TRANSPOSITION_TABLE = false;
-    search.config.USE_EVALUATION_CACHE = false;
-    search.config.MATE_DISTANCE_PRUNING = false;
-    search.config.USE_MINOR_PROMOTION_PRUNING = false;
-    search.config.USE_QUIESCENCE = false;
-    search.startSearch(boardPosition, searchMode);
-    waitWhileSearching();
-    values.add(String.format("SIZE REFERENCE  : %,14d >> %s",
-                             search.getSearchCounter().leafPositionsEvaluated,
-                             search.getSearchCounter().toString()));
-
-
-    // turn on optimizations to get a compare value of the search tree size
-    search.config.USE_ALPHABETA_PRUNING = true;
-    search.clearHashtables();
-    search.startSearch(boardPosition, searchMode);
-    waitWhileSearching();
-    values.add(String.format("SIZE AlphaBeta  : %,14d >> %s",
-                             search.getSearchCounter().leafPositionsEvaluated,
-                             search.getSearchCounter().toString()));
-
-    // turn on optimizations to get a compare value of the search tree size
-    search.config.USE_ROOT_MOVES_SORT = true;
-    search.clearHashtables();
-    search.startSearch(boardPosition, searchMode);
-    waitWhileSearching();
-    values.add(String.format("SIZE RootSort   : %,14d >> %s",
-                             search.getSearchCounter().leafPositionsEvaluated,
-                             search.getSearchCounter().toString()));
-
-
-    // turn on optimizations to get a compare value of the search tree size
-    search.config.USE_PVS = true;
-    search.clearHashtables();
-    search.startSearch(boardPosition, searchMode);
-    waitWhileSearching();
-    values.add(String.format("SIZE PVS        : %,14d >> %s",
-                             search.getSearchCounter().leafPositionsEvaluated,
-                             search.getSearchCounter().toString()));
-
-    // turn on optimizations to get a compare value of the search tree size
-    search.config.USE_EVALUATION_CACHE = true;
-    search.clearHashtables();
-    search.startSearch(boardPosition, searchMode);
-    waitWhileSearching();
-    values.add(String.format("SIZE PVS+EC     : %,14d >> %s",
-                             search.getSearchCounter().leafPositionsEvaluated,
-                             search.getSearchCounter().toString()));
-
-    // turn on optimizations to get a compare value of the search tree size
-    search.config.USE_TRANSPOSITION_TABLE = true;
-    search.clearHashtables();
-    search.startSearch(boardPosition, searchMode);
-    waitWhileSearching();
-    values.add(String.format("SIZE PVS+TT     : %,14d >> %s",
-                             search.getSearchCounter().leafPositionsEvaluated,
-                             search.getSearchCounter().toString()));
-
-    // turn on optimizations to get a compare value of the search tree size
-    search.config.MATE_DISTANCE_PRUNING = true;
-    search.clearHashtables();
-    search.startSearch(boardPosition, searchMode);
-    waitWhileSearching();
-    values.add(String.format("SIZE MDP        : %,14d >> %s",
-                             search.getSearchCounter().leafPositionsEvaluated,
-                             search.getSearchCounter().toString()));
-
-    search.config.USE_MINOR_PROMOTION_PRUNING = true;
-    search.clearHashtables();
-    search.startSearch(boardPosition, searchMode);
-    waitWhileSearching();
-    values.add(String.format("SIZE MPP        : %,14d >> %s",
-                             search.getSearchCounter().leafPositionsEvaluated,
-                             search.getSearchCounter().toString()));
-
-    search.config.USE_TRANSPOSITION_TABLE = false;
-    search.config.USE_EVALUATION_CACHE = false;
-    search.config.USE_QUIESCENCE = true;
-    search.clearHashtables();
-    search.startSearch(boardPosition, searchMode);
-    waitWhileSearching();
-    values.add(String.format("SIZE QS-TT-EC   : %,14d >> %s",
-                             search.getSearchCounter().leafPositionsEvaluated,
-                             search.getSearchCounter().toString()));
-
-    search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.USE_EVALUATION_CACHE = true;
-    search.config.USE_QUIESCENCE = true;
-    search.clearHashtables();
-    search.startSearch(boardPosition, searchMode);
-    waitWhileSearching();
-    values.add(String.format("SIZE QS+TT+EC   : %,14d >> %s",
-                             search.getSearchCounter().leafPositionsEvaluated,
-                             search.getSearchCounter().toString()));
-
-
-    // REPEAT
-    // search.clearHashtables();
-    search.startSearch(boardPosition, searchMode);
-    waitWhileSearching();
-    values.add(String.format("SIZE REPEAT w TT: %,14d >> %s",
-                             search.getSearchCounter().leafPositionsEvaluated,
-                             search.getSearchCounter().toString()));
+    for (String fen : fens) {
+      values.add("");
+      values.add(fen);
+      featureMeasurements(depth, values, fen);
+      values.add("");
+    }
 
     LOG.info("");
+    LOG.info("################## RESULTS ####################");
     for (String value : values) {
       LOG.info(value);
     }
   }
 
+  private void featureMeasurements(final int depth, final List<String> values, final String fen) {
+    BoardPosition boardPosition = new BoardPosition(fen);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
+
+    // turn off all optimizations to get a reference value of the search tree size
+    search.config.USE_ROOT_MOVES_SORT = false;
+    search.config.USE_ALPHABETA_PRUNING = false;
+    search.config.USE_ASPIRATION_WINDOW = false;
+    search.config.USE_PVS = false;
+    search.config.USE_TRANSPOSITION_TABLE = false;
+    search.config.USE_MATE_DISTANCE_PRUNING = false;
+    search.config.USE_MINOR_PROMOTION_PRUNING = false;
+    search.config.USE_QUIESCENCE = false;
+
+    meassureTreeSize(boardPosition, searchMode, values, "REFERENCE", true);
+
+    search.config.USE_ASPIRATION_WINDOW = true;
+    meassureTreeSize(boardPosition, searchMode, values, "Aspiration", true);
+
+    search.config.USE_ALPHABETA_PRUNING = true;
+    meassureTreeSize(boardPosition, searchMode, values, "AlphaBeta", true);
+
+    search.config.USE_ROOT_MOVES_SORT = true;
+    meassureTreeSize(boardPosition, searchMode, values, "RootMoveSort", true);
+
+    search.config.USE_PVS = true;
+    meassureTreeSize(boardPosition, searchMode, values, "PVS", true);
+
+    search.config.USE_TRANSPOSITION_TABLE = true;
+    meassureTreeSize(boardPosition, searchMode, values, "TT", true);
+
+    search.config.USE_MATE_DISTANCE_PRUNING = true;
+    meassureTreeSize(boardPosition, searchMode, values, "MDP", true);
+
+    search.config.USE_MINOR_PROMOTION_PRUNING = true;
+    meassureTreeSize(boardPosition, searchMode, values, "MPP", true);
+
+    search.config.USE_TRANSPOSITION_TABLE = false;
+    search.config.USE_QUIESCENCE = true;
+    meassureTreeSize(boardPosition, searchMode, values, "QS-TT", true);
+
+    search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_QUIESCENCE = true;
+    meassureTreeSize(boardPosition, searchMode, values, "QS+TT", true);
+
+    // REPEAT
+    meassureTreeSize(boardPosition, searchMode, values, "REPEAT+TT", false);
+  }
+
+  private void meassureTreeSize(final BoardPosition boardPosition, final SearchMode searchMode,
+                                final List<String> values, final String feature,
+                                final boolean clearTT) {
+
+    if (clearTT) search.clearHashtables();
+    search.startSearch(boardPosition, searchMode);
+    waitWhileSearching();
+    values.add(String.format("SIZE %-12s : %,14d >> %-14s (%4d) >> %s ", feature,
+                             search.getSearchCounter().leafPositionsEvaluated,
+                             Move.toString(search.getLastSearchResult().bestMove),
+                             search.getLastSearchResult().resultValue,
+                             search.getSearchCounter().toString()));
+  }
+
   @Test
   public void evaluationTest() {
-    final int depth = 4;
-
-    LOG.info("Start SIZE Test for depth {}", depth);
-
+    int depth;
     String fen = BoardPosition.STANDARD_BOARD_FEN;
-    //fen = "7k/8/8/8/8/8/P7/K7 w - - 0 1";
-    fen = "r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - - 3 10";
-
-    BoardPosition boardPosition = new BoardPosition(fen);
+    SearchMode searchMode;
+    BoardPosition boardPosition;
 
     search.config.USE_ROOT_MOVES_SORT = true;
     search.config.USE_ALPHABETA_PRUNING = true;
+    search.config.USE_ASPIRATION_WINDOW = true;
     search.config.USE_PVS = true;
     search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.MATE_DISTANCE_PRUNING = true;
+    search.config.USE_MATE_DISTANCE_PRUNING = true;
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
     search.config.USE_QUIESCENCE = false;
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
+    depth = 4;
+    fen = "1k3r2/pp6/3p4/8/8/n5B1/5PPP/5RK1 w - - 0 1"; // bm Bxd6+
+    boardPosition = new BoardPosition(fen);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
     search.startSearch(boardPosition, searchMode);
-
     waitWhileSearching();
-
     LOG.info("Best Move: {} Value: {} Ponder {}",
              Move.toSimpleString(search.getLastSearchResult().bestMove),
              search.getLastSearchResult().resultValue / 100f,
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
+    assertEquals("g3d6", Move.toSimpleString(search.getLastSearchResult().bestMove));
 
+//    depth = 4;
+//    fen = "rn1q1rk1/pbpp2pp/1p2pb2/4N3/3PN3/3B4/PPP2PPP/R2QK2R w KQ - 0 9"; // bm Dh5
+//    boardPosition = new BoardPosition(fen);
+//    searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
+//    search.startSearch(boardPosition, searchMode);
+//    waitWhileSearching();
+//    LOG.info("Best Move: {} Value: {} Ponder {}",
+//             Move.toSimpleString(search.getLastSearchResult().bestMove),
+//             search.getLastSearchResult().resultValue / 100f,
+//             Move.toSimpleString(search.getLastSearchResult().ponderMove));
+//    assertEquals("d1h5", Move.toSimpleString(search.getLastSearchResult().bestMove));
+
+    // 2kr4/ppq2pp1/2b1pn2/2P4r/2P5/3BQN1P/P4PP1/R4RK1 b - - 0 1
+//    depth = 8;
+//    fen = "2kr4/ppq2pp1/2b1pn2/2P4r/2P5/3BQN1P/P4PP1/R4RK1 b - - 0 1"; // bm Nf6-g4
+//    boardPosition = new BoardPosition(fen);
+//    searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
+//    search.startSearch(boardPosition, searchMode);
+//    waitWhileSearching();
+//    LOG.info("Best Move: {} Value: {} Ponder {}",
+//             Move.toSimpleString(search.getLastSearchResult().bestMove),
+//             search.getLastSearchResult().resultValue / 100f,
+//             Move.toSimpleString(search.getLastSearchResult().ponderMove));
+//    assertEquals("f6g4", Move.toSimpleString(search.getLastSearchResult().bestMove));
   }
 
   @Test

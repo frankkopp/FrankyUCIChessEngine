@@ -224,7 +224,7 @@ public class Evaluation {
     static public final int INFINITE  = Integer.MAX_VALUE;
     static public final int MIN_VALUE = -200000;
     static public final int DRAW      = 0;
-    static public final int CHECKMATE = 100000;
+    static public final int CHECKMATE = 10000;
   }
 
 }

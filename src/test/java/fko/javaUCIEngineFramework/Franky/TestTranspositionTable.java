@@ -112,8 +112,7 @@ public class TestTranspositionTable {
     search.config.USE_ALPHABETA_PRUNING = false;
     search.config.USE_PVS = false;
     search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.USE_EVALUATION_CACHE = false;
-    search.config.MATE_DISTANCE_PRUNING = false;
+    search.config.USE_MATE_DISTANCE_PRUNING = false;
     search.config.USE_MINOR_PROMOTION_PRUNING = false;
     search.config.USE_QUIESCENCE = false;
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
@@ -157,8 +156,7 @@ public class TestTranspositionTable {
     search.config.USE_ALPHABETA_PRUNING = false;
     search.config.USE_PVS = false;
     search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.USE_EVALUATION_CACHE = false;
-    search.config.MATE_DISTANCE_PRUNING = false;
+    search.config.USE_MATE_DISTANCE_PRUNING = false;
     search.config.USE_MINOR_PROMOTION_PRUNING = false;
     search.config.USE_QUIESCENCE = false;
     SearchMode searchMode =

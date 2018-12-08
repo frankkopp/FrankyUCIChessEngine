@@ -36,7 +36,7 @@ public class Configuration {
   public boolean PERFT = false;
 
   /** Hash Size */
-  public int HASH_SIZE = 128;
+  public int HASH_SIZE = 512;
 
   /** Ponder */
   public boolean PONDER = true;
@@ -60,18 +60,17 @@ public class Configuration {
   /** Use AlphaBeta Pruning */
   public boolean USE_ALPHABETA_PRUNING = true;
 
+  /** Use Aspiration Window in root search */
+  public boolean USE_ASPIRATION_WINDOW = true;
+
   /** Principal Variation Search */
   boolean USE_PVS = true;
 
   /** Use Transposition Tables for visited nodes (needs extra memory) */
   boolean USE_TRANSPOSITION_TABLE = true;
 
-  /** Use Cache for Board evaluations - very expensive, only worth
-   * with expensive evaluation - (needs extra memory) */
-  boolean USE_EVALUATION_CACHE = false;
-
   /** Mate Distance Pruning */
-  boolean MATE_DISTANCE_PRUNING = true;
+  boolean USE_MATE_DISTANCE_PRUNING = true;
 
   /** Minor Promotion Pruning */
   boolean USE_MINOR_PROMOTION_PRUNING = true;

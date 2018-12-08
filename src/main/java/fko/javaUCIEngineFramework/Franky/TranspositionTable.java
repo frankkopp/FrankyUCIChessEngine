@@ -66,7 +66,7 @@ public class TranspositionTable {
     long freeMemory = (Runtime.getRuntime().maxMemory() - usedMemory);
     int percentage = 10;
     if (freeMemory * percentage / 100 < sizeInByte) {
-      LOG.error(
+      LOG.warn(
         String.format("Not enough memory for a %,dMB transposition cache - reducing to %,dMB",
                       sizeInByte / (KB * KB), (freeMemory * percentage / 100) / (KB * KB)));
       sizeInByte = (int) (freeMemory * percentage / 100); // % of memory

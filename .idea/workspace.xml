@@ -5,20 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1a1dfe46-855b-412a-bfcd-658d3bc6f910" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/BoardPosition.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/BoardPosition.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Configuration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Configuration.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Evaluation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Evaluation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/MoveGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/MoveGenerator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/PERFT.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/PERFT.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TranspositionTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TranspositionTable.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestBoardPosition.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestBoardPosition.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestMoveGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestMoveGenerator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/testTimings_EvalVsCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/testTimings_EvalVsCache.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestTranspositionTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestTranspositionTable.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -38,17 +32,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Configuration.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="540">
-                  <caret line="53" selection-start-line="53" selection-end-line="53" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/FrankyEngine.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="445">
-                  <caret line="117" selection-start-line="117" selection-end-line="117" />
+                <state relative-caret-position="-47">
+                  <caret line="40" column="15" selection-start-line="40" selection-start-column="15" selection-end-line="40" selection-end-column="15" />
                 </state>
               </provider>
             </entry>
@@ -56,10 +41,20 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="3336">
-                  <caret line="670" selection-start-line="670" selection-end-line="670" />
+                <state relative-caret-position="453">
+                  <caret line="518" selection-start-line="518" selection-end-line="518" />
                   <folding>
                     <element signature="imports" expanded="true" />
+                    <element signature="e#33951#33952#0" expanded="true" />
+                    <element signature="e#34350#34351#0" expanded="true" />
+                    <element signature="e#34438#34439#0" expanded="true" />
+                    <element signature="e#36030#36031#0" expanded="true" />
+                    <element signature="e#36247#36248#0" expanded="true" />
+                    <element signature="e#36410#36411#0" expanded="true" />
+                    <element signature="e#36584#36585#0" expanded="true" />
+                    <element signature="e#36718#36719#0" expanded="true" />
+                    <element signature="e#36833#36834#0" expanded="true" />
+                    <element signature="e#36943#36944#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -77,9 +72,22 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Evaluation.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state>
+                <state relative-caret-position="1358">
+                  <caret line="226" column="43" selection-start-line="226" selection-start-column="43" selection-end-line="226" selection-end-column="43" />
                   <folding>
                     <element signature="e#7403#7404#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TranspositionTable.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="158">
+                  <caret line="65" column="32" selection-start-line="65" selection-start-column="32" selection-end-line="65" selection-end-column="32" />
+                  <folding>
+                    <element signature="imports" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -115,8 +123,17 @@
               <file pinned="false" current-in-tab="true">
                 <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="43">
-                      <caret line="520" column="23" selection-start-line="520" selection-start-column="23" selection-end-line="520" selection-end-column="23" />
+                    <state relative-caret-position="181">
+                      <caret line="453" column="22" lean-forward="true" selection-start-line="450" selection-end-line="457" selection-end-column="41" />
+                    </state>
+                  </provider>
+                </entry>
+              </file>
+              <file pinned="false" current-in-tab="false">
+                <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestTranspositionTable.java">
+                  <provider selected="true" editor-type-id="text-editor">
+                    <state relative-caret-position="108">
+                      <caret line="39" column="13" selection-start-line="39" selection-start-column="13" selection-end-line="39" selection-end-column="13" />
                     </state>
                   </provider>
                 </entry>
@@ -164,20 +181,32 @@
                   </provider>
                 </entry>
               </file>
-              <file pinned="false" current-in-tab="true">
+              <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/engine-interface.txt">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="-990">
-                      <caret line="290" column="5" selection-start-line="290" selection-start-column="5" selection-end-line="290" selection-end-column="5" />
+                    <state relative-caret-position="126">
+                      <caret line="286" column="14" selection-start-line="286" selection-start-column="6" selection-end-line="286" selection-end-column="14" />
                     </state>
                   </provider>
                 </entry>
               </file>
-              <file pinned="false" current-in-tab="false">
+              <file pinned="false" current-in-tab="true">
                 <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.txt">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="918">
-                      <caret line="62" column="100" selection-start-line="62" selection-start-column="100" selection-end-line="62" selection-end-column="100" />
+                    <state relative-caret-position="340">
+                      <caret line="54" selection-start-line="54" selection-end-line="54" />
+                      <caret line="53" selection-start-line="53" selection-end-line="53" />
+                      <caret line="52" selection-start-line="52" selection-end-line="52" />
+                      <caret line="51" selection-start-line="51" selection-end-line="51" />
+                      <caret line="50" selection-start-line="50" selection-end-line="50" />
+                      <caret line="49" selection-start-line="49" selection-end-line="49" />
+                      <caret line="48" selection-start-line="48" selection-end-line="48" />
+                      <caret line="47" selection-start-line="47" selection-end-line="47" />
+                      <caret line="46" selection-start-line="46" selection-end-line="46" />
+                      <caret line="45" selection-start-line="45" selection-end-line="45" />
+                      <caret line="44" selection-start-line="44" selection-end-line="44" />
+                      <caret line="43" selection-start-line="43" selection-end-line="43" />
+                      <caret line="42" selection-start-line="42" selection-end-line="42" />
                     </state>
                   </provider>
                 </entry>
@@ -199,9 +228,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>inputStream = System.in;</find>
-      <find>_remainingTime</find>
-      <find>_timer</find>
       <find>_principalVariation</find>
       <find>_currentVariation</find>
       <find>OmegaSquare</find>
@@ -228,6 +254,10 @@
       <find>principalVariation</find>
       <find>currentSearchDepth</find>
       <find>currentExtraSearchDepth</find>
+      <find>search.getSearchCounter().toString()));</find>
+      <find>search.getSearchCounter().leafPositionsEvaluated,</find>
+      <find>%,14d &gt;&gt; %s &gt;&gt; %s (%d)</find>
+      <find>(%3d)</find>
     </findStrings>
     <replaceStrings>
       <replace>Square</replace>
@@ -240,6 +270,11 @@
       <replace>InterruptedException</replace>
       <replace>System.currentTimeMillis()</replace>
       <replace>false</replace>
+      <replace>&gt;&gt; %s &gt;&gt; %s</replace>
+      <replace>search.re</replace>
+      <replace>%,14d &gt;&gt; %s (%d) &gt;&gt; %s</replace>
+      <replace>(%3d)</replace>
+      <replace>(%4d)</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -282,23 +317,23 @@
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TTHashTable.java" />
         <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TTHashTableTest.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestTranspositionTable.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/FrankyEngine.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/MoveList.java" />
         <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandlerTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/EvaluationCache.java" />
         <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestMoveGenerator.java" />
-        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TranspositionTable.java" />
         <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java" />
-        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestBoardPosition.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/BoardPosition.java" />
-        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Evaluation.java" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.java" />
-        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.txt" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/MoveGenerator.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TranspositionTable.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestTranspositionTable.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestBoardPosition.java" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Evaluation.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Configuration.java" />
-        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.txt" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java" />
       </list>
     </option>
   </component>
@@ -344,10 +379,10 @@
   <component name="MavenRunner">
     <option name="skipTests" value="true" />
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-7" />
     <option name="y" value="2" />
-    <option name="width" value="3452" />
+    <option name="width" value="2237" />
     <option name="height" value="1410" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -525,6 +560,14 @@
             </path>
             <path>
               <item name="JavaUCIEngineFramework" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="&lt; 11 &gt;" type="70bed36:NamedLibraryElementNode" />
+              <item name="java.base" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="lang" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="JavaUCIEngineFramework" type="b2602c69:ProjectViewProjectNode" />
               <item name="Scratches and Consoles" type="1a2a3e82:ScratchProjectViewPane$MyProjectNode" />
             </path>
             <path>
@@ -545,7 +588,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1544202552953" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1544289008852" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="TEXT&#10;JAVA" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
@@ -606,71 +649,11 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.TestSearch.evaluationTest">
+  <component name="RunManager" selected="JUnit.TestSearch.sizeOfSearchTreeTest">
     <configuration default="true" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Engine" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TestBoardPosition" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="JavaUCIEngineFramework" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestBoardPosition" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TestBoardPosition.testCopyContructor" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="JavaUCIEngineFramework" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestBoardPosition" />
-      <option name="METHOD_NAME" value="testCopyContructor" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TestBoardPosition.testIsAttackedTiming" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="JavaUCIEngineFramework" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestBoardPosition" />
-      <option name="METHOD_NAME" value="testIsAttackedTiming" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TestEvaluation" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="JavaUCIEngineFramework" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestEvaluation" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -687,6 +670,68 @@
       <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestSearch" />
       <option name="METHOD_NAME" value="evaluationTest" />
       <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestSearch.perftTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="JavaUCIEngineFramework" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
+      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestSearch" />
+      <option name="METHOD_NAME" value="perftTest" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestSearch.sizeOfSearchTreeTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="JavaUCIEngineFramework" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
+      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestSearch" />
+      <option name="METHOD_NAME" value="sizeOfSearchTreeTest" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestSearch.testMateSearch" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="JavaUCIEngineFramework" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
+      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestSearch" />
+      <option name="METHOD_NAME" value="testMateSearch" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestTranspositionTable" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="JavaUCIEngineFramework" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
+      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestTranspositionTable" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -751,19 +796,19 @@
       <item itemvalue="JUnit.fko.javaUCIEngineFramework in JavaUCIEngineFramework" />
       <item itemvalue="JUnit.UCIProtocolHandlerTest.uciCommand" />
       <item itemvalue="Maven.Install_EXE" />
-      <item itemvalue="JUnit.TestEvaluation" />
-      <item itemvalue="JUnit.TestBoardPosition.testCopyContructor" />
-      <item itemvalue="JUnit.TestBoardPosition" />
-      <item itemvalue="JUnit.TestBoardPosition.testIsAttackedTiming" />
+      <item itemvalue="JUnit.TestSearch.perftTest" />
+      <item itemvalue="JUnit.TestSearch.sizeOfSearchTreeTest" />
+      <item itemvalue="JUnit.TestSearch.testMateSearch" />
+      <item itemvalue="JUnit.TestTranspositionTable" />
       <item itemvalue="JUnit.TestSearch.evaluationTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.TestSearch.sizeOfSearchTreeTest" />
         <item itemvalue="JUnit.TestSearch.evaluationTest" />
-        <item itemvalue="JUnit.TestBoardPosition.testIsAttackedTiming" />
-        <item itemvalue="JUnit.TestBoardPosition" />
-        <item itemvalue="JUnit.TestBoardPosition.testCopyContructor" />
-        <item itemvalue="JUnit.TestEvaluation" />
+        <item itemvalue="JUnit.TestSearch.testMateSearch" />
+        <item itemvalue="JUnit.TestTranspositionTable" />
+        <item itemvalue="JUnit.TestSearch.perftTest" />
       </list>
     </recent_temporary>
   </component>
@@ -781,35 +826,35 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="TestSearch_evaluationTest - 2018.12.07 at 17h 14m 19s.xml">
-      <configuration name="TestSearch.evaluationTest" configurationId="JUnit" />
+    <history-entry file="TestSearch_sizeOfSearchTreeTest - 2018.12.08 at 17h 29m 56s.xml">
+      <configuration name="TestSearch.sizeOfSearchTreeTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestSearch_evaluationTest - 2018.12.07 at 17h 14m 40s.xml">
-      <configuration name="TestSearch.evaluationTest" configurationId="JUnit" />
+    <history-entry file="TestSearch_sizeOfSearchTreeTest - 2018.12.08 at 17h 37m 41s.xml">
+      <configuration name="TestSearch.sizeOfSearchTreeTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestSearch_evaluationTest - 2018.12.07 at 17h 20m 02s.xml">
-      <configuration name="TestSearch.evaluationTest" configurationId="JUnit" />
+    <history-entry file="TestSearch_sizeOfSearchTreeTest - 2018.12.08 at 17h 38m 28s.xml">
+      <configuration name="TestSearch.sizeOfSearchTreeTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestSearch_evaluationTest - 2018.12.07 at 17h 21m 16s.xml">
-      <configuration name="TestSearch.evaluationTest" configurationId="JUnit" />
+    <history-entry file="TestSearch_sizeOfSearchTreeTest - 2018.12.08 at 18h 01m 14s.xml">
+      <configuration name="TestSearch.sizeOfSearchTreeTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestSearch_evaluationTest - 2018.12.07 at 17h 55m 11s.xml">
-      <configuration name="TestSearch.evaluationTest" configurationId="JUnit" />
+    <history-entry file="TestSearch_sizeOfSearchTreeTest - 2018.12.08 at 18h 01m 43s.xml">
+      <configuration name="TestSearch.sizeOfSearchTreeTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestSearch_evaluationTest - 2018.12.07 at 17h 55m 58s.xml">
-      <configuration name="TestSearch.evaluationTest" configurationId="JUnit" />
+    <history-entry file="TestSearch_sizeOfSearchTreeTest - 2018.12.08 at 18h 02m 10s.xml">
+      <configuration name="TestSearch.sizeOfSearchTreeTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestSearch_evaluationTest - 2018.12.07 at 18h 03m 07s.xml">
-      <configuration name="TestSearch.evaluationTest" configurationId="JUnit" />
+    <history-entry file="TestSearch_sizeOfSearchTreeTest - 2018.12.08 at 18h 02m 59s.xml">
+      <configuration name="TestSearch.sizeOfSearchTreeTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestSearch_evaluationTest - 2018.12.07 at 18h 03m 18s.xml">
-      <configuration name="TestSearch.evaluationTest" configurationId="JUnit" />
+    <history-entry file="TestSearch_sizeOfSearchTreeTest - 2018.12.08 at 18h 03m 37s.xml">
+      <configuration name="TestSearch.sizeOfSearchTreeTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestSearch_evaluationTest - 2018.12.07 at 18h 03m 25s.xml">
-      <configuration name="TestSearch.evaluationTest" configurationId="JUnit" />
+    <history-entry file="TestSearch_sizeOfSearchTreeTest - 2018.12.08 at 18h 09m 19s.xml">
+      <configuration name="TestSearch.sizeOfSearchTreeTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestSearch_evaluationTest - 2018.12.07 at 18h 05m 24s.xml">
-      <configuration name="TestSearch.evaluationTest" configurationId="JUnit" />
+    <history-entry file="TestSearch_sizeOfSearchTreeTest - 2018.12.08 at 18h 11m 00s.xml">
+      <configuration name="TestSearch.sizeOfSearchTreeTest" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TodoView" selected-index="1">
@@ -822,28 +867,28 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-6" y="2" width="3012" height="1230" extended-state="0" />
+    <frame x="-8" y="-8" width="3018" height="1231" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.48547328" visible="true" weight="0.10305085" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.48508635" visible="true" weight="0.08389716" />
       <window_info id="Designer" order="1" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="UI Designer" order="4" />
       <window_info id="Learn" order="5" show_stripe_button="false" weight="0.32949153" />
-      <window_info auto_hide="true" x="168" y="57" width="304" height="1067" id="Structure" order="6" sideWeight="0.5145267" side_tool="true" weight="0.10305085" />
+      <window_info auto_hide="true" x="168" y="57" width="304" height="1067" id="Structure" order="6" sideWeight="0.5149137" side_tool="true" weight="0.08389716" />
       <window_info id="Favorites" order="7" sideWeight="0.43962264" weight="0.14711864" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3261481" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49960783" weight="0.32427368" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49941972" visible="true" weight="0.37582007" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49960783" weight="0.32397005" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49941972" visible="true" weight="0.40355805" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3298872" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32894737" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32455316" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50058025" side_tool="true" weight="0.3958724" />
-      <window_info anchor="bottom" id="Messages" order="10" weight="0.32333645" />
+      <window_info anchor="bottom" id="Messages" order="10" weight="0.32303372" />
       <window_info anchor="bottom" id="Run with VisualVM" order="11" />
       <window_info anchor="bottom" id="Debug with VisualVM" order="12" weight="0.32956687" />
       <window_info anchor="bottom" id="Inspection Results" order="13" weight="0.32925683" />
@@ -906,25 +951,39 @@
     </ignored-roots>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java</url>
-          <line>670</line>
-          <properties />
-          <option name="timeStamp" value="40" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java</url>
-          <line>495</line>
-          <properties />
-          <option name="timeStamp" value="41" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="JUnit">
+        <watch expression="((Search)this).principalVariation" custom="fko.javaUCIEngineFramework.Franky.Search" />
+        <watch expression="((Search)this).currentVariation" custom="fko.javaUCIEngineFramework.Franky.Search" />
+        <watch expression="((Search)this).rootMoves" custom="fko.javaUCIEngineFramework.Franky.Search" />
+        <watch expression="ttEntry" />
+        <watch expression="moves" />
+        <watch expression="((Search)this).currentVariation" language="JAVA" custom="fko.javaUCIEngineFramework.Franky.Search" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
+      <expression>
+        <expression-string>Move.toString(move)</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>Move.toSimpleString(principalVariation[0]._list[0])</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>Move.toSimpleString((Search)this).principalVariation[0]._list[0])</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>-alpha - 1</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>Move.toString(principalVariation[0]._list[0]);</expression-string>
         <language-id>JAVA</language-id>
@@ -952,26 +1011,50 @@
         <language-id>JAVA</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
-      <expression>
-        <expression-string>(int) 8236080816066982983L
-% 6100805</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>(int) 5701643939457933816L % 6100805</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
-      </expression>
     </expressions>
     <expressions id="breakpointCondition">
       <expression>
-        <expression-string>ply &gt;= 3</expression-string>
+        <expression-string>depth==5</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>depthLeft &lt;= 2</expression-string>
+        <expression-string>currentVariation.get(0)==67201446 &amp;&amp; currentVariation.get(1)==67285620  &amp;&amp; currentVariation.get(2)==67205587</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>move==67205587</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>currentVariation.get(0)==67201446 &amp;&amp; currentVariation.get(1)==67285620  &amp;&amp; currentVariation.get(2)==69825107</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>currentVariation.get(0)==67201446 &amp;&amp; currentVariation.get(1)==67285620</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>currentVariation.get(0)==67201446 &amp;&amp; currentVariation.get(1)==67285620 &amp;&amp; currentVariation.get(2)==67205587</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>currentVariation.get(0)==67201446 &amp;&amp; currentVariation.get(0)==67285620</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>currentVariation.get(0)==67201446</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>currentVariation[0]==67201446</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -995,20 +1078,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1-sources.jar!/org/apache/commons/lang3/RandomUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-522">
-          <caret line="25" column="13" selection-start-line="25" selection-start-column="13" selection-end-line="25" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1-sources.jar!/org/apache/commons/lang3/tuple/Triple.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="111">
-          <caret line="39" column="22" selection-start-line="39" selection-start-column="22" selection-end-line="39" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1-sources.jar!/org/apache/commons/lang3/tuple/Pair.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1617">
@@ -1083,16 +1152,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-66">
           <caret line="65" column="13" selection-start-line="65" selection-start-column="13" selection-end-line="65" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/SearchMode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-807">
-          <caret line="121" column="64" selection-start-line="121" selection-start-column="64" selection-end-line="121" selection-end-column="64" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1247,13 +1306,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/FrankyEngine.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="445">
-          <caret line="117" selection-start-line="117" selection-end-line="117" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk-11.0.1/lib/src.zip!/java.base/java/io/PrintStream.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="552">
@@ -1275,58 +1327,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestTranspositionTable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1368">
-          <caret line="142" column="8" selection-start-line="142" selection-start-column="8" selection-end-line="142" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TranspositionTable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3600">
-          <caret line="223" column="39" lean-forward="true" selection-start-line="223" selection-start-column="39" selection-end-line="223" selection-end-column="39" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#5266#5267#0" expanded="true" />
-            <element signature="e#5315#5316#0" expanded="true" />
-            <element signature="e#5819#5820#0" expanded="true" />
-            <element signature="e#5856#5857#0" expanded="true" />
-            <element signature="e#5923#5924#0" expanded="true" />
-            <element signature="e#5955#5956#0" expanded="true" />
-            <element signature="e#6028#6029#0" expanded="true" />
-            <element signature="e#6068#6069#0" expanded="true" />
-            <element signature="e#6157#6158#0" expanded="true" />
-            <element signature="e#6192#6193#0" expanded="true" />
-            <element signature="e#6315#6316#0" expanded="true" />
-            <element signature="e#6347#6348#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Evaluation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="e#7403#7404#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestBoardPosition.java">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#6079#6080#0" expanded="true" />
-            <element signature="e#6129#6130#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSuiteTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
@@ -1338,13 +1338,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
           <caret line="7" column="48" selection-start-line="7" selection-start-column="48" selection-end-line="7" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="918">
-          <caret line="62" column="100" selection-start-line="62" selection-start-column="100" selection-end-line="62" selection-end-column="100" />
         </state>
       </provider>
     </entry>
@@ -1390,20 +1383,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/engine-interface.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-990">
-          <caret line="290" column="5" selection-start-line="290" selection-start-column="5" selection-end-line="290" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Configuration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="53" selection-start-line="53" selection-end-line="53" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/MoveList.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="409">
@@ -1411,20 +1390,135 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TranspositionTable.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="43">
-          <caret line="520" column="23" selection-start-line="520" selection-start-column="23" selection-end-line="520" selection-end-column="23" />
+        <state relative-caret-position="158">
+          <caret line="65" column="32" selection-start-line="65" selection-start-column="32" selection-end-line="65" selection-end-column="32" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/testTimings_EvalVsCache.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7">
+          <caret line="49" column="35" lean-forward="true" selection-start-line="49" selection-start-column="35" selection-end-line="49" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/engine-interface.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="286" column="14" selection-start-line="286" selection-start-column="6" selection-end-line="286" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestBoardPosition.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/SearchMode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="294">
+          <caret line="83" column="9" selection-start-line="83" selection-start-column="9" selection-end-line="83" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Evaluation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1358">
+          <caret line="226" column="43" selection-start-line="226" selection-start-column="43" selection-end-line="226" selection-end-column="43" />
+          <folding>
+            <element signature="e#7403#7404#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk-11.0.1/lib/src.zip!/java.base/java/lang/Object.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="188">
+          <caret line="244" column="18" selection-start-line="244" selection-start-column="18" selection-end-line="244" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#6079#6080#0" expanded="true" />
+            <element signature="e#6129#6130#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestTranspositionTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="39" column="13" selection-start-line="39" selection-start-column="13" selection-end-line="39" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/FrankyEngine.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="445">
+          <caret line="117" selection-start-line="117" selection-end-line="117" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Configuration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-47">
+          <caret line="40" column="15" selection-start-line="40" selection-start-column="15" selection-end-line="40" selection-end-column="15" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3336">
-          <caret line="670" selection-start-line="670" selection-end-line="670" />
+        <state relative-caret-position="453">
+          <caret line="518" selection-start-line="518" selection-end-line="518" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#33951#33952#0" expanded="true" />
+            <element signature="e#34350#34351#0" expanded="true" />
+            <element signature="e#34438#34439#0" expanded="true" />
+            <element signature="e#36030#36031#0" expanded="true" />
+            <element signature="e#36247#36248#0" expanded="true" />
+            <element signature="e#36410#36411#0" expanded="true" />
+            <element signature="e#36584#36585#0" expanded="true" />
+            <element signature="e#36718#36719#0" expanded="true" />
+            <element signature="e#36833#36834#0" expanded="true" />
+            <element signature="e#36943#36944#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="54" selection-start-line="54" selection-end-line="54" />
+          <caret line="53" selection-start-line="53" selection-end-line="53" />
+          <caret line="52" selection-start-line="52" selection-end-line="52" />
+          <caret line="51" selection-start-line="51" selection-end-line="51" />
+          <caret line="50" selection-start-line="50" selection-end-line="50" />
+          <caret line="49" selection-start-line="49" selection-end-line="49" />
+          <caret line="48" selection-start-line="48" selection-end-line="48" />
+          <caret line="47" selection-start-line="47" selection-end-line="47" />
+          <caret line="46" selection-start-line="46" selection-end-line="46" />
+          <caret line="45" selection-start-line="45" selection-end-line="45" />
+          <caret line="44" selection-start-line="44" selection-end-line="44" />
+          <caret line="43" selection-start-line="43" selection-end-line="43" />
+          <caret line="42" selection-start-line="42" selection-end-line="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="181">
+          <caret line="453" column="22" lean-forward="true" selection-start-line="450" selection-end-line="457" selection-end-column="41" />
         </state>
       </provider>
     </entry>
