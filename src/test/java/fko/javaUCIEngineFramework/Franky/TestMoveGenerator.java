@@ -44,7 +44,7 @@ public class TestMoveGenerator {
   @Test
   public void testMaxMovesPosition() {
     String testFen = "R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"; // 218 moves to make
-    BoardPosition board = new BoardPosition(testFen);
+    Position board = new Position(testFen);
     MoveGenerator moveGenerator = new MoveGenerator();
     MoveList legal_moves = moveGenerator.getLegalMoves(board).clone();
     MoveList pseudo_moves = moveGenerator.getPseudoLegalMoves(board).clone();
@@ -61,7 +61,7 @@ public class TestMoveGenerator {
   public void testPseudoLegalMovesPosition() {
 
     String testFen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1";
-    BoardPosition board = new BoardPosition(testFen);
+    Position board = new Position(testFen);
     //board.makeMove(Move.fromUCINotation(board, "d8h8"));
 
     MoveGenerator moveGenerator = new MoveGenerator();
@@ -109,7 +109,7 @@ public class TestMoveGenerator {
   public void testCapturingMovesOnly() {
 
     String testFen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1";
-    BoardPosition board = new BoardPosition(testFen);
+    Position board = new Position(testFen);
 
     MoveGenerator moveGenerator = new MoveGenerator();
     MoveList pseudo_moves = moveGenerator.getPseudoLegalMoves(board).clone();
@@ -131,7 +131,7 @@ public class TestMoveGenerator {
 
     String testFen = "rnb1kbnr/pppp1ppp/4p3/8/5P1q/N7/PPPPP1PP/R1BQKBNR w KQkq - 2 3";
 
-    BoardPosition board = new BoardPosition(testFen);
+    Position board = new Position(testFen);
     MoveGenerator moveGenerator = new MoveGenerator();
 
     boolean hasLegalMoves = moveGenerator.hasLegalMove(board);
@@ -154,7 +154,7 @@ public class TestMoveGenerator {
     String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq - 0 113";
     testFen = "r3k2r/p1ppqNb1/bn2Pnp1/8/1p2P3/2N2Q2/PPPBBP1P/R3K1qR w KQkq - 0 3";
 
-    BoardPosition board = new BoardPosition(testFen);
+    Position board = new Position(testFen);
     MoveGenerator moveGenerator = new MoveGenerator();
     MoveList moves = moveGenerator.getLegalMoves(board);
     System.out.println(moves);
@@ -169,13 +169,13 @@ public class TestMoveGenerator {
   public void testOnDemandFromFenBoard() {
 
     MoveGenerator moveGenerator = new MoveGenerator();
-    BoardPosition board = null;
+    Position board = null;
 
     int i = 0;
     String[] fens = getFENs();
     while (fens[i] != null) {
       String testFen = fens[i];
-      board = new BoardPosition(testFen);
+      board = new Position(testFen);
 
       int j = 0;
       int move = moveGenerator.getNextPseudoLegalMove(board, false);
@@ -203,14 +203,14 @@ public class TestMoveGenerator {
   public void testMoveSorting() {
 
     MoveGenerator moveGenerator = new MoveGenerator();
-    BoardPosition board = null;
+    Position board = null;
 
     int i = 0;
     String[] fens = getFENs();
     while (fens[i] != null) {
       String testFen = fens[i++];
       System.out.println(testFen);
-      board = new BoardPosition(testFen);
+      board = new Position(testFen);
 
       MoveList moves = moveGenerator.getPseudoLegalMoves(board);
 
@@ -237,14 +237,14 @@ public class TestMoveGenerator {
     int DURATION = 1;
 
     MoveGenerator moveGenerator = new MoveGenerator();
-    BoardPosition board = null;
+    Position board = null;
     Instant start = null;
 
     int i = 0;
     String[] fens = getFENs();
     while (fens[i] != null) {
       String testFen = fens[i];
-      board = new BoardPosition(testFen);
+      board = new Position(testFen);
       //System.out.println(board);
 
       // Pseudo Legal Moves

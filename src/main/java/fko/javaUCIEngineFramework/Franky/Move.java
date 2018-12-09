@@ -209,7 +209,7 @@ public class Move {
     return s;
   }
 
-  public static int fromUCINotation(final BoardPosition position, final String move) {
+  public static int fromUCINotation(final Position position, final String move) {
     Square from = Square.fromUCINotation(move.substring(0, 2));
     Square to = Square.fromUCINotation(move.substring(2, 4));
     String promotion = "";
@@ -238,7 +238,7 @@ public class Move {
     return NOMOVE;
   }
 
-  public static String toUCINotation(final BoardPosition boardPosition, int move) {
+  public static String toUCINotation(final Position position, int move) {
     String promotion = "";
     if (Move.getMoveType(move) == MoveType.PROMOTION) {
       promotion = Move.getPromotion(move).getType().getShortName().toLowerCase();

@@ -73,7 +73,7 @@ public class PERFT {
             mg[i] = new MoveGenerator();
         }
 
-        BoardPosition board = new BoardPosition(_fen);
+        Position board = new Position(_fen);
 
         long result = 0;
 
@@ -96,7 +96,7 @@ public class PERFT {
      * @param move
      * @return
      */
-    private long dividePerft(int depth, MoveGenerator[] mg, BoardPosition board, int move) {
+    private long dividePerft(int depth, MoveGenerator[] mg, Position board, int move) {
         if (DIVIDE) System.out.print(Move.toSimpleString(move) + " ");
         board.makeMove(move);
         long r = miniMax(depth - 1, board, mg, 1);
@@ -105,7 +105,7 @@ public class PERFT {
         return r;
     }
 
-    private long miniMax(int depthleft, BoardPosition board, MoveGenerator[] mg, int ply) {
+    private long miniMax(int depthleft, Position board, MoveGenerator[] mg, int ply) {
 
         // PERFT only looks at leaf nodes
         if (depthleft == 0) {
@@ -136,7 +136,7 @@ public class PERFT {
     /**
      * @param board
      */
-    private void updateCounter(BoardPosition board) {
+    private void updateCounter(Position board) {
         if (board.hasCheck()) {
             _checkCounter++;
             if (board.hasCheckMate()) {

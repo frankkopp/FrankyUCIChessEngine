@@ -40,14 +40,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestEvaluation {
 
-    private String        fenStandard;
-    private BoardPosition boardPosition;
-    private Evaluation    evaluation;
+    private String     fenStandard;
+    private Position   position;
+    private Evaluation evaluation;
 
     @BeforeEach
     public void setUp()  {
         fenStandard = IUCIProtocolHandler.START_FEN;
-        boardPosition = new BoardPosition(fenStandard);
+        position = new Position(fenStandard);
         evaluation = new Evaluation();
     }
 
@@ -55,8 +55,8 @@ public class TestEvaluation {
     public final void testEvaluate_startPosValueZero() {
         // standard position should be 0
         // change if next player gets a bonus
-        boardPosition = new BoardPosition(fenStandard);
-        int value = evaluation.evaluate(boardPosition);
+        position = new Position(fenStandard);
+        int value = evaluation.evaluate(position);
         assertEquals(0, value, "Start Position should be 0");
     }
 
@@ -64,55 +64,55 @@ public class TestEvaluation {
     public void testEvaluate_mirroredPositionEqual() {
         // Mirrored position - should be equal
         String fen = "k6n/7p/6P1/7K/8/8/8/8 w - - 0 1"; // white
-        boardPosition = new BoardPosition(fen);
-        int value1 = evaluation.evaluate(boardPosition);
+        position = new Position(fen);
+        int value1 = evaluation.evaluate(position);
         fen = "8/8/8/8/k7/1p6/P7/N6K b - - 0 1"; // black
-        boardPosition = new BoardPosition(fen);
-        int value2 = evaluation.evaluate(boardPosition);
+        position = new Position(fen);
+        int value2 = evaluation.evaluate(position);
         assertEquals(value1,value2, "Mirrored Position should be equal");
     }
 
     @Test
     public final void testMaterial_OfStartPosition() {
-        boardPosition = new BoardPosition(fenStandard);
-        int value = evaluation.material(boardPosition);
+        position = new Position(fenStandard);
+        int value = evaluation.material(position);
         assertEquals(0, value);
     }
 
     @Test
     public final void testMaterial_OfDifferentPositions() {
         String fen = "k6n/7p/6P1/7K/8/8/8/8 w - - 0 1"; // white
-        boardPosition = new BoardPosition(fen);
-        int value = evaluation.material(boardPosition);
+        position = new Position(fen);
+        int value = evaluation.material(position);
         // System.out.println(value);
         assertEquals(-320, value);
 
         fen = "8/8/8/8/k7/1p6/P7/N6K b - - 0 1"; // black
-        boardPosition = new BoardPosition(fen);
-        value = evaluation.material(boardPosition);
+        position = new Position(fen);
+        value = evaluation.material(position);
         // System.out.println(value);
         assertEquals(-320, value);
     }
 
     @Test
     public final void testMobility_StartPosition() {
-        boardPosition = new BoardPosition(fenStandard);
-        int value = evaluation.mobility(boardPosition);
+        position = new Position(fenStandard);
+        int value = evaluation.mobility(position);
         //System.out.println(value);
         assertEquals(0, value);
     }
 
     @Test
     public final void testNeutralPosition() {
-        boardPosition = new BoardPosition("7k/7p/8/8/8/8/P7/K7 w - - 0 1");
-        int mat = evaluation.material(boardPosition);
-        int mob = evaluation.mobility(boardPosition);
+        position = new Position("7k/7p/8/8/8/8/P7/K7 w - - 0 1");
+        int mat = evaluation.material(position);
+        int mob = evaluation.mobility(position);
         System.out.println("Material: "+mat);
         System.out.println("Mobility: "+mob);
 
-        boardPosition = new BoardPosition("7k/7p/8/8/8/8/P7/K7 b - - 0 1");
-        mat = evaluation.material(boardPosition);
-        mob = evaluation.mobility(boardPosition);
+        position = new Position("7k/7p/8/8/8/8/P7/K7 b - - 0 1");
+        mat = evaluation.material(position);
+        mob = evaluation.mobility(position);
         System.out.println("Material: "+mat);
         System.out.println("Mobility: "+mob);
 
@@ -123,20 +123,20 @@ public class TestEvaluation {
     @Test
     public final void testMobility_otherPositions() {
         String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
-        boardPosition = new BoardPosition(fen);
-        int value = evaluation.mobility(boardPosition);
+        position = new Position(fen);
+        int value = evaluation.mobility(position);
         //System.out.println(value);
         assertEquals(52, value);
 
         fen = "k6n/7p/6P1/7K/8/8/8/8 w - - 0 1"; // white
-        boardPosition = new BoardPosition(fen);
-        value = evaluation.mobility(boardPosition);
+        position = new Position(fen);
+        value = evaluation.mobility(position);
         //System.out.println(value);
         assertEquals(-4, value);
 
         fen = "8/8/8/8/k7/1p6/P7/N6K b - - 0 1"; // black
-        boardPosition = new BoardPosition(fen);
-        value = evaluation.mobility(boardPosition);
+        position = new Position(fen);
+        value = evaluation.mobility(position);
         //System.out.println(value);
         assertEquals(-4, value);
     }
@@ -155,7 +155,7 @@ public class TestEvaluation {
         System.out.println("Running Timing Test");
 
         String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
-        boardPosition = new BoardPosition(fen);
+        position = new Position(fen);
 
         for (int j=0; j<ROUNDS ;j++) {
             System.gc();
@@ -174,6 +174,6 @@ public class TestEvaluation {
     }
 
     private void testCode() {
-        evaluation.evaluate(boardPosition);
+        evaluation.evaluate(position);
     }
 }

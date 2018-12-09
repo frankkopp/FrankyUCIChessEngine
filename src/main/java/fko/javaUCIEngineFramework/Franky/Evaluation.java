@@ -45,13 +45,12 @@ package fko.javaUCIEngineFramework.Franky;
  */
 public class Evaluation {
 
-  static private final boolean MATERIAL       = true;
-  static private final boolean MOBILITY       = true;
-  static private final boolean PIECE_POSITION = false;
+  private static final boolean MATERIAL       = true;
+  private static final boolean MOBILITY       = true;
+  private static final boolean PIECE_POSITION = false;
 
   /**
-   * Creates an instance of the OmegaEvaluator using a new Engine
-   * and a new Move Generator.
+   * Creates an instance of the Evaluator
    */
   public Evaluation() {
   }
@@ -59,21 +58,27 @@ public class Evaluation {
   /**
    * Always from the view of the active (next) player.
    *
-   * @param board
+   * @param position
    * @return value of the position from active player's view.
    */
-  public int evaluate(BoardPosition board) {
+  public int evaluate(Position position) {
 
     int value = Evaluation.Value.DRAW;
 
     // Material
-    if (MATERIAL) value += material(board);
+    if (MATERIAL) {
+      value += material(position);
+    }
 
     // Mobility
-    if (MOBILITY) value += mobility(board);
+    if (MOBILITY) {
+      value += mobility(position);
+    }
 
     // Piece Position
-    if (PIECE_POSITION) value += position(board);
+    if (PIECE_POSITION) {
+      value += position(position);
+    }
 
     return value;
   }
@@ -82,9 +87,9 @@ public class Evaluation {
    * @param board
    * @return material balance from the view of the active player
    */
-  int material(final BoardPosition board) {
-    int material =
-      board.getNextPlayer().factor * (board.getMaterial(Color.WHITE) - board.getMaterial(Color.BLACK));
+  int material(final Position board) {
+    int material = board.getNextPlayer().factor * (board.getMaterial(Color.WHITE) -
+                                                   board.getMaterial(Color.BLACK));
 
     // bonus/malus for bishop pair
     if (board.getBishopSquares()[board.getNextPlayer().ordinal()].size() >= 2) {
@@ -101,7 +106,7 @@ public class Evaluation {
    * @param board
    * @return number of pseudo legal moves for the next player
    */
-  int mobility(final BoardPosition board) {
+  int mobility(final Position board) {
     int mobility = 0;
 
     // to influence the weight of the piece type
@@ -157,7 +162,7 @@ public class Evaluation {
    * @param pieceDirections
    * @return
    */
-  private static int mobilityForPieces(BoardPosition board, Color color, PieceType type,
+  private static int mobilityForPieces(Position board, Color color, PieceType type,
                                        SquareList squareList, int[] pieceDirections) {
     int numberOfMoves = 0;
     // iterate over all squares where we have a piece
@@ -176,7 +181,7 @@ public class Evaluation {
    * @param square
    * @param pieceDirections
    */
-  private static int mobilityForPiece(BoardPosition board, Color color, PieceType type,
+  private static int mobilityForPiece(Position board, Color color, PieceType type,
                                       Square square, int[] pieceDirections) {
     int numberOfMoves = 0;
     for (int d : pieceDirections) {
@@ -211,7 +216,7 @@ public class Evaluation {
    * @param board
    * @return
    */
-  int position(BoardPosition board) {
+  int position(Position board) {
     return 0;
   }
 

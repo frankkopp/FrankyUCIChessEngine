@@ -48,7 +48,7 @@ public class MoveGenerator {
 
   // the current position we generate the move for
   // is set in the getMoves methods
-  private BoardPosition position = null;
+  private Position position = null;
 
   // which color do we generate moves for
   private Color activePlayer;
@@ -99,7 +99,7 @@ public class MoveGenerator {
    * @param capturingOnly
    * @return int representing the next legal Move. Return Move.NOMOVE if none available
    */
-  public int getNextPseudoLegalMove(BoardPosition position, boolean capturingOnly) {
+  public int getNextPseudoLegalMove(Position position, boolean capturingOnly) {
 
     // TODO zobrist could collide - then this will break.
     if (position.getZobristKey() != onDemandZobristLastPosition ||
@@ -211,7 +211,7 @@ public class MoveGenerator {
    * @param position
    * @return legal moves
    */
-  public IntStream streamLegalMoves(BoardPosition position) {
+  public IntStream streamLegalMoves(Position position) {
     return this.getLegalMoves(position).stream();
   }
 
@@ -228,7 +228,7 @@ public class MoveGenerator {
    * @param position
    * @return reference to a list of legal moves
    */
-  public MoveList getLegalMoves(BoardPosition position) {
+  public MoveList getLegalMoves(Position position) {
     if (position == null) {
       throw new IllegalArgumentException("position may not be null to generate moves");
     }
@@ -268,7 +268,7 @@ public class MoveGenerator {
    * @param capturingOnly
    * @return list of moves which may leave the king in check
    */
-  public IntStream streamPseudoLegalMoves(BoardPosition position, boolean capturingOnly) {
+  public IntStream streamPseudoLegalMoves(Position position, boolean capturingOnly) {
     return this.getPseudoLegalMoves(position).stream();
   }
 
@@ -284,7 +284,7 @@ public class MoveGenerator {
    * @param position
    * @return a reference to the list of moves which may leave the king in check
    */
-  public MoveList getPseudoLegalMoves(BoardPosition position) {
+  public MoveList getPseudoLegalMoves(Position position) {
     if (position == null) {
       throw new IllegalArgumentException("position may not be null to generate moves");
     }
@@ -326,7 +326,7 @@ public class MoveGenerator {
    * @param position
    * @return a reference to the list of moves which may leave the king in check
    */
-  public MoveList getPseudoLegalQSearchMoves(BoardPosition position) {
+  public MoveList getPseudoLegalQSearchMoves(Position position) {
     if (position == null) {
       throw new IllegalArgumentException("position may not be null to generate moves");
     }
@@ -723,7 +723,7 @@ public class MoveGenerator {
    * @param position
    * @return true if there is at least one legal move
    */
-  public boolean hasLegalMove(BoardPosition position) {
+  public boolean hasLegalMove(Position position) {
     if (position == null) {
       throw new IllegalArgumentException("position may not be null to find legal moves");
     }

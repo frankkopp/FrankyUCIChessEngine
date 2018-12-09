@@ -94,7 +94,7 @@ public class TranspositionTable {
    * @param type
    * @param depth
    */
-  public void put(BoardPosition position, int value, TT_EntryType type, int depth) {
+  public void put(Position position, int value, TT_EntryType type, int depth) {
 
     final int hash = getHash(position.getZobristKey());
 
@@ -137,7 +137,7 @@ public class TranspositionTable {
    * @param position
    * @return value for key or <tt>Integer.MIN_VALUE</tt> if not found
    */
-  public TT_Entry get(BoardPosition position) {
+  public TT_Entry get(Position position) {
     final int hash = getHash(position.getZobristKey());
     if (entries[hash].key == position.getZobristKey()) { // hash hit
       return entries[hash];

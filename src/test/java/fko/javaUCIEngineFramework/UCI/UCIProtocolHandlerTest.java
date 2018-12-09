@@ -141,7 +141,7 @@ class UCIProtocolHandlerTest {
     toHandlerPrinter.println("position fen 8/3P4/6K1/8/8/1k6/8/8 w - - 0 0 moves d7d8q");
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
 
-    assertEquals("3Q4/8/6K1/8/8/1k6/8/8 b - - 0 1", engine.getBoardPosition().toFENString());
+    assertEquals("3Q4/8/6K1/8/8/1k6/8/8 b - - 0 1", engine.getPosition().toFENString());
 
     // castling
     toHandlerPrinter.println(
@@ -149,27 +149,27 @@ class UCIProtocolHandlerTest {
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
 
     assertEquals("r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 1 1",
-                 engine.getBoardPosition().toFENString());
+                 engine.getPosition().toFENString());
 
     // normal
     toHandlerPrinter.println("position startpos moves e2e4 e7e5");
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
 
     assertEquals("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
-                 engine.getBoardPosition().toFENString());
+                 engine.getPosition().toFENString());
 
     toHandlerPrinter.println("position moves e2e4 e7e5");
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
 
     assertEquals("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
-                 engine.getBoardPosition().toFENString());
+                 engine.getPosition().toFENString());
 
     toHandlerPrinter.println(
       "position fen rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1 moves e1e2 e8e7");
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
 
     assertEquals("rnbq1bnr/4k3/8/8/8/8/4K3/RNBQ1BNR w - - 2 2",
-                 engine.getBoardPosition().toFENString());
+                 engine.getPosition().toFENString());
 
     toHandlerPrinter.println("quit");
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
@@ -401,7 +401,7 @@ class UCIProtocolHandlerTest {
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
 
     assertEquals("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
-                 engine.getBoardPosition().toFENString());
+                 engine.getPosition().toFENString());
 
     toHandlerPrinter.println("go ponder wtime 300000 btime 300000");
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);

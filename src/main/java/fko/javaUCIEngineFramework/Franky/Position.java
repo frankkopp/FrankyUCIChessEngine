@@ -33,7 +33,7 @@ import java.util.Random;
  * It uses a x88 board, a stack for undo moves, zobrist keys for transposition tables, piece lists,
  * material counter.<br>
  * Can be created with any FEN notation and as a copy from another
- * BoardPosition.
+ * Position.
  *
  * <p>x88 method
  *
@@ -52,7 +52,7 @@ import java.util.Random;
  *
  * <p>https://www.chessprogramming.org/0x88
  */
-public class BoardPosition {
+public class Position {
 
   /* Standard Board Setup as FEN */
   public static final String STANDARD_BOARD_FEN =
@@ -183,7 +183,7 @@ public class BoardPosition {
   /**
    * Creates a standard Chessly board and initializes it with standard chess setup.
    */
-  public BoardPosition() {
+  public Position() {
     this(STANDARD_BOARD_FEN);
   }
 
@@ -192,17 +192,17 @@ public class BoardPosition {
    *
    * @param fen
    */
-  public BoardPosition(String fen) {
+  public Position(String fen) {
     initializeLists();
     initBoard(fen);
   }
 
   /**
-   * Copy constructor - creates a copy of the given BoardPosition
+   * Copy constructor - creates a copy of the given Position
    *
    * @param op
    */
-  public BoardPosition(BoardPosition op) {
+  public Position(Position op) {
     if (op == null) throw new NullPointerException("Parameter op may not be null");
 
     // x88 board
@@ -258,7 +258,7 @@ public class BoardPosition {
   }
 
 
-  // public BoardPosition(GameBoard oldBoard) {
+  // public Position(GameBoard oldBoard) {
   //        this(oldBoard.toFENString());
   //    }
 
@@ -1528,10 +1528,10 @@ public class BoardPosition {
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof BoardPosition)) {
+    if (!(obj instanceof Position)) {
       return false;
     }
-    BoardPosition other = (BoardPosition) obj;
+    Position other = (Position) obj;
     if (this.getZobristKey() != other.getZobristKey()) {
       return false;
     }

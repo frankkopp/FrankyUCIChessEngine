@@ -45,7 +45,7 @@ import java.util.concurrent.CountDownLatch;
  * DONE: - QUIESCENCE (https://www.chessprogramming.org/Quiescence_Search)
  * TODO: - SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * DONE: - Mate Distance Pruning (https://www.chessprogramming.org/Mate_Distance_Pruning)
- * TODO: - NULL MOVE PRUNING
+ * DONE: - NULL MOVE PRUNING
  */
 public class Search implements Runnable {
 
@@ -91,10 +91,10 @@ public class Search implements Runnable {
   private long softTimeLimit;
 
   // search state - valid for one call to startSearch
-  private BoardPosition currentBoardPosition;
-  private Color         myColor;
-  private SearchMode    searchMode;
-  private SearchResult  lastSearchResult;
+  private Position     currentPosition;
+  private Color        myColor;
+  private SearchMode   searchMode;
+  private SearchResult lastSearchResult;
 
   // running search global variables
   private final RootMoveList rootMoves          = new RootMoveList();
@@ -143,10 +143,10 @@ public class Search implements Runnable {
    * The search also can be stopped by calling stop at any time. The
    * search will stop gracefully by storing the best move so far.
    *
-   * @param boardPosition
+   * @param position
    * @param searchMode
    */
-  public void startSearch(BoardPosition boardPosition, SearchMode searchMode) {
+  public void startSearch(Position position, SearchMode searchMode) {
     if (searchThread != null && searchThread.isAlive()) {
       final String s = "Search already running - can only be started once";
       IllegalStateException e = new IllegalStateException(s);
@@ -155,8 +155,8 @@ public class Search implements Runnable {
     }
 
     // create a deep copy of the position
-    this.currentBoardPosition = new BoardPosition(boardPosition);
-    this.myColor = currentBoardPosition.getNextPlayer();
+    this.currentPosition = new Position(position);
+    this.myColor = currentPosition.getNextPlayer();
     this.searchMode = searchMode;
 
     // setup latch
@@ -261,7 +261,7 @@ public class Search implements Runnable {
     waitForInitializationLatch.countDown();
 
     // run the search itself
-    lastSearchResult = iterativeSearch(currentBoardPosition);
+    lastSearchResult = iterativeSearch(currentPosition);
 
     // if the mode still is ponder at this point we have a ponder miss
     if (searchMode.isPonder()) {
@@ -281,7 +281,7 @@ public class Search implements Runnable {
    * @param position
    * @return the best move
    */
-  private SearchResult iterativeSearch(BoardPosition position) {
+  private SearchResult iterativeSearch(Position position) {
 
     // remember the start of the search
     startTime = System.currentTimeMillis();
@@ -415,7 +415,7 @@ public class Search implements Runnable {
    * @param position
    * @param depth
    */
-  private void rootMovesSearch(BoardPosition position, int depth) {
+  private void rootMovesSearch(Position position, int depth) {
 
     final int rootPly = 0;
 
@@ -538,7 +538,7 @@ public class Search implements Runnable {
    * @param doNullMove
    * @return value of the search
    */
-  private int negamax(BoardPosition position, int depthLeft, int ply, int alpha, int beta,
+  private int negamax(Position position, int depthLeft, int ply, int alpha, int beta,
                       boolean pvSearch, final boolean doNullMove) {
 
     // nodes counter
@@ -766,7 +766,7 @@ public class Search implements Runnable {
     return alpha;
   }
 
-  private int quiescence(BoardPosition position, int ply, int alpha, int beta) {
+  private int quiescence(Position position, int ply, int alpha, int beta) {
 
     // ###############################################
     // TT Lookup
@@ -921,7 +921,7 @@ public class Search implements Runnable {
     return alpha;
   }
 
-  private int evaluate(BoardPosition position) {
+  private int evaluate(Position position) {
 
     // update some perft stats - no real performance hit here
     int lastMove = position.getLastMove();
@@ -970,14 +970,14 @@ public class Search implements Runnable {
     return value;
   }
 
-  private boolean wasIllegalMove(final BoardPosition position) {
+  private boolean wasIllegalMove(final Position position) {
     return position.isAttacked(position.getNextPlayer(),
                                position.getKingSquares()[position.getNextPlayer()
                                                                  .getInverseColor()
                                                                  .ordinal()]);
   }
 
-  private TT_Entry probeTT(final BoardPosition position) {
+  private TT_Entry probeTT(final Position position) {
     TT_Entry ttEntry = null;
     if (config.USE_TRANSPOSITION_TABLE && !isPerftSearch()) {
       ttEntry = transpositionTable.get(position);
@@ -990,7 +990,7 @@ public class Search implements Runnable {
     return ttEntry;
   }
 
-  private void storeTT(final BoardPosition position, final int depthLeft, final TT_EntryType ttType,
+  private void storeTT(final Position position, final int depthLeft, final TT_EntryType ttType,
                        final int bestValue) {
     if (config.USE_TRANSPOSITION_TABLE && !isPerftSearch()) {
       transpositionTable.put(position, bestValue, ttType, depthLeft);
@@ -1065,7 +1065,7 @@ public class Search implements Runnable {
    * @param position
    * @return
    */
-  private static boolean bigPiecePresent(BoardPosition position) {
+  private static boolean bigPiecePresent(Position position) {
     final int activePlayer = position.getNextPlayer().ordinal();
     return !(position.getKnightSquares()[activePlayer].isEmpty() &&
              position.getBishopSquares()[activePlayer].isEmpty() &&
@@ -1073,7 +1073,7 @@ public class Search implements Runnable {
              position.getQueenSquares()[activePlayer].isEmpty());
   }
 
-  private void sendUCIUpdate(final BoardPosition position) {
+  private void sendUCIUpdate(final Position position) {
     // send current root move info to UCI every x milli seconds
     uciUpdateTicker = System.currentTimeMillis();
     if (System.currentTimeMillis() - uciUpdateTicker >= 250) {

@@ -33,8 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 /**
  * TestSuiteTest
  *
@@ -81,9 +79,9 @@ public class TestSuiteTest {
   public void manualTestSuite() {
     String testFen = "1k2r2r/pbb2p2/2qn2p1/8/PP6/2P2N2/1Q2NPB1/R4RK1 b - -";
 
-    BoardPosition boardPosition = new BoardPosition(testFen);
+    Position position = new Position(testFen);
 
-    System.out.println(boardPosition.toBoardString());
+    System.out.println(position.toBoardString());
 
     SearchMode searchMode = new SearchMode(0, 0, 0,
                                            0, 0, 0,
@@ -91,7 +89,7 @@ public class TestSuiteTest {
                                            null, false,
                                            true, false);
 
-    search.startSearch(boardPosition, searchMode);
+    search.startSearch(position, searchMode);
 
     // test search
     waitWhileSearching();

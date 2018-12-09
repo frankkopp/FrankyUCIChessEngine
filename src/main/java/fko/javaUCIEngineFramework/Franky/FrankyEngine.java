@@ -59,8 +59,8 @@ public class FrankyEngine implements IUCIEngine {
   private List<IUCIEngine.IUCIOption> iUciOptions;
 
   // engine state
-  private BoardPosition boardPosition;
-  private SearchMode    searchMode;
+  private Position   position;
+  private SearchMode searchMode;
 
   /**
    * Default Constructor
@@ -68,7 +68,7 @@ public class FrankyEngine implements IUCIEngine {
   public FrankyEngine() {
     initOptions();
     search = new Search(this, config);
-    boardPosition = new BoardPosition(); // default is standard start board
+    position = new Position(); // default is standard start board
   }
 
   /**
@@ -77,8 +77,8 @@ public class FrankyEngine implements IUCIEngine {
    *
    * @return the last position the engine has received through <code>setPosition</code>
    */
-  public BoardPosition getBoardPosition() {
-    return boardPosition;
+  public Position getPosition() {
+    return position;
   }
 
   /**
@@ -290,14 +290,14 @@ public class FrankyEngine implements IUCIEngine {
   @Override
   public void setPosition(final String fen) {
     LOG.info("Engine got Position command: {}", fen);
-    boardPosition = new BoardPosition(fen);
+    position = new Position(fen);
   }
 
   @Override
   public void doMove(final String move) {
     LOG.info("Engine got doMove command: " + move);
-    final int omegaMove = Move.fromUCINotation(boardPosition, move);
-    boardPosition.makeMove(omegaMove);
+    final int omegaMove = Move.fromUCINotation(position, move);
+    position.makeMove(omegaMove);
   }
 
   @Override
@@ -346,7 +346,7 @@ public class FrankyEngine implements IUCIEngine {
                                 uciSearchMode.isPerft());
     // @formatter:on
 
-    search.startSearch(boardPosition, searchMode);
+    search.startSearch(position, searchMode);
   }
 
   @Override
@@ -373,12 +373,12 @@ public class FrankyEngine implements IUCIEngine {
 
     if (ponderMove == Move.NOMOVE) {
       if (uciProtocolHandler != null) {
-        uciProtocolHandler.sendResultToUCI(Move.toUCINotation(boardPosition, bestMove));
+        uciProtocolHandler.sendResultToUCI(Move.toUCINotation(position, bestMove));
       }
     } else {
       if (uciProtocolHandler != null) {
-        uciProtocolHandler.sendResultToUCI(Move.toUCINotation(boardPosition, bestMove),
-                                           Move.toUCINotation(boardPosition, ponderMove));
+        uciProtocolHandler.sendResultToUCI(Move.toUCINotation(position, bestMove),
+                                           Move.toUCINotation(position, ponderMove));
       }
     }
   }

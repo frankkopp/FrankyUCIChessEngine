@@ -112,49 +112,11 @@ public class Configuration {
 
 
 
-
-
-
-
-
-
-
-
-
-
   // TODO vvvvvvvv
-  /**
-   * null evaluation
-   **/
-  boolean DO_NULL_EVALUATION = false;
-
   /**
    * If set to true we will use the opening book
    */
   boolean _USE_BOOK = false;
-
-
-  // Verbose
-  /**
-   * If set to false this object will produce info output to System.out
-   */
-  boolean VERBOSE_TO_SYSOUT = false;
-
-  /**
-   * verbose alphabeta search
-   **/
-  boolean VERBOSE_ALPHABETA = false;
-
-  /**
-   * verbose variation
-   **/
-  boolean VERBOSE_VARIATION = false;
-
-  /**
-   * verbose variation
-   **/
-  boolean VERBOSE_STATS = false;
-
 
   /**
    * value for folder to books
@@ -173,6 +135,7 @@ public class Configuration {
   //Mode _OB_Mode = Mode.PGN;
   //Mode _OB_Mode = Mode.SAN;
   //Mode _OB_Mode = Mode.SIMPLE;
+
   @Override
   public String toString() {
     return "Configuration{" + "PERFT=" + PERFT + ", HASH_SIZE=" + HASH_SIZE + ", PONDER=" + PONDER +

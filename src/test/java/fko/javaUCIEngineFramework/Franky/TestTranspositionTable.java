@@ -54,7 +54,7 @@ public class TestTranspositionTable {
   @Test
   public final void test_Cache() {
     TranspositionTable cache = new TranspositionTable(32);
-    BoardPosition position = new BoardPosition();
+    Position position = new Position();
     //    assertEquals(762600, cache.getMaxEntries());
     assertEquals(32 * 1024 * 1024, cache.getSize());
     cache.put(position, 999, TT_EntryType.EXACT, 5);
@@ -105,8 +105,8 @@ public class TestTranspositionTable {
     LOG.info("Start SIZE Test for depth {}", depth);
 
     String fen = "7k/8/8/8/8/8/P7/K7 b - - 0 1";
-    //    fen = BoardPosition.START_FEN;
-    BoardPosition boardPosition = new BoardPosition(fen);
+    //    fen = Position.START_FEN;
+    Position position = new Position(fen);
 
     search.config.USE_ROOT_MOVES_SORT = false;
     search.config.USE_ALPHABETA_PRUNING = false;
@@ -117,7 +117,7 @@ public class TestTranspositionTable {
     search.config.USE_QUIESCENCE = false;
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
 
-    search.startSearch(boardPosition, searchMode);
+    search.startSearch(position, searchMode);
 
     waitWhileSearching();
 
@@ -149,8 +149,8 @@ public class TestTranspositionTable {
     LOG.info("Start SIZE Test for depth {}", depth);
 
     String fen = "7k/8/8/8/8/8/P7/K7 w - - 0 1";
-    //    fen = BoardPosition.START_FEN;
-    BoardPosition boardPosition = new BoardPosition(fen);
+    //    fen = Position.START_FEN;
+    Position position = new Position(fen);
 
     search.config.USE_ROOT_MOVES_SORT = false;
     search.config.USE_ALPHABETA_PRUNING = false;
@@ -164,7 +164,7 @@ public class TestTranspositionTable {
                      depth, 0, 0, 0, null,
                      false, true, false);
 
-    search.startSearch(boardPosition, searchMode);
+    search.startSearch(position, searchMode);
 
     waitWhileSearching();
 

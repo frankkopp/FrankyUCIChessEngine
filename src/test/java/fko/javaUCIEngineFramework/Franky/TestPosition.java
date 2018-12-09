@@ -35,7 +35,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** @author fkopp */
-public class TestBoardPosition {
+public class TestPosition {
 
   private static final int ITERATIONS = 999;
 
@@ -44,53 +44,53 @@ public class TestBoardPosition {
   public void testInsufficientMaterial() {
 
     String fen;
-    BoardPosition position;
+    Position position;
 
     // KK
     fen = "8/3k4/8/8/8/8/4K3/8 w - -";
-    position = new BoardPosition(fen);
+    position = new Position(fen);
     assertTrue(position.checkInsufficientMaterial());
 
     // KQK
     fen = "8/3k4/8/8/8/8/4KQ2/8 w - -";
-    position = new BoardPosition(fen);
+    position = new Position(fen);
     assertFalse(position.checkInsufficientMaterial());
 
     // KNK
     fen = "8/3k4/8/8/8/8/4KN2/8 w - -";
-    position = new BoardPosition(fen);
+    position = new Position(fen);
     assertTrue(position.checkInsufficientMaterial());
 
     // KNNK
     fen = "8/3k4/8/8/8/8/4KNN1/8 w - -";
-    position = new BoardPosition(fen);
+    position = new Position(fen);
     assertTrue(position.checkInsufficientMaterial());
 
     // KKN
     fen = "8/2nk4/8/8/8/8/4K3/8 w - -";
-    position = new BoardPosition(fen);
+    position = new Position(fen);
     assertTrue(position.checkInsufficientMaterial());
 
     // KNNK
     fen = "8/1nnk4/8/8/8/8/4K3/8 w - -";
-    position = new BoardPosition(fen);
+    position = new Position(fen);
     assertTrue(position.checkInsufficientMaterial());
 
     // KBKB - B same field color
     fen = "8/3k1b2/8/8/8/8/4K1B1/8 w - -";
-    position = new BoardPosition(fen);
+    position = new Position(fen);
     assertTrue(position.checkInsufficientMaterial());
 
     // KBKB - B different field color
     fen = "8/3k2b1/8/8/8/8/4K1B1/8 w - -";
-    position = new BoardPosition(fen);
+    position = new Position(fen);
     assertFalse(position.checkInsufficientMaterial());
   }
 
   /** Test Null Move */
   @Test
   public void test3Repetitions() {
-    BoardPosition position = new BoardPosition();
+    Position position = new Position();
 
     int move;
 
@@ -206,7 +206,7 @@ public class TestBoardPosition {
   @Test
   public void testNullMove() {
     String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
-    BoardPosition position = new BoardPosition(fen);
+    Position position = new Position(fen);
 
     String f1 = position.toFENString();
     position.makeNullMove();
@@ -226,7 +226,7 @@ public class TestBoardPosition {
   @Test
   public void testNullMove_moveGen() {
     String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
-    BoardPosition omegaBoard = new BoardPosition(fen);
+    Position omegaBoard = new Position(fen);
     MoveGenerator omg = new MoveGenerator();
 
     MoveList moves = omg.getLegalMoves(omegaBoard);
@@ -247,13 +247,13 @@ public class TestBoardPosition {
   @Test
   public void testMoveOnBoard() {
     //        GameBoard gameBoard = new GameBoardImpl();
-    //        BoardPosition omegaBoard = new BoardPosition(gameBoard);
+    //        Position omegaBoard = new Position(gameBoard);
     //
     //        String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
     //
     //        // normal
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new BoardPosition(gameBoard);
+    //        omegaBoard = new Position(gameBoard);
     //        GameMove gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"c4-a4");
     //        int move = Move.convertFromGameMove(gameMove);
     //        GameMove convertedMove = Move.convertToGameMove(move);
@@ -269,7 +269,7 @@ public class TestBoardPosition {
     //
     //        // normal pawn move
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new BoardPosition(gameBoard);
+    //        omegaBoard = new Position(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"b7-b6");
     //        move = Move.convertFromGameMove(gameMove);
     //        convertedMove = Move.convertToGameMove(move);
@@ -285,7 +285,7 @@ public class TestBoardPosition {
     //
     //        // normal capture
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new BoardPosition(gameBoard);
+    //        omegaBoard = new Position(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"c4-e4");
     //        move = Move.convertFromGameMove(gameMove);
     //        convertedMove = Move.convertToGameMove(move);
@@ -301,7 +301,7 @@ public class TestBoardPosition {
     //
     //        // pawn double
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new BoardPosition(gameBoard);
+    //        omegaBoard = new Position(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"b7-b5");
     //        move = Move.convertFromGameMove(gameMove);
     //        convertedMove = Move.convertToGameMove(move);
@@ -317,7 +317,7 @@ public class TestBoardPosition {
     //
     //        // castling
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new BoardPosition(gameBoard);
+    //        omegaBoard = new Position(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"e8-g8");
     //        move = Move.convertFromGameMove(gameMove);
     //        convertedMove = Move.convertToGameMove(move);
@@ -333,7 +333,7 @@ public class TestBoardPosition {
     //
     //        // promotion
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new BoardPosition(gameBoard);
+    //        omegaBoard = new Position(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"a2-a1Q");
     //        move = Move.convertFromGameMove(gameMove);
     //        convertedMove = Move.convertToGameMove(move);
@@ -349,7 +349,7 @@ public class TestBoardPosition {
     //
     //        // promotion capture
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new BoardPosition(gameBoard);
+    //        omegaBoard = new Position(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"a2-b1R");
     //        move = Move.convertFromGameMove(gameMove);
     //        convertedMove = Move.convertToGameMove(move);
@@ -365,7 +365,7 @@ public class TestBoardPosition {
     //
     //        // en passant
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new BoardPosition(gameBoard);
+    //        omegaBoard = new Position(gameBoard);
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"f4-e3");
     //        move = Move.convertFromGameMove(gameMove);
     //        convertedMove = Move.convertToGameMove(move);
@@ -382,7 +382,7 @@ public class TestBoardPosition {
     //        // multiple moves
     //        // normal
     //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new BoardPosition(gameBoard);
+    //        omegaBoard = new Position(gameBoard);
     //        // en passant
     //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"f4-e3");
     //        move = Move.convertFromGameMove(gameMove);
@@ -499,16 +499,16 @@ public class TestBoardPosition {
     end = Instant.now();
     System.out.println(Duration.between(start, end));
 
-    System.out.println("BoardPosition creation and Copy Contructor of BoardPosition");
+    System.out.println("Position creation and Copy Contructor of Position");
     String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq e4 0 2";
-    BoardPosition obp = null;
+    Position obp = null;
     start = Instant.now();
-    for (int i = 0; i < ITERATIONS; i++) obp = new BoardPosition(fen);
+    for (int i = 0; i < ITERATIONS; i++) obp = new Position(fen);
     end = Instant.now();
     System.out.println(Duration.between(start, end));
-    @SuppressWarnings("unused") BoardPosition obp_copy = null;
+    @SuppressWarnings("unused") Position obp_copy = null;
     start = Instant.now();
-    for (int i = 0; i < ITERATIONS; i++) obp_copy = new BoardPosition(obp);
+    for (int i = 0; i < ITERATIONS; i++) obp_copy = new Position(obp);
     end = Instant.now();
     System.out.println(Duration.between(start, end));
 
@@ -548,7 +548,7 @@ public class TestBoardPosition {
     black, ep on e4, O-O & O-O-O for black
     */
 
-    BoardPosition obp = new BoardPosition(fen);
+    Position obp = new Position(fen);
     System.out.println(fen);
     System.out.println(obp.toFENString());
     assertEquals(fen, obp.toFENString());
@@ -557,7 +557,7 @@ public class TestBoardPosition {
     assertThrows(IllegalArgumentException.class,()->{
         //do whatever you want to do here
         String fen2 = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq k9 0 113";
-        BoardPosition obp2 = new BoardPosition(fen2);
+        Position obp2 = new Position(fen2);
     });
   }
 
@@ -565,8 +565,8 @@ public class TestBoardPosition {
   @Test
   public void testCopyContructor() {
     String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq e3 0 2";
-    BoardPosition position = new BoardPosition(fen);
-    BoardPosition positionCopy = new BoardPosition(position);
+    Position position = new Position(fen);
+    Position positionCopy = new Position(position);
     assertEquals(position, positionCopy);
     assertEquals(position.toFENString(), positionCopy.toFENString());
     assertEquals(position.getZobristKey(), positionCopy.getZobristKey());
@@ -580,7 +580,7 @@ public class TestBoardPosition {
     long initialZobrist = 0;
     long zobrist = 0;
 
-    BoardPosition omegaBoard = new BoardPosition(testFen);
+    Position omegaBoard = new Position(testFen);
 
     int testMove =
         Move.createMove(
@@ -606,7 +606,7 @@ public class TestBoardPosition {
     // as a newly created one
     String fenAfterMove = "r3k2r/2pn3p/1pq1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq - 0 114";
     omegaBoard.makeMove(testMove);
-    BoardPosition omegaBoard2 = new BoardPosition(fenAfterMove);
+    Position omegaBoard2 = new Position(fenAfterMove);
     System.out.println(omegaBoard.getZobristKey() + " " + omegaBoard.toFENString());
     System.out.println(omegaBoard2.getZobristKey() + " " + omegaBoard2.toFENString());
     assertEquals(omegaBoard.toFENString(), omegaBoard2.toFENString());
@@ -617,7 +617,7 @@ public class TestBoardPosition {
   @Test
   public void testIsAttacked() {
     String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
-    BoardPosition omegaBoard = new BoardPosition(testFen);
+    Position omegaBoard = new Position(testFen);
 
     System.out.println(omegaBoard);
 
@@ -634,7 +634,7 @@ public class TestBoardPosition {
 
     // king
     testFen = "rnbqkbnr/1ppppppp/8/p7/Q1P5/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
-    omegaBoard = new BoardPosition(testFen);
+    omegaBoard = new Position(testFen);
     System.out.println(omegaBoard);
     assertFalse(omegaBoard.isAttacked(Color.WHITE, Square.e8));
   }
@@ -647,13 +647,13 @@ public class TestBoardPosition {
     int ITERATIONS = 0;
     int DURATION = 2;
 
-    BoardPosition board = null;
+    Position board = null;
 
     int i = 0;
     String[] fens = getFENs();
     while (fens[i] != null) {
       String testFen = fens[i];
-      board = new BoardPosition(testFen);
+      board = new Position(testFen);
 
       boolean test = false;
       Instant start = Instant.now();
