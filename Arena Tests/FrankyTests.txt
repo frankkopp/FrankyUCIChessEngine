@@ -1,8 +1,8 @@
-   Engine              Score       Fr      Fr    S-B
-1: Franky_v0.1 Config1 50,5/84 ······· 50-33-1  1691,7
-2: Franky_v0.1 Config2 33,5/84 33-50-1 ·······  1691,7
+   Engine              Score        Fr      Fr    S-B
+1: Franky_v0.1 Config1 59,5/100 ······· 59-40-1  2409,7
+2: Franky_v0.1 Config2 40,5/100 40-59-1 ·······  2409,7
 
-84 of 100 games played
+100 games played / Tournament is finished
 Name of the tournament: Franky Test
 Site/ Country: RIPLEY, Germany
 Level: Tournament Game in 5 Minutes
