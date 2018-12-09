@@ -25,6 +25,7 @@
 
 package fko.javaUCIEngineFramework.Franky;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -35,12 +36,13 @@ import java.util.stream.Collectors;
  * It uses a numbering for a x88 board so that a1=0 and a2=16
  * It has several convenience methods for calculation in relation
  * to other squares.
- *
+ * <p>
  * As enumeration is type safe and also very fast this is preferred over
  * static final int.
  */
 public enum Square {
 
+  // @formatter:off
   /*
    0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15 */
   a1, b1, c1, d1, e1, f1, g1, h1, i1, j1, k1, l1, m1, n1, o1, p1, // 0-15
@@ -98,11 +100,12 @@ public enum Square {
       N, NE, E, SE,
       S, SW, W, NW
   };
+  // @formatter:on
 
   static {
     values = Square.values();
-    validSquares =
-        Arrays.stream(values()).filter(Square::isValidSquare).collect(Collectors.toList());
+    validSquares = Arrays.stream(values()).filter(Square::isValidSquare).collect(
+      Collectors.toList());
   }
 
   Square() {
@@ -112,10 +115,12 @@ public enum Square {
   /**
    * @param index
    * @return the Square for the given index of a 0x88 board - returns INVALID if not a valid
-   *     index
+   * index
    */
   public static Square getSquare(int index) {
-    if ((index & 0x88) != 0) return NOSQUARE;
+    if ((index & 0x88) != 0) {
+      return NOSQUARE;
+    }
     return Square.values[index];
   }
 
@@ -136,17 +141,25 @@ public enum Square {
     return square.isValidSquare() ? square : NOSQUARE;
   }
 
-  /** @return true if Square is a valid chess square */
+  /**
+   * @return true if Square is a valid chess square
+   */
   public boolean isValidSquare() {
     return _validSquare;
   }
 
-  /** */
+  /**
+   *
+   */
   public static Square getSquare(int file, int rank) {
-    if (file < 1 || file > 8 || rank < 1 || rank > 8) return Square.NOSQUARE;
+    if (file < 1 || file > 8 || rank < 1 || rank > 8) {
+      return Square.NOSQUARE;
+    }
     // index starts with 0 while file and rank start with 1 - decrease
     final int index = (rank - 1) * 16 + (file - 1);
-    if ((index & 0x88) != 0) return NOSQUARE; // is this extra check necessary?
+    if ((index & 0x88) != 0) {
+      return NOSQUARE; // is this extra check necessary?
+    }
     return Square.values[index];
   }
 
@@ -157,7 +170,9 @@ public enum Square {
    */
   public Square getNorth() {
     int index = this.ordinal() + N;
-    if ((index & 0x88) != 0) return NOSQUARE;
+    if ((index & 0x88) != 0) {
+      return NOSQUARE;
+    }
     return Square.values[index];
   }
 
@@ -168,7 +183,9 @@ public enum Square {
    */
   public Square getSouth() {
     int index = this.ordinal() + S;
-    if ((index & 0x88) != 0) return NOSQUARE;
+    if ((index & 0x88) != 0) {
+      return NOSQUARE;
+    }
     return Square.values[index];
   }
 
@@ -179,7 +196,9 @@ public enum Square {
    */
   public Square getEast() {
     int index = this.ordinal() + E;
-    if ((index & 0x88) != 0) return NOSQUARE;
+    if ((index & 0x88) != 0) {
+      return NOSQUARE;
+    }
     return Square.values[index];
   }
 
@@ -190,19 +209,29 @@ public enum Square {
    */
   public Square getWest() {
     int index = this.ordinal() + W;
-    if ((index & 0x88) != 0) return NOSQUARE;
+    if ((index & 0x88) != 0) {
+      return NOSQUARE;
+    }
     return Square.values[index];
   }
 
-  /** @return Square.File for this QmegaSquare */
+  /**
+   * @return Square.File for this QmegaSquare
+   */
   public File getFile() {
-    if (!this._validSquare) return File.NOFILE;
+    if (!this._validSquare) {
+      return File.NOFILE;
+    }
     return File.values()[this.ordinal() % 16];
   }
 
-  /** @return Square.Rank for this QmegaSquare */
+  /**
+   * @return Square.Rank for this QmegaSquare
+   */
   public Rank getRank() {
-    if (!this._validSquare) return Rank.NORANK;
+    if (!this._validSquare) {
+      return Rank.NORANK;
+    }
     return Rank.values()[this.ordinal() >>> 4];
   }
 
@@ -219,7 +248,15 @@ public enum Square {
    * This enum represents all files of a chess board. If used in a loop via values() omit NOFILE.
    */
   public enum File {
-      a, b, c, d, e, f, g, h, NOFILE;
+    a,
+    b,
+    c,
+    d,
+    e,
+    f,
+    g,
+    h,
+    NOFILE;
 
     // pre-filled list with all squares
     static final File[] values;
@@ -249,14 +286,25 @@ public enum Square {
 
     @Override
     public String toString() {
-      if (this == NOFILE) return "-";
+      if (this == NOFILE) {
+        return "-";
+      }
       return this.name();
-    }
-  }
+    }}
 
-  /** This enum represents all ranks of a chess board If used in a loop via values() omit NORANK. */
+  /**
+   * This enum represents all ranks of a chess board If used in a loop via values() omit NORANK.
+   */
   public enum Rank {
-      r1, r2, r3, r4, r5, r6, r7, r8, NORANK;
+    r1,
+    r2,
+    r3,
+    r4,
+    r5,
+    r6,
+    r7,
+    r8,
+    NORANK;
 
     // pre-filled list with all squares
     static final Rank[] values;
@@ -286,19 +334,20 @@ public enum Square {
 
     @Override
     public String toString() {
-      if (this == NORANK) return "-";
+      if (this == NORANK) {
+        return "-";
+      }
       return "" + (this.ordinal() + 1);
-    }
-  }
+    }}
 
-  public static final EnumSet<Square> WHITE_PAWNBASE_ROW  =
-      EnumSet.of(a2, b2, c2, d2, e2, f2, g2, h2);
-  public static final EnumSet<Square> BLACK_PAWNBASE_ROW  =
-      EnumSet.of(a7, b7, c7, d7, e7, f7, g7, h7);
-  public static final EnumSet<Square> WHITE_PROMOTION_ROW =
-      EnumSet.of(a8, b8, c8, d8, e8, f8, g8, h8);
-  public static final EnumSet<Square> BLACK_PROMOTION_ROW =
-      EnumSet.of(a1, b1, c1, d1, e1, f1, g1, h1);
+  public static final EnumSet<Square> WHITE_PAWNBASE_ROW  = EnumSet.of(a2, b2, c2, d2, e2, f2, g2,
+                                                                       h2);
+  public static final EnumSet<Square> BLACK_PAWNBASE_ROW  = EnumSet.of(a7, b7, c7, d7, e7, f7, g7,
+                                                                       h7);
+  public static final EnumSet<Square> WHITE_PROMOTION_ROW = EnumSet.of(a8, b8, c8, d8, e8, f8, g8,
+                                                                       h8);
+  public static final EnumSet<Square> BLACK_PROMOTION_ROW = EnumSet.of(a1, b1, c1, d1, e1, f1, g1,
+                                                                       h1);
 
   public boolean isWhitePawnBaseRow() {
     return WHITE_PAWNBASE_ROW.contains(this);
@@ -317,25 +366,4 @@ public enum Square {
       default:
         throw new RuntimeException("Invalid Color");
     }
-  }
-
-  /**
-   * Returns the matching Square to a given GamePosition
-   *
-   * @param gp
-   * @return matching Square
-   */
-  //    public static Square convertFromGamePosition(GamePosition gp) {
-  //        if (gp==null) return Square.NOSQUARE;
-  //        return Square.values[(gp.getRank()-1) * 16 +gp.getFile()-1];
-  //    }
-
-  /**
-   * Returns the matching GamePosition to this Square
-   *
-   * @return matching GamePosition
-   */
-  //    public GamePosition convertToGamePosition() {
-  //        return GamePosition.getGamePosition(this.getFile().get(), this.getRank().get());
-  //    }
-}
+  }}

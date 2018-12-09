@@ -55,8 +55,6 @@ public class Main {
     handler.startHandler();
 
     LOG.debug("Started UCI Engine Framework " + Instant.now());
-
-
   }
 
 }
