@@ -32,8 +32,11 @@ import fko.javaUCIEngineFramework.UCI.UCIOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 
 /**
  * Franky Engine for UCI GUIs
@@ -41,6 +44,8 @@ import java.util.List;
 public class FrankyEngine implements IUCIEngine {
 
   private static final Logger LOG = LoggerFactory.getLogger(FrankyEngine.class);
+
+  private static final String PROJECT_PROPERTIES = "project.properties";
 
   // back reference to the uci protocol handler for sending messages to the UCI UI
   private IUCIProtocolHandler uciProtocolHandler = null;
@@ -52,7 +57,7 @@ public class FrankyEngine implements IUCIEngine {
   private Search search;
 
   // ID of engine
-  private String iDName   = "Franky v0.2";
+  private String iDName   = "Franky";
   private String iDAuthor = "Frank Kopp";
 
   // options of engine
@@ -66,6 +71,19 @@ public class FrankyEngine implements IUCIEngine {
    * Default Constructor
    */
   public FrankyEngine() {
+
+    final Properties properties = new Properties();
+    try {
+      properties.load(Objects.requireNonNull(
+        this.getClass().getClassLoader().getResourceAsStream(PROJECT_PROPERTIES)));
+    } catch (IOException e) {
+      LOG.error("Could load properties file: {}", PROJECT_PROPERTIES);
+      LOG.error("Could load properties file: " + PROJECT_PROPERTIES, e);
+      e.printStackTrace();
+      System.exit(1);
+    }
+    iDName = properties.getProperty("artifactId") + " v" + properties.getProperty("version");
+
     initOptions();
     search = new Search(this, config);
     position = new Position(); // default is standard start board
