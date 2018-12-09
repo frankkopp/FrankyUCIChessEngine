@@ -1,0 +1,13 @@
+   Engine              Score       Fr      Fr    S-B
+1: Franky_v0.1 Config2 11,0/21 ······· 11-10-0  110,00
+2: Franky_v0.1 Config1 10,0/21 10-11-0 ·······  110,00
+
+21 of 100 games played
+Name of the tournament: Franky Test
+Site/ Country: RIPLEY, Germany
+Level: Tournament Game in 5 Minutes
+Hardware: Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz with 31,9 GB Memory
+Operating system: Windows 10 Home Home Edition (Build 9200) 64 bit
+PGN-File: C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\Arena Tests\FrankyTests.pgn
+Website: 
+E-Mail Address: 

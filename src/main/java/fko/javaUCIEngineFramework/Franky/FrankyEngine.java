@@ -52,7 +52,7 @@ public class FrankyEngine implements IUCIEngine {
   private Search search;
 
   // ID of engine
-  private String iDName   = "Franky v0.1";
+  private String iDName   = "Franky v0.2";
   private String iDAuthor = "Frank Kopp";
 
   // options of engine
@@ -60,7 +60,7 @@ public class FrankyEngine implements IUCIEngine {
 
   // engine state
   private BoardPosition boardPosition;
-  private SearchMode searchMode;
+  private SearchMode    searchMode;
 
   /**
    * Default Constructor
@@ -108,10 +108,66 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 "",
                 ""));
-        iUciOptions.add(
+    iUciOptions.add(
         new UCIOption("UCI_ShowCurrLine",
                 UCIOptionType.check,
                 Boolean.toString(config.UCI_ShowCurrLine),
+                "",
+                "",
+                ""));
+    iUciOptions.add(
+        new UCIOption("Use_QSearch",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_QUIESCENCE),
+                "",
+                "",
+                ""));
+    iUciOptions.add(
+        new UCIOption("Use_AlphaBeta_Pruning",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_ALPHABETA_PRUNING),
+                "",
+                "",
+                ""));
+    iUciOptions.add(
+        new UCIOption("Use_Aspiration_Window_Search",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_ASPIRATION_WINDOW),
+                "",
+                "",
+                ""));
+    iUciOptions.add(
+        new UCIOption("Use_PVS",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_PVS),
+                "",
+                "",
+                ""));
+    iUciOptions.add(
+        new UCIOption("Use_TranspositionTable",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_TRANSPOSITION_TABLE),
+                "",
+                "",
+                ""));
+    iUciOptions.add(
+        new UCIOption("Use_Mate_Distance_Pruning",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_MATE_DISTANCE_PRUNING),
+                "",
+                "",
+                ""));
+    iUciOptions.add(
+        new UCIOption("Use_Minor_Promotion_Pruning",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_MINOR_PROMOTION_PRUNING),
+                "",
+                "",
+                ""));
+     iUciOptions.add(
+        new UCIOption("Use_Null_Move_Pruning",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_NULL_MOVE_PRUNING),
                 "",
                 "",
                 ""));
@@ -150,12 +206,67 @@ public class FrankyEngine implements IUCIEngine {
 
   @Override
   public void setOption(String name, String value) {
-    switch (name.toLowerCase()) {
-      case "hash":
+    final String msg;
+    switch (name) {
+      case "Hash":
         setHashSizeOption(value);
         break;
-      case "ponder":
-        setPonderOption(value);
+      case "Ponder":
+        config.PONDER = Boolean.valueOf(value);
+        msg = "Engine Ponder set to " + (config.PONDER ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_QSearch":
+        config.USE_QUIESCENCE = Boolean.valueOf(value);
+        msg = "Use Quiescence Search set to " + (config.USE_QUIESCENCE ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_AlphaBeta_Pruning":
+        config.USE_ALPHABETA_PRUNING = Boolean.valueOf(value);
+        msg = "Use AlphaBeta Pruning set to " + (config.USE_ALPHABETA_PRUNING ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Aspiration_Window_Search":
+        config.USE_ASPIRATION_WINDOW = Boolean.valueOf(value);
+        msg =
+          "Use Aspiration Window Search set to " + (config.USE_ASPIRATION_WINDOW ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_PVS":
+        config.USE_PVS = Boolean.valueOf(value);
+        msg = "Use PVSearch set to " + (config.USE_PVS ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_TranspositionTable":
+        config.USE_TRANSPOSITION_TABLE = Boolean.valueOf(value);
+        msg = "Use Hashtable set to " + (config.USE_TRANSPOSITION_TABLE ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Mate_Distance_Pruning":
+        config.USE_MATE_DISTANCE_PRUNING = Boolean.valueOf(value);
+        msg =
+          "Use Mate Distance Pruning set to " + (config.USE_MATE_DISTANCE_PRUNING ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Minor_Promotion_Pruning":
+        config.USE_MINOR_PROMOTION_PRUNING = Boolean.valueOf(value);
+        msg = "Use Minor Promotion Pruning set to " +
+              (config.USE_MINOR_PROMOTION_PRUNING ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Null_Move_Pruning":
+        config.USE_NULL_MOVE_PRUNING = Boolean.valueOf(value);
+        msg = "Use Null Move Pruning set to " + (config.USE_NULL_MOVE_PRUNING ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       default:
         LOG.error("Unknown option: {}", name);
@@ -170,8 +281,9 @@ public class FrankyEngine implements IUCIEngine {
 
   @Override
   public void newGame() {
-    // TODO what need to be done for forgetting existing game
     LOG.info("Engine got New Game command");
+    LOG.info(config.toString());
+    uciProtocolHandler.sendInfoStringToUCI(config.toString());
     search.newGame();
   }
 
@@ -190,6 +302,8 @@ public class FrankyEngine implements IUCIEngine {
 
   @Override
   public boolean isReady() {
+    LOG.info(config.toString());
+    uciProtocolHandler.sendInfoStringToUCI(config.toString());
     return true;
   }
 
@@ -214,16 +328,23 @@ public class FrankyEngine implements IUCIEngine {
       search.stopSearch();
     }
 
-    IUCISearchMode uciSearchMode1 = uciSearchMode;
-    LOG.info("Engine got Start Search Command with " + uciSearchMode1.toString());
+    LOG.info("Engine got Start Search Command with " + uciSearchMode.toString());
 
-    searchMode = new SearchMode(uciSearchMode.getWhiteTime(), uciSearchMode.getBlackTime(),
-                                uciSearchMode.getWhiteInc(), uciSearchMode.getBlackInc(),
-                                uciSearchMode.getMovesToGo(), uciSearchMode.getDepth(),
-                                uciSearchMode.getNodes(), uciSearchMode.getMate(),
-                                uciSearchMode.getMoveTime(), uciSearchMode.getMoves(),
-                                uciSearchMode.isPonder(), uciSearchMode.isInfinite(),
+    // @formatter:off
+    searchMode = new SearchMode(uciSearchMode.getWhiteTime(),
+                                uciSearchMode.getBlackTime(),
+                                uciSearchMode.getWhiteInc(),
+                                uciSearchMode.getBlackInc(),
+                                uciSearchMode.getMovesToGo(),
+                                uciSearchMode.getDepth(),
+                                uciSearchMode.getNodes(),
+                                uciSearchMode.getMate(),
+                                uciSearchMode.getMoveTime(),
+                                uciSearchMode.getMoves(),
+                                config.PONDER && uciSearchMode.isPonder(),
+                                uciSearchMode.isInfinite(),
                                 uciSearchMode.isPerft());
+    // @formatter:on
 
     search.startSearch(boardPosition, searchMode);
   }
@@ -284,13 +405,6 @@ public class FrankyEngine implements IUCIEngine {
    */
   public int getHashSizeOption() {
     return this.config.HASH_SIZE;
-  }
-
-  private void setPonderOption(final String value) {
-    config.PONDER = Boolean.valueOf(value);
-    final String msg = "Engine Ponder set to " + (config.PONDER ? "On" : "Off");
-    LOG.info(msg);
-    uciProtocolHandler.sendInfoStringToUCI(msg);
   }
 
   /**

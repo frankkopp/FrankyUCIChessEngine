@@ -6,7 +6,7 @@
 
     <groupId>fko.javaUCIEngineFramework</groupId>
     <artifactId>JavaUCIEngineFramework</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
 
     <properties>
         <!-- JAVA8 -->

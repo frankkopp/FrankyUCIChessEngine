@@ -47,14 +47,14 @@ public class Main {
    */
   public static void main(final String[] args) {
 
-    LOG.debug("Start UCI Engine Framework" + Instant.now());
+    LOG.debug("Start UCI Engine Framework " + Instant.now());
 
     final IUCIEngine uciEngine = new FrankyEngine();
     final UCIProtocolHandler handler = new UCIProtocolHandler(uciEngine);
 
     handler.startHandler();
 
-    LOG.debug("Started UCI Engine Framework" + Instant.now());
+    LOG.debug("Started UCI Engine Framework " + Instant.now());
 
 
   }

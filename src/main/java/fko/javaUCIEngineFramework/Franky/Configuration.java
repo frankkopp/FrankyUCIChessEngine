@@ -32,48 +32,92 @@ package fko.javaUCIEngineFramework.Franky;
  */
 public class Configuration {
 
-  /** test the search without any pruning and count perft value */
-  public boolean PERFT = false;
 
-  /** Hash Size */
-  public int HASH_SIZE = 512;
+  /**
+   * test the search without any pruning and count perft value
+   */
+  boolean PERFT = false;
 
-  /** Ponder */
-  public boolean PONDER = true;
+  /**
+   * Hash Size
+   */
+  int HASH_SIZE = 512;
 
-  /** Debug */
-  public boolean DEBUG = false;
+  /**
+   * Ponder
+   */
+  boolean PONDER = true;
 
-  /** UCI Options */
-  public boolean UCI_ShowCurrLine = true;
+  /**
+   * Debug
+   */
+  boolean DEBUG = false;
+
+  /**
+   * UCI Options
+   */
+  boolean UCI_ShowCurrLine = true;
 
   /** ##################################################
    * OPTIMIZATIONS
    * ###################################################*/
 
-  /** Do quiescence evaluation and search extension for non quiet positions */
-  public boolean USE_QUIESCENCE = true;
+  /**
+   * Do quiescence evaluation and search extension for non quiet positions
+   */
+  boolean USE_QUIESCENCE = true;
 
-  /** Sort root moves after iterations. */
-  public boolean USE_ROOT_MOVES_SORT = true;
+  /**
+   * Sort root moves after iterations.
+   */
+  boolean USE_ROOT_MOVES_SORT = true;
 
-  /** Use AlphaBeta Pruning */
-  public boolean USE_ALPHABETA_PRUNING = true;
+  /**
+   * Use AlphaBeta Pruning
+   */
+  boolean USE_ALPHABETA_PRUNING = true;
 
-  /** Use Aspiration Window in root search */
-  public boolean USE_ASPIRATION_WINDOW = true;
+  /**
+   * Use Aspiration Window in root search
+   */
+  boolean USE_ASPIRATION_WINDOW = true;
 
-  /** Principal Variation Search */
+  /**
+   * Principal Variation Search
+   */
   boolean USE_PVS = true;
 
-  /** Use Transposition Tables for visited nodes (needs extra memory) */
+  /**
+   * Use Transposition Tables for visited nodes (needs extra memory)
+   */
   boolean USE_TRANSPOSITION_TABLE = true;
 
-  /** Mate Distance Pruning */
+  /**
+   * Mate Distance Pruning
+   */
   boolean USE_MATE_DISTANCE_PRUNING = true;
 
-  /** Minor Promotion Pruning */
+  /**
+   * Minor Promotion Pruning
+   */
   boolean USE_MINOR_PROMOTION_PRUNING = true;
+
+  /**
+   * Null Move Pruning
+   */
+  boolean USE_NULL_MOVE_PRUNING            = true;
+  int     NULL_MOVE_DEPTH                  = 2;
+  boolean USE_VERIFY_NMP                   = true;
+  int     NULL_MOVE_REDUCTION_VERIFICATION = 3;
+
+
+
+
+
+
+
+
+
 
 
 
@@ -89,11 +133,6 @@ public class Configuration {
    */
   boolean _USE_BOOK = false;
 
-  /**
-   * Null Move Pruning
-   */
-  boolean _USE_NMP        = false;
-  boolean _USE_VERIFY_NMP = false;
 
   // Verbose
   /**
@@ -127,9 +166,21 @@ public class Configuration {
   String _OB_fileNamePlain = "8moves_GM_LB.pgn";
   //String _OB_fileNamePlain = "book_graham.txt";
   //String _OB_fileNamePlain = "book.txt";
-  /** default opening book value */
+
+  /**
+   * default opening book value
+   */
   //Mode _OB_Mode = Mode.PGN;
   //Mode _OB_Mode = Mode.SAN;
   //Mode _OB_Mode = Mode.SIMPLE;
-
+  @Override
+  public String toString() {
+    return "Configuration{" + "PERFT=" + PERFT + ", HASH_SIZE=" + HASH_SIZE + ", PONDER=" + PONDER +
+           ", DEBUG=" + DEBUG + ", UCI_ShowCurrLine=" + UCI_ShowCurrLine + ", USE_QUIESCENCE=" +
+           USE_QUIESCENCE + ", USE_ROOT_MOVES_SORT=" + USE_ROOT_MOVES_SORT +
+           ", USE_ALPHABETA_PRUNING=" + USE_ALPHABETA_PRUNING + ", USE_ASPIRATION_WINDOW=" +
+           USE_ASPIRATION_WINDOW + ", USE_PVS=" + USE_PVS + ", USE_TRANSPOSITION_TABLE=" +
+           USE_TRANSPOSITION_TABLE + ", USE_MATE_DISTANCE_PRUNING=" + USE_MATE_DISTANCE_PRUNING +
+           ", USE_MINOR_PROMOTION_PRUNING=" + USE_MINOR_PROMOTION_PRUNING + '}';
+  }
 }
