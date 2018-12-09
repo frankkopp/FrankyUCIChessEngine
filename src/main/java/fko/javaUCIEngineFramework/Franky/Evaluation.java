@@ -28,6 +28,8 @@ package fko.javaUCIEngineFramework.Franky;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static fko.javaUCIEngineFramework.Franky.EvaluationConfig.*;
+
 /**
  * Omega Evaluation
  * <p>
@@ -45,6 +47,10 @@ import org.slf4j.LoggerFactory;
  * TODO: Center Distance
  * TODO: Square Control
  * TODO: King Protection
+ * TODO: Pawn Structure
+ * TODO: King Safety
+ * TODO: Board control
+ * TODO: Piece Position
  */
 public class Evaluation {
 
@@ -61,29 +67,30 @@ public class Evaluation {
   private static final int WHITE          = Color.WHITE.ordinal();
   private static final int BLACK          = Color.BLACK.ordinal();
 
-  // CONFIGURATION
-  private static final boolean MATERIAL       = true;
-  private static final boolean MOBILITY       = true;
-  private static final boolean PIECE_POSITION = false;
-
   // Game Phase
   private int gamePhaseFactor = GAME_PHASE_MAX;
 
   // Evaluation Results
-  private int material      = 0;
-  private int piecePosition = 0;
-  private int mobility      = 0;
-
+  private int material             = 0;
+  private int piecePosition        = 0;
+  private int mobility             = 0;
+  private int midGameMaterial      = 0;
+  private int endGameMaterial      = 0;
+  private int midGamePiecePosition = 0;
+  private int endGamePiecePosition = 0;
+  private int midGameMobility      = 0;
+  private int endGameMobility      = 0;
 
   // Convenience fields - improve readability
   private Position     position;
   private int          nextToMove;
   private int          opponent;
+  private SquareList[] pawnSquares;
   private SquareList[] knightSquares;
   private SquareList[] bishopSquares;
   private SquareList[] rookSquares;
   private SquareList[] queenSquares;
-
+  private Square[]     kingSquares;
 
   /**
    * Creates an instance of the Evaluator
@@ -91,25 +98,45 @@ public class Evaluation {
   public Evaluation() {
   }
 
-  public Position getPosition() {
-    return position;
-  }
-
+  /**
+   * Sets the reference to the position this evaluation operates on.
+   * <p>
+   * Attention: This does not create a deep copy. If the position changes after
+   * setting the reference the change will be reflected here. This does not
+   * create a deep copy.
+   *
+   * @param position
+   */
   public void setPosition(final Position position) {
     this.position = position;
 
     // convenience fields
     nextToMove = position.getNextPlayer().ordinal();
     opponent = position.getNextPlayer().getInverseColor().ordinal();
+    pawnSquares = position.getPawnSquares();
     knightSquares = position.getKnightSquares();
     bishopSquares = position.getBishopSquares();
     rookSquares = position.getRookSquares();
     queenSquares = position.getQueenSquares();
+    kingSquares = position.getKingSquares();
+  }
+
+  /**
+   * @return the reference to the last position object used in evaluation
+   */
+  public Position getPosition() {
+    return position;
   }
 
   /**
    * Sets the position to evaluate and evaluates the position.
    * Is equivalent to <code>setPosition(pos)</code> and <code>evaluate()</code>
+   * <p>
+   * Sets the reference to the position this evaluation operates on.
+   * <p>
+   * Attention: This does not create a deep copy. If the position changes after
+   * setting the reference the change will be reflected here. This does not
+   * create a deep copy.
    *
    * @param position
    * @return value of the position from active player's view.
@@ -135,7 +162,10 @@ public class Evaluation {
       throw e;
     }
 
-    // GamePhase - a value between 0 and 24 depending on officer material of
+    // Clear all evaluation values
+    clearValues();
+
+    // GamePhase - a value between 0 and 24 depending on officer midGameMaterial of
     // the position
     this.gamePhaseFactor = getGamePhaseFactor();
 
@@ -146,46 +176,234 @@ public class Evaluation {
      * - 3. all Squares > O(#squares)
      */
 
-    // ###########
     // Stage 1
-    // ###########
-
-    // Material
-    if (MATERIAL) {
-      this.material = material();
-    }
-
-    // TODO: Pawn Structure
-    // TODO: King Safety
-
-    // ###########
+    staticEvaluations();
     // Stage 2
-    // ###########
-
-    // Piece positions
-    if (PIECE_POSITION) {
-      this.piecePosition += position(position);
-    }
-
-    // ###########
+    iterateOverPieces();
     // Stage 3
-    // ###########
+    iterateOverSquares();
 
-    // Mobility
-    if (MOBILITY) {
-      this.mobility = mobility();
-    }
+    // ######################################
+    // Sum up per game phase
+    material = midGameMaterial * (gamePhaseFactor / GAME_PHASE_MAX) +
+               endGameMaterial * (1 - gamePhaseFactor / GAME_PHASE_MAX);
 
-    // TODO: Board control
+    piecePosition = midGamePiecePosition * (gamePhaseFactor / GAME_PHASE_MAX) +
+                    endGamePiecePosition * (1 - gamePhaseFactor / GAME_PHASE_MAX);
 
-    // TODO: Piece Position
+    mobility = midGameMobility * (gamePhaseFactor / GAME_PHASE_MAX) +
+               endGameMobility * (1 - gamePhaseFactor / GAME_PHASE_MAX);
 
-    // Endgames
+    // @formatter:off
+    int value = material * MATERIAL_WEIGHT +
+                      piecePosition * POSITION_WEIGHT +
+                      mobility * MOBILITY_WEIGHT;
+    // @formatter:on
 
     // Sum up per game phase
-    // @formatter:off
-    // @formatter:on
-    return material + piecePosition + mobility;
+    // ######################################
+
+    // Stage 4 Specials
+    // TODO Specials
+
+    // Giving check or being in check has value as it forces evation moves
+    value += position.isAttacked(position.getNextPlayer(), kingSquares[opponent]) ? CHECK_VALUE : 0;
+    value -= position.isAttacked(position.getOpponent(), kingSquares[nextToMove]) ? CHECK_VALUE : 0;
+
+    return value;
+  }
+
+  private void clearValues() {
+    gamePhaseFactor = 0;
+    material = 0;
+    piecePosition = 0;
+    mobility = 0;
+    midGameMaterial = 0;
+    endGameMaterial = 0;
+    midGamePiecePosition = 0;
+    endGamePiecePosition = 0;
+    midGameMobility = 0;
+    endGameMobility = 0;
+  }
+
+  private void staticEvaluations() {
+
+    // ##########################
+    // Material
+    // ##########################
+
+    // midGameMaterial is incrementally counted in Position
+    midGameMaterial = position.getNextPlayer().factor * (position.getMaterial(Color.WHITE) -
+                                                         position.getMaterial(Color.BLACK));
+
+    // bonus/malus for bishop pair
+    if (bishopSquares[nextToMove].size() >= 2) {
+      midGameMaterial += BISHOP_PAIR;
+    }
+    if (bishopSquares[opponent].size() >= 2) {
+      midGameMaterial -= BISHOP_PAIR;
+    }
+
+    // bonus/malus for knight pair
+    if (knightSquares[nextToMove].size() >= 2) {
+      midGameMaterial += KNIGHT_PAIR;
+    }
+    if (knightSquares[opponent].size() >= 2) {
+      midGameMaterial -= KNIGHT_PAIR;
+    }
+
+    // bonus/malus for rook pair
+    if (rookSquares[nextToMove].size() >= 2) {
+      midGameMaterial += ROOK_PAIR;
+    }
+    if (rookSquares[opponent].size() >= 2) {
+      midGameMaterial -= ROOK_PAIR;
+    }
+
+    // for now they are always the same
+    // TODO: e.g. should reflect that in endgames certain combinations are
+    //  draws or mostly draws
+    endGameMaterial = midGameMaterial;
+
+  }
+
+  /**
+   * Iterates over all pieces for both colors and does all evaluations
+   * for this piece.
+   */
+  private void iterateOverPieces() {
+
+    // Pawns
+    for (int i = 0; i < pawnSquares[nextToMove].size(); i++) {
+      Square square = pawnSquares[nextToMove].get(i);
+      final int index = square.ordinal();
+      assert (position.getPiece(index).getType().equals(PieceType.PAWN));
+      assert (position.getPiece(index).getColor().ordinal() == nextToMove);
+
+      // position
+      midGamePiecePosition += pawnsMidGame[getWhiteTableIndex(index)];
+      endGamePiecePosition += pawnsEndGame[getWhiteTableIndex(index)];
+
+    }
+    for (int i = 0; i < pawnSquares[opponent].size(); i++) {
+      Square square = pawnSquares[opponent].get(i);
+      final int index = square.ordinal();
+      assert (position.getPiece(index).getType().equals(PieceType.PAWN));
+      assert (position.getPiece(index).getColor().ordinal() == opponent);
+
+      // position
+      midGamePiecePosition -= pawnsMidGame[getBlackTableIndex(index)];
+      endGamePiecePosition -= pawnsEndGame[getBlackTableIndex(index)];
+
+    }
+
+    // Knights
+    for (int i = 0; i < knightSquares[nextToMove].size(); i++) {
+      Square square = knightSquares[nextToMove].get(i);
+      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.KNIGHT));
+      assert (position.getPiece(square.ordinal()).getColor().ordinal() == nextToMove);
+
+      // midGameMobility
+      midGameMobility += KNIGHTS_MOBILITY_FACTOR * mobilityForPiece(PieceType.KNIGHT, square,
+                                                                    Square.knightDirections);
+
+    }
+    for (int i = 0; i < knightSquares[opponent].size(); i++) {
+      Square square = knightSquares[opponent].get(i);
+      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.KNIGHT));
+      assert (position.getPiece(square.ordinal()).getColor().ordinal() == opponent);
+
+      // midGameMobility
+      midGameMobility -= KNIGHTS_MOBILITY_FACTOR * mobilityForPiece(PieceType.KNIGHT, square,
+                                                                    Square.knightDirections);
+
+    }
+
+    // Bishops
+    for (int i = 0; i < bishopSquares[nextToMove].size(); i++) {
+      Square square = bishopSquares[nextToMove].get(i);
+      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.BISHOP));
+      assert (position.getPiece(square.ordinal()).getColor().ordinal() == nextToMove);
+
+      // midGameMobility
+      midGameMobility += BISHOP_MOBILITY_FACTOR * mobilityForPiece(PieceType.BISHOP, square,
+                                                                   Square.bishopDirections);
+
+    }
+    for (int i = 0; i < bishopSquares[opponent].size(); i++) {
+      Square square = bishopSquares[opponent].get(i);
+      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.BISHOP));
+      assert (position.getPiece(square.ordinal()).getColor().ordinal() == opponent);
+
+      // midGameMobility
+      midGameMobility -= BISHOP_MOBILITY_FACTOR * mobilityForPiece(PieceType.BISHOP, square,
+                                                                   Square.bishopDirections);
+    }
+
+    // Rooks
+    for (int i = 0; i < rookSquares[nextToMove].size(); i++) {
+      Square square = rookSquares[nextToMove].get(i);
+      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.ROOK));
+      assert (position.getPiece(square.ordinal()).getColor().ordinal() == nextToMove);
+
+      // midGameMobility
+      midGameMobility += ROOK_MOBILITY_FACTOR * mobilityForPiece(PieceType.ROOK, square,
+                                                                 Square.rookDirections);
+    }
+    for (int i = 0; i < rookSquares[opponent].size(); i++) {
+      Square square = rookSquares[opponent].get(i);
+      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.ROOK));
+      assert (position.getPiece(square.ordinal()).getColor().ordinal() == opponent);
+
+      // midGameMobility
+      midGameMobility -= ROOK_MOBILITY_FACTOR * mobilityForPiece(PieceType.ROOK, square,
+                                                                 Square.rookDirections);
+    }
+
+    // Queens
+    for (int i = 0; i < queenSquares[nextToMove].size(); i++) {
+      Square square = queenSquares[nextToMove].get(i);
+      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.QUEEN));
+      assert (position.getPiece(square.ordinal()).getColor().ordinal() == nextToMove);
+
+      // midGameMobility
+      midGameMobility += QUEEN_MOBILITY_FACTOR * mobilityForPiece(PieceType.QUEEN, square,
+                                                                  Square.queenDirections);
+    }
+    for (int i = 0; i < queenSquares[opponent].size(); i++) {
+      Square square = queenSquares[opponent].get(i);
+      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.QUEEN));
+      assert (position.getPiece(square.ordinal()).getColor().ordinal() == opponent);
+
+      // midGameMobility
+      midGameMobility -= QUEEN_MOBILITY_FACTOR * mobilityForPiece(PieceType.QUEEN, square,
+                                                                  Square.queenDirections);
+    }
+
+    // Kings
+    Square whiteKingSquare = kingSquares[nextToMove];
+    assert (position.getPiece(whiteKingSquare.ordinal()).getType().equals(PieceType.KING));
+    assert (position.getPiece(whiteKingSquare.ordinal()).getColor().ordinal() == nextToMove);
+
+    Square blackKingSquare = kingSquares[opponent];
+    assert (position.getPiece(blackKingSquare.ordinal()).getType().equals(PieceType.KING));
+    assert (position.getPiece(blackKingSquare.ordinal()).getColor().ordinal() == opponent);
+
+    // for now they are always the same
+    // TODO: different mobility for mid and end game
+    endGameMobility = midGameMobility;
+
+  }
+
+  /**
+   * Iterates over all squares an does evaluations specific to the square
+   */
+  private void iterateOverSquares() {
+
+    for (Square square : Square.validSquares) {
+
+    }
+
   }
 
   /**
@@ -196,7 +414,7 @@ public class Evaluation {
    * In rare cases were through pawn promotions more officers than the opening position
    * are present the value is at maximum 24.
    *
-   * @return a value depending on officer material of both sides between 0 and 24
+   * @return a value depending on officer midGameMaterial of both sides between 0 and 24
    */
   public int getGamePhaseFactor() {
 
@@ -221,119 +439,30 @@ public class Evaluation {
   }
 
   /**
-   * @param position
-   * @return
-   */
-  public int position(Position position) {
-    return 0;
-  }
-
-  /**
    * @return material balance from the view of the active player
    */
   public int material() {
-
-    // protect against null position
-    if (position == null) {
-      IllegalStateException e = new IllegalStateException();
-      LOG.error("No position to evaluate. Set position before calling this", e);
-      throw e;
-    }
-
-    // material is incrementally counted in Position
-    int material = position.getNextPlayer().factor * (position.getMaterial(Color.WHITE) -
-                                                      position.getMaterial(Color.BLACK));
-
-    // bonus/malus for bishop pair
-    if (bishopSquares[nextToMove].size() >= 2) {
-      material += Value.BISHOP_PAIR;
-    }
-    if (bishopSquares[opponent].size() >= 2) {
-      material -= Value.BISHOP_PAIR;
-    }
-
-    // bonus/malus for knight pair
-    if (knightSquares[nextToMove].size() >= 2) {
-      material += Value.KNIGHT_PAIR;
-    }
-    if (knightSquares[opponent].size() >= 2) {
-      material -= Value.KNIGHT_PAIR;
-    }
-
-    // bonus/malus for rook pair
-    if (rookSquares[nextToMove].size() >= 2) {
-      material += Value.ROOK_PAIR;
-    }
-    if (rookSquares[opponent].size() >= 2) {
-      material -= Value.ROOK_PAIR;
-    }
-
+    // clear old values
+    evaluate();
     return material;
+  }
+
+  /**
+   * @return
+   */
+  public int position() {
+    // piece position is done in the piece iteration
+    evaluate();
+    return piecePosition;
   }
 
   /**
    * @return number of pseudo legal moves for the next player
    */
   public int mobility() {
-
-    // protect against null position
-    if (position == null) {
-      IllegalStateException e = new IllegalStateException();
-      LOG.error("No position to evaluate. Set position before calling this", e);
-      throw e;
-    }
-
-    int mobility = 0;
-
-    // to influence the weight of the piece type
-    int factor = 1;
-
-    // knights
-    factor = Value.KNIGHTS_MOBILITY_FACTOR;
-    mobility += factor * mobilityForPieces(PieceType.KNIGHT, knightSquares[nextToMove],
-                                           Square.knightDirections);
-    mobility -= factor * mobilityForPieces(PieceType.KNIGHT, knightSquares[opponent],
-                                           Square.knightDirections);
-
-    // bishops
-    factor = Value.BISHOP_MOBILITY_FACTOR;
-    mobility += factor * mobilityForPieces(PieceType.BISHOP, bishopSquares[nextToMove],
-                                           Square.bishopDirections);
-    mobility -= factor * mobilityForPieces(PieceType.BISHOP, bishopSquares[opponent],
-                                           Square.bishopDirections);
-
-    // rooks
-    factor = Value.ROOK_MOBILITY_FACTOR;
-    mobility += factor * mobilityForPieces(PieceType.ROOK, rookSquares[nextToMove],
-                                           Square.rookDirections);
-    mobility -= factor * mobilityForPieces(PieceType.ROOK, rookSquares[opponent],
-                                           Square.rookDirections);
-
-    // queens
-    factor = Value.QUEEN_MOBILITY_FACTOR;
-    mobility += factor * mobilityForPieces(PieceType.QUEEN, queenSquares[nextToMove],
-                                           Square.queenDirections);
-    mobility -= factor * mobilityForPieces(PieceType.QUEEN, queenSquares[opponent],
-                                           Square.queenDirections);
-
+    // midGameMobility is done in the squares iteration
+    evaluate();
     return mobility;
-  }
-
-  /**
-   * @param type
-   * @param squareList
-   * @param pieceDirections
-   * @return
-   */
-  private int mobilityForPieces(PieceType type, SquareList squareList, int[] pieceDirections) {
-    int numberOfMoves = 0;
-    // iterate over all squares where we have a piece
-    final int size = squareList.size();
-    for (int i = 0; i < size; i++) {
-      Square square = squareList.get(i);
-      numberOfMoves += mobilityForPiece(type, square, pieceDirections);
-    }
-    return numberOfMoves;
   }
 
   /**
@@ -372,20 +501,5 @@ public class Evaluation {
     return numberOfMoves;
   }
 
-
-  /**
-   * Predefined values for Evaluation of positions.
-   */
-  private static class Value {
-
-    public static final int BISHOP_PAIR = 30;
-    public static final int KNIGHT_PAIR = 10;
-    public static final int ROOK_PAIR   = 15;
-
-    public static final int KNIGHTS_MOBILITY_FACTOR = 2;
-    public static final int BISHOP_MOBILITY_FACTOR  = 2;
-    public static final int ROOK_MOBILITY_FACTOR    = 2;
-    public static final int QUEEN_MOBILITY_FACTOR   = 1;
-  }
 
 }
