@@ -53,6 +53,21 @@ public class TestEvaluation {
 
   @Test
   void evaluate() {
+    // standard position should be 0
+    // change if next player gets a bonus
+    position = new Position(fenStandard);
+    int value = evaluation.evaluate(position);
+    assertEquals(0, value, "Start Position should be 0");
+
+    // Mirrored position - should be equal
+    String fen = "k6n/7p/6P1/7K/8/8/8/8 w - - 0 1"; // white
+    position = new Position(fen);
+    int value1 = evaluation.evaluate(position);
+    fen = "8/8/8/8/k7/1p6/P7/N6K b - - 0 1"; // black
+    position = new Position(fen);
+    int value2 = evaluation.evaluate(position);
+    assertEquals(value1, value2, "Mirrored Position should be equal");
+
   }
 
   @Test
@@ -72,50 +87,17 @@ public class TestEvaluation {
 
   @Test
   void material() {
-  }
-
-  @Test
-  void mobility() {
-  }
-
-  @Test
-  void position() {
-  }
-
-  @Test
-  public final void testEvaluate_startPosValueZero() {
-    // standard position should be 0
-    // change if next player gets a bonus
+    // Start position
     position = new Position(fenStandard);
-    int value = evaluation.evaluate(position);
-    assertEquals(0, value, "Start Position should be 0");
-  }
-
-  @Test
-  public void testEvaluate_mirroredPositionEqual() {
-    // Mirrored position - should be equal
-    String fen = "k6n/7p/6P1/7K/8/8/8/8 w - - 0 1"; // white
-    position = new Position(fen);
-    int value1 = evaluation.evaluate(position);
-    fen = "8/8/8/8/k7/1p6/P7/N6K b - - 0 1"; // black
-    position = new Position(fen);
-    int value2 = evaluation.evaluate(position);
-    assertEquals(value1, value2, "Mirrored Position should be equal");
-  }
-
-  @Test
-  public final void testMaterial_OfStartPosition() {
-    position = new Position(fenStandard);
+    evaluation.setPosition(position);
     int value = evaluation.material();
     assertEquals(0, value);
-  }
 
-  @Test
-  public final void testMaterial_OfDifferentPositions() {
+    // other positions
     String fen = "k6n/7p/6P1/7K/8/8/8/8 w - - 0 1"; // white
     position = new Position(fen);
     evaluation.setPosition(position);
-    int value = evaluation.material();
+    value = evaluation.material();
     // System.out.println(value);
     assertEquals(-320, value);
 
@@ -125,15 +107,62 @@ public class TestEvaluation {
     value = evaluation.material();
     // System.out.println(value);
     assertEquals(-320, value);
+
+
   }
 
   @Test
-  public final void testMobility_StartPosition() {
+  void mobility() {
+    // Start position
     position = new Position(fenStandard);
     evaluation.setPosition(position);
     int value = evaluation.mobility();
     //System.out.println(value);
     assertEquals(0, value);
+
+    // other positions
+    String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
+    position = new Position(fen);
+    evaluation.setPosition(position);
+    value = evaluation.mobility();
+    //System.out.println(value);
+    assertEquals(52, value);
+
+    fen = "k6n/7p/6P1/7K/8/8/8/8 w - - 0 1"; // white
+    position = new Position(fen);
+    evaluation.setPosition(position);
+    value = evaluation.mobility();
+    //System.out.println(value);
+    assertEquals(-4, value);
+
+    fen = "8/8/8/8/k7/1p6/P7/N6K b - - 0 1"; // black
+    position = new Position(fen);
+    evaluation.setPosition(position);
+    value = evaluation.mobility();
+    //System.out.println(value);
+    assertEquals(-4, value);
+  }
+
+  @Test
+  void position() {
+    // Start Position
+    position = new Position();
+    evaluation.setPosition(position);
+    evaluation.evaluate();
+    assertEquals(0,evaluation.position());
+
+    // All White pieces no Black pieces but King
+    position = new Position("4k3/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1");
+    evaluation.setPosition(position);
+    evaluation.evaluate();
+    assertEquals(70,evaluation.position());
+
+    // All Black pieces no Black pieces but King
+    position = new Position("rnbqkbnr/pppppppp/8/8/8/8/8/4K3 w kq - 0 1");
+    evaluation.setPosition(position);
+    evaluation.evaluate();
+    assertEquals(-70,evaluation.position());
+
   }
 
   @Test
@@ -157,36 +186,26 @@ public class TestEvaluation {
   }
 
   @Test
-  public final void testMobility_otherPositions() {
-    String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
-    position = new Position(fen);
-    evaluation.setPosition(position);
-    int value = evaluation.mobility();
-    //System.out.println(value);
-    assertEquals(52, value);
+  public final void testCheckPosition() {
+    // no in check
+    position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
+    assertEquals(64, evaluation.evaluate(position));
 
-    fen = "k6n/7p/6P1/7K/8/8/8/8 w - - 0 1"; // white
-    position = new Position(fen);
-    evaluation.setPosition(position);
-    value = evaluation.mobility();
-    //System.out.println(value);
-    assertEquals(-4, value);
+    // white gives check to back
+    position = new Position("r2R3k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2K5 b - - 0 1");
+    assertEquals(-106, evaluation.evaluate(position));
 
-    fen = "8/8/8/8/k7/1p6/P7/N6K b - - 0 1"; // black
-    position = new Position(fen);
-    evaluation.setPosition(position);
-    value = evaluation.mobility();
-    //System.out.println(value);
-    assertEquals(-4, value);
+    // black gives check to white
+    position = new Position("r6k/6R1/p4p1p/2p2P1P/1p1qPN2/6P1/1PPK4/3R4 w - - 0 2");
+    assertEquals(26, evaluation.evaluate(position));
   }
 
   @Test
   @Disabled
   public final void testNewEvals() {
-    position = new Position();
+    position = new Position("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1");
     evaluation.setPosition(position);
-
-    int value = evaluation.evaluate(position);
+    evaluation.evaluate();
   }
 
   @Test
@@ -209,15 +228,12 @@ public class TestEvaluation {
       System.gc();
       start = Instant.now();
       ITERATIONS = 0;
-      while (true) {
+      do {
         ITERATIONS++;
         // ### TEST CODE
         testCode();
         // ### /TEST CODE
-        if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) {
-          break;
-        }
-      }
+      } while (Duration.between(start, Instant.now()).getSeconds() < DURATION);
       System.out.println(String.format("Timing: %,7d runs/s", ITERATIONS / DURATION));
 
     }
