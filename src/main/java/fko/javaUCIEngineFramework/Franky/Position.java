@@ -152,10 +152,10 @@ public class Position {
 
   private enum Flag {
     TBD, TRUE, FALSE;
+
   }
   // **********************************************************
   // static initialization
-
   static {
     // all pieces on all squares
     for (Piece p : Piece.values) {
@@ -178,8 +178,8 @@ public class Position {
     nextPlayer_Zobrist = Math.abs(random.nextLong());
   }
 
-  // Constructors START -----------------------------------------
 
+  // Constructors START -----------------------------------------
   /**
    * Creates a standard Chessly board and initializes it with standard chess setup.
    */
@@ -258,10 +258,10 @@ public class Position {
   }
 
 
+
   // public Position(GameBoard oldBoard) {
   //        this(oldBoard.toFENString());
   //    }
-
   /**
    * Initialize the lists for the pieces and the material counter
    */
@@ -770,6 +770,10 @@ public class Position {
     return old;
   }
 
+  public Piece getPiece(final int to) {
+    return x88Board[to];
+  }
+
   /**
    * @param toSquare
    * @param piece
@@ -1194,13 +1198,12 @@ public class Position {
   private void initBoard(String fen) {
     // clear board
     Arrays.fill(getX88Board(), Piece.NOPIECE);
-    // Standard Start Board
+    // setup board according to given FEN
     setupFromFEN(fen);
-    // used for debugging
-    // setupFromFEN("8/1P6/6k1/8/8/8/p1K5/8 w - - 0 1");
   }
 
   /**
+   * Setup board according to given FEN
    * @param fen
    */
   private void setupFromFEN(String fen) {
