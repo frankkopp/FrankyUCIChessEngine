@@ -1135,6 +1135,13 @@ public class Position {
   }
 
   /**
+   * @return color of opponent player
+   */
+  public Color getOpponent() {
+    return nextPlayer.getInverseColor();
+  }
+
+  /**
    * Returns the last move. Returns Move.NOMOVE if there is no last move.
    *
    * @return int representing a move
