@@ -304,17 +304,17 @@ public class Search implements Runnable {
     for (int i = 0; i < legalMoves.size(); i++) {
       // filter UCI search moves
       if (searchMode.getMoves().isEmpty()) {
-        rootMoves.add(legalMoves.get(i), Evaluation.Value.NOVALUE);
+        rootMoves.add(legalMoves.get(i), Evaluation.NOVALUE);
       } else {
         if (searchMode.getMoves().contains(Move.toUCINotation(position, legalMoves.get(i)))) {
-          rootMoves.add(legalMoves.get(i), Evaluation.Value.NOVALUE);
+          rootMoves.add(legalMoves.get(i), Evaluation.NOVALUE);
         }
       }
     }
 
     // temporary best move - take the first move available
     searchCounter.currentBestRootMove = rootMoves.getMove(0);
-    searchCounter.currentBestRootValue = Evaluation.Value.NOVALUE;
+    searchCounter.currentBestRootValue = Evaluation.NOVALUE;
 
     // prepare search result
     SearchResult searchResult = new SearchResult();
@@ -347,8 +347,8 @@ public class Search implements Runnable {
       rootMovesSearch(position, depth);
 
       // sure mate value found?
-      if (searchCounter.currentBestRootValue >= Evaluation.Value.CHECKMATE - depth ||
-          searchCounter.currentBestRootValue <= -Evaluation.Value.CHECKMATE + depth) {
+      if (searchCounter.currentBestRootValue >= Evaluation.CHECKMATE - depth ||
+          searchCounter.currentBestRootValue <= -Evaluation.CHECKMATE + depth) {
         stopSearch = true;
       }
 
@@ -423,10 +423,10 @@ public class Search implements Runnable {
     searchCounter.currentSearchDepth = 0;
     searchCounter.currentExtraSearchDepth = 0;
 
-    int bestValue = Evaluation.Value.NOVALUE;
+    int bestValue = Evaluation.NOVALUE;
 
-    int alpha = -Evaluation.Value.INFINITE;
-    int beta = Evaluation.Value.INFINITE;
+    int alpha = -Evaluation.INFINITE;
+    int beta = Evaluation.INFINITE;
 
     // ##### Iterate through all available root moves
     for (int i = 0; i < rootMoves.size(); i++) {
@@ -450,13 +450,13 @@ public class Search implements Runnable {
         // ########################################
         // ### START ASPIRATION WINDOW SEARCH   ###
         int delta = 50; // ASPIRATION WINDOW
-        alpha = Math.max(previousValue - delta, -Evaluation.Value.INFINITE);
-        beta = Math.min(previousValue + delta, Evaluation.Value.INFINITE);
+        alpha = Math.max(previousValue - delta, -Evaluation.INFINITE);
+        beta = Math.min(previousValue + delta, Evaluation.INFINITE);
         value = -negamax(position, depth - 1, rootPly + 1, alpha, beta, NO_PV, DO_NULL);
         if (value <= alpha || value >= beta) {
           // failed
-          alpha = -Evaluation.Value.INFINITE;
-          beta = Evaluation.Value.INFINITE;
+          alpha = -Evaluation.INFINITE;
+          beta = Evaluation.INFINITE;
           value = -negamax(position, depth - 1, rootPly + 1, alpha, beta, IS_PV, DO_NULL);
         }
         // ### END ASPIRATION WINDOW SEARCH     ###
@@ -552,8 +552,8 @@ public class Search implements Runnable {
     // ## BEGIN Mate Distance Pruning
     // ## Did we already find a shorter mate then ignore this one
     if (config.USE_MATE_DISTANCE_PRUNING && !isPerftSearch()) {
-      alpha = Math.max(-Evaluation.Value.CHECKMATE + ply, alpha);
-      beta = Math.min(Evaluation.Value.CHECKMATE - ply, beta);
+      alpha = Math.max(-Evaluation.CHECKMATE + ply, alpha);
+      beta = Math.min(Evaluation.CHECKMATE - ply, beta);
       if (alpha >= beta) {
         searchCounter.mateDistancePrunings++;
         return alpha;
@@ -585,7 +585,7 @@ public class Search implements Runnable {
     if (!isPerftSearch()) {
       if (position.check50Moves() || position.check3Repetitions() ||
           position.checkInsufficientMaterial()) {
-        return Evaluation.Value.DRAW;
+        return Evaluation.DRAW;
       }
     }
 
@@ -648,8 +648,10 @@ public class Search implements Runnable {
     MoveList moves = moveGenerators[ply].getPseudoLegalMoves(position);
     searchCounter.movesGenerated++;
 
+    // TODO: Move list sorting needed????
+
     // Initialize best values
-    int pvValue = Evaluation.Value.NOVALUE;
+    int pvValue = Evaluation.NOVALUE;
 
     // Prepare hash type
     TT_EntryType ttType = TT_EntryType.ALPHA;
@@ -699,7 +701,7 @@ public class Search implements Runnable {
 
         // ########################################
         // ### START PVS ###
-        if (!config.USE_PVS || !pvSearch || pvValue == Evaluation.Value.NOVALUE) {
+        if (!config.USE_PVS || !pvSearch || pvValue == Evaluation.NOVALUE) {
           // no PV yet - do a full search
           value = -negamax(position, depthLeft - 1, ply + 1, -beta, -alpha, pvSearch, DO_NULL);
         } else {
@@ -725,7 +727,7 @@ public class Search implements Runnable {
               currentVariation.removeLast();
               position.undoMove();
               searchCounter.prunings++;
-              return beta;
+              return value; // TODO: return value or beta???
             }
           }
           // alpha improved
@@ -752,13 +754,13 @@ public class Search implements Runnable {
       searchCounter.nonLeafPositionsEvaluated++;
       if (position.hasCheck()) {
         // We have a check mate. Return a -CHECKMATE.
-        int value = -Evaluation.Value.CHECKMATE + ply;
+        int value = -Evaluation.CHECKMATE + ply;
         storeTT(position, depthLeft, TT_EntryType.EXACT, value);
         return value;
       } else {
         // We have a stale mate. Return the draw value.
-        storeTT(position, depthLeft, TT_EntryType.EXACT, Evaluation.Value.DRAW);
-        return Evaluation.Value.DRAW;
+        storeTT(position, depthLeft, TT_EntryType.EXACT, Evaluation.DRAW);
+        return Evaluation.DRAW;
       }
     }
 
@@ -818,8 +820,8 @@ public class Search implements Runnable {
       // ## BEGIN Mate Distance Pruning
       // ## Did we already find a shorter mate then ignore this one
       if (config.USE_MATE_DISTANCE_PRUNING && !isPerftSearch()) {
-        alpha = Math.max(-Evaluation.Value.CHECKMATE + ply, alpha);
-        beta = Math.min(Evaluation.Value.CHECKMATE - ply, beta);
+        alpha = Math.max(-Evaluation.CHECKMATE + ply, alpha);
+        beta = Math.min(Evaluation.CHECKMATE - ply, beta);
         if (alpha >= beta) {
           return alpha;
         }
@@ -869,7 +871,7 @@ public class Search implements Runnable {
         // check draw through 50-moves-rule, 3-fold-repetition, insufficient material
         if (position.check50Moves() || position.check3Repetitions() ||
             position.checkInsufficientMaterial()) {
-          value = Evaluation.Value.DRAW;
+          value = Evaluation.DRAW;
         } else {
           // go one ply deeper into the search tree
           value = -quiescence(position, ply + 1, -beta, -alpha);
@@ -907,13 +909,13 @@ public class Search implements Runnable {
       searchCounter.leafPositionsEvaluated++;
       if (position.hasCheck()) {
         // We have a check mate. Return a -CHECKMATE.
-        value = -Evaluation.Value.CHECKMATE + ply;
+        value = -Evaluation.CHECKMATE + ply;
         storeTT(position, 0, TT_EntryType.EXACT, value);
         return value;
       } else {
         // We have a stale mate. Return the draw value.
-        storeTT(position, 0, TT_EntryType.EXACT, Evaluation.Value.DRAW);
-        return Evaluation.Value.DRAW;
+        storeTT(position, 0, TT_EntryType.EXACT, Evaluation.DRAW);
+        return Evaluation.DRAW;
       }
     }
 
@@ -1178,7 +1180,7 @@ public class Search implements Runnable {
 
     // Info values
     int  currentBestRootMove     = Move.NOMOVE;
-    int  currentBestRootValue    = Evaluation.Value.NOVALUE;
+    int  currentBestRootValue    = Evaluation.NOVALUE;
     int  currentIterationDepth   = 0;
     int  currentSearchDepth      = 0;
     int  currentExtraSearchDepth = 0;

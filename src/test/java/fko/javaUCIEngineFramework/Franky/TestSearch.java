@@ -210,7 +210,7 @@ public class TestSearch {
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    assertEquals(Evaluation.Value.CHECKMATE - 3, search.getLastSearchResult().resultValue);
+    assertEquals(Evaluation.CHECKMATE - 3, search.getLastSearchResult().resultValue);
 
     // mate in 3 (5 plys)
     fen = "4rk2/p5p1/1p2P2N/7R/nP5P/5PQ1/b6K/q7 w - - 0 1";
@@ -221,7 +221,7 @@ public class TestSearch {
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    assertEquals(Evaluation.Value.CHECKMATE - 5, search.getLastSearchResult().resultValue);
+    assertEquals(Evaluation.CHECKMATE - 5, search.getLastSearchResult().resultValue);
 
 
     // mate in 4 (7 plys)
