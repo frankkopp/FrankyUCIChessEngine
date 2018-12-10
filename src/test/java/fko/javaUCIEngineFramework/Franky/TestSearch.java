@@ -225,20 +225,20 @@ public class TestSearch {
 
 
     // mate in 4 (7 plys)
-    fen = "r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - - 0 1";
-    position = new Position(fen);
-
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
-
-    search.startSearch(position, searchMode);
-
-    // test search
-    waitWhileSearching();
-
-    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
-    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
-    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    assertEquals(Evaluation.CHECKMATE - 7, search.getLastSearchResult().resultValue);
+//    fen = "r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - - 0 1";
+//    position = new Position(fen);
+//
+//    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
+//
+//    search.startSearch(position, searchMode);
+//
+//    // test search
+//    waitWhileSearching();
+//
+//    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+//    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+//    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+//    assertEquals(Evaluation.CHECKMATE - 7, search.getLastSearchResult().resultValue);
 
     // mate in 8 (15 plys)
     //    fen = "8/7K/8/8/8/8/R7/7k w - - 0 1";
