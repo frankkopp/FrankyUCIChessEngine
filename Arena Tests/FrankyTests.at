@@ -4,7 +4,7 @@ Type=0
 CurrSwissRound=0
 Rounds=100
 CurrentPair=1
-CurrentRound=14
+CurrentRound=15
 Level=5 -1\5/-1#5@-1|5
 [Options]
 QuitAfterTournament=0
@@ -67,10 +67,10 @@ Website=
 E-Mail=
 ArenaVersion=Arena 3.5.1
 LastGameDate=2018.12.10
-LastGameTime=15:30:29
+LastGameTime=15:36:57
 [PairingResults]
 Franky_v0.1 Config1 ------ Franky_v0.1 Config2=100000101110110010101110001101½111111010101010001101001000110111011110111101111111010011011101010110
-Franky-0.3 ------ Franky_v0.2=00100100100101
+Franky-0.3 ------ Franky_v0.2=001001001001010?
 [Participants]
 Engine1=Franky_v0.2
 Engine2=Franky-0.3
