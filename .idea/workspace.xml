@@ -51,21 +51,13 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Evaluation.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state>
+                <state relative-caret-position="1667">
+                  <caret line="309" column="46" selection-start-line="309" selection-start-column="46" selection-end-line="309" selection-end-column="46" />
                   <folding>
                     <element signature="imports" expanded="true" />
                     <element signature="e#4287#4288#0" expanded="true" />
                     <element signature="e#4312#4313#0" expanded="true" />
                   </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/EvaluationConfig.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="838">
-                  <caret line="183" column="8" selection-start-line="183" selection-start-column="8" selection-end-line="183" selection-end-column="8" />
                 </state>
               </provider>
             </entry>
@@ -85,15 +77,24 @@
                   </provider>
                 </entry>
               </file>
-              <file pinned="false" current-in-tab="true">
+              <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="451">
-                      <caret line="163" column="19" selection-start-line="163" selection-start-column="19" selection-end-line="163" selection-end-column="19" />
+                    <state relative-caret-position="3294">
+                      <caret line="206" column="19" selection-start-line="206" selection-start-column="19" selection-end-line="206" selection-end-column="19" />
                       <folding>
                         <element signature="imports" expanded="true" />
-                        <element signature="e#7453#7454#0" expanded="true" />
+                        <element signature="e#7740#7741#0" expanded="true" />
                       </folding>
+                    </state>
+                  </provider>
+                </entry>
+              </file>
+              <file pinned="false" current-in-tab="true">
+                <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java">
+                  <provider selected="true" editor-type-id="text-editor">
+                    <state relative-caret-position="483">
+                      <caret line="218" column="38" selection-start-line="218" selection-start-column="38" selection-end-line="218" selection-end-column="38" />
                     </state>
                   </provider>
                 </entry>
@@ -137,8 +138,8 @@
               <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/../cpw-engine/eval.cpp">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="-270">
-                      <caret line="183" column="44" selection-start-line="183" selection-start-column="44" selection-end-line="183" selection-end-column="44" />
+                    <state relative-caret-position="185">
+                      <caret line="121" column="43" selection-start-line="121" selection-start-column="38" selection-end-line="121" selection-end-column="43" />
                     </state>
                   </provider>
                 </entry>
@@ -146,13 +147,13 @@
               <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/../cpw-engine/eval_init.cpp">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="954">
-                      <caret line="185" selection-start-line="185" selection-end-line="192" selection-end-column="41" />
+                    <state relative-caret-position="702">
+                      <caret line="297" column="17" selection-start-line="297" selection-start-column="17" selection-end-line="297" selection-end-column="17" />
                     </state>
                   </provider>
                 </entry>
               </file>
-              <file pinned="false" current-in-tab="true">
+              <file pinned="false" current-in-tab="false">
                 <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.txt">
                   <provider selected="true" editor-type-id="text-editor">
                     <state relative-caret-position="54">
@@ -161,14 +162,11 @@
                   </provider>
                 </entry>
               </file>
-              <file pinned="false" current-in-tab="false">
-                <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Evaluation.java">
+              <file pinned="false" current-in-tab="true">
+                <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/EvaluationConfig.java">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="55">
-                      <caret line="516" selection-start-line="516" selection-end-line="516" />
-                      <folding>
-                        <element signature="imports" expanded="true" />
-                      </folding>
+                    <state relative-caret-position="2433">
+                      <caret line="179" selection-start-line="179" selection-end-line="179" />
                     </state>
                   </provider>
                 </entry>
@@ -217,9 +215,9 @@
       <find>use_hash</find>
       <find>stm</find>
       <find>knight</find>
+      <find>EvaluationConfig.</find>
       <find>ENDGAME_MAT</find>
       <find>TEMPO</find>
-      <find>EvaluationConfig.</find>
     </findStrings>
     <replaceStrings>
       <replace>Square</replace>
@@ -283,20 +281,20 @@
         <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestTranspositionTable.java" />
         <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestBoardPosition.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/UCI/UCIProtocolHandler.java" />
-        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java" />
         <option value="$PROJECT_DIR$/jar2exe.bat" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Configuration.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Position.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Square.java" />
-        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java" />
         <option value="$PROJECT_DIR$/src/main/resources/project.properties" />
-        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Main.java" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.txt" />
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Main.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/FrankyEngine.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/EvaluationConfig.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Evaluation.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java" />
       </list>
     </option>
   </component>
@@ -517,7 +515,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1544397130876" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1544401449771" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="TEXT&#10;JAVA" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
@@ -586,7 +584,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.TestSearch.testInfiniteSearch">
+  <component name="RunManager" selected="JUnit.ALL Tests">
     <configuration default="true" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
@@ -595,8 +593,25 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="ALL Tests" type="JUnit" factoryName="JUnit">
+      <module name="Franky" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="fko.javaUCIEngineFramework.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework" />
+      <option name="MAIN_CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <option name="PARAMETERS" value="" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="TestEvaluation" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="JavaUCIEngineFramework" />
+      <module name="Franky" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
@@ -605,12 +620,30 @@
       </extension>
       <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
       <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestEvaluation" />
+      <option name="METHOD_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestEvaluation.evaluate" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Franky" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
+      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestEvaluation" />
+      <option name="METHOD_NAME" value="evaluate" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration name="TestEvaluation.position" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="JavaUCIEngineFramework" />
+      <module name="Franky" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
@@ -621,12 +654,13 @@
       <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestEvaluation" />
       <option name="METHOD_NAME" value="position" />
       <option name="TEST_OBJECT" value="method" />
+      <option name="PARAMETERS" value="" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration name="TestEvaluation.testCheckPosition" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="JavaUCIEngineFramework" />
+      <module name="Franky" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
@@ -637,27 +671,12 @@
       <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestEvaluation" />
       <option name="METHOD_NAME" value="testCheckPosition" />
       <option name="TEST_OBJECT" value="method" />
+      <option name="PARAMETERS" value="" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TestEvaluation.testNewEvals" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="JavaUCIEngineFramework" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestEvaluation" />
-      <option name="METHOD_NAME" value="testNewEvals" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TestSearch.testInfiniteSearch" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="TestEvaluation.testNeutralPosition" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Franky" />
       <extension name="coverage">
         <pattern>
@@ -666,40 +685,9 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.Franky" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestSearch" />
-      <option name="METHOD_NAME" value="testInfiniteSearch" />
+      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.Franky.TestEvaluation" />
+      <option name="METHOD_NAME" value="testNeutralPosition" />
       <option name="TEST_OBJECT" value="method" />
-      <option name="PARAMETERS" value="" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="UCIProtocolHandlerTest.uciCommand" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
-      <module name="JavaUCIEngineFramework" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="fko.javaUCIEngineFramework.Franky.FrankyEngine" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework.UCI" />
-      <option name="MAIN_CLASS_NAME" value="fko.javaUCIEngineFramework.UCI.UCIProtocolHandlerTest" />
-      <option name="METHOD_NAME" value="uciCommand" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="fko.javaUCIEngineFramework in JavaUCIEngineFramework" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
-      <module name="JavaUCIEngineFramework" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="fko.javaUCIEngineFramework.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="fko.javaUCIEngineFramework" />
-      <option name="TEST_OBJECT" value="package" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -731,22 +719,21 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="JUnit.fko.javaUCIEngineFramework in JavaUCIEngineFramework" />
-      <item itemvalue="JUnit.UCIProtocolHandlerTest.uciCommand" />
-      <item itemvalue="Maven.Install_EXE" />
+      <item itemvalue="JUnit.ALL Tests" />
       <item itemvalue="JUnit.TestEvaluation" />
       <item itemvalue="JUnit.TestEvaluation.testCheckPosition" />
-      <item itemvalue="JUnit.TestEvaluation.testNewEvals" />
       <item itemvalue="JUnit.TestEvaluation.position" />
-      <item itemvalue="JUnit.TestSearch.testInfiniteSearch" />
+      <item itemvalue="JUnit.TestEvaluation.testNeutralPosition" />
+      <item itemvalue="JUnit.TestEvaluation.evaluate" />
+      <item itemvalue="Maven.Install_EXE" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.TestSearch.testInfiniteSearch" />
-        <item itemvalue="JUnit.TestEvaluation.position" />
-        <item itemvalue="JUnit.TestEvaluation.testNewEvals" />
-        <item itemvalue="JUnit.TestEvaluation.testCheckPosition" />
         <item itemvalue="JUnit.TestEvaluation" />
+        <item itemvalue="JUnit.TestEvaluation.testCheckPosition" />
+        <item itemvalue="JUnit.TestEvaluation.evaluate" />
+        <item itemvalue="JUnit.TestEvaluation.testNeutralPosition" />
+        <item itemvalue="JUnit.TestEvaluation.position" />
       </list>
     </recent_temporary>
   </component>
@@ -764,35 +751,35 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="TestEvaluation_position - 2018.12.09 at 19h 59m 43s.xml">
-      <configuration name="TestEvaluation.position" configurationId="JUnit" />
+    <history-entry file="TestEvaluation_testCheckPosition - 2018.12.10 at 01h 11m 34s.xml">
+      <configuration name="TestEvaluation.testCheckPosition" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestEvaluation_position - 2018.12.09 at 20h 00m 19s.xml">
-      <configuration name="TestEvaluation.position" configurationId="JUnit" />
+    <history-entry file="TestEvaluation_testCheckPosition - 2018.12.10 at 01h 11m 43s.xml">
+      <configuration name="TestEvaluation.testCheckPosition" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestEvaluation_position - 2018.12.09 at 20h 03m 34s.xml">
-      <configuration name="TestEvaluation.position" configurationId="JUnit" />
+    <history-entry file="TestEvaluation_testCheckPosition - 2018.12.10 at 01h 12m 01s.xml">
+      <configuration name="TestEvaluation.testCheckPosition" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestEvaluation_position - 2018.12.09 at 23h 12m 02s.xml">
-      <configuration name="TestEvaluation.position" configurationId="JUnit" />
+    <history-entry file="fko_javaUCIEngineFramework_in_JavaUCIEngineFramework - 2018.12.10 at 01h 14m 06s.xml">
+      <configuration name="fko.javaUCIEngineFramework in JavaUCIEngineFramework" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestEvaluation_position - 2018.12.09 at 23h 13m 02s.xml">
-      <configuration name="TestEvaluation.position" configurationId="JUnit" />
+    <history-entry file="TestEvaluation - 2018.12.10 at 01h 14m 15s.xml">
+      <configuration name="TestEvaluation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestEvaluation_position - 2018.12.09 at 23h 13m 18s.xml">
-      <configuration name="TestEvaluation.position" configurationId="JUnit" />
+    <history-entry file="UCIProtocolHandlerTest_uciCommand - 2018.12.10 at 01h 15m 16s.xml">
+      <configuration name="UCIProtocolHandlerTest.uciCommand" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestEvaluation_position - 2018.12.09 at 23h 14m 45s.xml">
-      <configuration name="TestEvaluation.position" configurationId="JUnit" />
+    <history-entry file="UCIProtocolHandlerTest_uciCommand - 2018.12.10 at 01h 15m 23s.xml">
+      <configuration name="UCIProtocolHandlerTest.uciCommand" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestEvaluation_position - 2018.12.09 at 23h 14m 56s.xml">
-      <configuration name="TestEvaluation.position" configurationId="JUnit" />
+    <history-entry file="ALL_Tests - 2018.12.10 at 01h 18m 21s.xml">
+      <configuration name="ALL Tests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestSearch_testInfiniteSearch - 2018.12.09 at 23h 25m 24s.xml">
-      <configuration name="TestSearch.testInfiniteSearch" configurationId="JUnit" />
+    <history-entry file="ALL_Tests - 2018.12.10 at 01h 24m 04s.xml">
+      <configuration name="ALL Tests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestSearch_testInfiniteSearch - 2018.12.09 at 23h 58m 53s.xml">
-      <configuration name="TestSearch.testInfiniteSearch" configurationId="JUnit" />
+    <history-entry file="ALL_Tests - 2018.12.10 at 01h 28m 49s.xml">
+      <configuration name="ALL Tests" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TodoView" selected-index="1">
@@ -819,7 +806,7 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3258427" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49960783" weight="0.3233645" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49941972" weight="0.40355805" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49941972" visible="true" weight="0.40280375" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3298872" />
@@ -905,7 +892,9 @@
     </breakpoint-manager>
     <watches-manager>
       <configuration name="JUnit">
-        <watch expression="this.midGamePiecePosition" language="JAVA" />
+        <watch expression="endGamePiecePosition" language="JAVA" />
+        <watch expression="midGamePiecePosition" language="JAVA" />
+        <watch expression="((Evaluation)this).position" custom="fko.javaUCIEngineFramework.Franky.Evaluation" />
       </configuration>
     </watches-manager>
   </component>
@@ -1146,13 +1135,6 @@
     <entry file="file://$PROJECT_DIR$/../cpw-engine/eval.h">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Configuration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="414">
-          <caret line="111" selection-start-line="111" selection-end-line="111" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Move.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
@@ -1277,20 +1259,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../cpw-engine/eval_init.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="954">
-          <caret line="185" selection-start-line="185" selection-end-line="192" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../cpw-engine/eval.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-270">
-          <caret line="183" column="44" selection-start-line="183" selection-start-column="44" selection-end-line="183" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Square.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5850">
@@ -1315,45 +1283,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="3" column="22" selection-start-line="3" selection-start-column="22" selection-end-line="3" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/jar2exe.bat">
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <caret column="376" selection-start-column="376" selection-end-column="376" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/project.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="26" column="32" selection-start-line="26" selection-start-column="32" selection-end-line="26" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="49" selection-start-line="49" selection-end-line="49" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1626">
-          <caret line="592" lean-forward="true" selection-start-line="592" selection-end-line="592" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/FrankyEngine.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-198">
-          <caret line="47" column="9" selection-start-line="47" selection-start-column="9" selection-end-line="47" selection-end-column="9" />
         </state>
       </provider>
     </entry>
@@ -1380,6 +1313,73 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="342">
+          <caret line="48" selection-start-line="48" selection-end-line="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/FrankyEngine.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="486">
+          <caret line="73" lean-forward="true" selection-start-line="73" selection-end-line="73" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../cpw-engine/eval_init.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="702">
+          <caret line="297" column="17" selection-start-line="297" selection-start-column="17" selection-end-line="297" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../cpw-engine/eval.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="121" column="43" selection-start-line="121" selection-start-column="38" selection-end-line="121" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="3" column="22" selection-start-line="3" selection-start-column="22" selection-end-line="3" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/EvaluationConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2433">
+          <caret line="179" selection-start-line="179" selection-end-line="179" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3294">
+          <caret line="206" column="19" selection-start-line="206" selection-start-column="19" selection-end-line="206" selection-end-column="19" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#7740#7741#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Configuration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="414">
+          <caret line="111" selection-start-line="111" selection-end-line="111" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/project.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="468">
+          <caret line="26" column="32" selection-start-line="26" selection-start-column="32" selection-end-line="26" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="702">
@@ -1387,32 +1387,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="451">
-          <caret line="163" column="19" selection-start-line="163" selection-start-column="19" selection-end-line="163" selection-end-column="19" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#7453#7454#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/EvaluationConfig.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="838">
-          <caret line="183" column="8" selection-start-line="183" selection-start-column="8" selection-end-line="183" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Evaluation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
+        <state relative-caret-position="1667">
+          <caret line="309" column="46" selection-start-line="309" selection-start-column="46" selection-end-line="309" selection-end-column="46" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#4287#4288#0" expanded="true" />
             <element signature="e#4312#4313#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="483">
+          <caret line="218" column="38" selection-start-line="218" selection-start-column="38" selection-end-line="218" selection-end-column="38" />
         </state>
       </provider>
     </entry>

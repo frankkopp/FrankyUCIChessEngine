@@ -25,14 +25,12 @@
 
 package fko.javaUCIEngineFramework.Franky;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Predefined values for Evaluation of positions.
  */
 class EvaluationConfig {
 
+  public static final int TEMPO       = 10;
   public static final int CHECK_VALUE = 30;
 
   public static final int BISHOP_PAIR = 30;
@@ -47,6 +45,7 @@ class EvaluationConfig {
   public static final int MATERIAL_WEIGHT = 1;
   public static final int POSITION_WEIGHT = 1;
   public static final int MOBILITY_WEIGHT = 1;
+
 
   // @formatter:off
   // PAWN Tables

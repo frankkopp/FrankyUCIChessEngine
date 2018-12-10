@@ -71,6 +71,8 @@ public class Evaluation {
   private int gamePhaseFactor = GAME_PHASE_MAX;
 
   // Evaluation Results
+  private int value                = 0;
+  private int special              = 0;
   private int material             = 0;
   private int piecePosition        = 0;
   private int mobility             = 0;
@@ -91,6 +93,7 @@ public class Evaluation {
   private SquareList[] rookSquares;
   private SquareList[] queenSquares;
   private Square[]     kingSquares;
+
 
   /**
    * Creates an instance of the Evaluator
@@ -195,26 +198,21 @@ public class Evaluation {
                endGameMobility * (1 - gamePhaseFactor / GAME_PHASE_MAX);
 
     // @formatter:off
-    int value = material * MATERIAL_WEIGHT +
-                      piecePosition * POSITION_WEIGHT +
-                      mobility * MOBILITY_WEIGHT;
+    value = material      * MATERIAL_WEIGHT +
+            piecePosition * POSITION_WEIGHT +
+            mobility      * MOBILITY_WEIGHT +
+            special;
     // @formatter:on
 
     // Sum up per game phase
     // ######################################
-
-    // Stage 4 Specials
-    // TODO Specials
-
-    // Giving check or being in check has value as it forces evation moves
-    value += position.isAttacked(position.getNextPlayer(), kingSquares[opponent]) ? CHECK_VALUE : 0;
-    value -= position.isAttacked(position.getOpponent(), kingSquares[nextToMove]) ? CHECK_VALUE : 0;
-
     return value;
   }
 
   private void clearValues() {
+    value = 0;
     gamePhaseFactor = 0;
+    special = 0;
     material = 0;
     piecePosition = 0;
     mobility = 0;
@@ -228,9 +226,24 @@ public class Evaluation {
 
   private void staticEvaluations() {
 
-    // ##########################
-    // Material
-    // ##########################
+    // CHECK Bonus: Giving check or being in check has value as it forces evation moves
+    special += position.isAttacked(position.getNextPlayer(), kingSquares[opponent])
+               ? CHECK_VALUE
+               : 0;
+    special -= position.isAttacked(position.getOpponent(), kingSquares[nextToMove])
+               ? CHECK_VALUE
+               : 0;
+
+    // TEMPO Bonus
+    special += nextToMove == WHITE
+               ? TEMPO * (gamePhaseFactor / GAME_PHASE_MAX)
+               : -TEMPO * (gamePhaseFactor / GAME_PHASE_MAX);
+
+    materialEvaluation();
+
+  }
+
+  private void materialEvaluation() {
 
     // midGameMaterial is incrementally counted in Position
     midGameMaterial = position.getNextPlayer().factor * (position.getMaterial(Color.WHITE) -
@@ -264,7 +277,6 @@ public class Evaluation {
     // TODO: e.g. should reflect that in endgames certain combinations are
     //  draws or mostly draws
     endGameMaterial = midGameMaterial;
-
   }
 
   /**
@@ -281,8 +293,9 @@ public class Evaluation {
       assert (position.getPiece(index).getColor().ordinal() == nextToMove);
 
       // position
-      midGamePiecePosition += pawnsMidGame[getWhiteTableIndex(index)];
-      endGamePiecePosition += pawnsEndGame[getWhiteTableIndex(index)];
+      final int tableIndex = nextToMove==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      this.midGamePiecePosition += pawnsMidGame[tableIndex];
+      this.endGamePiecePosition += pawnsEndGame[tableIndex];
 
     }
     for (int i = 0; i < pawnSquares[opponent].size(); i++) {
@@ -292,9 +305,9 @@ public class Evaluation {
       assert (position.getPiece(index).getColor().ordinal() == opponent);
 
       // position
-      midGamePiecePosition -= pawnsMidGame[getBlackTableIndex(index)];
-      endGamePiecePosition -= pawnsEndGame[getBlackTableIndex(index)];
-
+      final int tableIndex = opponent==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      this.midGamePiecePosition -= pawnsMidGame[tableIndex];
+      this.endGamePiecePosition -= pawnsEndGame[tableIndex];
     }
 
     // Knights
@@ -501,5 +514,22 @@ public class Evaluation {
     return numberOfMoves;
   }
 
-
+  @Override
+  public String toString() {
+    // @formatter:off
+    return "Evaluation{" +
+           "value=" + value +
+           ", gamePhaseFactor=" + gamePhaseFactor +
+           ", special=" + special +
+           ", material=" + material +
+           ", midGameMaterial=" + midGameMaterial +
+           ", endGameMaterial=" + endGameMaterial +
+           ", piecePosition=" + piecePosition +
+           ", midGamePiecePosition=" + midGamePiecePosition +
+           ", endGamePiecePosition=" + endGamePiecePosition +
+           ", mobility=" + mobility +
+           ", midGameMobility=" + midGameMobility +
+           ", endGameMobility=" + endGameMobility + '}';
+    // @formatter:on
+  }
 }

@@ -415,6 +415,7 @@ public class TestSearch {
   }
 
   @Test
+  @Disabled
   public void sizeOfSearchTreeTest() {
 
     int depth = 6;

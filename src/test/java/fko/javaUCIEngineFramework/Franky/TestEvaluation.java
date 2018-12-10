@@ -29,6 +29,8 @@ import fko.javaUCIEngineFramework.UCI.IUCIProtocolHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -39,6 +41,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Attempt at a proper Unit Test for Evaluation
  */
 public class TestEvaluation {
+
+  private static final Logger LOG = LoggerFactory.getLogger(TestEvaluation.class);
+
   private String fenStandard;
 
   private Position   position;
@@ -57,15 +62,15 @@ public class TestEvaluation {
     // change if next player gets a bonus
     position = new Position(fenStandard);
     int value = evaluation.evaluate(position);
-    assertEquals(0, value, "Start Position should be 0");
+    assertEquals(10, value, "Start Position should be 10 from TEMPO");
 
     // Mirrored position - should be equal
-    String fen = "k6n/7p/6P1/7K/8/8/8/8 w - - 0 1"; // white
-    position = new Position(fen);
+    position = new Position("k6n/7p/6P1/7K/8/8/8/8 w - - 0 1");
     int value1 = evaluation.evaluate(position);
-    fen = "8/8/8/8/k7/1p6/P7/N6K b - - 0 1"; // black
-    position = new Position(fen);
+    LOG.info(evaluation.toString());
+    position = new Position("8/8/8/8/k7/1p6/P7/N6K b - - 0 1");
     int value2 = evaluation.evaluate(position);
+    LOG.info(evaluation.toString());
     assertEquals(value1, value2, "Mirrored Position should be equal");
 
   }
@@ -189,15 +194,18 @@ public class TestEvaluation {
   public final void testCheckPosition() {
     // no in check
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
-    assertEquals(64, evaluation.evaluate(position));
+    assertEquals(104, evaluation.evaluate(position));
+    LOG.info(evaluation.toString());
 
-    // white gives check to back
+    // white gives check to black
     position = new Position("r2R3k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2K5 b - - 0 1");
-    assertEquals(-106, evaluation.evaluate(position));
+    assertEquals(-146, evaluation.evaluate(position));
+    LOG.info(evaluation.toString());
 
     // black gives check to white
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1p1qPN2/6P1/1PPK4/3R4 w - - 0 2");
-    assertEquals(26, evaluation.evaluate(position));
+    assertEquals(66, evaluation.evaluate(position));
+    LOG.info(evaluation.toString());
   }
 
   @Test
