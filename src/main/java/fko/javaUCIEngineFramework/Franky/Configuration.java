@@ -80,7 +80,7 @@ public class Configuration {
   /**
    * Use Aspiration Window in root search
    */
-  boolean USE_ASPIRATION_WINDOW = true;
+  boolean USE_ASPIRATION_WINDOW = false;
 
   /**
    * Principal Variation Search

@@ -32,6 +32,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 
@@ -101,7 +102,7 @@ public class Search implements Runnable {
   // current variation of the search
   private final MoveList     currentVariation   = new MoveList(MAX_SEARCH_DEPTH);
   private final MoveList[]   principalVariation = new MoveList[MAX_SEARCH_DEPTH];
-  private long uciUpdateTicker;
+  private       long         uciUpdateTicker;
 
   /**
    * /**
@@ -285,6 +286,7 @@ public class Search implements Runnable {
 
     // remember the start of the search
     startTime = System.currentTimeMillis();
+    uciUpdateTicker = System.currentTimeMillis();
 
     // generate all root moves
     MoveList legalMoves = moveGenerators[0].getLegalMoves(position);
@@ -443,26 +445,27 @@ public class Search implements Runnable {
       int value;
       int previousValue = rootMoves.get(i).value;
 
-      if (depth < 4 || !config.USE_ASPIRATION_WINDOW || isPerftSearch()) {
-        value = -negamax(position, depth - 1, rootPly + 1, alpha, beta, IS_PV, NO_NULL);
-      } else {
-
-        // ########################################
-        // ### START ASPIRATION WINDOW SEARCH   ###
-        int delta = 50; // ASPIRATION WINDOW
-        alpha = Math.max(previousValue - delta, -Evaluation.INFINITE);
-        beta = Math.min(previousValue + delta, Evaluation.INFINITE);
-        value = -negamax(position, depth - 1, rootPly + 1, alpha, beta, NO_PV, DO_NULL);
-        if (value <= alpha || value >= beta) {
-          // failed
-          alpha = -Evaluation.INFINITE;
-          beta = Evaluation.INFINITE;
-          value = -negamax(position, depth - 1, rootPly + 1, alpha, beta, IS_PV, DO_NULL);
-        }
-        // ### END ASPIRATION WINDOW SEARCH     ###
-        // ########################################
-
-      }
+      //      ASPIRATION
+      //      if (depth < 4 || !config.USE_ASPIRATION_WINDOW || isPerftSearch()) {
+      //        value = -negamax(position, depth - 1, rootPly + 1, alpha, beta, IS_PV, NO_NULL);
+      //      } else {
+      //
+      //        // ########################################
+      //        // ### START ASPIRATION WINDOW SEARCH   ###
+      //        int delta = 50; // ASPIRATION WINDOW
+      //        alpha = Math.max(previousValue - delta, -Evaluation.INFINITE);
+      //        beta = Math.min(previousValue + delta, Evaluation.INFINITE);
+      //        value = -negamax(position, depth - 1, rootPly + 1, alpha, beta, NO_PV, DO_NULL);
+      //        if (value <= alpha || value >= beta) {
+      //          // failed
+      //          alpha = -Evaluation.INFINITE;
+      //          beta = Evaluation.INFINITE;
+      //          value = -negamax(position, depth - 1, rootPly + 1, alpha, beta, IS_PV, DO_NULL);
+      //        }
+      //        // ### END ASPIRATION WINDOW SEARCH     ###
+      //        // ########################################
+      //
+      //      }
 
       //        ASPIRATION Search with loop
       //        do {
@@ -481,17 +484,23 @@ public class Search implements Runnable {
       //          delta += delta / 4 + 5;
       //        } while (true);
 
-      //        PVS in ROOT
-      //        if (!config.USE_PVS || bestValue == Evaluation.Value.NOVALUE) { // no PV yet
-      //          value = -negamax(position, depth - 1, rootPly + 1, -beta, -alpha, false);
-      //        } else {
-      //          // try null window search
-      //          value = -negamax(position, depth - 1, rootPly + 1, -alpha - 1, -alpha, true);
-      //          if (value > alpha && value < beta) { // not failed - research
-      //            searchCounter.pv_researches++;
-      //            value = -negamax(position, depth - 1, rootPly + 1, -beta, -alpha, true);
-      //          }
-      //        }
+      // PVS in ROOT
+      // ########################################
+      // ### START PVS ROOT SEARCH            ###
+      if (!config.USE_PVS || bestValue == Evaluation.NOVALUE || isPerftSearch()) { // no PV yet
+        value = -negamax(position, depth - 1, rootPly + 1, -beta, -alpha, true, true);
+      } else {
+        // try null window search
+        value = -negamax(position, depth - 1, rootPly + 1, -alpha - 1, -alpha, false, true);
+        if (value > alpha && value < beta) { // not failed - research
+          searchCounter.pv_root_researches++;
+          value = -negamax(position, depth - 1, rootPly + 1, -beta, -alpha, true, true);
+        } else {
+          searchCounter.pv_root_cutoffs++;
+        }
+      }
+      // ### END PVS ROOT SEARCH              ###
+      // ########################################
 
       // write the value back to the root moves list
       rootMoves.set(i, move, value);
@@ -565,7 +574,7 @@ public class Search implements Runnable {
     // if in check extend search depth
     // this means no quiescence search while in check
     if (position.hasCheck()) {
-//      depthLeft++;
+      //      depthLeft++;
     }
 
     // on leaf node call quiescence
@@ -625,8 +634,8 @@ public class Search implements Runnable {
       position.makeNullMove();
       // null move search
       int reduction = depthLeft > 6 ? 3 : 2;
-      int nullValue = -negamax(position, depthLeft - reduction, ply + 1, -beta, -beta + 1,
-                               NO_PV, NO_NULL);
+      int nullValue = -negamax(position, depthLeft - reduction, ply + 1, -beta, -beta + 1, NO_PV,
+                               NO_NULL);
       position.undoNullMove();
 
       // pruning
@@ -711,6 +720,8 @@ public class Search implements Runnable {
             // no fail - do a full research
             searchCounter.pv_researches++;
             value = -negamax(position, depthLeft - 1, ply + 1, -beta, -alpha, IS_PV, DO_NULL);
+          } else {
+            searchCounter.pv_cutoffs++;
           }
         }
         // ### END PVS ###
@@ -1077,7 +1088,6 @@ public class Search implements Runnable {
 
   private void sendUCIUpdate(final Position position) {
     // send current root move info to UCI every x milli seconds
-    uciUpdateTicker = System.currentTimeMillis();
     if (System.currentTimeMillis() - uciUpdateTicker >= 250) {
       // @formatter:off
         engine.sendInfoToUCI("depth " + searchCounter.currentSearchDepth
@@ -1201,7 +1211,10 @@ public class Search implements Runnable {
     // Optimization Values
     long positionsNonQuiet      = 0;
     long prunings               = 0;
+    long pv_root_researches     = 0;
+    long pv_root_cutoffs        = 0;
     long pv_researches          = 0;
+    long pv_cutoffs             = 0;
     long nodeCache_Hits         = 0;
     long nodeCache_Misses       = 0;
     long movesGenerated         = 0;
@@ -1221,7 +1234,10 @@ public class Search implements Runnable {
       leafPositionsEvaluated = 0;
       positionsNonQuiet = 0;
       prunings = 0;
+      pv_root_researches = 0;
+      pv_root_cutoffs = 0;
       pv_researches = 0;
+      pv_cutoffs = 0;
       nodeCache_Hits = 0;
       nodeCache_Misses = 0;
       movesGenerated = 0;
@@ -1237,20 +1253,35 @@ public class Search implements Runnable {
 
     @Override
     public String toString() {
-      return "SearchCounter{" + "nodesVisited=" + nodesVisited + ", lastSearchTime=" +
-             DurationFormatUtils.formatDurationHMS(lastSearchTime) + ", currentBestRootMove=" +
-             currentBestRootMove + ", currentBestRootValue=" + currentBestRootValue +
-             ", currentIterationDepth=" + currentIterationDepth + ", currentSearchDepth=" +
-             currentSearchDepth + ", currentExtraSearchDepth=" + currentExtraSearchDepth +
-             ", currentRootMove=" + currentRootMove + ", currentRootMoveNumber=" +
-             currentRootMoveNumber + ", leafPositionsEvaluated=" + leafPositionsEvaluated +
-             ", nonLeafPositionsEvaluated=" + nonLeafPositionsEvaluated + ", checkCounter=" +
-             checkCounter + ", checkMateCounter=" + checkMateCounter + ", captureCounter=" +
-             captureCounter + ", enPassantCounter=" + enPassantCounter + ", positionsNonQuiet=" +
-             ", nodeCache_Hits=" + nodeCache_Hits + ", nodeCache_Misses=" + nodeCache_Misses +
-             ", movesGenerated=" + movesGenerated + ", mateDistancePrunings=" +
-             mateDistancePrunings + ", minorPromotionPrunings=" +
-             minorPromotionPrunings + ", nullMovePrunings=" + nullMovePrunings + '}';
+      // @formatter:off
+      return "SearchCounter{" +
+             "nodesVisited=" + nodesVisited +
+             ", lastSearchTime=" + DurationFormatUtils.formatDurationHMS(lastSearchTime) +
+             ", currentBestRootMove=" + currentBestRootMove +
+             ", currentBestRootValue=" + currentBestRootValue +
+             ", currentIterationDepth=" + currentIterationDepth +
+             ", currentSearchDepth=" + currentSearchDepth +
+             ", currentExtraSearchDepth=" + currentExtraSearchDepth +
+             ", currentRootMove=" + currentRootMove +
+             ", currentRootMoveNumber=" + currentRootMoveNumber +
+             ", leafPositionsEvaluated=" + leafPositionsEvaluated +
+             ", nonLeafPositionsEvaluated=" + nonLeafPositionsEvaluated +
+             ", checkCounter=" + checkCounter +
+             ", checkMateCounter=" + checkMateCounter +
+             ", captureCounter=" + captureCounter +
+             ", enPassantCounter=" + enPassantCounter +
+             ", positionsNonQuiet=" + positionsNonQuiet +
+             ", nodeCache_Hits=" + nodeCache_Hits +
+             ", nodeCache_Misses=" + nodeCache_Misses +
+             ", movesGenerated=" + movesGenerated +
+             ", pv_root_researches" + pv_root_researches +
+             ", pv_root_cutoffs" + pv_root_cutoffs +
+             ", pv_researches" + pv_researches +
+             ", pv_cutoffs" + pv_cutoffs +
+             ", mateDistancePrunings=" + mateDistancePrunings +
+             ", minorPromotionPrunings=" + minorPromotionPrunings +
+             ", nullMovePrunings=" + nullMovePrunings + '}';
+      // @formatter:on
     }
   }
 }

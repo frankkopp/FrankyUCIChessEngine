@@ -147,13 +147,13 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 "",
                 ""));
-    iUciOptions.add(
-        new UCIOption("Use_Aspiration_Window_Search",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_ASPIRATION_WINDOW),
-                "",
-                "",
-                ""));
+//    iUciOptions.add(
+//        new UCIOption("Use_Aspiration_Window_Search",
+//                UCIOptionType.check,
+//                Boolean.toString(config.USE_ASPIRATION_WINDOW),
+//                "",
+//                "",
+//                ""));
     iUciOptions.add(
         new UCIOption("Use_PVS",
                 UCIOptionType.check,
