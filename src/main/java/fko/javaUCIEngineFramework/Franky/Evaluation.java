@@ -338,7 +338,7 @@ public class Evaluation {
                                                                     Square.knightDirections);
 
       // position
-      final int tableIndex = nextToMove==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      final int tableIndex = opponent==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
       this.midGamePiecePosition -= knightMidGame[tableIndex];
       this.endGamePiecePosition -= knightEndGame[tableIndex];
     }
@@ -371,7 +371,7 @@ public class Evaluation {
                                                                    Square.bishopDirections);
 
       // position
-      final int tableIndex = nextToMove==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      final int tableIndex = opponent==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
       this.midGamePiecePosition -= bishopMidGame[tableIndex];
       this.endGamePiecePosition -= bishopEndGame[tableIndex];
     }
@@ -403,7 +403,7 @@ public class Evaluation {
                                                                  Square.rookDirections);
 
       // position
-      final int tableIndex = nextToMove==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      final int tableIndex = opponent==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
       this.midGamePiecePosition -= rookMidGame[tableIndex];
       this.endGamePiecePosition -= rookEndGame[tableIndex];
     }
@@ -435,7 +435,7 @@ public class Evaluation {
                                                                   Square.queenDirections);
 
       // position
-      final int tableIndex = nextToMove==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      final int tableIndex = opponent==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
       this.midGamePiecePosition -= queenMidGame[tableIndex];
       this.endGamePiecePosition -= queenEndGame[tableIndex];
     }
@@ -459,7 +459,7 @@ public class Evaluation {
       assert (position.getPiece(blackKingSquare.ordinal()).getColor().ordinal() == opponent);
 
       // position
-      final int tableIndex = nextToMove == WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      final int tableIndex = opponent == WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
       this.midGamePiecePosition -= kingMidGame[tableIndex];
       this.endGamePiecePosition -= kingEndGame[tableIndex];
     }
