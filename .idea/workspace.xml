@@ -42,7 +42,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/pom.xml">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2628">
+                <state relative-caret-position="896">
                   <caret line="183" selection-start-line="183" selection-end-line="183" />
                 </state>
               </provider>
@@ -69,20 +69,20 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="449">
-                  <caret line="774" column="21" lean-forward="true" selection-start-line="774" selection-start-column="21" selection-end-line="774" selection-end-column="21" />
+                <state relative-caret-position="188">
+                  <caret line="650" column="45" lean-forward="true" selection-start-line="649" selection-start-column="4" selection-end-line="650" selection-end-column="45" />
                   <folding>
                     <element signature="imports" expanded="true" />
-                    <element signature="e#35436#35437#0" expanded="true" />
-                    <element signature="e#35835#35836#0" expanded="true" />
-                    <element signature="e#35923#35924#0" expanded="true" />
-                    <element signature="e#39371#39372#0" expanded="true" />
-                    <element signature="e#39588#39589#0" expanded="true" />
-                    <element signature="e#39751#39752#0" expanded="true" />
-                    <element signature="e#39925#39926#0" expanded="true" />
-                    <element signature="e#40059#40060#0" expanded="true" />
-                    <element signature="e#40174#40175#0" expanded="true" />
-                    <element signature="e#40284#40285#0" expanded="true" />
+                    <element signature="e#34341#34342#0" expanded="true" />
+                    <element signature="e#34740#34741#0" expanded="true" />
+                    <element signature="e#34828#34829#0" expanded="true" />
+                    <element signature="e#38276#38277#0" expanded="true" />
+                    <element signature="e#38493#38494#0" expanded="true" />
+                    <element signature="e#38656#38657#0" expanded="true" />
+                    <element signature="e#38830#38831#0" expanded="true" />
+                    <element signature="e#38964#38965#0" expanded="true" />
+                    <element signature="e#39079#39080#0" expanded="true" />
+                    <element signature="e#39189#39190#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -125,7 +125,7 @@
         </leaf>
       </split-first>
       <split-second>
-        <splitter split-orientation="horizontal" split-proportion="0.493266">
+        <splitter split-orientation="horizontal" split-proportion="0.50617284">
           <split-first>
             <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
               <file pinned="false" current-in-tab="false">
@@ -137,11 +137,11 @@
                   </provider>
                 </entry>
               </file>
-              <file pinned="false" current-in-tab="false">
+              <file pinned="false" current-in-tab="true">
                 <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="1109">
-                      <caret line="285" selection-start-line="285" selection-end-line="285" />
+                    <state relative-caret-position="533">
+                      <caret line="436" column="17" selection-start-line="436" selection-start-column="17" selection-end-line="436" selection-end-column="17" />
                     </state>
                   </provider>
                 </entry>
@@ -155,10 +155,10 @@
                   </provider>
                 </entry>
               </file>
-              <file pinned="false" current-in-tab="true">
+              <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="-979">
+                    <state relative-caret-position="-871">
                       <caret line="168" column="18" selection-start-line="168" selection-start-column="18" selection-end-line="168" selection-end-column="18" />
                       <folding>
                         <element signature="imports" expanded="true" />
@@ -171,20 +171,20 @@
               <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="229">
-                      <caret line="933" column="36" lean-forward="true" selection-start-line="933" selection-start-column="36" selection-end-line="933" selection-end-column="36" />
+                    <state relative-caret-position="216">
+                      <caret line="928" column="31" selection-start-line="928" selection-start-column="31" selection-end-line="928" selection-end-column="31" />
                       <folding>
                         <element signature="imports" expanded="true" />
-                        <element signature="e#35436#35437#0" expanded="true" />
-                        <element signature="e#35835#35836#0" expanded="true" />
-                        <element signature="e#35923#35924#0" expanded="true" />
-                        <element signature="e#39371#39372#0" expanded="true" />
-                        <element signature="e#39588#39589#0" expanded="true" />
-                        <element signature="e#39751#39752#0" expanded="true" />
-                        <element signature="e#39925#39926#0" expanded="true" />
-                        <element signature="e#40059#40060#0" expanded="true" />
-                        <element signature="e#40174#40175#0" expanded="true" />
-                        <element signature="e#40284#40285#0" expanded="true" />
+                        <element signature="e#34341#34342#0" expanded="true" />
+                        <element signature="e#34740#34741#0" expanded="true" />
+                        <element signature="e#34828#34829#0" expanded="true" />
+                        <element signature="e#38276#38277#0" expanded="true" />
+                        <element signature="e#38493#38494#0" expanded="true" />
+                        <element signature="e#38656#38657#0" expanded="true" />
+                        <element signature="e#38830#38831#0" expanded="true" />
+                        <element signature="e#38964#38965#0" expanded="true" />
+                        <element signature="e#39079#39080#0" expanded="true" />
+                        <element signature="e#39189#39190#0" expanded="true" />
                       </folding>
                     </state>
                   </provider>
@@ -203,11 +203,11 @@
                   </provider>
                 </entry>
               </file>
-              <file pinned="false" current-in-tab="true">
+              <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/../cpw-engine/search.cpp">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="-1435">
-                      <caret line="458" column="25" selection-start-line="458" selection-start-column="13" selection-end-line="458" selection-end-column="25" />
+                    <state relative-caret-position="162">
+                      <caret line="546" column="5" selection-start-line="458" selection-start-column="13" selection-end-line="458" selection-end-column="25" />
                     </state>
                   </provider>
                 </entry>
@@ -228,11 +228,6 @@
                       <caret line="17" selection-start-line="17" selection-end-line="17" />
                     </state>
                   </provider>
-                </entry>
-              </file>
-              <file pinned="false" current-in-tab="false">
-                <entry file="file://$PROJECT_DIR$/../cpw-engine/board0x88.cpp">
-                  <provider selected="true" editor-type-id="text-editor" />
                 </entry>
               </file>
               <file pinned="false" current-in-tab="false">
@@ -329,6 +324,29 @@
                       <caret line="1" selection-start-line="1" selection-end-line="1" />
                     </state>
                   </provider>
+                </entry>
+              </file>
+              <file pinned="false" current-in-tab="true">
+                <entry file="file://$PROJECT_DIR$/../Stockfish/src/search.cpp">
+                  <provider selected="true" editor-type-id="text-editor">
+                    <state relative-caret-position="-5436">
+                      <caret line="328" column="22" lean-forward="true" selection-start-line="328" selection-start-column="22" selection-end-line="328" selection-end-column="22" />
+                    </state>
+                  </provider>
+                </entry>
+              </file>
+              <file pinned="false" current-in-tab="false">
+                <entry file="file://$PROJECT_DIR$/../Stockfish/src/evaluate.cpp">
+                  <provider selected="true" editor-type-id="text-editor">
+                    <state relative-caret-position="324">
+                      <caret line="18" column="2" selection-start-line="18" selection-start-column="2" selection-end-line="18" selection-end-column="2" />
+                    </state>
+                  </provider>
+                </entry>
+              </file>
+              <file pinned="false" current-in-tab="false">
+                <entry file="file://$PROJECT_DIR$/../Stockfish/src/tt.cpp">
+                  <provider selected="true" editor-type-id="text-editor" />
                 </entry>
               </file>
             </leaf>
@@ -452,9 +470,9 @@
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/EvaluationConfig.java" />
         <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.txt" />
+        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestMoveGenerator.java" />
         <option value="$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java" />
         <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java" />
-        <option value="$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestMoveGenerator.java" />
       </list>
     </option>
   </component>
@@ -684,7 +702,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1544478613439" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1544482867118" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="TEXT&#10;JAVA" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
@@ -753,7 +771,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.ALL Tests">
+  <component name="RunManager" selected="JUnit.TestSearch.sizeOfSearchTreeTest">
     <configuration default="true" type="Application" factoryName="Application">
       <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
@@ -1034,9 +1052,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.TestSearch.sizeOfSearchTreeTest" />
         <item itemvalue="JUnit.TestSearch.testExtMateSearch" />
         <item itemvalue="JUnit.TestSearch.testMateSearch" />
-        <item itemvalue="JUnit.TestSearch.sizeOfSearchTreeTest" />
         <item itemvalue="JUnit.TestSearch.perftTest" />
         <item itemvalue="JUnit.TestSearch.testInfiniteSearch" />
       </list>
@@ -1056,18 +1074,6 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="TestSearch_testMateSearch - 2018.12.10 at 18h 49m 32s.xml">
-      <configuration name="TestSearch.testMateSearch" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestSearch_testExtMateSearch - 2018.12.10 at 18h 57m 09s.xml">
-      <configuration name="TestSearch.testExtMateSearch" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestSearch_testExtMateSearch - 2018.12.10 at 19h 05m 06s.xml">
-      <configuration name="TestSearch.testExtMateSearch" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestSearch_testExtMateSearch - 2018.12.10 at 19h 13m 19s.xml">
-      <configuration name="TestSearch.testExtMateSearch" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="TestSearch_testExtMateSearch - 2018.12.10 at 22h 44m 45s.xml">
       <configuration name="TestSearch.testExtMateSearch" configurationId="JUnit" />
     </history-entry>
@@ -1086,6 +1092,18 @@
     <history-entry file="ALL_Tests - 2018.12.10 at 22h 53m 25s.xml">
       <configuration name="ALL Tests" configurationId="JUnit" />
     </history-entry>
+    <history-entry file="ALL_Tests - 2018.12.10 at 23h 03m 01s.xml">
+      <configuration name="ALL Tests" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestSearch - 2018.12.10 at 23h 04m 11s.xml">
+      <configuration name="TestSearch" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestSearch - 2018.12.10 at 23h 53m 44s.xml">
+      <configuration name="TestSearch" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestSearch_sizeOfSearchTreeTest - 2018.12.10 at 23h 58m 30s.xml">
+      <configuration name="TestSearch.sizeOfSearchTreeTest" configurationId="JUnit" />
+    </history-entry>
   </component>
   <component name="TodoView" selected-index="1">
     <todo-panel id="selected-file">
@@ -1100,18 +1118,18 @@
     <frame x="-8" y="-8" width="3018" height="1231" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.48356807" visible="true" weight="0.084573746" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4834254" visible="true" weight="0.084573746" />
       <window_info id="Designer" order="1" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="UI Designer" order="4" />
       <window_info id="Learn" order="5" show_stripe_button="false" weight="0.32949153" />
-      <window_info x="168" y="57" width="304" height="1067" id="Structure" order="6" sideWeight="0.5164319" side_tool="true" visible="true" weight="0.084573746" />
+      <window_info x="168" y="57" width="304" height="1067" id="Structure" order="6" sideWeight="0.51657456" side_tool="true" visible="true" weight="0.084573746" />
       <window_info id="Favorites" order="7" sideWeight="0.43962264" weight="0.14711864" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3258427" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49960783" weight="0.3233645" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49941972" visible="true" weight="0.40280375" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49960783" visible="true" weight="0.3233645" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49941972" weight="0.40280375" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3298872" />
@@ -1317,8 +1335,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/TTHashTable.java" />
-    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluationCache.java" />
     <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestPERFT.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="533">
@@ -1465,13 +1481,6 @@
     <entry file="file://$PROJECT_DIR$/../cpw-engine/0x88_math.h">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/../Stockfish/src/search.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="218">
-          <caret line="762" column="43" lean-forward="true" selection-start-line="762" selection-start-column="43" selection-end-line="762" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Omega/OmegaEngine.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="523">
@@ -1556,13 +1565,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="468">
           <caret line="26" column="32" selection-start-line="26" selection-start-column="11" selection-end-line="26" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2628">
-          <caret line="183" selection-start-line="183" selection-end-line="183" />
         </state>
       </provider>
     </entry>
@@ -1710,15 +1712,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../cpw-engine/search.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1435">
-          <caret line="458" column="25" selection-start-line="458" selection-start-column="13" selection-end-line="458" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1109">
-          <caret line="285" selection-start-line="285" selection-end-line="285" />
+        <state relative-caret-position="162">
+          <caret line="546" column="5" selection-start-line="458" selection-start-column="13" selection-end-line="458" selection-end-column="25" />
         </state>
       </provider>
     </entry>
@@ -1731,7 +1726,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestEvaluation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-979">
+        <state relative-caret-position="-871">
           <caret line="168" column="18" selection-start-line="168" selection-start-column="18" selection-end-line="168" selection-end-column="18" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -1740,23 +1735,54 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../Stockfish/src/evaluate.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="324">
+          <caret line="18" column="2" selection-start-line="18" selection-start-column="2" selection-end-line="18" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../Stockfish/src/tt.cpp">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../Stockfish/src/search.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-5436">
+          <caret line="328" column="22" lean-forward="true" selection-start-line="328" selection-start-column="22" selection-end-line="328" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="896">
+          <caret line="183" selection-start-line="183" selection-end-line="183" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/fko/javaUCIEngineFramework/Franky/Search.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="449">
-          <caret line="774" column="21" lean-forward="true" selection-start-line="774" selection-start-column="21" selection-end-line="774" selection-end-column="21" />
+        <state relative-caret-position="216">
+          <caret line="928" column="31" selection-start-line="928" selection-start-column="31" selection-end-line="928" selection-end-column="31" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#35436#35437#0" expanded="true" />
-            <element signature="e#35835#35836#0" expanded="true" />
-            <element signature="e#35923#35924#0" expanded="true" />
-            <element signature="e#39371#39372#0" expanded="true" />
-            <element signature="e#39588#39589#0" expanded="true" />
-            <element signature="e#39751#39752#0" expanded="true" />
-            <element signature="e#39925#39926#0" expanded="true" />
-            <element signature="e#40059#40060#0" expanded="true" />
-            <element signature="e#40174#40175#0" expanded="true" />
-            <element signature="e#40284#40285#0" expanded="true" />
+            <element signature="e#34341#34342#0" expanded="true" />
+            <element signature="e#34740#34741#0" expanded="true" />
+            <element signature="e#34828#34829#0" expanded="true" />
+            <element signature="e#38276#38277#0" expanded="true" />
+            <element signature="e#38493#38494#0" expanded="true" />
+            <element signature="e#38656#38657#0" expanded="true" />
+            <element signature="e#38830#38831#0" expanded="true" />
+            <element signature="e#38964#38965#0" expanded="true" />
+            <element signature="e#39079#39080#0" expanded="true" />
+            <element signature="e#39189#39190#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/fko/javaUCIEngineFramework/Franky/TestSearch.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="533">
+          <caret line="436" column="17" selection-start-line="436" selection-start-column="17" selection-end-line="436" selection-end-column="17" />
         </state>
       </provider>
     </entry>

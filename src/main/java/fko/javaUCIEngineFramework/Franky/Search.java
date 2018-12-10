@@ -32,6 +32,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 
@@ -549,6 +550,11 @@ public class Search implements Runnable {
   private int negamax(Position position, int depthLeft, int ply, int alpha, int beta,
                       boolean pvSearch, final boolean doNullMove) {
 
+    // on leaf node call quiescence
+    if (depthLeft < 1) {
+      return quiescence(position, ply, alpha, beta);
+    }
+
     // ###############################################
     // ## BEGIN Mate Distance Pruning
     // ## Did we already find a shorter mate then ignore this one
@@ -562,11 +568,6 @@ public class Search implements Runnable {
     }
     // ## ENDOF Mate Distance Pruning
     // ###############################################
-
-    // on leaf node call quiescence
-    if (depthLeft < 1) {
-      return quiescence(position, ply, alpha, beta);
-    }
 
     // nodes counter
     if (searchMode.getNodes() > 0 && searchCounter.nodesVisited >= searchMode.getNodes()) {
@@ -593,22 +594,9 @@ public class Search implements Runnable {
 
     // ###############################################
     // TT Lookup
-    // TODO: MATE value need correction
-    final TT_Entry ttEntry = probeTT(position);
-    if (ttEntry != null) { // possible TT Hit
-      if (ttEntry.depth >= depthLeft) { // only if tt depth was equal or deeper
-        if (ttEntry.type == TT_EntryType.EXACT) {
-          return ttEntry.value;
-        } else if (ttEntry.type == TT_EntryType.ALPHA) {
-          if (ttEntry.value <= alpha) {
-            return alpha; // TODO CORRECT?
-          }
-        } else if (ttEntry.type == TT_EntryType.BETA) {
-          if (ttEntry.value >= beta) {
-            return beta; // TODO CORRECT?
-          }
-        }
-      }
+    int ttValue = probeTT(position, depthLeft, alpha, beta);
+    if (ttValue != Evaluation.NOVALUE) {
+      return ttValue;
     }
     // End TT Lookup
     // ###############################################
@@ -786,18 +774,18 @@ public class Search implements Runnable {
 
   private int quiescence(Position position, int ply, int alpha, int beta) {
 
-    //    // ###############################################
-    //    // ## BEGIN Mate Distance Pruning
-    //    // ## Did we already find a shorter mate then ignore this one
-    //    if (config.USE_MATE_DISTANCE_PRUNING && !isPerftSearch()) {
-    //      alpha = Math.max(-Evaluation.CHECKMATE + ply, alpha);
-    //      beta = Math.min(Evaluation.CHECKMATE - ply, beta);
-    //      if (alpha >= beta) {
-    //        return alpha;
-    //      }
-    //    }
-    //    // ## ENDOF Mate Distance Pruning
-    //    // ###############################################
+    // ###############################################
+    // ## BEGIN Mate Distance Pruning
+    // ## Did we already find a shorter mate then ignore this one
+    if (config.USE_MATE_DISTANCE_PRUNING && !isPerftSearch()) {
+      alpha = Math.max(-Evaluation.CHECKMATE + ply, alpha);
+      beta = Math.min(Evaluation.CHECKMATE - ply, beta);
+      if (alpha >= beta) {
+        return alpha;
+      }
+    }
+    // ## ENDOF Mate Distance Pruning
+    // ###############################################
 
     // nodes counter
     if (searchMode.getNodes() > 0 && searchCounter.nodesVisited >= searchMode.getNodes()) {
@@ -819,44 +807,32 @@ public class Search implements Runnable {
       }
     }
 
-    //    // ###############################################
-    //    // TT Lookup
-    //    // TODO: MATE value need correction
-    //    final TT_Entry ttEntry = probeTT(position);
-    //    if (ttEntry != null) { // possible TT Hit
-    //      if (ttEntry.type == TT_EntryType.EXACT) {
-    //        return ttEntry.value;
-    //      } else if (ttEntry.type == TT_EntryType.ALPHA) {
-    //        if (ttEntry.value <= alpha) {
-    //          return alpha; // TODO CORRECT?
-    //        }
-    //      } else if (ttEntry.type == TT_EntryType.BETA) {
-    //        if (ttEntry.value >= beta) {
-    //          return beta; // TODO CORRECT?
-    //        }
-    //      }
-    //    }
-    //    // End TT Lookup
-    //    // ###############################################
-
-    // prepare hash type
-    //    TT_EntryType ttType = null;
+    // ###############################################
+    // TT Lookup
+    int ttValue = probeTT(position, 0, alpha, beta);
+    if (ttValue != Evaluation.NOVALUE) {
+      return ttValue;
+    }
+    // End TT Lookup
+    // ###############################################
 
     // evaluate the position and use it a standing pat (lower bound)
     int value = evaluate(position);
 
     if (isPerftSearch() || !config.USE_QUIESCENCE) {
-      //      storeTT(position, 0, TT_EntryType.EXACT, value);
+      storeTT(position, 0, TT_EntryType.EXACT, value);
       return value;
     }
 
+    // Prepare hash type
+    TT_EntryType ttType = TT_EntryType.ALPHA;
+
     // Standing Pat
     if (value >= beta) {
-      //      storeTT(position, 0, TT_EntryType.BETA, beta);
+      storeTT(position, 0, TT_EntryType.BETA, beta);
       return beta;
     }
     if (value > alpha) {
-      //      ttType = TT_EntryType.EXACT;
       alpha = value;
     }
 
@@ -916,13 +892,12 @@ public class Search implements Runnable {
         // PRUNING START
         if (value > alpha) {
           if (value >= beta) {
-            //            storeTT(position, 0, TT_EntryType.BETA, beta);
+            storeTT(position, 0, TT_EntryType.BETA, beta);
             searchCounter.prunings++;
             return beta;
           }
           MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
           alpha = value;
-          //          ttType = TT_EntryType.EXACT;
         }
         // PRUNING END
 
@@ -942,16 +917,16 @@ public class Search implements Runnable {
       if (position.hasCheck()) {
         // We have a check mate. Return a -CHECKMATE.
         value = -Evaluation.CHECKMATE + ply;
-        //        storeTT(position, 0, TT_EntryType.EXACT, value);
+        storeTT(position, 0, TT_EntryType.EXACT, value);
         return value;
       } else {
         // We have a stale mate. Return the draw value.
-        //        storeTT(position, 0, TT_EntryType.EXACT, Evaluation.DRAW);
+        storeTT(position, 0, TT_EntryType.EXACT, Evaluation.DRAW);
         return Evaluation.DRAW;
       }
     }
 
-    //    storeTT(position, 0, ttType, alpha);
+    storeTT(position, 0, ttType, alpha);
     return alpha;
   }
 
@@ -979,22 +954,6 @@ public class Search implements Runnable {
       return 1;
     }
 
-    // ###############################################
-    // TT Lookup
-    if (config.USE_TRANSPOSITION_TABLE && !isPerftSearch()) {
-      final TT_Entry ttEntry = transpositionTable.get(position);
-      if (ttEntry != null) { // possible TT Hit
-        if (ttEntry.type == TT_EntryType.EXACT) {
-          searchCounter.nodeCache_Hits++;
-          return ttEntry.value;
-        }
-      } else {
-        searchCounter.nodeCache_Misses++;
-      }
-    }
-    // End TT Lookup
-    // ###############################################
-
     // call the evaluation
     // count all leaf nodes evaluated
     final int value = evaluator.evaluate(position);
@@ -1011,17 +970,36 @@ public class Search implements Runnable {
                                                                  .ordinal()]);
   }
 
-  private TT_Entry probeTT(final Position position) {
-    TT_Entry ttEntry = null;
+  private int probeTT(final Position position, int depthLeft, int alpha, int beta) {
+    TT_Entry ttEntry;
+
+    // TODO: MATE value need correction
+
     if (config.USE_TRANSPOSITION_TABLE && !isPerftSearch()) {
       ttEntry = transpositionTable.get(position);
-      if (ttEntry == null) {
-        searchCounter.nodeCache_Misses++;
-        return null;
+
+      if (ttEntry != null) {
+        // hit
+        searchCounter.nodeCache_Hits++;
+        if (ttEntry.depth >= depthLeft) { // only if tt depth was equal or deeper
+
+          if (ttEntry.type == TT_EntryType.EXACT) {
+            return ttEntry.value;
+          } else if (ttEntry.type == TT_EntryType.ALPHA) {
+            if (ttEntry.value <= alpha) {
+              return alpha; // TODO CORRECT?
+            }
+          } else if (ttEntry.type == TT_EntryType.BETA) {
+            if (ttEntry.value >= beta) {
+              return beta; // TODO CORRECT?
+            }
+          }
+        }
       }
-      searchCounter.nodeCache_Hits++;
+      // miss
+      searchCounter.nodeCache_Misses++;
     }
-    return ttEntry;
+    return Evaluation.NOVALUE;
   }
 
   private void storeTT(final Position position, final int depthLeft, final TT_EntryType ttType,
