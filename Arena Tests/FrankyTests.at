@@ -3,7 +3,7 @@ TournamentName=Franky Test
 Type=0
 CurrSwissRound=0
 Rounds=10
-CurrentPair=1
+CurrentPair=7
 CurrentRound=1
 Level=5 -1\5/-1#5@-1|5
 [Options]
@@ -65,11 +65,17 @@ Website=
 E-Mail=
 ArenaVersion=Arena 3.5.1
 LastGameDate=2018.12.11
-LastGameTime=19:15:18
+LastGameTime=19:47:50
 FirstGameDate=2018.12.11
 FirstGameTime=19:11:05
 [PairingResults]
 Franky_v0.2 ------ Ruffian 1.0.5=0
+Franky-0.3 ------ Spike 1.4=0
+AnMon 5.75 ------ Spike 1.4=0
+Franky-0.3 ------ Franky_v0.2=1
+Franky-0.3 ------ Ruffian 1.0.5=0
+AnMon 5.75 ------ Franky_v0.2=1
+Franky_v0.2 ------ Spike 1.4=0
 [Participants]
 Engine1=Franky_v0.2
 Engine2=Franky-0.3
