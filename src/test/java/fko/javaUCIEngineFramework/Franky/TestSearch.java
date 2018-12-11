@@ -269,36 +269,15 @@ public class TestSearch {
     SearchMode searchMode;
 
     // mate in 4 (7 plys)
-    fen = "r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - - 0 1";
-    position = new Position(fen);
-
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
-
-    search.startSearch(position, searchMode);
-
-    // test search
-    waitWhileSearching();
-
-    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
-    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
-    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    assertEquals(Evaluation.CHECKMATE - 7, search.getLastSearchResult().resultValue);
-
-      // FIXME: This mate search seems to be wrong - Fritz says 8 (15ply) this says 12
-      // search.config.USE_QUIESCENCE = true;
-      // search.config.USE_MATE_DISTANCE_PRUNING = true;
-      // search.config.USE_TRANSPOSITION_TABLE = false;
-
-//    //mate in 8 (15 plys)
-//    fen = "8/7K/8/8/8/8/R7/7k w - - 0 1";
+//    fen = "r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - - 0 1";
 //    position = new Position(fen);
-//    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, false, false);
+//    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
 //    search.startSearch(position, searchMode);
 //    waitWhileSearching();
 //    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
 //    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
 //    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-//    assertEquals(Evaluation.CHECKMATE - 12, search.getLastSearchResult().resultValue);
+//    assertEquals(Evaluation.CHECKMATE - 7, search.getLastSearchResult().resultValue);
 
   }
 
@@ -474,6 +453,7 @@ public class TestSearch {
     search.config.USE_MINOR_PROMOTION_PRUNING = false;
     search.config.USE_QUIESCENCE = false;
     search.config.USE_NULL_MOVE_PRUNING = false;
+    search.config.USE_PVS_MOVE_ORDERING = false;
 
     meassureTreeSize(position, searchMode, values, "REFERENCE", true);
 
@@ -501,13 +481,23 @@ public class TestSearch {
     search.config.USE_TRANSPOSITION_TABLE = true;
     meassureTreeSize(position, searchMode, values, "TT", true);
 
-    search.config.USE_TRANSPOSITION_TABLE = false;
-    search.config.USE_QUIESCENCE = true;
-    meassureTreeSize(position, searchMode, values, "QS-TT", true);
+    search.config.USE_PVS_MOVE_ORDERING = true;
+    meassureTreeSize(position, searchMode, values, "PVS_ORDER", true);
+
+//    search.config.USE_TRANSPOSITION_TABLE = false;
+//    search.config.USE_QUIESCENCE = true;
+//    meassureTreeSize(position, searchMode, values, "QS-TT", true);
 
     search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_QUIESCENCE = true;
-    meassureTreeSize(position, searchMode, values, "QS+TT", true);
+    search.config.USE_PVS_MOVE_ORDERING = false;
+    meassureTreeSize(position, searchMode, values, "QS-PVSO", true);
+
+    search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_QUIESCENCE = true;
+    search.config.USE_PVS_MOVE_ORDERING = true;
+    meassureTreeSize(position, searchMode, values, "QS+PVSO", true);
+
 
     // REPEAT
     meassureTreeSize(position, searchMode, values, "REPEAT+TT", false);

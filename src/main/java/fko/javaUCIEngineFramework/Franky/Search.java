@@ -245,7 +245,7 @@ public class Search implements Runnable {
       LOG.info("****** INFINITE SEARCH *******");
     }
     if (searchMode.getMate() > 0) {
-      LOG.info("****** MATE SEARCH *******");
+      LOG.info("****** MATE SEARCH (" + searchMode.getMaxDepth() + ") *******");
     }
 
     // reset lastSearchResult
@@ -292,7 +292,14 @@ public class Search implements Runnable {
 
     // no legal root moves - game already ended!
     if (legalMoves.size() == 0) {
-      return new SearchResult();
+      final SearchResult searchResult = new SearchResult();
+      searchResult.bestMove = Move.NOMOVE;
+      if (position.hasCheck()) {
+        searchResult.resultValue = Evaluation.CHECKMATE;
+      } else {
+        searchResult.resultValue = Evaluation.DRAW;
+      }
+      return searchResult;
     }
 
     // prepare principal variation lists
@@ -383,8 +390,8 @@ public class Search implements Runnable {
 
     // retrieved ponder move from pv
     int p_move;
-    if (principalVariation[0].size() > 1 && (p_move = principalVariation[0].get(1)) !=
-                                            Move.NOMOVE) {
+    if (principalVariation[0].size() > 1
+        && (p_move = principalVariation[0].get(1)) != Move.NOMOVE) {
       searchResult.ponderMove = p_move;
     } else {
       searchResult.ponderMove = Move.NOMOVE;
@@ -531,7 +538,7 @@ public class Search implements Runnable {
       rootMoves.sort();
       // push PV move to head of list
       if (principalVariation[0].size() != 0) {
-        rootMoves.pushToHead(principalVariation[0].get(0));
+        rootMoves.pushToHead(principalVariation[0].getFirst());
       }
     }
   }
@@ -631,9 +638,6 @@ public class Search implements Runnable {
     // NULL MOVE PRUNING
     // ###############################################
 
-    // clear principal Variation for this depth
-    principalVariation[ply].clear();
-
     // needed to remember if we even had a legal move
     boolean hadLegaMove = false;
 
@@ -641,7 +645,19 @@ public class Search implements Runnable {
     MoveList moves = moveGenerators[ply].getPseudoLegalMoves(position);
     searchCounter.movesGenerated++;
 
-    // TODO: Move list sorting needed????
+    if (config.USE_PVS_MOVE_ORDERING) {
+      // TODO: Move list sorting needed????
+      // TODO: use best move from last iteration as the first search move
+      if (principalVariation[ply].size() > 0) {
+//        System.out.println("Before:  "+moves);
+//        System.out.println("PV move: "+principalVariation[ply].get(0));
+        moves.pushToHead(principalVariation[ply].getFirst());
+//        System.out.println("After:   " + moves);
+      }
+    }
+
+    // clear principal Variation for this depth
+    principalVariation[ply].clear();
 
     // Initialize best values
     int pvValue = Evaluation.NOVALUE;
@@ -793,11 +809,6 @@ public class Search implements Runnable {
     }
     searchCounter.nodesVisited++;
 
-    // in quiescence search we count extra depth here
-    if (searchCounter.currentExtraSearchDepth < ply) {
-      searchCounter.currentExtraSearchDepth = ply;
-    }
-
     // check draw through 50-moves-rule, 3-fold-repetition, insufficient material
     if (!isPerftSearch()) {
       if (position.check50Moves() || position.check3Repetitions() ||
@@ -835,82 +846,101 @@ public class Search implements Runnable {
       alpha = value;
     }
 
-    // do we even have legal moves?
-    if (moveGenerators[ply].hasLegalMove(position)) {
+    // needed to remember if we even had a legal move
+    boolean hadLegaMove = false;
 
-      // clear principal Variation for this depth
-      principalVariation[ply].clear();
 
-      // ##############################################################
-      // START QUIESCENCE
+    // ##############################################################
+    // START QUIESCENCE
 
-      // TODO QUIESCENCE
-      // TODO Check that there is no endless qsearch due to
-      // TODO endless captures or checks
+    // TODO QUIESCENCE
+    // TODO Check that there is no endless qsearch due to
+    // TODO endless captures or checks
 
-      // Generate all PseudoLegalMoves for QSearch
-      // Usually only capture moves and check evasions
-      // will be determined in move generator
-      MoveList moves = moveGenerators[ply].getPseudoLegalQSearchMoves(position);
-      searchCounter.movesGenerated++;
+    // Generate all PseudoLegalMoves for QSearch
+    // Usually only capture moves and check evasions
+    // will be determined in move generator
+    MoveList moves = moveGenerators[ply].getPseudoLegalQSearchMoves(position);
+    searchCounter.movesGenerated++;
 
+    if (config.USE_PVS_MOVE_ORDERING) {
       // TODO: Move list sorting needed????
+      // TODO: use best move from last iteration as the first search move
+      if (principalVariation[ply].size() > 0) {
+        //        System.out.println("Before:  "+moves);
+        //        System.out.println("PV move: "+principalVariation[ply].get(0));
+        moves.pushToHead(principalVariation[ply].getFirst());
+        //        System.out.println("After:   " + moves);
+      }
+    }
 
-      // moves to search recursively
-      for (int i = 0; i < moves.size(); i++) {
-        int move = moves.get(i);
+    // clear principal Variation for this depth
+    principalVariation[ply].clear();
 
-        // TODO: Delta Cutoff
-        //  https://www.chessprogramming.org/Delta_Pruning
+    // moves to search recursively
+    for (int i = 0; i < moves.size(); i++) {
+      int move = moves.get(i);
 
-        // TODO: Bad Capture or SEE
+      // TODO: Delta Cutoff
+      //  https://www.chessprogramming.org/Delta_Pruning
 
-        position.makeMove(move);
+      // TODO: Bad Capture or SEE
 
-        // Skip illegal moves
-        if (wasIllegalMove(position)) {
-          position.undoMove();
-          continue;
-        }
+      position.makeMove(move);
 
-        // count as non quiet board
-        searchCounter.positionsNonQuiet++;
-
-        // needed to remember if we even had a legal move
-        currentVariation.add(move);
-
-        // update UCI
-        sendUCIUpdate(position);
-
-        // go one ply deeper into the search tree
-        value = -quiescence(position, ply + 1, -beta, -alpha);
-
-        currentVariation.removeLast();
+      // Skip illegal moves
+      if (wasIllegalMove(position)) {
         position.undoMove();
+        continue;
+      }
 
-        // PRUNING START
-        if (value > alpha) {
-          if (value >= beta) {
-            storeTT(position, 0, TT_EntryType.BETA, beta);
-            searchCounter.prunings++;
-            return beta;
-          }
-          MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
-          alpha = value;
+      // needed to remember if we even had a legal move
+      hadLegaMove = true;
+
+      // in quiescence search we count extra depth here after we made a move
+      if (searchCounter.currentExtraSearchDepth < ply) {
+        searchCounter.currentExtraSearchDepth = ply;
+      }
+
+      // count as non quiet board
+      searchCounter.positionsNonQuiet++;
+
+      // needed to remember if we even had a legal move
+      currentVariation.add(move);
+
+      // update UCI
+      sendUCIUpdate(position);
+
+      // go one ply deeper into the search tree
+      value = -quiescence(position, ply + 1, -beta, -alpha);
+
+      currentVariation.removeLast();
+      position.undoMove();
+
+      // PRUNING START
+      if (value > alpha) {
+        if (value >= beta) {
+          storeTT(position, 0, TT_EntryType.BETA, beta);
+          searchCounter.prunings++;
+          return beta;
         }
-        // PRUNING END
+        MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
+        alpha = value;
+      }
+      // PRUNING END
 
-        // check if we need to stop search - could be external or time.
-        // we should have any best move here
-        if (stopSearch || hardTimeLimitReached()) {
-          break;
-        }
-      } // iteration over all qmoves
-      // END QUIESCENCE
-      // ##############################################################
+      // check if we need to stop search - could be external or time.
+      // we should have any best move here
+      if (stopSearch || hardTimeLimitReached()) {
+        break;
+      }
+    } // iteration over all qmoves
+    // END QUIESCENCE
+    // ##############################################################
 
-    } // no moves - mate position?
-    else {
+
+    // if we did not have a legal move then we have a mate
+    if (!hadLegaMove && !stopSearch) {
       // as we will not enter evaluation we count it here
       searchCounter.leafPositionsEvaluated++;
       if (position.hasCheck()) {

@@ -1,11 +1,11 @@
-   Engine        Score     Sp    Ru    Fr    An    Fr    S-B
-1: Spike 1.4     3,0/3  ·····       1-0-0 1-0-0 1-0-0    2,00
-2: Ruffian 1.0.5 2,0/2        ····· 1-0-0       1-0-0    1,00
-3: Franky-0.3    1,0/3  0-1-0 0-1-0 ·····       1-0-0    0,00
-3: AnMon 5.75    1,0/2  0-1-0             ····· 1-0-0    0,00
-5: Franky_v0.2   0,0/4  0-1-0 0-1-0 0-1-0 0-1-0 ·····    0,00
+   Engine        Score     Sp    Ru    An    Fr    Fr    S-B
+1: Spike 1.4     11,0/11 ····· 2-0-0 3-0-0 3-0-0 3-0-0   45,00
+2: Ruffian 1.0.5 9,0/11  0-2-0 ····· 3-0-0 3-0-0 3-0-0   27,00
+3: AnMon 5.75    6,0/12  0-3-0 0-3-0 ····· 3-0-0 3-0-0    9,00
+4: Franky-0.3    3,0/12  0-3-0 0-3-0 0-3-0 ····· 3-0-0    0,00
+5: Franky_v0.2   0,0/12  0-3-0 0-3-0 0-3-0 0-3-0 ·····    0,00
 
-7 of 100 games played
+29 of 100 games played
 Name of the tournament: Franky Test
 Site/ Country: RIPLEY, Germany
 Level: Tournament Game in 5 Minutes

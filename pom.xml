@@ -43,6 +43,7 @@
             <artifactId>jol-core</artifactId>
             <version>RELEASE</version>
         </dependency>
+
     </dependencies>
 
     <profiles>
