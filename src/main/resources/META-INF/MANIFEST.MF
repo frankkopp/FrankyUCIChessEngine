@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Main-Class: fko.javaUCIEngineFramework.UCIEngine
+Main-Class: fko.javaUCIEngineFramework.Franky.FrankyEngine
 
 

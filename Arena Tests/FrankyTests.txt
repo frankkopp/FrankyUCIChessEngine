@@ -1,0 +1,16 @@
+   Engine        Score     Sp    Ru    An    Fr    Fr    S-B
+1: Spike 1.4     11,0/11 ····· 2-0-0 3-0-0 3-0-0 3-0-0   45,00
+2: Ruffian 1.0.5 9,0/11  0-2-0 ····· 3-0-0 3-0-0 3-0-0   27,00
+3: AnMon 5.75    6,0/12  0-3-0 0-3-0 ····· 3-0-0 3-0-0    9,00
+4: Franky-0.3    3,0/12  0-3-0 0-3-0 0-3-0 ····· 3-0-0    0,00
+5: Franky_v0.2   0,0/12  0-3-0 0-3-0 0-3-0 0-3-0 ·····    0,00
+
+29 of 100 games played
+Name of the tournament: Franky Test
+Site/ Country: RIPLEY, Germany
+Level: Tournament Game in 5 Minutes
+Hardware: Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz with 31,9 GB Memory
+Operating system: Windows 10 Home Home Edition (Build 9200) 64 bit
+PGN-File: C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\Arena Tests\FrankyTests.pgn
+Website: 
+E-Mail Address: 

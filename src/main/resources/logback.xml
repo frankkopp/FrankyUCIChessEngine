@@ -26,33 +26,50 @@
   -->
 
 <configuration>
-    <!-- debug="true" scan="true" -->
+    <!-- debugOption="true" scan="true" -->
     <contextName>JavaUCIEngineFramework</contextName>
 
-    <!-- Send debug messages to System.out -->
+    <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
+
+    <!-- Send debugOption messages to System.out -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%-20.-20thread] %-5.5level %-15.15logger{0} > %msg%n</pattern>
         </encoder>
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>log/JavaUCIEngineFramework.log</file>
+        <file>log/app.log</file>
         <append>true</append>
-        <!-- set immediateFlush to false for much higher logging throughput -->
         <immediateFlush>true</immediateFlush>
-        <!-- encoders are assigned the type
-             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
         <encoder>
-            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%-20.-20thread] %-5.5level %-15.15logger{0} > %msg%n</pattern>
         </encoder>
     </appender>
 
+    <appender name="COMLOG" class="ch.qos.logback.core.FileAppender">
+        <file>log/com.log</file>
+        <append>true</append>
+        <immediateFlush>true</immediateFlush>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %msg%n</pattern>
+        </encoder>
+    </appender>
 
-    <logger name="fko.javaUCIEngineFramework" level="DEBUG" additivity="true"></logger>
-
-    <!-- By default, the level of the root level is set to DEBUG -->
-    <root level="DEBUG"><appender-ref ref="FILE"/></root>
-    <root level="DEBUG"><appender-ref ref="STDOUT"/></root>
+    <logger name="ComLog" level="DEBUG" additivity="true">
+        <appender-ref ref="COMLOG"/>
+    </logger>
+    <logger name="fko.javaUCIEngineFramework" level="DEBUG" additivity="true">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="fko.javaUCIEngineFramework.UCI" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="fko.javaUCIEngineFramework.Franky" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
 
 </configuration>
