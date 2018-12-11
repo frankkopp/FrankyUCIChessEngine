@@ -231,6 +231,7 @@ public class TestMoveGenerator {
    * Tests the timing
    */
   @Test
+  @Disabled
   public void testTiming() {
 
     int ITERATIONS = 0;

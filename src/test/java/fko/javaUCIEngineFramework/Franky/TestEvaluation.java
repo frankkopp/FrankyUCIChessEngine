@@ -160,13 +160,13 @@ public class TestEvaluation {
     position = new Position("4k3/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1");
     evaluation.setPosition(position);
     evaluation.evaluate();
-    assertEquals(70,evaluation.position());
+    assertEquals(-35,evaluation.position());
 
-    // All Black pieces no Black pieces but King
+    // All Black pieces no White pieces but King
     position = new Position("rnbqkbnr/pppppppp/8/8/8/8/8/4K3 w kq - 0 1");
     evaluation.setPosition(position);
     evaluation.evaluate();
-    assertEquals(-70,evaluation.position());
+    assertEquals(35,evaluation.position());
 
   }
 
@@ -194,17 +194,17 @@ public class TestEvaluation {
   public final void testCheckPosition() {
     // no in check
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
-    assertEquals(104, evaluation.evaluate(position));
+    assertEquals(134, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
 
     // white gives check to black
     position = new Position("r2R3k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2K5 b - - 0 1");
-    assertEquals(-146, evaluation.evaluate(position));
+    assertEquals(-181, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
 
     // black gives check to white
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1p1qPN2/6P1/1PPK4/3R4 w - - 0 2");
-    assertEquals(66, evaluation.evaluate(position));
+    assertEquals(126, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
   }
 

@@ -195,10 +195,9 @@ public class TestSearch {
     Position position;
     SearchMode searchMode;
 
-    search.config.USE_ASPIRATION_WINDOW = true;
-    search.config.USE_QUIESCENCE = true;
-    search.config.USE_MATE_DISTANCE_PRUNING = true;
-    search.config.USE_TRANSPOSITION_TABLE = true;
+//    search.config.USE_QUIESCENCE = true;
+//    search.config.USE_MATE_DISTANCE_PRUNING = true;
+//    search.config.USE_TRANSPOSITION_TABLE = true;
 
     // mate in 2 (3 plys)
     fen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1"; // Position
@@ -222,34 +221,6 @@ public class TestSearch {
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
     assertEquals(Evaluation.CHECKMATE - 5, search.getLastSearchResult().resultValue);
-
-
-    // mate in 4 (7 plys)
-    fen = "r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - - 0 1";
-    position = new Position(fen);
-
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
-
-    search.startSearch(position, searchMode);
-
-    // test search
-    waitWhileSearching();
-
-    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
-    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
-    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    assertEquals(Evaluation.CHECKMATE - 7, search.getLastSearchResult().resultValue);
-
-    // mate in 8 (15 plys)
-    //    fen = "8/7K/8/8/8/8/R7/7k w - - 0 1";
-    //    position = new Position(fen);
-    //    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, false, false);
-    //    search.startSearch(position, searchMode);
-    //    waitWhileSearching();
-    //    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
-    //    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
-    //    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    //    assertEquals(Evaluation.Value.CHECKMATE - 5, search.getLastSearchResult().resultValue);
 
      /*
     // Test - Mate in 2
@@ -286,6 +257,30 @@ public class TestSearch {
     // 1r1r2k1/2p1qp1p/6p1/ppQB1b2/5Pn1/2R1P1P1/PP5P/R1B3K1 b ;bm Qe4
     */
   }
+
+  @Test
+  @Disabled
+  public void testExtMateSearch() {
+
+//    testMateSearch();
+
+    String fen;
+    Position position;
+    SearchMode searchMode;
+
+    // mate in 4 (7 plys)
+//    fen = "r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - - 0 1";
+//    position = new Position(fen);
+//    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
+//    search.startSearch(position, searchMode);
+//    waitWhileSearching();
+//    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+//    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+//    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+//    assertEquals(Evaluation.CHECKMATE - 7, search.getLastSearchResult().resultValue);
+
+  }
+
 
   @Test
   public void testMovesSearch() {
@@ -458,6 +453,7 @@ public class TestSearch {
     search.config.USE_MINOR_PROMOTION_PRUNING = false;
     search.config.USE_QUIESCENCE = false;
     search.config.USE_NULL_MOVE_PRUNING = false;
+    search.config.USE_PVS_MOVE_ORDERING = false;
 
     meassureTreeSize(position, searchMode, values, "REFERENCE", true);
 
@@ -485,13 +481,23 @@ public class TestSearch {
     search.config.USE_TRANSPOSITION_TABLE = true;
     meassureTreeSize(position, searchMode, values, "TT", true);
 
-    search.config.USE_TRANSPOSITION_TABLE = false;
-    search.config.USE_QUIESCENCE = true;
-    meassureTreeSize(position, searchMode, values, "QS-TT", true);
+    search.config.USE_PVS_MOVE_ORDERING = true;
+    meassureTreeSize(position, searchMode, values, "PVS_ORDER", true);
+
+//    search.config.USE_TRANSPOSITION_TABLE = false;
+//    search.config.USE_QUIESCENCE = true;
+//    meassureTreeSize(position, searchMode, values, "QS-TT", true);
 
     search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_QUIESCENCE = true;
-    meassureTreeSize(position, searchMode, values, "QS+TT", true);
+    search.config.USE_PVS_MOVE_ORDERING = false;
+    meassureTreeSize(position, searchMode, values, "QS-PVSO", true);
+
+    search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_QUIESCENCE = true;
+    search.config.USE_PVS_MOVE_ORDERING = true;
+    meassureTreeSize(position, searchMode, values, "QS+PVSO", true);
+
 
     // REPEAT
     meassureTreeSize(position, searchMode, values, "REPEAT+TT", false);

@@ -9,8 +9,5 @@
         <module name="Franky" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="JavaUCIEngineFramework" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>

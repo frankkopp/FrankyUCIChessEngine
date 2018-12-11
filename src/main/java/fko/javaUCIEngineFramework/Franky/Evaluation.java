@@ -313,6 +313,7 @@ public class Evaluation {
     // Knights
     for (int i = 0; i < knightSquares[nextToMove].size(); i++) {
       Square square = knightSquares[nextToMove].get(i);
+      final int index = square.ordinal();
       assert (position.getPiece(square.ordinal()).getType().equals(PieceType.KNIGHT));
       assert (position.getPiece(square.ordinal()).getColor().ordinal() == nextToMove);
 
@@ -320,9 +321,15 @@ public class Evaluation {
       midGameMobility += KNIGHTS_MOBILITY_FACTOR * mobilityForPiece(PieceType.KNIGHT, square,
                                                                     Square.knightDirections);
 
+      // position
+      final int tableIndex = nextToMove==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      this.midGamePiecePosition += knightMidGame[tableIndex];
+      this.endGamePiecePosition += knightEndGame[tableIndex];
+
     }
     for (int i = 0; i < knightSquares[opponent].size(); i++) {
       Square square = knightSquares[opponent].get(i);
+      final int index = square.ordinal();
       assert (position.getPiece(square.ordinal()).getType().equals(PieceType.KNIGHT));
       assert (position.getPiece(square.ordinal()).getColor().ordinal() == opponent);
 
@@ -330,11 +337,16 @@ public class Evaluation {
       midGameMobility -= KNIGHTS_MOBILITY_FACTOR * mobilityForPiece(PieceType.KNIGHT, square,
                                                                     Square.knightDirections);
 
+      // position
+      final int tableIndex = opponent==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      this.midGamePiecePosition -= knightMidGame[tableIndex];
+      this.endGamePiecePosition -= knightEndGame[tableIndex];
     }
 
     // Bishops
     for (int i = 0; i < bishopSquares[nextToMove].size(); i++) {
       Square square = bishopSquares[nextToMove].get(i);
+      final int index = square.ordinal();
       assert (position.getPiece(square.ordinal()).getType().equals(PieceType.BISHOP));
       assert (position.getPiece(square.ordinal()).getColor().ordinal() == nextToMove);
 
@@ -342,66 +354,115 @@ public class Evaluation {
       midGameMobility += BISHOP_MOBILITY_FACTOR * mobilityForPiece(PieceType.BISHOP, square,
                                                                    Square.bishopDirections);
 
+      // position
+      final int tableIndex = nextToMove==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      this.midGamePiecePosition += bishopMidGame[tableIndex];
+      this.endGamePiecePosition += bishopEndGame[tableIndex];
+
     }
     for (int i = 0; i < bishopSquares[opponent].size(); i++) {
       Square square = bishopSquares[opponent].get(i);
+      final int index = square.ordinal();
       assert (position.getPiece(square.ordinal()).getType().equals(PieceType.BISHOP));
       assert (position.getPiece(square.ordinal()).getColor().ordinal() == opponent);
 
       // midGameMobility
       midGameMobility -= BISHOP_MOBILITY_FACTOR * mobilityForPiece(PieceType.BISHOP, square,
                                                                    Square.bishopDirections);
+
+      // position
+      final int tableIndex = opponent==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      this.midGamePiecePosition -= bishopMidGame[tableIndex];
+      this.endGamePiecePosition -= bishopEndGame[tableIndex];
     }
 
     // Rooks
     for (int i = 0; i < rookSquares[nextToMove].size(); i++) {
       Square square = rookSquares[nextToMove].get(i);
+      final int index = square.ordinal();
       assert (position.getPiece(square.ordinal()).getType().equals(PieceType.ROOK));
       assert (position.getPiece(square.ordinal()).getColor().ordinal() == nextToMove);
 
       // midGameMobility
       midGameMobility += ROOK_MOBILITY_FACTOR * mobilityForPiece(PieceType.ROOK, square,
                                                                  Square.rookDirections);
+
+      // position
+      final int tableIndex = nextToMove==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      this.midGamePiecePosition += rookMidGame[tableIndex];
+      this.endGamePiecePosition += rookEndGame[tableIndex];
     }
     for (int i = 0; i < rookSquares[opponent].size(); i++) {
       Square square = rookSquares[opponent].get(i);
+      final int index = square.ordinal();
       assert (position.getPiece(square.ordinal()).getType().equals(PieceType.ROOK));
       assert (position.getPiece(square.ordinal()).getColor().ordinal() == opponent);
 
       // midGameMobility
       midGameMobility -= ROOK_MOBILITY_FACTOR * mobilityForPiece(PieceType.ROOK, square,
                                                                  Square.rookDirections);
+
+      // position
+      final int tableIndex = opponent==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      this.midGamePiecePosition -= rookMidGame[tableIndex];
+      this.endGamePiecePosition -= rookEndGame[tableIndex];
     }
 
     // Queens
     for (int i = 0; i < queenSquares[nextToMove].size(); i++) {
       Square square = queenSquares[nextToMove].get(i);
+      final int index = square.ordinal();
       assert (position.getPiece(square.ordinal()).getType().equals(PieceType.QUEEN));
       assert (position.getPiece(square.ordinal()).getColor().ordinal() == nextToMove);
 
       // midGameMobility
       midGameMobility += QUEEN_MOBILITY_FACTOR * mobilityForPiece(PieceType.QUEEN, square,
                                                                   Square.queenDirections);
+
+      // position
+      final int tableIndex = nextToMove==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      this.midGamePiecePosition += queenMidGame[tableIndex];
+      this.endGamePiecePosition += queenEndGame[tableIndex];
     }
     for (int i = 0; i < queenSquares[opponent].size(); i++) {
       Square square = queenSquares[opponent].get(i);
+      final int index = square.ordinal();
       assert (position.getPiece(square.ordinal()).getType().equals(PieceType.QUEEN));
       assert (position.getPiece(square.ordinal()).getColor().ordinal() == opponent);
 
       // midGameMobility
       midGameMobility -= QUEEN_MOBILITY_FACTOR * mobilityForPiece(PieceType.QUEEN, square,
                                                                   Square.queenDirections);
+
+      // position
+      final int tableIndex = opponent==WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      this.midGamePiecePosition -= queenMidGame[tableIndex];
+      this.endGamePiecePosition -= queenEndGame[tableIndex];
     }
 
     // Kings
-    Square whiteKingSquare = kingSquares[nextToMove];
-    assert (position.getPiece(whiteKingSquare.ordinal()).getType().equals(PieceType.KING));
-    assert (position.getPiece(whiteKingSquare.ordinal()).getColor().ordinal() == nextToMove);
+    {
+      Square whiteKingSquare = kingSquares[nextToMove];
+      final int index = whiteKingSquare.ordinal();
+      assert (position.getPiece(whiteKingSquare.ordinal()).getType().equals(PieceType.KING));
+      assert (position.getPiece(whiteKingSquare.ordinal()).getColor().ordinal() == nextToMove);
 
-    Square blackKingSquare = kingSquares[opponent];
-    assert (position.getPiece(blackKingSquare.ordinal()).getType().equals(PieceType.KING));
-    assert (position.getPiece(blackKingSquare.ordinal()).getColor().ordinal() == opponent);
+      // position
+      final int tableIndex = nextToMove == WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      this.midGamePiecePosition += kingMidGame[tableIndex];
+      this.endGamePiecePosition += kingEndGame[tableIndex];
+    }
+    {
+      Square blackKingSquare = kingSquares[opponent];
+      final int index = blackKingSquare.ordinal();
+      assert (position.getPiece(blackKingSquare.ordinal()).getType().equals(PieceType.KING));
+      assert (position.getPiece(blackKingSquare.ordinal()).getColor().ordinal() == opponent);
 
+      // position
+      final int tableIndex = opponent == WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+      this.midGamePiecePosition -= kingMidGame[tableIndex];
+      this.endGamePiecePosition -= kingEndGame[tableIndex];
+    }
     // for now they are always the same
     // TODO: different mobility for mid and end game
     endGameMobility = midGameMobility;

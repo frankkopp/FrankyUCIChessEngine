@@ -211,7 +211,6 @@ public class SimpleIntList implements Iterable<Integer> {
             _list[_head] = _list[element];
             _list[element] = tmp;
         }
-
     }
 
     /**

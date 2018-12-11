@@ -73,14 +73,14 @@ public class Configuration {
   boolean USE_ROOT_MOVES_SORT = true;
 
   /**
+   * Push last PV move to search first position for iterations.
+   */
+  boolean USE_PVS_MOVE_ORDERING = true;
+
+  /**
    * Use AlphaBeta Pruning
    */
   boolean USE_ALPHABETA_PRUNING = true;
-
-  /**
-   * Use Aspiration Window in root search
-   */
-  boolean USE_ASPIRATION_WINDOW = false;
 
   /**
    * Principal Variation Search
@@ -113,6 +113,12 @@ public class Configuration {
 
 
   // TODO vvvvvvvv
+
+  /**
+   * Use Aspiration Window in root search
+   */
+  boolean USE_ASPIRATION_WINDOW = false;
+
   /**
    * If set to true we will use the opening book
    */
