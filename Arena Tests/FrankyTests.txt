@@ -1,8 +1,11 @@
-   Engine      Score      Fr     Fr    S-B
-1: Franky_v0.2 10,0/15 ······ 10-5-0   50,00
-2: Franky-0.3  5,0/15  5-10-0 ······   50,00
+   Engine        Score     Ru    Fr    Sp    Fr    An    S-B
+1: Ruffian 1.0.5 1,0/1  ·····             1-0-0          0,00
+2: Franky-0.3    0,0/0        ·····                      0,00
+2: Spike 1.4     0,0/0              ·····                0,00
+2: Franky_v0.2   0,0/1  0-1-0             ·····          0,00
+2: AnMon 5.75    0,0/0                          ·····    0,00
 
-15 of 100 games played
+1 of 100 games played
 Name of the tournament: Franky Test
 Site/ Country: RIPLEY, Germany
 Level: Tournament Game in 5 Minutes

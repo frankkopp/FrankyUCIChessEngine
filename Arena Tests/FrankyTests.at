@@ -2,9 +2,9 @@
 TournamentName=Franky Test
 Type=0
 CurrSwissRound=0
-Rounds=100
+Rounds=10
 CurrentPair=1
-CurrentRound=15
+CurrentRound=1
 Level=5 -1\5/-1#5@-1|5
 [Options]
 QuitAfterTournament=0
@@ -57,8 +57,6 @@ FCHdir=
 FCHnames=
 [Data]
 LastPGNEPDindex=1
-FirstGameDate=2018.12.08
-FirstGameTime=23:12:16
 Country=Germany
 Site=RIPLEY
 Hardware=Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz with 31,9 GB Memory
@@ -66,11 +64,15 @@ OS=Windows 10 Home Home Edition (Build 9200) 64 bit
 Website=
 E-Mail=
 ArenaVersion=Arena 3.5.1
-LastGameDate=2018.12.10
-LastGameTime=15:36:57
+LastGameDate=2018.12.11
+LastGameTime=19:15:18
+FirstGameDate=2018.12.11
+FirstGameTime=19:11:05
 [PairingResults]
-Franky_v0.1 Config1 ------ Franky_v0.1 Config2=100000101110110010101110001101½111111010101010001101001000110111011110111101111111010011011101010110
-Franky-0.3 ------ Franky_v0.2=001001001001010?
+Franky_v0.2 ------ Ruffian 1.0.5=0
 [Participants]
 Engine1=Franky_v0.2
 Engine2=Franky-0.3
+Engine3=Spike 1.4
+Engine4=Ruffian 1.0.5
+Engine5=AnMon 5.75
