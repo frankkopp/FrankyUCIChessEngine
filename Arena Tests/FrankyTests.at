@@ -1,0 +1,76 @@
+[Settings]
+TournamentName=Franky Test
+Type=0
+CurrSwissRound=0
+Rounds=100
+CurrentPair=1
+CurrentRound=72
+Level=5 -1\5/-1#5@-1|5
+[Options]
+QuitAfterTournament=0
+ShutDownAfterTournament=0
+RestartEngines=1
+RepeatStartPosition=1
+Startposition=0
+Variant=0
+StartPGNEPD=
+Resign=0
+ResignValue=-900
+MaxGameLength=250
+EarlyDrawFromMove=9999
+TablebaseDraw=0
+Autoflag=1
+Ponder=1
+AutoRotateInGautlet=1
+RutschSystem=1
+RestartArenaAfterGamesValue=20
+RestartArenaAtHour1=0
+RestartArenaAtHourValue=2
+ShutdownComputerAfterGames1=0
+ShutdownComputerAfterGamesValue=10
+[Save]
+SaveGamesPGN=1
+SaveIncompleteGamesPGN=1
+PGNFile=C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\Arena Tests\FrankyTests.pgn
+Protocolfile=C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\Arena Tests\FrankyTests.log
+TurTabTextfile=C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\Arena Tests\FrankyTests.txt
+TurTabHTMLfile=C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\Arena Tests\FrankyTests,html
+SaveTurTabText=1
+SaveTurTabHTML=1
+HTMLuseCountry=0
+HTMLuseFlags=0
+HTMLuseEnglish=0
+HTMLshortResults=1
+HTMLonlyPoints=0
+HTMLFlagsFromWebsite=0
+HTMLshowPGNfilename=1
+HTMLshowBenchmark=0
+PGNwebsite=
+HTMLWinPercent=0
+HTMLStartELO=0
+HTMLShowConditions=1
+HTMLConditions=Hash: 128MB, Tablebases: On, Ponder On
+HTMLTopLineColorized=0
+HTMLTableTopLineColor=6737151
+SaveGamesFCH=0
+FCHdir=
+FCHnames=
+[Data]
+LastPGNEPDindex=1
+Country=Germany
+Site=RIPLEY
+Hardware=Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz with 31,9 GB Memory
+OS=Windows 10 Home Home Edition (Build 9200) 64 bit
+Website=
+E-Mail=
+ArenaVersion=Arena 3.5.1
+LastGameDate=2018.12.12
+LastGameTime=07:41:47
+FirstGameDate=2018.12.12
+FirstGameTime=00:51:41
+[PairingResults]
+Franky_v0.1 Config1 ------ Franky_v0.2=?
+Franky-0.3 ------ Franky_v0.2=111110111111111111111111111111111111111111111111111111111110111111111111
+[Participants]
+Engine1=Franky_v0.2
+Engine2=Franky-0.3
