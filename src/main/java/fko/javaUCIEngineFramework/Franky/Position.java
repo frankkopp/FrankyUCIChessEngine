@@ -770,8 +770,8 @@ public class Position {
     return old;
   }
 
-  public Piece getPiece(final int to) {
-    return x88Board[to];
+  public Piece getPiece(final int squareIdx) {
+    return x88Board[squareIdx];
   }
 
   /**

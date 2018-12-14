@@ -218,7 +218,7 @@ public class TestSearch {
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
-    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+    assertTrue(search.getSearchCounter().currentIterationDepth > 0);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
     assertEquals(Evaluation.CHECKMATE - 5, search.getLastSearchResult().resultValue);
 
@@ -455,57 +455,57 @@ public class TestSearch {
     search.config.USE_NULL_MOVE_PRUNING = false;
     search.config.USE_PVS_MOVE_ORDERING = false;
 
-    meassureTreeSize(position, searchMode, values, "REFERENCE", true);
+    measureTreeSize(position, searchMode, values, "REFERENCE", true);
 
 //    search.config.USE_ASPIRATION_WINDOW = true;
-//    meassureTreeSize(position, searchMode, values, "Aspiration", true);
+//    measureTreeSize(position, searchMode, values, "Aspiration", true);
 
     search.config.USE_ALPHABETA_PRUNING = true;
-    meassureTreeSize(position, searchMode, values, "AlphaBeta", true);
+    measureTreeSize(position, searchMode, values, "AlphaBeta", true);
 
     search.config.USE_ROOT_MOVES_SORT = true;
-    meassureTreeSize(position, searchMode, values, "RootMoveSort", true);
+    measureTreeSize(position, searchMode, values, "RootMoveSort", true);
 
     search.config.USE_PVS = true;
-    meassureTreeSize(position, searchMode, values, "PVS", true);
+    measureTreeSize(position, searchMode, values, "PVS", true);
 
     search.config.USE_MATE_DISTANCE_PRUNING = true;
-    meassureTreeSize(position, searchMode, values, "MDP", true);
+    measureTreeSize(position, searchMode, values, "MDP", true);
 
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
-    meassureTreeSize(position, searchMode, values, "MPP", true);
+    measureTreeSize(position, searchMode, values, "MPP", true);
 
     search.config.USE_NULL_MOVE_PRUNING = true;
-    meassureTreeSize(position, searchMode, values, "NMP", true);
+    measureTreeSize(position, searchMode, values, "NMP", true);
 
     search.config.USE_TRANSPOSITION_TABLE = true;
-    meassureTreeSize(position, searchMode, values, "TT", true);
+    measureTreeSize(position, searchMode, values, "TT", true);
 
     search.config.USE_PVS_MOVE_ORDERING = true;
-    meassureTreeSize(position, searchMode, values, "PVS_ORDER", true);
+    measureTreeSize(position, searchMode, values, "PVS_ORDER", true);
 
 //    search.config.USE_TRANSPOSITION_TABLE = false;
 //    search.config.USE_QUIESCENCE = true;
-//    meassureTreeSize(position, searchMode, values, "QS-TT", true);
+//    measureTreeSize(position, searchMode, values, "QS-TT", true);
 
     search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_QUIESCENCE = true;
     search.config.USE_PVS_MOVE_ORDERING = false;
-    meassureTreeSize(position, searchMode, values, "QS-PVSO", true);
+    measureTreeSize(position, searchMode, values, "QS-PVSO", true);
 
     search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_QUIESCENCE = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
-    meassureTreeSize(position, searchMode, values, "QS+PVSO", true);
+    measureTreeSize(position, searchMode, values, "QS+PVSO", true);
 
 
     // REPEAT
-    meassureTreeSize(position, searchMode, values, "REPEAT+TT", false);
+    measureTreeSize(position, searchMode, values, "REPEAT+TT", false);
   }
 
-  private void meassureTreeSize(final Position position, final SearchMode searchMode,
-                                final List<String> values, final String feature,
-                                final boolean clearTT) {
+  private void measureTreeSize(final Position position, final SearchMode searchMode,
+                               final List<String> values, final String feature,
+                               final boolean clearTT) {
 
     if (clearTT) search.clearHashtables();
     search.startSearch(position, searchMode);
@@ -546,6 +546,19 @@ public class TestSearch {
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
     assertEquals("g3d6", Move.toSimpleString(search.getLastSearchResult().bestMove));
 
+    // Spanish Opening - next move should be 0-0
+//    depth = 1;
+//    fen = "r1bqkb1r/1ppp1ppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 5";
+//    position = new Position(fen);
+//    searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
+//    search.startSearch(position, searchMode);
+//    waitWhileSearching();
+//    LOG.info("Best Move: {} Value: {} Ponder {}",
+//             Move.toSimpleString(search.getLastSearchResult().bestMove),
+//             search.getLastSearchResult().resultValue / 100f,
+//             Move.toSimpleString(search.getLastSearchResult().ponderMove));
+//    assertEquals("e1g1", Move.toSimpleString(search.getLastSearchResult().bestMove));
+
 //    depth = 4;
 //    fen = "rn1q1rk1/pbpp2pp/1p2pb2/4N3/3PN3/3B4/PPP2PPP/R2QK2R w KQ - 0 9"; // bm Dh5
 //    position = new Position(fen);
@@ -576,14 +589,9 @@ public class TestSearch {
   @Disabled
   public void testInfiniteSearch() {
     Position position = new Position();
-
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 0, null, false, true, false);
-
     search.startSearch(position, searchMode);
-
-    // test search
     waitWhileSearching();
-
   }
 
   private void waitWhileSearching() {

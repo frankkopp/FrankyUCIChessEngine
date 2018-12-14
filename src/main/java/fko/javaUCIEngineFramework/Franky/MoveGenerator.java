@@ -337,7 +337,7 @@ public class MoveGenerator {
 
     // TODO improve qsearch extensions by selecting only relevant moves
     if (position.hasCheck()) {
-      // when in check generate all moves- they will be later filtered for these
+      // when in check generate all moves - they will be later filtered for these
       // moves which evade the check anyway.
       captureMovesOnly = false;
     } else {

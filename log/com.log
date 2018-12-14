@@ -1,0 +1,398 @@
+22:27:49.935 >> go perft 5
+22:27:49.938 >> stop
+22:27:49.938 << info depth 4 seldepth 4 multipv 1 score cp -1 nodes 5 nps 2000 time 0 pv a2a4 a7a5 b2b4 a5b4 c2c4 
+22:27:49.939 << bestmove a2a4 ponder a7a5
+22:27:50.940 >> quit
+22:27:51.477 >> position fen 8/3P4/6K1/8/8/1k6/8/8 w - - 0 0 moves d7d8q
+22:27:52.478 >> position fen r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 0 moves e1g1
+22:27:53.480 >> position startpos moves e2e4 e7e5
+22:27:54.481 >> position moves e2e4 e7e5
+22:27:55.483 >> position fen rnbqkbnr/8/8/8/8/8/8/RNBQKBNR w KQkq - 0 1 moves e1e2 e8e7
+22:27:55.487 >> quit
+22:27:56.005 >> setoption name Hash value 4096
+22:27:56.818 << info string Hash Size set to 4096
+22:27:57.820 >> setoption name Ponder value false
+22:27:57.820 << info string Engine Ponder set to Off
+22:27:57.820 >> quit
+22:27:58.516 >> uci
+22:27:58.516 << id name Franky v0.4
+22:27:58.516 << id author Frank Kopp
+22:27:58.516 << option name Hash type spin default 512 min 1 max 512
+22:27:58.516 << option name Ponder type check default true
+22:27:58.516 << option name UCI_ShowCurrLine type check default true
+22:27:58.516 << option name Use_QSearch type check default true
+22:27:58.516 << option name Use_AlphaBeta_Pruning type check default true
+22:27:58.516 << option name Use_PVS type check default true
+22:27:58.516 << option name Use_TranspositionTable type check default true
+22:27:58.516 << option name Use_Mate_Distance_Pruning type check default true
+22:27:58.516 << option name Use_Minor_Promotion_Pruning type check default true
+22:27:58.516 << option name Use_Null_Move_Pruning type check default true
+22:27:58.516 << uciok
+22:27:59.190 >> go infinite
+22:27:59.190 >> stop
+22:27:59.190 << info depth 0 seldepth 0 multipv 1 score cp 21 nodes 1 nps 0 time 0 pv a2a4 
+22:27:59.191 << bestmove a2a4
+22:27:59.191 >> go ponder
+22:27:59.191 >> stop
+22:27:59.192 << info depth 0 seldepth 0 multipv 1 score cp 21 nodes 1 nps 0 time 1 pv a2a4 
+22:27:59.192 << bestmove a2a4
+22:27:59.192 >> go infinite searchmoves e2e4 d2d4
+22:27:59.192 >> stop
+22:27:59.193 << info depth 0 seldepth 0 multipv 1 score cp 100 nodes 1 nps 0 time 1 pv d2d4 
+22:27:59.193 << bestmove d2d4
+22:27:59.518 >> quit
+22:28:00.193 >> go wtime 300000 btime 300000 movestogo 20
+22:28:00.195 >> stop
+22:28:00.196 << info depth 0 seldepth 0 multipv 1 score cp 21 nodes 1 nps 0 time 1 pv a2a4 
+22:28:00.196 << bestmove a2a4
+22:28:00.196 >> go wtime 300000 btime 300000 movestogo 5
+22:28:00.197 >> stop
+22:28:00.198 << info depth 0 seldepth 0 multipv 1 score cp 21 nodes 1 nps 0 time 1 pv a2a4 
+22:28:00.198 << bestmove a2a4
+22:28:00.199 >> go wtime 500000 btime 500000
+22:28:00.200 >> stop
+22:28:00.200 << info depth 0 seldepth 0 multipv 1 score cp 21 nodes 1 nps 0 time 0 pv a2a4 
+22:28:00.201 << bestmove a2a4
+22:28:00.201 >> go wtime 300000 btime 300000 winc 2000 binc 2000
+22:28:00.202 >> stop
+22:28:00.203 << info depth 0 seldepth 0 multipv 1 score cp 21 nodes 1 nps 0 time 1 pv a2a4 
+22:28:00.204 << bestmove a2a4
+22:28:00.204 >> go movetime 10000
+22:28:00.205 >> stop
+22:28:00.206 << info depth 0 seldepth 0 multipv 1 score cp 21 nodes 1 nps 0 time 1 pv a2a4 
+22:28:00.207 << bestmove a2a4
+22:28:00.207 >> go mate 5
+22:28:00.208 >> stop
+22:28:00.209 << info depth 0 seldepth 0 multipv 1 score cp 21 nodes 1 nps 0 time 1 pv a2a4 
+22:28:00.210 << bestmove a2a4
+22:28:00.210 >> go nodes 1000000000
+22:28:00.211 >> stop
+22:28:00.212 << info depth 0 seldepth 0 multipv 1 score cp 21 nodes 1 nps 0 time 1 pv a2a4 
+22:28:00.213 << bestmove a2a4
+22:28:00.213 >> go depth 10
+22:28:00.214 >> stop
+22:28:00.215 << info depth 9 seldepth 11 multipv 1 score cp 467 nodes 12 nps 4000 time 1 pv a2a4 a7a5 b2b4 a5b4 c2c4 b4c3 d2c3 a8a4 a1a4 b7b5 
+22:28:00.216 << bestmove a2a4 ponder a7a5
+22:28:00.216 >> quit
+22:28:00.836 >> ucinewgame
+22:28:00.836 << info string Configuration{PERFT=false, HASH_SIZE=512, PONDER=true, DEBUG=false, UCI_ShowCurrLine=true, USE_QUIESCENCE=true, USE_ROOT_MOVES_SORT=true, USE_ALPHABETA_PRUNING=true, USE_ASPIRATION_WINDOW=false, USE_PVS=true, USE_TRANSPOSITION_TABLE=true, USE_MATE_DISTANCE_PRUNING=true, USE_MINOR_PROMOTION_PRUNING=true}
+22:28:00.950 >> quit
+22:28:01.472 >> go movetime 15000
+22:28:01.473 << info depth 0 seldepth 0 multipv 1 score cp 0 nodes 20 nps 6000 time 1 pv a2a4 
+22:28:01.476 << info depth 1 seldepth 3 multipv 1 score cp 0 nodes 447 nps 74000 time 4 pv a2a4 a7a5 
+22:28:01.505 << info depth 2 seldepth 13 multipv 1 score cp 108 nodes 5152 nps 147000 time 33 pv g1f3 b8c6 b1c3 
+22:28:01.642 << info depth 3 seldepth 11 multipv 1 score cp 10 nodes 31680 nps 184000 time 170 pv g1f3 b8c6 b1c3 g8f6 
+22:28:01.722 << info depth 4 seldepth 16 nodes 42860 nps 171440 time 250 hashfull 2
+22:28:01.722 << info currmove b1c3 currmovenumber 2
+22:28:01.722 << info currline b1c3 b7b6 c3e4 d7d6 d2d4 
+22:28:02.037 << info depth 4 seldepth 22 nodes 81419 nps 144104 time 565 hashfull 4
+22:28:02.037 << info currmove g1h3 currmovenumber 3
+22:28:02.037 << info currline g1h3 f7f6 h3g1 b7b6 h2h4 
+22:28:02.287 << info depth 4 seldepth 22 nodes 120716 nps 148117 time 815 hashfull 6
+22:28:02.287 << info currmove b1a3 currmovenumber 4
+22:28:02.287 << info currline b1a3 h7h5 d2d4 a7a6 c1h6 g7h6 
+22:28:02.537 << info depth 4 seldepth 22 nodes 153268 nps 143913 time 1065 hashfull 8
+22:28:02.537 << info currmove e2e3 currmovenumber 6
+22:28:02.537 << info currline e2e3 e7e5 d2d4 h7h6 b2b4 e5d4 d1d4 f8b4 c1d2 
+22:28:02.787 << info depth 4 seldepth 22 nodes 185652 nps 141180 time 1315 hashfull 10
+22:28:02.787 << info currmove d2d3 currmovenumber 7
+22:28:02.787 << info currline d2d3 g8f6 a2a4 h8g8 
+22:28:03.037 << info depth 4 seldepth 22 nodes 222808 nps 142369 time 1565 hashfull 12
+22:28:03.037 << info currmove d2d3 currmovenumber 7
+22:28:03.037 << info currline d2d3 h7h5 e2e4 e7e6 b2b4 f8b4 d1d2 
+22:28:03.287 << info depth 4 seldepth 22 nodes 257285 nps 141754 time 1815 hashfull 14
+22:28:03.287 << info currmove e2e4 currmovenumber 8
+22:28:03.287 << info currline e2e4 h7h5 g1e2 b8a6 b1a3 
+22:28:03.537 << info depth 4 seldepth 22 nodes 290456 nps 140656 time 2065 hashfull 16
+22:28:03.537 << info currmove d2d4 currmovenumber 9
+22:28:03.537 << info currline d2d4 f7f6 c2c3 c7c5 a2a3 c5d4 c3d4 
+22:28:03.787 << info depth 4 seldepth 22 nodes 326350 nps 140971 time 2315 hashfull 17
+22:28:03.787 << info currmove a2a4 currmovenumber 10
+22:28:03.787 << info currline a2a4 d7d6 g1f3 h7h6 b1a3 
+22:28:04.037 << info depth 4 seldepth 22 nodes 369443 nps 144032 time 2565 hashfull 20
+22:28:04.037 << info currmove a2a3 currmovenumber 12
+22:28:04.037 << info currline a2a3 d7d5 d2d4 c8g4 c1g5 g4e2 g5e7 e2d1 e7d8 
+22:28:04.287 << info depth 4 seldepth 22 nodes 417165 nps 148193 time 2815 hashfull 22
+22:28:04.287 << info currmove b2b3 currmovenumber 16
+22:28:04.287 << info currline b2b3 d7d5 c1b2 d5d4 f2f3 
+22:28:04.537 << info depth 4 seldepth 22 nodes 466280 nps 152130 time 3065 hashfull 24
+22:28:04.537 << info currmove c2c3 currmovenumber 19
+22:28:04.537 << info currline c2c3 e7e6 c3c4 e6e5 c4c5 
+22:28:04.590 << info depth 4 seldepth 22 multipv 1 score cp 36 nodes 477749 nps 153000 time 3118 pv d2d4 d7d5 g1h3 b8c6 b1c3 
+22:28:04.787 << info depth 5 seldepth 18 nodes 506006 nps 152641 time 3315 hashfull 25
+22:28:04.787 << info currmove d2d4 currmovenumber 1
+22:28:04.787 << info currline d2d4 e7e5 e2e3 d7d5 a2a4 f8b4 b1c3 
+22:28:05.037 << info depth 5 seldepth 21 nodes 545717 nps 153076 time 3565 hashfull 27
+22:28:05.037 << info currmove d2d4 currmovenumber 1
+22:28:05.037 << info currline d2d4 d7d5 g1f3 a7a6 a2a4 
+22:28:05.287 << info depth 5 seldepth 21 nodes 583765 nps 153018 time 3815 hashfull 29
+22:28:05.287 << info currmove d2d4 currmovenumber 1
+22:28:05.287 << info currline d2d4 d7d5 d1d3 e7e6 g2g3 e6e5 d3h7 h8h7 
+22:28:05.537 << info depth 5 seldepth 21 nodes 616187 nps 151583 time 4065 hashfull 31
+22:28:05.537 << info currmove a2a3 currmovenumber 2
+22:28:05.537 << info currline a2a3 e7e6 b2b4 b7b5 c2c3 a7a5 b4a5 f8a3 b1a3 
+22:28:05.787 << info depth 5 seldepth 21 nodes 652353 nps 151182 time 4315 hashfull 33
+22:28:05.787 << info currmove e2e4 currmovenumber 3
+22:28:05.787 << info currline e2e4 d7d5 a2a4 e7e5 b1a3 a7a5 e4d5 f8a3 b2a3 d8d5 
+22:28:06.037 << info depth 5 seldepth 21 nodes 683173 nps 149654 time 4565 hashfull 35
+22:28:06.037 << info currmove e2e4 currmovenumber 3
+22:28:06.037 << info currline e2e4 d7d5 d2d3 g8f6 e4e5 b7b5 e5f6 e7f6 
+22:28:06.287 << info depth 5 seldepth 21 nodes 718230 nps 149165 time 4815 hashfull 37
+22:28:06.287 << info currmove e2e4 currmovenumber 3
+22:28:06.287 << info currline e2e4 d7d5 g1h3 e7e6 g2g4 e6e5 e4d5 c8g4 d1g4 d8d5 
+22:28:06.537 << info depth 5 seldepth 21 nodes 747718 nps 147624 time 5065 hashfull 39
+22:28:06.537 << info currmove e2e3 currmovenumber 4
+22:28:06.537 << info currline e2e3 d7d5 b2b3 d5d4 g1f3 c8f5 e3d4 d8d4 
+22:28:06.787 << info depth 5 seldepth 21 nodes 779240 nps 146611 time 5315 hashfull 41
+22:28:06.787 << info currmove h2h3 currmovenumber 5
+22:28:06.787 << info currline h2h3 d7d5 a2a3 b8a6 e2e4 d8d7 
+22:28:07.037 << info depth 5 seldepth 21 nodes 817210 nps 146848 time 5565 hashfull 43
+22:28:07.037 << info currmove h2h3 currmovenumber 5
+22:28:07.037 << info currline h2h3 d7d5 h3h4 a7a6 c2c4 g7g5 c4d5 d8d5 h4g5 d5a2 
+22:28:07.287 << info depth 5 seldepth 21 nodes 851249 nps 146388 time 5815 hashfull 45
+22:28:07.287 << info currmove h2h3 currmovenumber 5
+22:28:07.287 << info currline h2h3 g8h6 a2a4 h6g4 h3g4 b8c6 
+22:28:07.537 << info depth 5 seldepth 21 nodes 888804 nps 146546 time 6065 hashfull 46
+22:28:07.537 << info currmove a2a4 currmovenumber 6
+22:28:07.537 << info currline a2a4 e7e5 e2e3 g8e7 a4a5 b7b6 a5b6 
+22:28:07.787 << info depth 5 seldepth 21 nodes 924305 nps 146366 time 6315 hashfull 48
+22:28:07.787 << info currmove b2b3 currmovenumber 7
+22:28:07.787 << info currline b2b3 d7d5 g2g3 g8h6 b1c3 e7e6 
+22:28:08.037 << info depth 5 seldepth 21 nodes 961324 nps 146431 time 6565 hashfull 50
+22:28:08.037 << info currmove g2g3 currmovenumber 8
+22:28:08.037 << info currline g2g3 d7d5 a2a3 h7h6 g3g4 b7b6 
+22:28:08.287 << info depth 5 seldepth 21 nodes 998558 nps 146523 time 6815 hashfull 52
+22:28:08.287 << info currmove g2g3 currmovenumber 8
+22:28:08.287 << info currline g2g3 d7d5 b1a3 e7e6 d2d4 d8e7 
+22:28:08.537 << info depth 5 seldepth 21 nodes 1033472 nps 146280 time 7065 hashfull 54
+22:28:08.537 << info currmove d2d3 currmovenumber 9
+22:28:08.537 << info currline d2d3 d7d5 c1f4 a7a5 g2g4 
+22:28:08.787 << info depth 5 seldepth 21 nodes 1064166 nps 145477 time 7315 hashfull 55
+22:28:08.787 << info currmove g1f3 currmovenumber 10
+22:28:08.787 << info currline g1f3 d7d5 f3g5 d8d6 e2e4 d6h2 h1h2 d5e4 
+22:28:09.037 << info depth 5 seldepth 21 nodes 1102619 nps 145752 time 7565 hashfull 57
+22:28:09.037 << info currmove b1c3 currmovenumber 11
+22:28:09.037 << info currline b1c3 d7d5 h2h4 e7e5 h4h5 g7g5 h5g6 f7g6 h1h7 
+22:28:09.287 << info depth 5 seldepth 21 nodes 1136873 nps 145473 time 7815 hashfull 59
+22:28:09.287 << info currmove g1h3 currmovenumber 12
+22:28:09.287 << info currline g1h3 d7d5 h3f4 g8f6 f4h5 c7c6 h5f6 
+22:28:09.537 << info depth 5 seldepth 21 nodes 1173421 nps 145495 time 8065 hashfull 61
+22:28:09.537 << info currmove b1a3 currmovenumber 13
+22:28:09.537 << info currline b1a3 d7d5 e2e3 b8a6 c2c4 c7c6 c4d5 d8d5 f1a6 d5a2 
+22:28:09.787 << info depth 5 seldepth 21 nodes 1206804 nps 145135 time 8315 hashfull 63
+22:28:09.787 << info currmove b1a3 currmovenumber 13
+22:28:09.787 << info currline b1a3 g8f6 c2c3 b7b6 g2g3 f6g8 
+22:28:10.037 << info depth 5 seldepth 21 nodes 1244151 nps 145259 time 8565 hashfull 65
+22:28:10.037 << info currmove h2h4 currmovenumber 14
+22:28:10.037 << info currline h2h4 d7d5 b1a3 c8d7 f2f4 a7a6 
+22:28:10.287 << info depth 5 seldepth 21 nodes 1278929 nps 145085 time 8815 hashfull 67
+22:28:10.287 << info currmove h2h4 currmovenumber 14
+22:28:10.287 << info currline h2h4 g8f6 c2c4 c7c6 d2d4 d8a5 b1c3 
+22:28:10.537 << info depth 5 seldepth 21 nodes 1317052 nps 145289 time 9065 hashfull 68
+22:28:10.537 << info currmove c2c4 currmovenumber 15
+22:28:10.537 << info currline c2c4 d7d5 d1c2 e7e6 d2d3 g8h6 c4d5 e6d5 c1h6 
+22:28:10.787 << info depth 5 seldepth 21 nodes 1355719 nps 145541 time 9315 hashfull 70
+22:28:10.787 << info currmove g2g4 currmovenumber 16
+22:28:10.787 << info currline g2g4 d7d5 f1h3 b8c6 c2c4 a7a6 c4d5 c8g4 d5c6 g4h3 g1h3 
+22:28:11.037 << info depth 5 seldepth 21 nodes 1395219 nps 145867 time 9565 hashfull 72
+22:28:11.037 << info currmove f2f4 currmovenumber 17
+22:28:11.037 << info currline f2f4 d7d5 b2b3 b8a6 e2e3 c8g4 f1a6 g4d1 
+22:28:11.287 << info depth 5 seldepth 21 nodes 1431499 nps 145848 time 9815 hashfull 74
+22:28:11.287 << info currmove f2f4 currmovenumber 17
+22:28:11.287 << info currline f2f4 e7e5 h2h4 d7d5 f4e5 c8d7 
+22:28:11.537 << info depth 5 seldepth 21 nodes 1462194 nps 145275 time 10065 hashfull 76
+22:28:11.537 << info currmove f2f4 currmovenumber 17
+22:28:11.537 << info currline f2f4 b8c6 g2g4 a7a6 g1h3 b7b6 
+22:28:11.787 << info depth 5 seldepth 21 nodes 1502858 nps 145696 time 10315 hashfull 78
+22:28:11.787 << info currmove b2b4 currmovenumber 18
+22:28:11.787 << info currline b2b4 d7d5 c1b2 c8f5 a2a3 e7e5 b2e5 f5c2 e5c7 c2d1 
+22:28:12.037 << info depth 5 seldepth 21 nodes 1540752 nps 145835 time 10565 hashfull 79
+22:28:12.037 << info currmove c2c3 currmovenumber 19
+22:28:12.037 << info currline c2c3 d7d5 d1c2 b7b5 a2a4 d5d4 c3d4 d8d4 a4b5 d4b2 
+22:28:12.287 << info depth 5 seldepth 21 nodes 1570420 nps 145207 time 10815 hashfull 81
+22:28:12.287 << info currmove f2f3 currmovenumber 20
+22:28:12.287 << info currline f2f3 d7d5 d2d4 h7h6 c2c4 b8c6 c4d5 c6d4 c1h6 d8d5 h6g7 f8g7 d1d4 d5a2 a1a2 
+22:28:12.537 << info depth 5 seldepth 21 nodes 1603140 nps 144883 time 11065 hashfull 82
+22:28:12.537 << info currmove f2f3 currmovenumber 20
+22:28:12.537 << info currline f2f3 e7e6 c2c3 g7g6 d2d3 b8a6 
+22:28:12.629 << info depth 5 seldepth 21 multipv 1 score cp 0 nodes 1616237 nps 144000 time 11157 pv a2a3 d7d5 d2d3 d5d4 b1d2 a7a5 
+22:28:12.787 << info depth 6 seldepth 21 nodes 1639179 nps 144867 time 11315 hashfull 84
+22:28:12.787 << info currmove a2a3 currmovenumber 1
+22:28:12.787 << info currline a2a3 d7d5 b2b4 e7e5 b1c3 a7a5 d2d4 a5b4 c3d5 b4a3 c1a3 
+22:28:13.037 << info depth 6 seldepth 23 nodes 1677407 nps 145041 time 11565 hashfull 86
+22:28:13.037 << info currmove a2a3 currmovenumber 1
+22:28:13.037 << info currline a2a3 d7d5 d2d4 e7e6 c1f4 c7c5 c2c4 c5d4 c4d5 e6d5 d1d4 f8a3 d4g7 a3b2 a1a7 b2g7 
+22:28:13.287 << info depth 6 seldepth 24 nodes 1712057 nps 144905 time 11815 hashfull 88
+22:28:13.287 << info currmove a2a3 currmovenumber 1
+22:28:13.287 << info currline a2a3 d7d5 d2d4 c8e6 c1f4 b7b6 h2h4 
+22:28:13.537 << info depth 6 seldepth 24 nodes 1745942 nps 144711 time 12065 hashfull 90
+22:28:13.537 << info currmove a2a3 currmovenumber 1
+22:28:13.537 << info currline a2a3 a7a6 b2b4 b7b5 c1b2 c7c5 
+22:28:13.787 << info depth 6 seldepth 24 nodes 1778893 nps 144449 time 12315 hashfull 92
+22:28:13.787 << info currmove a2a3 currmovenumber 1
+22:28:13.787 << info currline a2a3 a7a6 h2h3 a6a5 d2d3 d7d6 c2c3 
+22:28:14.037 << info depth 6 seldepth 24 nodes 1813174 nps 144303 time 12565 hashfull 93
+22:28:14.037 << info currmove a2a3 currmovenumber 1
+22:28:14.037 << info currline a2a3 a7a6 d2d4 d7d6 c1e3 g7g6 b1c3 
+22:28:14.287 << info depth 6 seldepth 24 nodes 1847366 nps 144156 time 12815 hashfull 95
+22:28:14.287 << info currmove a2a3 currmovenumber 1
+22:28:14.287 << info currline a2a3 b7b5 d2d4 e7e6 b2b3 g7g5 f2f4 g5f4 c1f4 f8a3 f4c7 d8c7 a1a3 c7h2 h1h2 
+22:28:14.537 << info depth 6 seldepth 24 nodes 1880359 nps 143923 time 13065 hashfull 97
+22:28:14.537 << info currmove a2a3 currmovenumber 1
+22:28:14.537 << info currline a2a3 b7b6 e2e4 e7e6 b2b4 c7c5 c2c4 c5b4 a3b4 f8b4 
+22:28:14.787 << info depth 6 seldepth 24 nodes 1908367 nps 143324 time 13315 hashfull 99
+22:28:14.787 << info currmove a2a3 currmovenumber 1
+22:28:14.787 << info currline a2a3 b7b6 h2h3 a7a5 d2d4 g7g5 b2b4 a5b4 c1g5 a8a3 b1a3 b4a3 
+22:28:15.037 << info depth 6 seldepth 24 nodes 1937696 nps 142845 time 13565 hashfull 100
+22:28:15.037 << info currmove a2a3 currmovenumber 1
+22:28:15.037 << info currline a2a3 b7b6 d2d4 b8c6 b2b4 h7h6 c1h6 
+22:28:15.287 << info depth 6 seldepth 24 nodes 1970193 nps 142612 time 13815 hashfull 102
+22:28:15.287 << info currmove a2a3 currmovenumber 1
+22:28:15.287 << info currline a2a3 c7c5 d2d4 b8c6 g1f3 h7h5 c2c4 c5d4 d1d4 
+22:28:15.537 << info depth 6 seldepth 24 nodes 2003753 nps 142463 time 14065 hashfull 104
+22:28:15.537 << info currmove a2a3 currmovenumber 1
+22:28:15.537 << info currline a2a3 c7c6 e2e3 d7d5 c2c3 b7b5 f2f3 
+22:28:15.787 << info depth 6 seldepth 24 nodes 2037410 nps 142326 time 14315 hashfull 106
+22:28:15.787 << info currmove a2a3 currmovenumber 1
+22:28:15.787 << info currline a2a3 c7c6 b2b4 e7e6 c1b2 b7b6 h2h4 
+22:28:16.037 << info depth 6 seldepth 24 nodes 2069349 nps 142076 time 14565 hashfull 107
+22:28:16.037 << info currmove a2a3 currmovenumber 1
+22:28:16.037 << info currline a2a3 c7c6 d2d4 d7d6 d4d5 d8b6 b2b3 c6d5 
+22:28:16.287 << info depth 6 seldepth 24 nodes 2102496 nps 141916 time 14815 hashfull 109
+22:28:16.287 << info currmove a2a3 currmovenumber 1
+22:28:16.287 << info currline a2a3 c7c6 f2f4 a7a5 e2e3 b7b6 b2b4 a5b4 a3b4 
+22:28:16.472 << info depth 6 seldepth 24 multipv 1 score cp 2 nodes 2129169 nps 141000 time 15000 pv a2a3 c7c6 b2b4 g8f6 d2d4 d8b6 c2c4 
+22:28:16.472 << bestmove a2a3 ponder c7c6
+22:28:16.482 >> stop
+22:28:16.482 >> quit
+22:28:17.071 >> ucinewgame
+22:28:17.071 << info string Configuration{PERFT=false, HASH_SIZE=512, PONDER=true, DEBUG=false, UCI_ShowCurrLine=true, USE_QUIESCENCE=true, USE_ROOT_MOVES_SORT=true, USE_ALPHABETA_PRUNING=true, USE_ASPIRATION_WINDOW=false, USE_PVS=true, USE_TRANSPOSITION_TABLE=true, USE_MATE_DISTANCE_PRUNING=true, USE_MINOR_PROMOTION_PRUNING=true}
+22:28:17.184 >> position fen 3rkb1r/1p3p2/p1n1p3/q5pp/2PpP3/1P4P1/P1Q1BPKP/R2N3R b k - 0 0
+22:28:17.185 >> go infinite
+22:28:17.191 << info depth 0 seldepth 10 multipv 1 score cp 114 nodes 520 nps 65000 time 6 pv a5e5 
+22:28:17.201 << info depth 1 seldepth 3 multipv 1 score cp 39 nodes 2239 nps 124000 time 16 pv f8d6 e2h5 
+22:28:17.435 << info depth 2 seldepth 15 nodes 36706 nps 146824 time 250 hashfull 2
+22:28:17.435 << info currmove c6b8 currmovenumber 36
+22:28:17.435 << info currline c6b8 c4c5 a5c5 e2h5 c5c2 h5f7 
+22:28:17.455 << info depth 2 seldepth 15 multipv 1 score cp 392 nodes 39993 nps 147000 time 270 pv d4d3 e2d3 d8d3 e2h5 
+22:28:17.685 << info depth 3 seldepth 16 nodes 85157 nps 170314 time 500 hashfull 4
+22:28:17.685 << info currmove f7f5 currmovenumber 16
+22:28:17.685 << info currline f7f5 d1b2 f5e4 g2h3 
+22:28:17.935 << info depth 3 seldepth 20 nodes 131809 nps 175745 time 750 hashfull 7
+22:28:17.935 << info currmove d8d5 currmovenumber 37
+22:28:17.935 << info currline d8d5 e4d5 c6e5 c2b1 
+22:28:21.188 >> stop
+22:28:21.205 << info depth 3 seldepth 20 multipv 1 score cp 27 nodes 131810 nps 32000 time 4020 pv f8d6 a2a4 e8e7 d1e3 
+22:28:21.206 << bestmove f8d6 ponder a2a4
+22:28:22.834 >> position startpos moves e2e4 e7e5
+22:28:23.835 >> go ponder wtime 300000 btime 300000
+22:28:23.836 << info depth 0 seldepth 2 multipv 1 score cp 0 nodes 43 nps 14000 time 1 pv a2a4 
+22:28:23.846 << info depth 1 seldepth 12 multipv 1 score cp 2 nodes 1308 nps 100000 time 11 pv g1f3 b8c6 
+22:28:24.006 << info depth 2 seldepth 16 multipv 1 score cp 145 nodes 24348 nps 140000 time 171 pv g1f3 b8c6 f3e5 
+22:28:24.085 << info depth 3 seldepth 16 nodes 35850 nps 143400 time 250 hashfull 2
+22:28:24.085 << info currmove b1c3 currmovenumber 4
+22:28:24.085 << info currline b1c3 b8a6 d2d4 f8c5 
+22:28:24.335 << info depth 3 seldepth 16 nodes 76048 nps 152096 time 500 hashfull 4
+22:28:24.335 << info currmove h2h3 currmovenumber 16
+22:28:24.335 << info currline h2h3 f8c5 b2b3 d7d5 
+22:28:24.525 << info depth 3 seldepth 17 multipv 1 score cp 10 nodes 109700 nps 158000 time 690 pv g1f3 b8c6 b1c3 d7d5 
+22:28:24.585 << info depth 4 seldepth 14 nodes 118934 nps 158578 time 750 hashfull 6
+22:28:24.585 << info currmove g1f3 currmovenumber 1
+22:28:24.585 << info currline g1f3 b7b5 d2d4 c7c6 h2h4 e5d4 f3d4 d8h4 
+22:28:24.835 << info depth 4 seldepth 19 nodes 154799 nps 154799 time 1000 hashfull 8
+22:28:24.835 << info currmove g1f3 currmovenumber 1
+22:28:24.835 << info currline g1f3 h7h5 d2d4 f8e7 g2g4 
+22:28:24.836 >> ponderhit
+22:28:25.085 << info depth 4 seldepth 19 nodes 188429 nps 756742 time 249 hashfull 10
+22:28:25.085 << info currmove d2d4 currmovenumber 2
+22:28:25.085 << info currline d2d4 a7a6 d4e5 h7h5 b2b4 f8b4 b1c3 b4c3 
+22:28:25.335 << info depth 4 seldepth 20 nodes 217393 nps 435657 time 499 hashfull 12
+22:28:25.335 << info currmove d2d4 currmovenumber 2
+22:28:25.335 << info currline d2d4 h7h5 c2c4 e5d4 d1e2 
+22:28:25.585 << info depth 4 seldepth 20 nodes 252764 nps 337468 time 749 hashfull 14
+22:28:25.585 << info currmove f1e2 currmovenumber 3
+22:28:25.585 << info currline f1e2 b7b6 d2d4 b6b5 e2b5 
+22:28:25.835 << info depth 4 seldepth 20 nodes 287351 nps 287638 time 999 hashfull 16
+22:28:25.835 << info currmove f1e2 currmovenumber 3
+22:28:25.835 << info currline f1e2 h7h5 c2c3 d7d5 f2f3 
+22:28:26.085 << info depth 4 seldepth 20 nodes 318864 nps 255295 time 1249 hashfull 18
+22:28:26.085 << info currmove f1e2 currmovenumber 3
+22:28:26.085 << info currline f1e2 d8g5 b1c3 g5g2 e2c4 g2h1 
+22:28:26.335 << info depth 4 seldepth 21 nodes 346038 nps 230845 time 1499 hashfull 19
+22:28:26.335 << info currmove f1c4 currmovenumber 4
+22:28:26.335 << info currline f1c4 f7f6 a2a3 b8c6 b1c3 f8a3 c4g8 h8g8 b2a3 
+22:28:26.585 << info depth 4 seldepth 21 nodes 373759 nps 213698 time 1749 hashfull 21
+22:28:26.585 << info currmove f1c4 currmovenumber 4
+22:28:26.585 << info currline f1c4 f8c5 b2b4 a7a6 c4a6 b7a6 b4c5 
+22:28:26.835 << info depth 4 seldepth 21 nodes 403620 nps 201910 time 1999 hashfull 23
+22:28:26.835 << info currmove f1d3 currmovenumber 5
+22:28:26.835 << info currline f1d3 c7c5 d1e2 a7a6 b1a3 
+22:28:27.085 << info depth 4 seldepth 21 nodes 432222 nps 192184 time 2249 hashfull 24
+22:28:27.085 << info currmove f1d3 currmovenumber 5
+22:28:27.085 << info currline f1d3 g7g6 d1f3 b7b5 f3g4 
+22:28:27.335 << info depth 4 seldepth 21 nodes 467683 nps 187148 time 2499 hashfull 26
+22:28:27.335 << info currmove f1d3 currmovenumber 5
+22:28:27.335 << info currline f1d3 d8g5 d3c4 h7h5 g2g3 g5g3 h2g3 
+22:28:27.585 << info depth 4 seldepth 21 nodes 502285 nps 182715 time 2749 hashfull 28
+22:28:27.585 << info currmove f1b5 currmovenumber 6
+22:28:27.585 << info currline f1b5 g7g6 d2d3 g8h6 a2a3 
+22:28:27.835 << info depth 4 seldepth 21 nodes 535649 nps 178609 time 2999 hashfull 30
+22:28:27.835 << info currmove f1b5 currmovenumber 6
+22:28:27.835 << info currline f1b5 f8b4 h2h4 g8e7 g1f3 b4d2 e1e2 
+22:28:28.085 << info depth 4 seldepth 21 nodes 571450 nps 175884 time 3249 hashfull 32
+22:28:28.085 << info currmove b1c3 currmovenumber 7
+22:28:28.085 << info currline b1c3 f8b4 a2a4 b7b5 g1f3 
+22:28:28.335 << info depth 4 seldepth 21 nodes 604755 nps 172836 time 3499 hashfull 34
+22:28:28.335 << info currmove d2d3 currmovenumber 8
+22:28:28.335 << info currline d2d3 d7d6 b1c3 h7h5 g1f3 
+22:28:28.585 << info depth 4 seldepth 21 nodes 639400 nps 170552 time 3749 hashfull 36
+22:28:28.585 << info currmove d2d3 currmovenumber 8
+22:28:28.585 << info currline d2d3 b8a6 f2f3 d7d5 a2a3 
+22:28:28.835 << info depth 4 seldepth 21 nodes 675961 nps 169032 time 3999 hashfull 38
+22:28:28.835 << info currmove d2d3 currmovenumber 8
+22:28:28.835 << info currline d2d3 d8f6 a2a4 f6c6 a4a5 c6e4 f1e2 
+22:28:29.085 << info depth 4 seldepth 21 nodes 713051 nps 167816 time 4249 hashfull 40
+22:28:29.085 << info currmove g1e2 currmovenumber 9
+22:28:29.085 << info currline g1e2 h7h6 c2c4 b7b5 h2h4 
+22:28:29.335 << info depth 4 seldepth 21 nodes 753708 nps 167527 time 4499 hashfull 42
+22:28:29.335 << info currmove d1g4 currmovenumber 10
+22:28:29.335 << info currline d1g4 b7b6 g4h3 f7f5 f1d3 f5e4 h3d7 
+22:28:29.585 << info depth 4 seldepth 21 nodes 791481 nps 166662 time 4749 hashfull 44
+22:28:29.585 << info currmove d1g4 currmovenumber 10
+22:28:29.585 << info currline d1g4 g7g6 b1a3 d7d5 d2d4 c8g4 
+22:28:29.835 << info depth 4 seldepth 21 nodes 831570 nps 166347 time 4999 hashfull 46
+22:28:29.835 << info currmove d1g4 currmovenumber 10
+22:28:29.835 << info currline d1g4 g8e7 g4g7 h8g8 g7g8 
+22:28:30.085 << info depth 4 seldepth 21 nodes 867074 nps 165188 time 5249 hashfull 48
+22:28:30.085 << info currmove g1h3 currmovenumber 11
+22:28:30.085 << info currline g1h3 c7c5 f2f4 
+22:28:30.335 << info depth 4 seldepth 21 nodes 905048 nps 164584 time 5499 hashfull 50
+22:28:30.335 << info currmove g1h3 currmovenumber 11
+22:28:30.335 << info currline g1h3 d8f6 a2a4 c7c5 d2d3 
+22:28:30.585 << info depth 4 seldepth 21 nodes 949148 nps 165097 time 5749 hashfull 52
+22:28:30.585 << info currmove d1h5 currmovenumber 12
+22:28:30.585 << info currline d1h5 f8d6 d2d3 b7b6 g2g3 
+22:28:30.835 << info depth 4 seldepth 21 nodes 983780 nps 163990 time 5999 hashfull 54
+22:28:30.835 << info currmove b1a3 currmovenumber 13
+22:28:30.835 << info currline b1a3 f7f6 b2b3 g7g6 c2c3 f8a3 c1a3 
+22:28:31.085 << info depth 4 seldepth 21 nodes 1018616 nps 163004 time 6249 hashfull 56
+22:28:31.085 << info currmove h2h3 currmovenumber 14
+22:28:31.085 << info currline h2h3 a7a5 d1h5 b7b6 h5e5 f8e7 e5c7 
+22:28:31.335 << info depth 4 seldepth 21 nodes 1056551 nps 162571 time 6499 hashfull 58
+22:28:31.335 << info currmove h2h3 currmovenumber 14
+22:28:31.335 << info currline h2h3 h7h5 d2d4 e8e7 b2b3 e5d4 d1h5 h8h5 
+22:28:31.703 << info depth 4 seldepth 21 nodes 1094405 nps 159371 time 6867 hashfull 60
+22:28:31.703 << info currmove f2f4 currmovenumber 15
+22:28:31.703 << info currline f2f4 a7a6 f4e5 f8a3 b2b3 a3c1 f1a6 
+22:28:31.953 << info depth 4 seldepth 21 nodes 1130846 nps 158893 time 7117 hashfull 62
+22:28:31.953 << info currmove f2f4 currmovenumber 15
+22:28:31.953 << info currline f2f4 g8h6 b1c3 b7b6 f4e5 
+22:28:32.203 << info depth 4 seldepth 21 nodes 1168303 nps 158585 time 7367 hashfull 63
+22:28:32.203 << info currmove d1f3 currmovenumber 16
+22:28:32.203 << info currline d1f3 b7b6 b2b4 f8b4 h2h3 
+22:28:32.311 << info depth 4 seldepth 21 multipv 1 score cp 140 nodes 1186259 nps 158000 time 7475 pv b1c3 f8b4 a2a3 b4c5 d2d4 
+22:28:32.311 << bestmove b1c3 ponder f8b4
+22:28:32.839 >> quit
+22:28:33.480 >> debug on
+22:28:33.480 << info string Engine Debug set to On
+22:28:34.480 >> quit

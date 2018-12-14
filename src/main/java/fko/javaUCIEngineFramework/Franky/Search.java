@@ -390,8 +390,8 @@ public class Search implements Runnable {
 
     // retrieved ponder move from pv
     int p_move;
-    if (principalVariation[0].size() > 1
-        && (p_move = principalVariation[0].get(1)) != Move.NOMOVE) {
+    if (principalVariation[0].size() > 1 && (p_move = principalVariation[0].get(1)) !=
+                                            Move.NOMOVE) {
       searchResult.ponderMove = p_move;
     } else {
       searchResult.ponderMove = Move.NOMOVE;
@@ -600,7 +600,7 @@ public class Search implements Runnable {
 
     // ###############################################
     // TT Lookup
-    int ttValue = probeTT(position, depthLeft, alpha, beta);
+    int ttValue = probeTT(position, ply, depthLeft, alpha, beta);
     if (ttValue != Evaluation.NOVALUE) {
       return ttValue;
     }
@@ -645,14 +645,11 @@ public class Search implements Runnable {
     MoveList moves = moveGenerators[ply].getPseudoLegalMoves(position);
     searchCounter.movesGenerated++;
 
+    // if we have already a PV move from the last iteration push it to the head
+    // of the move list to be evaluated first for more cutoffs
     if (config.USE_PVS_MOVE_ORDERING) {
-      // TODO: Move list sorting needed????
-      // TODO: use best move from last iteration as the first search move
       if (principalVariation[ply].size() > 0) {
-//        System.out.println("Before:  "+moves);
-//        System.out.println("PV move: "+principalVariation[ply].get(0));
         moves.pushToHead(principalVariation[ply].getFirst());
-//        System.out.println("After:   " + moves);
       }
     }
 
@@ -819,7 +816,7 @@ public class Search implements Runnable {
 
     // ###############################################
     // TT Lookup
-    int ttValue = probeTT(position, 0, alpha, beta);
+    int ttValue = probeTT(position, ply, 0, alpha, beta);
     if (ttValue != Evaluation.NOVALUE) {
       return ttValue;
     }
@@ -860,17 +857,15 @@ public class Search implements Runnable {
     // Generate all PseudoLegalMoves for QSearch
     // Usually only capture moves and check evasions
     // will be determined in move generator
-    MoveList moves = moveGenerators[ply].getPseudoLegalQSearchMoves(position);
+    MoveList moves;
+    moves = moveGenerators[ply].getPseudoLegalQSearchMoves(position);
     searchCounter.movesGenerated++;
 
+    // if we have already a PV move from the last iteration push it to the head
+    // of the move list to be evaluated first for more cutoffs
     if (config.USE_PVS_MOVE_ORDERING) {
-      // TODO: Move list sorting needed????
-      // TODO: use best move from last iteration as the first search move
       if (principalVariation[ply].size() > 0) {
-        //        System.out.println("Before:  "+moves);
-        //        System.out.println("PV move: "+principalVariation[ply].get(0));
         moves.pushToHead(principalVariation[ply].getFirst());
-        //        System.out.println("After:   " + moves);
       }
     }
 
@@ -999,7 +994,20 @@ public class Search implements Runnable {
                                                                  .ordinal()]);
   }
 
-  private int probeTT(final Position position, int depthLeft, int alpha, int beta) {
+  private void storeTT(final Position position, final int depthLeft, final TT_EntryType ttType,
+                       final int value) {
+    if (config.USE_TRANSPOSITION_TABLE && !isPerftSearch()) {
+      transpositionTable.put(position, value, ttType, depthLeft);
+
+      // FIXME
+      if (Math.abs(value) > Evaluation.CHECKMATE - MAX_SEARCH_DEPTH && ttType == TT_EntryType.EXACT) {
+//        LOG.debug("STORE: ttType: {} ttValue: {} ttDepth: {} Depthleft: {}", ttType, value, depthLeft, depthLeft);
+      }
+    }
+  }
+
+  private int probeTT(final Position position, final int ply, final int depthLeft, final int alpha,
+                      final int beta) {
     TT_Entry ttEntry;
 
     // TODO: MATE value need correction
@@ -1011,16 +1019,31 @@ public class Search implements Runnable {
         // hit
         searchCounter.nodeCache_Hits++;
         if (ttEntry.depth >= depthLeft) { // only if tt depth was equal or deeper
+          int value = ttEntry.value;
 
+          // FIXME: MATE Values are wrong - need correction due depth
+          // compensate for mate in # moves - the value in hash table is absolute
+          // and must be corrected by current ply
+          if (Math.abs(value) > Evaluation.CHECKMATE - MAX_SEARCH_DEPTH && ttEntry.type == TT_EntryType.EXACT) {
+            LOG.debug("READ: ttType: {} ttValue: {} ttDepth: {} Ply: {} Depthleft: {}",
+                      ttEntry.type, value, ttEntry.depth, ply, depthLeft);
+            if (value > 0) {
+//              value -= ttEntry.depth;
+            } else {
+//              value += ttEntry.depth;
+            }
+          }
+
+          // check the retrieved hash table entry
           if (ttEntry.type == TT_EntryType.EXACT) {
-            return ttEntry.value;
+            return value;
           } else if (ttEntry.type == TT_EntryType.ALPHA) {
-            if (ttEntry.value <= alpha) {
-              return alpha; // TODO CORRECT?
+            if (value <= alpha) {
+              return alpha;
             }
           } else if (ttEntry.type == TT_EntryType.BETA) {
-            if (ttEntry.value >= beta) {
-              return beta; // TODO CORRECT?
+            if (value >= beta) {
+              return beta;
             }
           }
         }
@@ -1029,13 +1052,6 @@ public class Search implements Runnable {
       searchCounter.nodeCache_Misses++;
     }
     return Evaluation.NOVALUE;
-  }
-
-  private void storeTT(final Position position, final int depthLeft, final TT_EntryType ttType,
-                       final int bestValue) {
-    if (config.USE_TRANSPOSITION_TABLE && !isPerftSearch()) {
-      transpositionTable.put(position, bestValue, ttType, depthLeft);
-    }
   }
 
   private boolean isPerftSearch() {

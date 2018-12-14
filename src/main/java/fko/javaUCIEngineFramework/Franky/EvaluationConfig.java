@@ -30,21 +30,21 @@ package fko.javaUCIEngineFramework.Franky;
  */
 class EvaluationConfig {
 
-  public static final int TEMPO       = 10;
-  public static final int CHECK_VALUE = 30;
+  static final int TEMPO       = 10;
+  static final int CHECK_VALUE = 30;
 
-  public static final int BISHOP_PAIR = 30;
-  public static final int KNIGHT_PAIR = 10;
-  public static final int ROOK_PAIR   = 15;
+  static final int BISHOP_PAIR = 30;
+  static final int KNIGHT_PAIR = 10;
+  static final int ROOK_PAIR   = 15;
 
-  public static final int KNIGHTS_MOBILITY_FACTOR = 2;
-  public static final int BISHOP_MOBILITY_FACTOR  = 2;
-  public static final int ROOK_MOBILITY_FACTOR    = 2;
-  public static final int QUEEN_MOBILITY_FACTOR   = 1;
+  static final int KNIGHTS_MOBILITY_FACTOR = 2;
+  static final int BISHOP_MOBILITY_FACTOR  = 2;
+  static final int ROOK_MOBILITY_FACTOR    = 2;
+  static final int QUEEN_MOBILITY_FACTOR   = 1;
 
-  public static final int MATERIAL_WEIGHT = 1;
-  public static final int POSITION_WEIGHT = 1;
-  public static final int MOBILITY_WEIGHT = 1;
+  static final int MATERIAL_WEIGHT = 1;
+  static final int POSITION_WEIGHT = 1;
+  static final int MOBILITY_WEIGHT = 4;
 
 
   // @formatter:off
@@ -120,7 +120,7 @@ class EvaluationConfig {
       0,  0,  0,  0,  0,  0,  0,  0,
       0,  0,  0,  0,  0,  0,  0,  0,
       0,  0,  0,  0,  0,  0,  0,  0,
-     -5,  0,  5,  5,  5,  5,  0, -5,
+     -5,  0, 15,  5,  5, 15,  0, -5,
   };
   static int[] rookEndGame   = new int[] {
     5,  5,  5,  5,  5,  5,  5,  5,
@@ -162,7 +162,7 @@ class EvaluationConfig {
     -20,-30,-30,-40,-40,-30,-30,-20,
     -10,-20,-20,-20,-20,-20,-20,-10,
      20, 20,  0,  0,  0,  0, 20, 20,
-     20, 30, 10,  0,  0, 10, 30, 20
+     20, 30, 50,  0,  0, 10, 50, 20
   };
   static int[] kingEndGame   = new int[] {
     -50,-40,-30,-20,-20,-30,-40,-50,
@@ -176,11 +176,11 @@ class EvaluationConfig {
   };
   // @formatter:on
 
-  public static int getWhiteTableIndex(final int index) {
+  static int getWhiteTableIndex(final int index) {
     return 56 - (8 * (index / 16)) + (index % 16);
   }
 
-  public static int getBlackTableIndex(final int index) {
+  static int getBlackTableIndex(final int index) {
     return (8 * (index / 16)) + (index % 16);
   }
 }

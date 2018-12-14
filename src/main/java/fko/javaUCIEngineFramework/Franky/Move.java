@@ -250,7 +250,7 @@ public class Move {
    * Lightweight check if the given int is a valid int representing a move.<br>
    * <b>This does not check if this is a legal move</b>.<br>
    * It simply checks if the we can extract a valid Square as "from" and "to" and valid
-   * OmegaPieces for piece (without NOPIECE), target and promotion.
+   * Pieces for piece (without NOPIECE), target and promotion.
    *
    * @param move
    * @return true if we could extract valid squares and pieces
