@@ -52,11 +52,6 @@ class TestMateSearch {
     engine = new FrankyEngine();
     search = ((FrankyEngine) engine).getSearch();
 
-//    search.config.USE_QUIESCENCE = false;
-//    search.config.USE_MATE_DISTANCE_PRUNING = false;
-//    search.config.USE_TRANSPOSITION_TABLE = false;
-//    search.config.USE_NULL_MOVE_PRUNING = false;
-
   }
 
   @Test
@@ -175,6 +170,15 @@ class TestMateSearch {
   @Test
   @Disabled
   public void testMate5Search() {
+
+    search.config.USE_ALPHABETA_PRUNING = true;
+    search.config.USE_NULL_MOVE_PRUNING = true;
+    search.config.USE_MINOR_PROMOTION_PRUNING = true;
+    search.config.USE_PVS_MOVE_ORDERING = true;
+    search.config.USE_MATE_DISTANCE_PRUNING = true;
+    search.config.USE_QUIESCENCE = true;
+    search.config.USE_PVS = true;
+    search.config.USE_TRANSPOSITION_TABLE = true;
 
     String fen;
     Position position;

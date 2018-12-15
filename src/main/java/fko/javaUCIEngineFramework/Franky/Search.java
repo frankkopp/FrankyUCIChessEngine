@@ -449,9 +449,9 @@ public class Search implements Runnable {
       currentVariation.add(move);
 
       int value;
-      int previousValue = rootMoves.get(i).value;
 
       //      ASPIRATION
+      //      int previousValue = rootMoves.get(i).value;
       //      if (depth < 4 || !config.USE_ASPIRATION_WINDOW || isPerftSearch()) {
       //        value = -negamax(position, depth - 1, rootPly + 1, alpha, beta, IS_PV, NO_NULL);
       //      } else {
@@ -602,7 +602,11 @@ public class Search implements Runnable {
     // TT Lookup
     int ttValue = probeTT(position, ply, depthLeft, alpha, beta);
     if (ttValue != Evaluation.NOVALUE) {
-      return ttValue;
+      // FIXME???
+      // in PV node only return ttValue if it was an exact hit
+      if (!pvSearch || (alpha < ttValue && ttValue < beta)) {
+        return ttValue;
+      }
     }
     // End TT Lookup
     // ###############################################
@@ -816,6 +820,7 @@ public class Search implements Runnable {
 
     // ###############################################
     // TT Lookup
+    // FIXME???
     int ttValue = probeTT(position, ply, 0, alpha, beta);
     if (ttValue != Evaluation.NOVALUE) {
       return ttValue;
@@ -1000,8 +1005,10 @@ public class Search implements Runnable {
       transpositionTable.put(position, value, ttType, depthLeft);
 
       // FIXME
-      if (Math.abs(value) > Evaluation.CHECKMATE - MAX_SEARCH_DEPTH && ttType == TT_EntryType.EXACT) {
-//        LOG.debug("STORE: ttType: {} ttValue: {} ttDepth: {} Depthleft: {}", ttType, value, depthLeft, depthLeft);
+      if (Math.abs(value) > Evaluation.CHECKMATE - MAX_SEARCH_DEPTH &&
+          ttType == TT_EntryType.EXACT) {
+        // LOG.debug("STORE: ttType: {} ttValue: {} ttDepth: {} Depthleft: {}", ttType, value,
+        // depthLeft, depthLeft);
       }
     }
   }
@@ -1021,21 +1028,22 @@ public class Search implements Runnable {
         if (ttEntry.depth >= depthLeft) { // only if tt depth was equal or deeper
           int value = ttEntry.value;
 
-          // FIXME: MATE Values are wrong - need correction due depth
-          // compensate for mate in # moves - the value in hash table is absolute
-          // and must be corrected by current ply
-          if (Math.abs(value) > Evaluation.CHECKMATE - MAX_SEARCH_DEPTH && ttEntry.type == TT_EntryType.EXACT) {
-            LOG.debug("READ: ttType: {} ttValue: {} ttDepth: {} Ply: {} Depthleft: {}",
-                      ttEntry.type, value, ttEntry.depth, ply, depthLeft);
-            if (value > 0) {
-//              value -= ttEntry.depth;
-            } else {
-//              value += ttEntry.depth;
-            }
-          }
-
           // check the retrieved hash table entry
           if (ttEntry.type == TT_EntryType.EXACT) {
+
+            // FIXME: MATE Values are wrong - need correction due depth
+            // compensate for mate in # moves - the value in hash table is absolute
+            // and must be corrected by current ply
+            if (Math.abs(value) > Evaluation.CHECKMATE - MAX_SEARCH_DEPTH) {
+              // LOG.debug("READ: ttType: {} ttValue: {} ttDepth: {} Ply: {} Depthleft: {}",
+              // ttEntry.type, value, ttEntry.depth, ply, depthLeft);
+              if (value > 0) {
+                value -= 0;
+              } else {
+                value += 0;
+              }
+            }
+
             return value;
           } else if (ttEntry.type == TT_EntryType.ALPHA) {
             if (value <= alpha) {

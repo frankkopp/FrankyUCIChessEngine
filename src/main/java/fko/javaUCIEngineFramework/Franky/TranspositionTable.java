@@ -34,6 +34,9 @@ import org.slf4j.LoggerFactory;
  * are calculated by using the modulo of the max number of entries from the key.
  * <code>entries[key%maxNumberOfEntries]</code>. As long as key is randomly distributed
  * this works just fine.
+ *
+ * TODO: make the hashtable entries smaller to increase number of elements
+ *  Use bits to store information
  */
 public class TranspositionTable {
 
