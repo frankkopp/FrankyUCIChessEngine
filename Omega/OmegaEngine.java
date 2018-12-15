@@ -22,7 +22,7 @@
  * SOFTWARE.
  *
  */
-package fko.javaUCIEngineFramework.Franky;
+package fko.FrankyEngine.Franky;
 
 import fko.chessly.Chessly;
 import fko.chessly.Playroom;

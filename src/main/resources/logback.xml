@@ -67,7 +67,7 @@
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </logger>
-    <logger name="fko.javaUCIEngineFramework.Franky" level="DEBUG" additivity="false">
+    <logger name="fko.FrankyEngine.Franky" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </logger>

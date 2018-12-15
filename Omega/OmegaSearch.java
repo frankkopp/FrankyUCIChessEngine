@@ -23,10 +23,10 @@
  *
  */
 
-package fko.javaUCIEngineFramework.Franky;
+package fko.FrankyEngine.Franky;
 
-import fko.javaUCIEngineFramework.Franky.OmegaTranspositionTable.TT_Entry;
-import fko.javaUCIEngineFramework.Franky.OmegaTranspositionTable.TT_EntryType;
+import fko.FrankyEngine.Franky.OmegaTranspositionTable.TT_Entry;
+import fko.FrankyEngine.Franky.OmegaTranspositionTable.TT_EntryType;
 import fko.javaUCIEngineFramework.UCI.IUCIEngine;
 
 import java.time.Duration;

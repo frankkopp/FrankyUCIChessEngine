@@ -149,7 +149,7 @@ public interface IUCIEngine {
    * Possible search parameters are encoded in SearchMode<br/>
    *
    * @param searchMode possible search parameters
-   * @see fko.javaUCIEngineFramework.Franky.SearchMode
+   * @see fko.FrankyEngine.Franky.SearchMode
    */
   void startSearch(IUCISearchMode searchMode);
 
