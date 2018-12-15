@@ -1,2 +1,4 @@
 # JavaUCIEngineFramework
-Framework for communicating with a Chess GUI based on UCI
+Java "framework" for communicating with a Chess GUI based on UCI
+
+Also includes new chess engine "Franky"
