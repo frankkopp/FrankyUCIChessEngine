@@ -53,6 +53,8 @@ public class Search implements Runnable {
 
   public static final int MAX_SEARCH_DEPTH = 100;
 
+  public static final int MATEVALUE_MAXPLY = Evaluation.CHECKMATE - Search.MAX_SEARCH_DEPTH;
+
   // Readabilty constants
   private static final boolean DO_NULL = true;
   private static final boolean NO_NULL = false;
@@ -453,7 +455,7 @@ public class Search implements Runnable {
       //      ASPIRATION
       //      int previousValue = rootMoves.get(i).value;
       //      if (depth < 4 || !config.USE_ASPIRATION_WINDOW || isPerftSearch()) {
-      //        value = -negamax(position, depth - 1, rootPly + 1, alpha, beta, IS_PV, NO_NULL);
+      //        value = -search(position, depth - 1, rootPly + 1, alpha, beta, IS_PV, NO_NULL);
       //      } else {
       //
       //        // ########################################
@@ -461,12 +463,12 @@ public class Search implements Runnable {
       //        int delta = 50; // ASPIRATION WINDOW
       //        alpha = Math.max(previousValue - delta, -Evaluation.INFINITE);
       //        beta = Math.min(previousValue + delta, Evaluation.INFINITE);
-      //        value = -negamax(position, depth - 1, rootPly + 1, alpha, beta, NO_PV, DO_NULL);
+      //        value = -search(position, depth - 1, rootPly + 1, alpha, beta, NO_PV, DO_NULL);
       //        if (value <= alpha || value >= beta) {
       //          // failed
       //          alpha = -Evaluation.INFINITE;
       //          beta = Evaluation.INFINITE;
-      //          value = -negamax(position, depth - 1, rootPly + 1, alpha, beta, IS_PV, DO_NULL);
+      //          value = -search(position, depth - 1, rootPly + 1, alpha, beta, IS_PV, DO_NULL);
       //        }
       //        // ### END ASPIRATION WINDOW SEARCH     ###
       //        // ########################################
@@ -475,7 +477,7 @@ public class Search implements Runnable {
 
       //        ASPIRATION Search with loop
       //        do {
-      //          value = -negamax(position, depth - 1, rootPly + 1, alpha, beta, false);
+      //          value = -search(position, depth - 1, rootPly + 1, alpha, beta, false);
       //          if (value <= alpha) {
       //            // failed low
       //            beta = (alpha + beta) / 2;
@@ -494,13 +496,13 @@ public class Search implements Runnable {
       // ########################################
       // ### START PVS ROOT SEARCH            ###
       if (!config.USE_PVS || bestValue == Evaluation.NOVALUE || isPerftSearch()) { // no PV yet
-        value = -negamax(position, depth - 1, rootPly + 1, -beta, -alpha, true, true);
+        value = -search(position, depth - 1, rootPly + 1, -beta, -alpha, true, true);
       } else {
         // try null window search
-        value = -negamax(position, depth - 1, rootPly + 1, -alpha - 1, -alpha, false, true);
+        value = -search(position, depth - 1, rootPly + 1, -alpha - 1, -alpha, false, true);
         if (alpha < value && value < beta) { // not failed - research
           searchCounter.pv_root_researches++;
-          value = -negamax(position, depth - 1, rootPly + 1, -beta, -alpha, true, true);
+          value = -search(position, depth - 1, rootPly + 1, -beta, -alpha, true, true);
         } else {
           searchCounter.pv_root_cutoffs++;
         }
@@ -553,12 +555,20 @@ public class Search implements Runnable {
    * @param doNullMove
    * @return value of the search
    */
-  private int negamax(Position position, int depthLeft, int ply, int alpha, int beta,
-                      boolean pvSearch, final boolean doNullMove) {
+  private int search(Position position, int depthLeft, int ply, int alpha, int beta,
+                     boolean pvSearch, final boolean doNullMove) {
 
-    // on leaf node call quiescence
+    // on leaf node call qsearch
     if (depthLeft < 1) {
-      return quiescence(position, ply, alpha, beta);
+      return qsearch(position, ply, alpha, beta);
+    }
+
+    // check draw through 50-moves-rule, 3-fold-repetition, insufficient material
+    if (!isPerftSearch()) {
+      if (position.check50Moves() || position.check3Repetitions() ||
+          position.checkInsufficientMaterial()) {
+        return Evaluation.DRAW;
+      }
     }
 
     // ###############################################
@@ -575,27 +585,19 @@ public class Search implements Runnable {
     // ## ENDOF Mate Distance Pruning
     // ###############################################
 
-    // nodes counter
+    // check if we search max allowed nodes and update nodes counter
     if (searchMode.getNodes() > 0 && searchCounter.nodesVisited >= searchMode.getNodes()) {
       stopSearch = true;
       return alpha;
     }
     searchCounter.nodesVisited++;
 
-    // current search depth
+    // update current search depth stats
     if (searchCounter.currentSearchDepth < ply) {
       searchCounter.currentSearchDepth = ply;
     }
     if (searchCounter.currentExtraSearchDepth < ply) {
       searchCounter.currentExtraSearchDepth = ply;
-    }
-
-    // check draw through 50-moves-rule, 3-fold-repetition, insufficient material
-    if (!isPerftSearch()) {
-      if (position.check50Moves() || position.check3Repetitions() ||
-          position.checkInsufficientMaterial()) {
-        return Evaluation.DRAW;
-      }
     }
 
     // ###############################################
@@ -629,14 +631,19 @@ public class Search implements Runnable {
       position.makeNullMove();
       // null move search
       int reduction = depthLeft > 6 ? 3 : 2;
-      int nullValue = -negamax(position, depthLeft - reduction, ply + 1, -beta, -beta + 1, NO_PV,
-                               NO_NULL);
+      int nullValue = -search(position, depthLeft - reduction, ply + 1, -beta, beta+1, NO_PV,
+                              NO_NULL);
       position.undoNullMove();
+
+      // do not return unproven mate values
+      if (nullValue >= MATEVALUE_MAXPLY) {
+        nullValue=beta;
+      }
 
       // pruning
       if (nullValue >= beta) {
         searchCounter.nullMovePrunings++;
-        return beta;
+        return nullValue; // TODO: was beta - but testing with nullValue now
       }
     }
     // NULL MOVE PRUNING
@@ -716,21 +723,21 @@ public class Search implements Runnable {
 
       // go one ply deeper into the search tree
       if (isPerftSearch()) {
-        value = -negamax(position, depthLeft - 1, ply + 1, -beta, -alpha, IS_PV, NO_NULL);
+        value = -search(position, depthLeft - 1, ply + 1, -beta, -alpha, IS_PV, NO_NULL);
       } else {
 
         // ########################################
         // ### START PVS ###
         if (!config.USE_PVS || !pvSearch || pvValue == Evaluation.NOVALUE) {
           // no PV yet - do a full search
-          value = -negamax(position, depthLeft - 1, ply + 1, -beta, -alpha, pvSearch, DO_NULL);
+          value = -search(position, depthLeft - 1, ply + 1, -beta, -alpha, pvSearch, DO_NULL);
         } else {
           // try null window search
-          value = -negamax(position, depthLeft - 1, ply + 1, -alpha - 1, -alpha, NO_PV, DO_NULL);
+          value = -search(position, depthLeft - 1, ply + 1, -alpha - 1, -alpha, NO_PV, DO_NULL);
           if (value > alpha && value < beta) {
             // no fail - do a full research
             searchCounter.pv_researches++;
-            value = -negamax(position, depthLeft - 1, ply + 1, -beta, -alpha, IS_PV, DO_NULL);
+            value = -search(position, depthLeft - 1, ply + 1, -beta, -alpha, IS_PV, DO_NULL);
           } else {
             searchCounter.pv_cutoffs++;
           }
@@ -788,7 +795,7 @@ public class Search implements Runnable {
     return alpha;
   }
 
-  private int quiescence(Position position, int ply, int alpha, int beta) {
+  private int qsearch(Position position, int ply, int alpha, int beta) {
 
     // ###############################################
     // ## BEGIN Mate Distance Pruning
@@ -897,7 +904,7 @@ public class Search implements Runnable {
       // needed to remember if we even had a legal move
       hadLegaMove = true;
 
-      // in quiescence search we count extra depth here after we made a move
+      // in qsearch search we count extra depth here after we made a move
       if (searchCounter.currentExtraSearchDepth < ply) {
         searchCounter.currentExtraSearchDepth = ply;
       }
@@ -912,7 +919,7 @@ public class Search implements Runnable {
       sendUCIUpdate(position);
 
       // go one ply deeper into the search tree
-      value = -quiescence(position, ply + 1, -beta, -alpha);
+      value = -qsearch(position, ply + 1, -beta, -alpha);
 
       currentVariation.removeLast();
       position.undoMove();
