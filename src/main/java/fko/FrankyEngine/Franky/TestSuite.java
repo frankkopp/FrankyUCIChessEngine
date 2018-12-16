@@ -88,6 +88,7 @@ public class TestSuite {
   /**
    * Creates a TestSuite instance using the given path to file as the test file.
    * Otherwise reads main properties file.
+   *
    * @param testFile
    */
   public TestSuite(String testFile) {
@@ -97,6 +98,7 @@ public class TestSuite {
 
   /**
    * Starts a test with the given time per move
+   *
    * @param searchTime time per move in ms
    */
   public void startTests(final int searchTime) {
@@ -172,8 +174,8 @@ public class TestSuite {
   }
 
   /**
-   * @param epd a EPD line for the test to conducted
-   * @param searchTime search time per move in ms
+   * @param epd        a EPD line for the test to conducted
+   * @param searchTime search time per move in ms (ignored for mate search)
    */
   public void startOneTest(final String epd, final int searchTime) {
     this.searchTime = searchTime;
@@ -203,6 +205,7 @@ public class TestSuite {
   /**
    * Searches the position for the best move nd compares the result with the
    * expected result from the test case
+   *
    * @param testCase
    */
   private void searchBestMoveTest(final TestCase testCase) {
@@ -244,19 +247,46 @@ public class TestSuite {
   /**
    * Searches a mate in the given amount of moves. Test fails if we do not find a mate
    * at all or with more moves.
-   *
+   * <p>
    * // TODO: not implemented yet
+   *
    * @param testCase
    */
   private void searchDirectMateTest(final TestCase testCase) {
-    System.out.printf("Search for mate in %s moves\n", testCase.operand);
-    System.out.println("NOT YET IMPLEMENTED");
+    int mateDepth = Integer.valueOf(testCase.operand);
+    System.out.printf("Search for mate in %d moves\n", mateDepth);
+
+    FrankyEngine engine = new FrankyEngine();
+    Search search = engine.getSearch();
+
+    Position position = new Position(testCase.fen);
+
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, mateDepth, 0, null, false, false,
+                                           false);
+    search.startSearch(position, searchMode);
+    waitWhileSearching(search);
+
+    testCase.engineMove = search.getLastSearchResult().bestMove;
+    testCase.engineValue = search.getLastSearchResult().resultValue;
+
+    System.out.println("RESULT: " + testCase.engineValue);
+
+    testCase.result = Result.FAILED;
+    int depthPly = Evaluation.CHECKMATE - testCase.engineValue;
+    if (depthPly == mateDepth * 2 - 1) {
+      System.out.printf("SUCCESS: Found Mate in %d moves (%d plys): %s\n", mateDepth, depthPly,
+                        Move.toString(testCase.engineMove));
+      testCase.result = Result.SUCCESS;
+    } else {
+      System.out.printf("FAILED: Mate in %d not found.\n", mateDepth);
+    }
   }
 
   /**
    * Reads and extracts the moves for bm OpCode from the operand string
+   *
    * @param position current position to check if moves are legal
-   * @param operand string holding the moves in SAN notation
+   * @param operand  string holding the moves in SAN notation
    * @return list of extracted moves
    */
   private MoveList getMovesFromOperand(final Position position, final String operand) {
@@ -294,8 +324,10 @@ public class TestSuite {
       String promotion = matcher.group(6);
       String checkSign = matcher.group(7);
 
-      if (trace) System.out.printf("Piece: %s File: %s Row: %s Target: %s Promotion: %s CheckSign: %s\n",
-                        piece, disambFile, disambRank, targetSquare, promotion, checkSign);
+      if (trace) {
+        System.out.printf("Piece: %s File: %s Row: %s Target: %s Promotion: %s CheckSign: %s\n",
+                          piece, disambFile, disambRank, targetSquare, promotion, checkSign);
+      }
 
       // generate all legal moves from the position
       // and try to find a matching move
@@ -304,14 +336,20 @@ public class TestSuite {
       int moveFromSAN = Move.NOMOVE;
       int movesFound = 0;
       for (int move : moveList) {
-        if (trace) System.out.printf("Move %s\n", Move.toString(move));
+        if (trace) {
+          System.out.printf("Move %s\n", Move.toString(move));
+        }
         // castling
         if (Move.getMoveType(move) == MoveType.CASTLING) {
-          if (trace) System.out.println("Castling");
+          if (trace) {
+            System.out.println("Castling");
+          }
           if (!targetSquare.equals(Move.toString(move))) {
             continue;
           }
-          if (trace) System.out.println("Castling MATCH " + Move.toString(move));
+          if (trace) {
+            System.out.println("Castling MATCH " + Move.toString(move));
+          }
           moveFromSAN = move;
           movesFound++;
           continue;
@@ -319,36 +357,54 @@ public class TestSuite {
         // same end square
         if (Move.getEnd(move).name().equals(targetSquare)) {
           if (piece != null && Move.getPiece(move).getType().getShortName().equals(piece)) {
-            if (trace) System.out.println("Piece MATCH " + Move.getPiece(move).getType().toString());
+            if (trace) {
+              System.out.println("Piece MATCH " + Move.getPiece(move).getType().toString());
+            }
           } else if (piece == null && Move.getPiece(move).getType().equals(PieceType.PAWN)) {
-            if (trace) System.out.println("Piece MATCH PAWN");
+            if (trace) {
+              System.out.println("Piece MATCH PAWN");
+            }
           } else {
-            if (trace) System.out.println("Piece NO MATCH");
+            if (trace) {
+              System.out.println("Piece NO MATCH");
+            }
             continue;
           }
           // Disambiguation
           if (disambFile != null) {
             if (Move.getStart(move).getFile().name().equals(disambFile)) {
-              if (trace) System.out.println("File MATCH " + Move.getStart(move).getFile().name());
+              if (trace) {
+                System.out.println("File MATCH " + Move.getStart(move).getFile().name());
+              }
             } else {
-              if (trace) System.out.println("File NO MATCH " + Move.getStart(move).getFile().name());
+              if (trace) {
+                System.out.println("File NO MATCH " + Move.getStart(move).getFile().name());
+              }
               continue;
             }
           }
           if (disambRank != null) {
             if (("" + Move.getStart(move).getRank().get()).equals(disambRank)) {
-              if (trace) System.out.println("Rank MATCH " + Move.getStart(move).getRank().get());
+              if (trace) {
+                System.out.println("Rank MATCH " + Move.getStart(move).getRank().get());
+              }
             } else {
-              if (trace) System.out.println("Rank NO MATCH " + Move.getStart(move).getRank().get());
+              if (trace) {
+                System.out.println("Rank NO MATCH " + Move.getStart(move).getRank().get());
+              }
               continue;
             }
           }
           // promotion
           if (promotion != null) {
             if (Move.getPromotion(move).getType().getShortName().equals(promotion)) {
-              if (trace) System.out.println("Promotion MATCH");
+              if (trace) {
+                System.out.println("Promotion MATCH");
+              }
             } else {
-              if (trace) System.out.println("Promotion NO MATCH");
+              if (trace) {
+                System.out.println("Promotion NO MATCH");
+              }
               continue;
             }
           }
@@ -359,7 +415,7 @@ public class TestSuite {
       if (movesFound > 1) {
         LOG.error("SAN move is ambiguous!");
       } else if (movesFound == 0 || !Move.isValid(moveFromSAN)) {
-        LOG.error("SAN move not valid!");
+        LOG.error("SAN move not valid! No such move at the current position: "+sanMove);
       } else {
         bestMoves.add(moveFromSAN);
       }
@@ -396,6 +452,7 @@ public class TestSuite {
 
   /**
    * Interprets a line of EPD and creates a TestCase instance
+   *
    * @param line EPD string
    * @return the extracted TestCase instance
    */
@@ -499,8 +556,7 @@ public class TestSuite {
     NOT_TESTED,
     SUCCESS,
     FAILED,
-    SKIPPED
-  }
+    SKIPPED}
 
 
 }

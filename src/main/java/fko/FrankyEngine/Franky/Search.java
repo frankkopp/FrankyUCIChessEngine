@@ -51,13 +51,13 @@ public class Search implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Search.class);
 
+  public static final int MAX_SEARCH_DEPTH = 100;
+
   // Readabilty constants
   private static final boolean DO_NULL = true;
   private static final boolean NO_NULL = false;
   private static final boolean IS_PV   = true;
   private static final boolean NO_PV   = false;
-
-  private static final int MAX_SEARCH_DEPTH = 100;
 
   // search counters
   private final SearchCounter searchCounter = new SearchCounter();
