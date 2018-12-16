@@ -13,3 +13,5 @@ rn2kb1r/pp3ppp/4pn2/2pq4/3P2b1/2P2N2/PP2BPPP/RNBQK2R w KQkq - bm O-O; id "Crafty
 r1bq1rk1/3nbppp/p2pp3/6PQ/1p1BP2P/2NB4/PPP2P2/2KR3R w - - bm Bxg7; id "CCC-I No.2";
 2kr4/ppq2pp1/2b1pn2/2P4r/2P5/3BQN1P/P4PP1/R4RK1 b - - bm Ng4!; id "CCC-I No.3";
 8/3r1pk1/p1R2p2/1p5p/r2p4/PRP1K1P1/5P1P/8 w - - bm cxd4; id "Crafty Test Pos.20"; c0 "DB/GK Philadelphia 1996, Game 3, move 35W (cxd4)";
+r1bqk2r/pp1n1ppp/2pbpn2/3p4/2PP4/3BPN2/PP1N1PPP/R1BQK2R w KQkq - bm e4; id "Crafty Test Pos.21"; c0 "GK/DB Philadelphia 1996, Game 4, move 7W (e4)";
+r1q1r1k1/1p3pp1/2p1bn1p/p3N3/2P2P2/P1Q1R3/1PB3PP/4R1K1 w - - bm h3; id "Crafty Test Pos.23"; c0 "GK/DB Philadelphia 1996, Game 4, move 21W (h3)";

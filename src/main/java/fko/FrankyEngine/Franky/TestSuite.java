@@ -58,7 +58,13 @@ public class TestSuite {
 
   private List<TestCase> testCases = new ArrayList<>();
 
+  /**
+   * Creates a TestSuite instance based on the configuration in the main properties
+   * files (TestSuiteConfig.properties)
+   */
   public TestSuite() {
+
+    // load properties
     final Properties properties = new Properties();
     try {
       properties.load(Objects.requireNonNull(
@@ -69,64 +75,52 @@ public class TestSuite {
       System.exit(1);
     }
 
-    // Testfile
+    // get path for the test file with the EPD lines
     setFilePath(properties.getProperty("testfile"));
 
-    // search time
+    // get search time and make sure it is not <=0
     searchTime = Integer.valueOf(properties.getProperty("search_time"));
     if (searchTime <= 0) {
       searchTime = 60;
     }
   }
 
+  /**
+   * Creates a TestSuite instance using the given path to file as the test file.
+   * Otherwise reads main properties file.
+   * @param testFile
+   */
   public TestSuite(String testFile) {
     this();
     setFilePath(testFile);
   }
 
-  private void setFilePath(final String testFile) {
-    filePath = FileSystems.getDefault().getPath(testFile);
-    // Check if file exists
-    if (Files.notExists(filePath, LinkOption.NOFOLLOW_LINKS)) {
-      LOG.error("While reading epd file: File {} could not be found.",
-                filePath.getFileName().toString());
-      System.exit(1);
-    }
-  }
-
+  /**
+   * Starts a test with the given time per move
+   * @param searchTime time per move in ms
+   */
   public void startTests(final int searchTime) {
     this.searchTime = searchTime;
     startTests();
   }
 
+  /**
+   * Starts the test iwth the parameters set in the main properties file
+   */
   public void startTests() {
 
     System.out.println("Testsuite Test Started!");
     System.out.println("========================================");
     System.out.printf("Opening Testsuite file: %s\n", filePath);
 
+    // read the test cases from the given file of EPD lines
     readTestCsaes();
 
     System.out.printf("Testsuite has %d test cases.\n\n", testCases.size());
 
-    // Do tests
+    // Do tests and store result in the testCase objects
     for (TestCase testCase : testCases) {
-      System.out.printf("Test %d: %s Fen: %s\n", testCases.indexOf(testCase) + 1, testCase.id,
-                        testCase.fen);
-      switch (testCase.opCode) {
-        case "bm":
-          searchBestMoveTest(testCase);
-          break;
-        case "dm":
-          searchDirectMateTest(testCase);
-          break;
-        default:
-          testCase.result = Result.SKIPPED;
-          System.out.println("SKIPPED! OpCode unknown or not implemented: " + testCase.opCode);
-          System.out.println();
-          continue;
-      }
-      System.out.println();
+      doOneTestCase(testCase);
     }
 
     // Print results
@@ -136,9 +130,11 @@ public class TestSuite {
     int notTestedCounter = 0;
     System.out.println();
     System.out.printf("Results with search time %,dms for file %s\n", searchTime, filePath);
-    System.out.println("==================================================================================");
+    System.out.println(
+      "==================================================================================");
     System.out.println("No  | Result     | Engine   | Value | Best Move       | Fen ");
-    System.out.println("==================================================================================");
+    System.out.println(
+      "==================================================================================");
     for (TestCase testCase : testCases) {
       switch (testCase.result) {
         case SUCCESS:
@@ -161,7 +157,8 @@ public class TestSuite {
                         : "" + testCase.engineValue, testCase.bestMoves.toNotationString(),
                         testCase.fen);
     }
-    System.out.println("==================================================================================");
+    System.out.println(
+      "==================================================================================");
     System.out.printf("Successful: %,3d (%d Prozent)\n", successCounter,
                       100 * successCounter / testCases.size());
     System.out.printf("Failed:     %,3d (%d Prozent)\n", failedCounter,
@@ -174,6 +171,40 @@ public class TestSuite {
 
   }
 
+  /**
+   * @param epd a EPD line for the test to conducted
+   * @param searchTime search time per move in ms
+   */
+  public void startOneTest(final String epd, final int searchTime) {
+    this.searchTime = searchTime;
+    TestCase testCase = readOneEPD(epd);
+    doOneTestCase(testCase);
+  }
+
+  private void doOneTestCase(final TestCase testCase) {
+    System.out.printf("Test %d: %s Fen: %s\n", testCases.indexOf(testCase) + 1, testCase.id,
+                      testCase.fen);
+    switch (testCase.opCode) {
+      case "bm":
+        searchBestMoveTest(testCase);
+        break;
+      case "dm":
+        searchDirectMateTest(testCase);
+        break;
+      default:
+        testCase.result = Result.SKIPPED;
+        System.out.println("SKIPPED! OpCode unknown or not implemented: " + testCase.opCode);
+        System.out.println();
+        return;
+    }
+    System.out.println();
+  }
+
+  /**
+   * Searches the position for the best move nd compares the result with the
+   * expected result from the test case
+   * @param testCase
+   */
   private void searchBestMoveTest(final TestCase testCase) {
     System.out.printf("Search for best move: %s\n", testCase.operand);
 
@@ -181,7 +212,7 @@ public class TestSuite {
     Search search = engine.getSearch();
 
     Position position = new Position(testCase.fen);
-    testCase.bestMoves = getMoveFromOperand(position, testCase.operand);
+    testCase.bestMoves = getMovesFromOperand(position, testCase.operand);
 
     System.out.printf("Best Moves: %s\n", testCase.bestMoves);
 
@@ -210,17 +241,32 @@ public class TestSuite {
 
   }
 
+  /**
+   * Searches a mate in the given amount of moves. Test fails if we do not find a mate
+   * at all or with more moves.
+   *
+   * // TODO: not implemented yet
+   * @param testCase
+   */
   private void searchDirectMateTest(final TestCase testCase) {
     System.out.printf("Search for mate in %s moves\n", testCase.operand);
+    System.out.println("NOT YET IMPLEMENTED");
   }
 
-  private MoveList getMoveFromOperand(final Position position, final String operand) {
+  /**
+   * Reads and extracts the moves for bm OpCode from the operand string
+   * @param position current position to check if moves are legal
+   * @param operand string holding the moves in SAN notation
+   * @return list of extracted moves
+   */
+  private MoveList getMovesFromOperand(final Position position, final String operand) {
+
+    // debugging
+    boolean trace = false;
 
     MoveList bestMoves = new MoveList();
 
-    //System.out.printf("OPERAND SAN: %s\n", operand);
-
-    // remove x from operand
+    // remove unnecessary characters from operand
     String movesString = operand.replaceAll("x", "");
     movesString = movesString.replaceAll("!", "");
 
@@ -247,8 +293,9 @@ public class TestSuite {
       String targetSquare = matcher.group(4);
       String promotion = matcher.group(6);
       String checkSign = matcher.group(7);
-      // System.out.printf("Piece: %s File: %s Row: %s Target: %s Promotion: %s CheckSign: %s\n",
-      //   piece, disambFile, disambRank, targetSquare, promotion, checkSign);
+
+      if (trace) System.out.printf("Piece: %s File: %s Row: %s Target: %s Promotion: %s CheckSign: %s\n",
+                        piece, disambFile, disambRank, targetSquare, promotion, checkSign);
 
       // generate all legal moves from the position
       // and try to find a matching move
@@ -257,53 +304,51 @@ public class TestSuite {
       int moveFromSAN = Move.NOMOVE;
       int movesFound = 0;
       for (int move : moveList) {
-        //System.out.printf("Move %d: %s\n", i, Move.toString(move));
+        if (trace) System.out.printf("Move %s\n", Move.toString(move));
         // castling
         if (Move.getMoveType(move) == MoveType.CASTLING) {
-          //System.out.println("Castling");
+          if (trace) System.out.println("Castling");
           if (!targetSquare.equals(Move.toString(move))) {
             continue;
           }
-          //System.out.println("Castling MATCH " + Move.toString(move));
+          if (trace) System.out.println("Castling MATCH " + Move.toString(move));
           moveFromSAN = move;
           movesFound++;
           continue;
         }
         // same end square
         if (Move.getEnd(move).name().equals(targetSquare)) {
-          if (piece != null) {
-            if (Move.getPiece(move).getType().getShortName().equals(piece)) {
-              //System.out.println("Piece MATCH " + Move.getPiece(move).getType().toString());
-            } else if (Move.getPiece(move).getType().equals(PieceType.PAWN)) {
-              //System.out.println("Piece MATCH PAWN");
-            } else {
-              //System.out.println("Piece NO MATCH");
-              continue;
-            }
+          if (piece != null && Move.getPiece(move).getType().getShortName().equals(piece)) {
+            if (trace) System.out.println("Piece MATCH " + Move.getPiece(move).getType().toString());
+          } else if (piece == null && Move.getPiece(move).getType().equals(PieceType.PAWN)) {
+            if (trace) System.out.println("Piece MATCH PAWN");
+          } else {
+            if (trace) System.out.println("Piece NO MATCH");
+            continue;
           }
           // Disambiguation
           if (disambFile != null) {
             if (Move.getStart(move).getFile().name().equals(disambFile)) {
-              //System.out.println("File MATCH " + Move.getStart(move).getFile().name());
+              if (trace) System.out.println("File MATCH " + Move.getStart(move).getFile().name());
             } else {
-              //System.out.println("File NO MATCH " + Move.getStart(move).getFile().name());
+              if (trace) System.out.println("File NO MATCH " + Move.getStart(move).getFile().name());
               continue;
             }
           }
           if (disambRank != null) {
             if (("" + Move.getStart(move).getRank().get()).equals(disambRank)) {
-              //System.out.println("Rank MATCH "+ Move.getStart(move).getRank().get());
+              if (trace) System.out.println("Rank MATCH " + Move.getStart(move).getRank().get());
             } else {
-              //System.out.println("Rank NO MATCH "+ Move.getStart(move).getRank().get());
+              if (trace) System.out.println("Rank NO MATCH " + Move.getStart(move).getRank().get());
               continue;
             }
           }
           // promotion
           if (promotion != null) {
             if (Move.getPromotion(move).getType().getShortName().equals(promotion)) {
-              //System.out.println("Promotion MATCH");
+              if (trace) System.out.println("Promotion MATCH");
             } else {
-              //System.out.println("Promotion NO MATCH");
+              if (trace) System.out.println("Promotion NO MATCH");
               continue;
             }
           }
@@ -322,15 +367,10 @@ public class TestSuite {
     return bestMoves;
   }
 
-  private void waitWhileSearching(Search search) {
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) {
-      }
-    }
-  }
-
+  /**
+   * Reads all lines from the given file, interpretes the line and
+   * stores the test case into the field testCases.
+   */
   private void readTestCsaes() {
     // read all lines from file
     Charset charset = Charset.forName("ISO-8859-1");
@@ -347,58 +387,89 @@ public class TestSuite {
     }
 
     for (String line : lines) {
-      // skip empty line and comments
-      line = line.trim();
       if (line.isEmpty() || line.startsWith("#")) {
         continue;
       }
-
-      // https://www.chessprogramming.org/Extended_Position_Description
-      // tokenize the string
-      String[] tokens = line.split("\\s");
-
-      // get fen from tokens 0-3
-      String fen = tokens[0] + " " + tokens[1] + " " + tokens[2] + " " + tokens[3] + " ";
-
-      // setup a test case with fen
-      TestCase testCase = new TestCase(fen);
-
-      // get the operation part of the input
-      String op = "";
-      for (int i = 4; i < tokens.length; i++) {
-        op += " " + tokens[i];
-      }
-      String[] ops = op.split("\\s*;\\s*");
-
-      // for each operation split opCode from operand and store them in the testCase.
-      // For now we are only interested in bm and dm
-      for (int i = 0; i < ops.length; i++) {
-        ops[i] = ops[i].trim();
-
-        String opCode = ops[i].substring(0, ops[i].indexOf(" ")).trim();
-        String operand = ops[i].substring(ops[i].indexOf(" ")).trim();
-
-        switch (opCode) {
-          case "id": // id of test
-            testCase.id = operand;
-            break;
-          case "bm": // best move
-            testCase.opCode = "bm";
-            testCase.operand = operand;
-            break;
-          case "dm": // direct mate
-            testCase.opCode = "dm";
-            testCase.operand = operand;
-            break;
-          default:
-            // ignore non implemented or unknown opcodes
-            break;
-        }
-      }
-      testCases.add(testCase);
+      testCases.add(readOneEPD(line));
     }
   }
 
+  /**
+   * Interprets a line of EPD and creates a TestCase instance
+   * @param line EPD string
+   * @return the extracted TestCase instance
+   */
+  private TestCase readOneEPD(String line) {
+    line = line.trim();
+
+    // https://www.chessprogramming.org/Extended_Position_Description
+    // tokenize the string
+    String[] tokens = line.split("\\s");
+
+    // get fen from tokens 0-3
+    String fen = tokens[0] + " " + tokens[1] + " " + tokens[2] + " " + tokens[3] + " ";
+
+    // setup a test case with fen
+    TestCase testCase = new TestCase(fen);
+
+    // get the operation part of the input
+    String op = "";
+    for (int i = 4; i < tokens.length; i++) {
+      op += " " + tokens[i];
+    }
+    String[] ops = op.split("\\s*;\\s*");
+
+    // for each operation split opCode from operand and store them in the testCase.
+    // For now we are only interested in bm and dm
+    for (int i = 0; i < ops.length; i++) {
+      ops[i] = ops[i].trim();
+
+      String opCode = ops[i].substring(0, ops[i].indexOf(" ")).trim();
+      String operand = ops[i].substring(ops[i].indexOf(" ")).trim();
+
+      switch (opCode) {
+        case "id": // id of test
+          testCase.id = operand;
+          break;
+        case "bm": // best move
+          testCase.opCode = "bm";
+          testCase.operand = operand;
+          break;
+        case "dm": // direct mate
+          testCase.opCode = "dm";
+          testCase.operand = operand;
+          break;
+        default:
+          // ignore non implemented or unknown opcodes
+          break;
+      }
+    }
+    return testCase;
+
+  }
+
+  private void setFilePath(final String testFile) {
+    filePath = FileSystems.getDefault().getPath(testFile);
+    // Check if file exists
+    if (Files.notExists(filePath, LinkOption.NOFOLLOW_LINKS)) {
+      LOG.error("While reading epd file: File {} could not be found.",
+                filePath.getFileName().toString());
+      System.exit(1);
+    }
+  }
+
+  private void waitWhileSearching(Search search) {
+    while (search.isSearching()) {
+      try {
+        Thread.sleep(200);
+      } catch (InterruptedException ignored) {
+      }
+    }
+  }
+
+  /**
+   * Parameter object for TestCases
+   */
   class TestCase {
 
     String   fen;
@@ -421,6 +492,9 @@ public class TestSuite {
     }
   }
 
+  /**
+   * A test case is in one of these states
+   */
   enum Result {
     NOT_TESTED,
     SUCCESS,
