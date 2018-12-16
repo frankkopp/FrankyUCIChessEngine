@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * TestSuiteTest
  *
@@ -65,7 +67,7 @@ public class TestSuiteTest {
   @Test
   void startFrankySuite() {
     testSuite = new TestSuite("./testsets/franky_tests.epd");
-    testSuite.startTests(2000);
+    testSuite.startTests(5000);
   }
 
   @Test
@@ -83,8 +85,8 @@ public class TestSuiteTest {
   }
 
   @Test
-  void startOneMATETest() {
-    testSuite.startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;", 5000);
-    testSuite.startOneTest("8/8/8/8/4K3/8/R7/4k3 w - - dm 5;",5000);
+  void startOneMateTest() {
+    assertTrue(testSuite.startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;", 5000));
+    assertTrue(testSuite.startOneTest("8/8/8/8/4K3/8/R7/4k3 w - - dm 5;",5000));
   }
 }

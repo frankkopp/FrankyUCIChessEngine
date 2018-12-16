@@ -52,10 +52,8 @@ public class TestSuite {
 
   private static final String TESTSUITE_PROPERTIES = "TestSuiteConfig.properties";
 
-  private Path filePath;
-
-  private int searchTime;
-
+  private Path           filePath;
+  private int            searchTime;
   private List<TestCase> testCases = new ArrayList<>();
 
   /**
@@ -125,7 +123,7 @@ public class TestSuite {
       doOneTestCase(testCase);
     }
 
-    // Print results
+    // Print summary of results
     int successCounter = 0;
     int failedCounter = 0;
     int skippedCounter = 0;
@@ -174,13 +172,18 @@ public class TestSuite {
   }
 
   /**
-   * @param epd        a EPD line for the test to conducted
+   * @param epd        An EPD line for the test to conducted
    * @param searchTime search time per move in ms (ignored for mate search)
    */
-  public void startOneTest(final String epd, final int searchTime) {
+  public boolean startOneTest(final String epd, final int searchTime) {
     this.searchTime = searchTime;
     TestCase testCase = readOneEPD(epd);
     doOneTestCase(testCase);
+    if (testCase.result == Result.SUCCESS) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   private void doOneTestCase(final TestCase testCase) {
@@ -203,10 +206,13 @@ public class TestSuite {
   }
 
   /**
-   * Searches the position for the best move nd compares the result with the
-   * expected result from the test case
+   * Searches the fen position in the testCase for the best move and compares
+   * the result with the expected result from the test case.
    *
-   * @param testCase
+   * Result will be stored into the given TestCase object.
+   *
+   * @param testCase TestCase object containing the fen and the test opcode. Result
+   *                 will be stored back into this object.
    */
   private void searchBestMoveTest(final TestCase testCase) {
     System.out.printf("Search for best move: %s\n", testCase.operand);
@@ -415,7 +421,7 @@ public class TestSuite {
       if (movesFound > 1) {
         LOG.error("SAN move is ambiguous!");
       } else if (movesFound == 0 || !Move.isValid(moveFromSAN)) {
-        LOG.error("SAN move not valid! No such move at the current position: "+sanMove);
+        LOG.error("SAN move not valid! No such move at the current position: " + sanMove);
       } else {
         bestMoves.add(moveFromSAN);
       }
