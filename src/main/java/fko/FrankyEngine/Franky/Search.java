@@ -498,7 +498,7 @@ public class Search implements Runnable {
       } else {
         // try null window search
         value = -negamax(position, depth - 1, rootPly + 1, -alpha - 1, -alpha, false, true);
-        if (value > alpha && value < beta) { // not failed - research
+        if (alpha < value && value < beta) { // not failed - research
           searchCounter.pv_root_researches++;
           value = -negamax(position, depth - 1, rootPly + 1, -beta, -alpha, true, true);
         } else {
@@ -1005,11 +1005,12 @@ public class Search implements Runnable {
       transpositionTable.put(position, value, ttType, depthLeft);
 
       // FIXME
-      if (Math.abs(value) > Evaluation.CHECKMATE - MAX_SEARCH_DEPTH &&
-          ttType == TT_EntryType.EXACT) {
-        // LOG.debug("STORE: ttType: {} ttValue: {} ttDepth: {} Depthleft: {}", ttType, value,
-        // depthLeft, depthLeft);
-      }
+      // if (Math.abs(value) > Evaluation.CHECKMATE - MAX_SEARCH_DEPTH &&
+      //   ttType == TT_EntryType.EXACT) {
+      //   // LOG.debug("STORE: ttType: {} ttValue: {} ttDepth: {} Depthleft: {}", ttType,
+      //   value,
+      //   // depthLeft, depthLeft);
+      // }
     }
   }
 
@@ -1034,15 +1035,16 @@ public class Search implements Runnable {
             // FIXME: MATE Values are wrong - need correction due depth
             // compensate for mate in # moves - the value in hash table is absolute
             // and must be corrected by current ply
-            if (Math.abs(value) > Evaluation.CHECKMATE - MAX_SEARCH_DEPTH) {
-              // LOG.debug("READ: ttType: {} ttValue: {} ttDepth: {} Ply: {} Depthleft: {}",
-              // ttEntry.type, value, ttEntry.depth, ply, depthLeft);
-              if (value > 0) {
-                value -= 0;
-              } else {
-                value += 0;
-              }
-            }
+            //            if (Math.abs(value) > Evaluation.CHECKMATE - MAX_SEARCH_DEPTH) {
+            //              // LOG.debug("READ: ttType: {} ttValue: {} ttDepth: {} Ply: {}
+            //              Depthleft: {}",
+            //              // ttEntry.type, value, ttEntry.depth, ply, depthLeft);
+            //              if (value > 0) {
+            //                value -= 0;
+            //              } else {
+            //                value += 0;
+            //              }
+            //            }
 
             return value;
           } else if (ttEntry.type == TT_EntryType.ALPHA) {

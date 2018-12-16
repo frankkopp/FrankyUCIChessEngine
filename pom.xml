@@ -142,7 +142,7 @@
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
-                                <phase>install</phase>
+                                <phase>deploy</phase>
                                 <configuration>
                                     <executable>"C:\Program Files (x86)\Jar2Exe Wizard\j2ewiz.exe"</executable>
                                     <commandlineArgs>/jar
@@ -165,7 +165,7 @@
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
-                                <phase>install</phase>
+                                <phase>deploy</phase>
                                 <configuration>
                                     <executable>cmd.exe</executable>
                                     <commandlineArgs>
