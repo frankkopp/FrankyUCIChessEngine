@@ -454,6 +454,8 @@ public class TestSearch {
     search.config.USE_QUIESCENCE = false;
     search.config.USE_NULL_MOVE_PRUNING = false;
     search.config.USE_PVS_MOVE_ORDERING = false;
+    search.config.USE_EVAL_PRUNING = false;
+    search.config.USE_RAZOR_PRUNING = false;
 
     measureTreeSize(position, searchMode, values, "REFERENCE", true);
 
@@ -475,14 +477,20 @@ public class TestSearch {
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
     measureTreeSize(position, searchMode, values, "MPP", true);
 
+    search.config.USE_PVS_MOVE_ORDERING = true;
+    measureTreeSize(position, searchMode, values, "PVS_ORDER", true);
+
     search.config.USE_NULL_MOVE_PRUNING = true;
     measureTreeSize(position, searchMode, values, "NMP", true);
 
+    search.config.USE_EVAL_PRUNING = true;
+    measureTreeSize(position, searchMode, values, "EVALPRUN", true);
+
+    search.config.USE_RAZOR_PRUNING = true;
+    measureTreeSize(position, searchMode, values, "RAZOR", true);
+
     search.config.USE_TRANSPOSITION_TABLE = true;
     measureTreeSize(position, searchMode, values, "TT", true);
-
-    search.config.USE_PVS_MOVE_ORDERING = true;
-    measureTreeSize(position, searchMode, values, "PVS_ORDER", true);
 
 //    search.config.USE_TRANSPOSITION_TABLE = false;
 //    search.config.USE_QUIESCENCE = true;
@@ -526,16 +534,19 @@ public class TestSearch {
 
     search.config.USE_ROOT_MOVES_SORT = true;
     search.config.USE_ALPHABETA_PRUNING = true;
-    search.config.USE_ASPIRATION_WINDOW = true;
+    search.config.USE_ASPIRATION_WINDOW = false;
     search.config.USE_PVS = true;
     search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_MATE_DISTANCE_PRUNING = true;
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
     search.config.USE_QUIESCENCE = true;
+    search.config.USE_PVS_MOVE_ORDERING = true;
     search.config.USE_NULL_MOVE_PRUNING = true;
+    search.config.USE_EVAL_PRUNING = true;
+    search.config.USE_RAZOR_PRUNING = true;
 
-    depth = 4;
-    fen = "1k3r2/pp6/3p4/8/8/n5B1/5PPP/5RK1 w - - 0 1"; // bm Bxd6+
+    depth = 8;
+    fen = "r1bnkbnr/ppppqppp/8/3Pp3/2B1P3/5N2/PPP2PPP/RNBQK2R b KQkq -"; // bm Bxd6+
     position = new Position(fen);
     searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
     search.startSearch(position, searchMode);
@@ -544,7 +555,20 @@ public class TestSearch {
              Move.toSimpleString(search.getLastSearchResult().bestMove),
              search.getLastSearchResult().resultValue / 100f,
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
-    assertEquals("g3d6", Move.toSimpleString(search.getLastSearchResult().bestMove));
+
+    LOG.debug(search.getSearchCounter().toString());
+
+//    depth = 4;
+//    fen = "1k3r2/pp6/3p4/8/8/n5B1/5PPP/5RK1 w - - 0 1"; // bm Bxd6+
+//    position = new Position(fen);
+//    searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
+//    search.startSearch(position, searchMode);
+//    waitWhileSearching();
+//    LOG.info("Best Move: {} Value: {} Ponder {}",
+//             Move.toSimpleString(search.getLastSearchResult().bestMove),
+//             search.getLastSearchResult().resultValue / 100f,
+//             Move.toSimpleString(search.getLastSearchResult().ponderMove));
+//    assertEquals("g3d6", Move.toSimpleString(search.getLastSearchResult().bestMove));
 
     // Spanish Opening - next move should be 0-0
 //    depth = 1;

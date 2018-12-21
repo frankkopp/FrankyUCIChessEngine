@@ -32,7 +32,6 @@ package fko.FrankyEngine.Franky;
  */
 public class Configuration {
 
-
   /**
    * test the search without any pruning and count perft value
    */
@@ -107,10 +106,24 @@ public class Configuration {
    */
   boolean USE_NULL_MOVE_PRUNING            = true;
   int     NULL_MOVE_DEPTH                  = 2;
-  boolean USE_VERIFY_NMP                   = true;
-  int     NULL_MOVE_REDUCTION_VERIFICATION = 3;
+  //boolean USE_VERIFY_NMP                   = false;
+  //int     NULL_MOVE_REDUCTION_VERIFICATION = 3;
 
+  /**
+   * Eval Pruning - early cut for low static evals
+   * Reverse Futility Pruning
+   * https://www.chessprogramming.org/Reverse_Futility_Pruning
+   */
+  boolean USE_EVAL_PRUNING    = true;
+  int     EVAL_PRUNING_DEPTH  = 2;
+  int     EVAL_PRUNING_MARGIN = 120;
 
+  /**
+   * Razor  - early qsearch for low static evals
+   */
+  boolean USE_RAZOR_PRUNING    = true;
+  int     RAZOR_PRUNING_DEPTH  = 3;
+  int     RAZOR_PRUNING_MARGIN = 600;
 
   // TODO vvvvvvvv
 
@@ -141,7 +154,6 @@ public class Configuration {
   //Mode _OB_Mode = Mode.PGN;
   //Mode _OB_Mode = Mode.SAN;
   //Mode _OB_Mode = Mode.SIMPLE;
-
   @Override
   public String toString() {
     return "Configuration{" + "PERFT=" + PERFT + ", HASH_SIZE=" + HASH_SIZE + ", PONDER=" + PONDER +

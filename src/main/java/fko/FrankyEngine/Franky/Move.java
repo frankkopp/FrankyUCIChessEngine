@@ -132,7 +132,7 @@ public class Move {
    * @return the target piece.
    */
   static Piece getTarget(int move) {
-    assert move != NOMOVE;
+    if (move == NOMOVE) return Piece.NOPIECE;
     int chessman = (move & TARGET_MASK) >>> TARGET_SHIFT;
     return Piece.values[chessman];
   }
@@ -156,7 +156,7 @@ public class Move {
    * @return the type.
    */
   static MoveType getMoveType(int move) {
-    assert move != NOMOVE : "STOP";
+    if (move == NOMOVE) return MoveType.NOMOVETYPE;
     int type = ((move & MOVETYPE_MASK) >>> MOVETYPE_SHIFT);
     return MoveType.values[type];
   }

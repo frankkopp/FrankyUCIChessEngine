@@ -189,6 +189,33 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 "",
                 ""));
+     iUciOptions.add(
+        new UCIOption("Use_PVS_Move_Ordering",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_PVS_MOVE_ORDERING),
+                "",
+                "",
+                ""));
+     iUciOptions.add(
+        new UCIOption("Use_Eval_Pruning",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_EVAL_PRUNING),
+                "",
+                "",
+                ""));
+     iUciOptions.add(
+        new UCIOption("Use_Razor_Pruning",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_RAZOR_PRUNING),
+                "",
+                "",
+                ""));
+
+
+//     search.config.USE_PVS_MOVE_ORDERING = true;
+//     search.config.USE_EVAL_PRUNING = false;
+//     search.config.USE_RAZOR_PRUNING = true;
+//
 //    iUciOptions.add( // DUMMY for testing
 //        new UCIOption(
 //            "OwnBook",
@@ -283,6 +310,24 @@ public class FrankyEngine implements IUCIEngine {
       case "Use_Null_Move_Pruning":
         config.USE_NULL_MOVE_PRUNING = Boolean.valueOf(value);
         msg = "Use Null Move Pruning set to " + (config.USE_NULL_MOVE_PRUNING ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_PVS_Move_Ordering":
+        config.USE_PVS_MOVE_ORDERING = Boolean.valueOf(value);
+        msg = "Use PVS Ordering set to " + (config.USE_PVS_MOVE_ORDERING ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Eval_Pruning":
+        config.USE_EVAL_PRUNING = Boolean.valueOf(value);
+        msg = "Use Eval Pruning set to " + (config.USE_EVAL_PRUNING ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Razor_Pruning":
+        config.USE_RAZOR_PRUNING = Boolean.valueOf(value);
+        msg = "Use Razor Pruning set to " + (config.USE_RAZOR_PRUNING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
