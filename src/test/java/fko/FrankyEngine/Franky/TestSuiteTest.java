@@ -66,7 +66,7 @@ public class TestSuiteTest {
   @Test
   void startFrankySuite() {
     testSuite = new TestSuite("./testsets/franky_tests.epd");
-    testSuite.startTests(10000);
+    testSuite.startTests(5000);
   }
 
   @Test
