@@ -208,7 +208,7 @@ public class TestEvaluation {
 
   @Test
   public final void testSinglePieces() {
-    
+
   }
 
   @Test
