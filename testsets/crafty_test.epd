@@ -58,7 +58,7 @@ rn1qkb1r/ppp2ppp/4pn2/8/2PP2b1/5N2/PP2BPPP/RNBQK2R w KQkq - bm Be3; id "Crafty T
 r2q1rk1/pp1nbppp/2p1pnb1/8/2PP2PN/P3B2P/1P1NBP2/R2Q1RK1 w - - bm Nxg6; id "Crafty Test Pos.58"; c0 "DEEP THOUGHT 0.01/IGOR IVANOV U. S. OPEN 1988, move 14W (Nxg6)";
 r2q1rk1/ppbn1pp1/4p1p1/2P3P1/1p1P1P2/P3B2P/4B3/R2Q1RK1 w - - bm axb4; id "Crafty Test Pos.59"; c0 "DEEP THOUGHT 0.01/IGOR IVANOV U. S. OPEN 1988, move 21W (axb4)";
 1rr3k1/1Qbnqpp1/6p1/2p1P1P1/1PBP4/4B2P/8/R4RK1 w - - bm Rxf7; id "Crafty Test Pos.60"; c0 "DEEP THOUGHT 0.01/IGOR IVANOV U. S. OPEN 1988, move 28W (Rxf7)";
-r1bqkb1r/ppp1p1pp/1nnpp3/8/2PP4/5N2/PP3PPP/RNBQKB1R w KQkq - bm Rxf7; id "Crafty Test Pos.61"; c0 "DEEP THOUGHT 0.02/HITECH  ACM NACC 1988, move 7W (Ng5)";
+r1bqkb1r/ppp1p1pp/1nnpp3/8/2PP4/5N2/PP3PPP/RNBQKB1R w KQkq - bm Ng5; id "Crafty Test Pos.61"; c0 "DEEP THOUGHT 0.02/HITECH  ACM NACC 1988, move 7W (Ng5)";
 r1b2k1r/pp2p3/1n1qp1p1/2pp1n2/2P5/1P1B4/P2N1PPP/R1BQ1RK1 w - - bm Nf3; id "Crafty Test Pos.62"; c0 "DEEP THOUGHT 0.02/HITECH  ACM NACC 1988, move 14W (Nf3)";
 r4k2/pp1bp2r/1q2p1p1/2p1R3/2Pp2Pn/1P1B2B1/P4P1P/R2Q2K1 w - - bm Rh5!; id "Crafty Test Pos.63"; c0 "DEEP THOUGHT 0.02/HITECH  ACM NACC 1988, move 21W (Rh5!)";
 2r2k2/pp2p2B/6q1/2p1p2p/2Pp3B/1P3P1b/P6P/4R1K1 w - - bm Bxg6; id "Crafty Test Pos.64"; c0 "DEEP THOUGHT 0.02/HITECH  ACM NACC 1988, move 28W (Bxg6)";
@@ -252,7 +252,7 @@ r1b1k1nr/2B2pbp/p1p1p3/3p4/4P3/2N5/PPP1BPP1/R4R1K w kq - bm Rad1; id "Crafty Tes
 1r6/4k2p/2b1p1n1/p4p1B/R7/1P6/5PP1/4RK2 w - - bm Rxa5; id "Crafty Test Pos.252"; c0 "DEEP BLUE PROTOTYPE/JUDIT POLGAR, Game 1, Match, August 1993, move 42W (Rxa5)";
 8/4k3/4p2R/1b3pnB/8/1r4P1/5PK1/4R3 w - - bm Re5; id "Crafty Test Pos.253"; c0 "DEEP BLUE PROTOTYPE/JUDIT POLGAR, Game 1, Match, August 1993, move 49W (Re5)";
 8/4k3/4p2R/3b1p2/4n3/6P1/1r2BP2/2R1K3 w - - bm Ra1; id "Crafty Test Pos.254"; c0 "DEEP BLUE PROTOTYPE/JUDIT POLGAR, Game 1, Match, August 1993, move 56W (Ra1)";
-8/4k3/2n1p2R/8/8/1b1B2P1/5P2/1r3k2 w - - bm Bxb1; id "Crafty Test Pos.255"; c0 "DEEP BLUE PROTOTYPE/JUDIT POLGAR, Game 1, Match, August 1993, move 63W (Bxb1)";
+8/4k3/2n1p2R/8/8/1b1B2P1/5P2/1r3K2 w - - bm Bxb1; id "Crafty Test Pos.255"; c0 "DEEP BLUE PROTOTYPE/JUDIT POLGAR, Game 1, Match, August 1993, move 63W (Bxb1)";
 8/5n2/2b2k2/4p3/5PPR/4K3/8/1B6 w - - bm g5+; id "Crafty Test Pos.256"; c0 "DEEP BLUE PROTOTYPE/JUDIT POLGAR, Game 1, Match, August 1993, move 70W (g5+)";
 r1bqk2r/pp1n1ppp/2pb1n2/3pp3/8/3P1NP1/PPPNPPBP/R1BQ1RK1 w kq - bm Nh4; id "Crafty Test Pos.257"; c0 "JUDIT POLGAR/DEEP BLUE PROTOTYPE, Game 2, Match, August 1993, move 7W (Nh4)";
 r2r2k1/pp3ppp/1qpbbn2/2n1p3/4P2N/5PP1/PPP3BP/R1BQRN1K w - - bm Qe2; id "Crafty Test Pos.258"; c0 "JUDIT POLGAR/DEEP BLUE PROTOTYPE, Game 2, Match, August 1993, move 14W (Qe2)";

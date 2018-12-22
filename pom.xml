@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>fko.javaUCIEngineFramework</groupId>
+    <groupId>fko.FrankyEngine</groupId>
     <artifactId>Franky</artifactId>
-    <version>0.3</version>
+    <version>0.4</version>
 
     <properties>
         <!-- JAVA8 -->
@@ -71,7 +71,7 @@
                                 <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <mainClass>fko.javaUCIEngineFramework.Main</mainClass>
+                                    <mainClass>fko.FrankyEngine.Main</mainClass>
                                     <classpathPrefix>libs/</classpathPrefix>
                                 </manifest>
                             </archive>
@@ -142,16 +142,18 @@
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
-                                <phase>install</phase>
+                                <phase>deploy</phase>
                                 <configuration>
                                     <executable>"C:\Program Files (x86)\Jar2Exe Wizard\j2ewiz.exe"</executable>
                                     <commandlineArgs>/jar
                                         C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\target\${project.artifactId}-${project.version}.jar
                                         /o
                                         C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\target\${project.artifactId}-${project.version}.exe
-                                        /m fko.javaUCIEngineFramework.Main /type console /minjre 1.8 /platform windows /checksum /amd64
+                                        /m fko.FrankyEngine.Main /type console /minjre 1.8 /platform windows /checksum
+                                        /amd64
                                         /pv ${project.version} /ve "ProductVersion=${project.version}" /ve
-                                        "ProductName=${project.artifactId} Chess Engine" /ve "LegalCopyright=Copyright (c) 2018 by Frank
+                                        "ProductName=${project.artifactId} Chess Engine" /ve "LegalCopyright=Copyright
+                                        (c) 2018 by Frank
                                         Kopp" /ve "FileDescription=Franky UCI Chess Engine"
                                     </commandlineArgs>
                                     <workingDirectory>C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework
@@ -163,7 +165,7 @@
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
-                                <phase>install</phase>
+                                <phase>deploy</phase>
                                 <configuration>
                                     <executable>cmd.exe</executable>
                                     <commandlineArgs>
