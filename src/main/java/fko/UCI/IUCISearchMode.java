@@ -23,7 +23,7 @@
  *
  */
 
-package fko.javaUCIEngineFramework.UCI;
+package fko.UCI;
 
 import java.util.List;
 

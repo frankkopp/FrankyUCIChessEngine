@@ -27,7 +27,7 @@ package fko.FrankyEngine.Franky;
 
 import fko.FrankyEngine.Franky.TranspositionTable.TT_Entry;
 import fko.FrankyEngine.Franky.TranspositionTable.TT_EntryType;
-import fko.javaUCIEngineFramework.UCI.IUCIEngine;
+import fko.UCI.IUCIEngine;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

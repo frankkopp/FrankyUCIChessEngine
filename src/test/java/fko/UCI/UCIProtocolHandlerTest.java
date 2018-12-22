@@ -23,7 +23,7 @@
  *
  */
 
-package fko.javaUCIEngineFramework.UCI;
+package fko.UCI;
 
 import fko.FrankyEngine.Franky.FrankyEngine;
 import org.junit.jupiter.api.AfterEach;

@@ -23,7 +23,7 @@
  *
  */
 
-package fko.javaUCIEngineFramework.UCI;
+package fko.UCI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -267,7 +267,7 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   }
 
   private void commandPosition(final Scanner scanner) {
-    String startFen = IUCIProtocolHandler.START_FEN;
+    String startFen = START_FEN;
     String token = scanner.next();
     if (token.equals("fen")) {
       startFen = "";
@@ -275,7 +275,7 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
         startFen += token + " ";
       }
     } else if (token.equals("startpos")) {
-      startFen = IUCIProtocolHandler.START_FEN;
+      startFen = START_FEN;
     }
     List<String> moves = new ArrayList<>();
     if (token.equals("moves") || (scanner.hasNext() && (token = scanner.next()).equals("moves"))) {

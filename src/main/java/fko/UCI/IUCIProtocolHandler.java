@@ -23,7 +23,7 @@
  *
  */
 
-package fko.javaUCIEngineFramework.UCI;
+package fko.UCI;
 
 public interface IUCIProtocolHandler {
 

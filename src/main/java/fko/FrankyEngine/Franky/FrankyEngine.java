@@ -25,10 +25,10 @@
 
 package fko.FrankyEngine.Franky;
 
-import fko.javaUCIEngineFramework.UCI.IUCIEngine;
-import fko.javaUCIEngineFramework.UCI.IUCIProtocolHandler;
-import fko.javaUCIEngineFramework.UCI.IUCISearchMode;
-import fko.javaUCIEngineFramework.UCI.UCIOption;
+import fko.UCI.IUCIEngine;
+import fko.UCI.IUCIProtocolHandler;
+import fko.UCI.IUCISearchMode;
+import fko.UCI.UCIOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

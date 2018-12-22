@@ -25,7 +25,7 @@
 
 package fko.FrankyEngine.Franky;
 
-import fko.javaUCIEngineFramework.UCI.IUCIProtocolHandler;
+import fko.UCI.IUCIProtocolHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
