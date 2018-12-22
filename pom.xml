@@ -6,7 +6,7 @@
 
     <groupId>fko.FrankyEngine</groupId>
     <artifactId>Franky</artifactId>
-    <version>0.4</version>
+    <version>0.5</version>
 
     <properties>
         <!-- JAVA8 -->
