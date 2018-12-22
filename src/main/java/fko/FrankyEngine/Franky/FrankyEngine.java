@@ -210,27 +210,6 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 "",
                 ""));
-
-
-//     search.config.USE_PVS_MOVE_ORDERING = true;
-//     search.config.USE_EVAL_PRUNING = false;
-//     search.config.USE_RAZOR_PRUNING = true;
-//
-//    iUciOptions.add( // DUMMY for testing
-//        new UCIOption(
-//            "OwnBook",
-//                UCIOptionType.check,
-//                useOwnBookOption ? "true" : "false",
-//                "",
-//                "",
-//                ""));
-//    iUciOptions.add( // DUMMY for testing
-//        new UCIOption(
-//            "Style",
-//                UCIOptionType.combo,
-//                "Normal", "",
-//                "",
-//                "Solid Normal Risky"));
    // @formatter:on
   }
 

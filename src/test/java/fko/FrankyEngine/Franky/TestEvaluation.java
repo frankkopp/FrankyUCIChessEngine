@@ -112,8 +112,6 @@ public class TestEvaluation {
     value = evaluation.material();
     // System.out.println(value);
     assertEquals(-320, value);
-
-
   }
 
   @Test
@@ -206,6 +204,11 @@ public class TestEvaluation {
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1p1qPN2/6P1/1PPK4/3R4 w - - 0 2");
     assertEquals(189, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
+  }
+
+  @Test
+  public final void testSinglePieces() {
+    
   }
 
   @Test
