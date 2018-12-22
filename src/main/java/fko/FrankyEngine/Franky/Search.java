@@ -394,8 +394,8 @@ public class Search implements Runnable {
 
     // retrieved ponder move from pv
     int p_move;
-    if (principalVariation[0].size() > 1 && (p_move = principalVariation[0].get(1)) !=
-                                            Move.NOMOVE) {
+    if (principalVariation[0].size() > 1 &&
+        (p_move = principalVariation[0].get(1)) != Move.NOMOVE) {
       searchResult.ponderMove = p_move;
     } else {
       searchResult.ponderMove = Move.NOMOVE;
@@ -665,8 +665,8 @@ public class Search implements Runnable {
       position.makeNullMove();
       // null move search
       int reduction = depthLeft > 6 ? 3 : 2;
-      int nullValue = -search(position, depthLeft - reduction, ply + 1, -beta, -beta + 1, NO_PV,
-                              NO_NULL);
+      int nullValue =
+        -search(position, depthLeft - reduction, ply + 1, -beta, -beta + 1, NO_PV, NO_NULL);
       position.undoNullMove();
 
       // pruning
@@ -1050,7 +1050,7 @@ public class Search implements Runnable {
           // check the retrieved hash table entry
           if (ttEntry.type == TT_EntryType.EXACT) {
 
-            // FIXME: MATE Values are wrong - need correction due depth
+            // FIXME: MATE Values could be wrong - need correction due depth???
             // compensate for mate in # moves - the value in hash table is absolute
             // and must be corrected by current ply
             if (Math.abs(value) > Evaluation.CHECKMATE - MAX_SEARCH_DEPTH) {
