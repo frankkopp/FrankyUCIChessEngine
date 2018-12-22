@@ -71,7 +71,7 @@ public class TestSuiteTest {
 
   @Test
   void startTestSuite() {
-    testSuite.startTests(1000);
+    testSuite.startTests(5000);
   }
 
   @Test

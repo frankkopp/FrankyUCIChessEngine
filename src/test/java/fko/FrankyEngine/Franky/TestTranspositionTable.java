@@ -100,7 +100,7 @@ public class TestTranspositionTable {
     engine = new FrankyEngine();
     search = ((FrankyEngine) engine).getSearch();
 
-    final int depth = 15;
+    final int depth = 10;
 
     LOG.info("Start SIZE Test for depth {}", depth);
 
