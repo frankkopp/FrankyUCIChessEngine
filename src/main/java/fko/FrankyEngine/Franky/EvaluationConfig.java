@@ -30,8 +30,8 @@ package fko.FrankyEngine.Franky;
  */
 class EvaluationConfig {
 
-  static final int TEMPO       = 10;
-  static final int CHECK_VALUE = 30;
+  static final int TEMPO                     = 10;
+  static final int CHECK_VALUE               = 30;
 
   static final int BISHOP_PAIR = 30;
   static final int KNIGHT_PAIR = 10;
@@ -45,7 +45,10 @@ class EvaluationConfig {
   static final int MATERIAL_WEIGHT = 1;
   static final int POSITION_WEIGHT = 1;
   static final int MOBILITY_WEIGHT = 4;
+  static final int KING_SAFETY_WEIGHT = 1;
 
+  static final int KING_SAFETY_PAWNSHIELD = 10;
+  static final int CORNERED_ROOK_PENALTY  = -50;
 
   // @formatter:off
   // PAWN Tables
@@ -165,7 +168,7 @@ class EvaluationConfig {
      20, 30, 50,  0,  0, 10, 50, 20
   };
   static int[] kingEndGame   = new int[] {
-    -50,-40,-30,-20,-20,-30,-40,-50,
+    -50,-30,-30,-20,-20,-30,-30,-50,
     -30,-20,-10,  0,  0,-10,-20,-30,
     -30,-10, 20, 30, 30, 20,-10,-30,
     -30,-10, 30, 40, 40, 30,-10,-30,

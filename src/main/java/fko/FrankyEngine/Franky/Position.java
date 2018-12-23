@@ -774,6 +774,10 @@ public class Position {
     return x88Board[squareIdx];
   }
 
+  public Piece getPiece(final Square square) {
+    return x88Board[square.ordinal()];
+  }
+
   /**
    * @param toSquare
    * @param piece

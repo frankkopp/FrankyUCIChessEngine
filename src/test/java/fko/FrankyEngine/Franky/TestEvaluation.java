@@ -209,6 +209,49 @@ public class TestEvaluation {
   @Test
   public final void testSinglePieces() {
 
+    // king values
+    position = new Position("8/4k3/8/8/8/8/8/4K3 w - -");
+    assertEquals(-30, evaluation.evaluate(position));
+    LOG.info(evaluation.toString());
+    position = new Position("8/4k3/8/8/8/8/8/4K3 b - -");
+    assertEquals(30, evaluation.evaluate(position));
+    LOG.info(evaluation.toString());
+    position = new Position("k7/8/8/8/4K3/8/8/8 w - -");
+    assertEquals(90, evaluation.evaluate(position));
+    LOG.info(evaluation.toString());
+    position = new Position("k7/8/8/8/4K3/8/8/8 b - -");
+    assertEquals(-90, evaluation.evaluate(position));
+    LOG.info(evaluation.toString());
+    position = new Position("K7/8/8/8/4k3/8/8/8 w - -");
+    assertEquals(-90, evaluation.evaluate(position));
+    LOG.info(evaluation.toString());
+    position = new Position("K7/8/8/8/4k3/8/8/8 b - -");
+    assertEquals(90, evaluation.evaluate(position));
+    LOG.info(evaluation.toString());
+
+  }
+
+  @Test
+  public final void testKingSafety() {
+    position = new Position("rnbq1rk1/pppp1ppp/5n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w - -");
+    evaluation.setPosition(position);
+    assertEquals(0, evaluation.kingSafety());
+    LOG.info(evaluation.toString());
+
+    position = new Position("2kr1bnr/pppq1ppp/2np4/4p3/2B1P1b1/2NP1N2/PPP2PPP/R1BQ1RK1 w - -");
+    evaluation.setPosition(position);
+    assertEquals(10, evaluation.kingSafety());
+    LOG.info(evaluation.toString());
+
+    position = new Position("rnbq1rk1/pppp1ppp/5n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b - -");
+    evaluation.setPosition(position);
+    assertEquals(0, evaluation.kingSafety());
+    LOG.info(evaluation.toString());
+
+    position = new Position("2kr1bnr/pppq1ppp/2np4/4p3/2B1P1b1/2NP1N2/PPP2PPP/R1BQ1RK1 b - -");
+    evaluation.setPosition(position);
+    assertEquals(-10, evaluation.kingSafety());
+    LOG.info(evaluation.toString());
   }
 
   @Test
