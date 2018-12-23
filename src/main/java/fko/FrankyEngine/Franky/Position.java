@@ -149,11 +149,11 @@ public class Position {
 
   private final MoveGenerator mateCheckMG = new MoveGenerator();
 
-
+  // Flag for boolean states with undetermined state
   private enum Flag {
     TBD, TRUE, FALSE;
-
   }
+
   // **********************************************************
   // static initialization
   static {
@@ -178,17 +178,16 @@ public class Position {
     nextPlayer_Zobrist = Math.abs(random.nextLong());
   }
 
-
   // Constructors START -----------------------------------------
   /**
-   * Creates a standard Chessly board and initializes it with standard chess setup.
+   * Creates a standard board position and initializes it with standard chess setup.
    */
   public Position() {
     this(STANDARD_BOARD_FEN);
   }
 
   /**
-   * Creates a standard Chessly board and initializes it with a fen position
+   * Creates a standard board position and initializes it with a fen position
    *
    * @param fen
    */
@@ -257,11 +256,6 @@ public class Position {
     this.material[1] = op.material[1];
   }
 
-
-
-  // public Position(GameBoard oldBoard) {
-  //        this(oldBoard.toFENString());
-  //    }
   /**
    * Initialize the lists for the pieces and the material counter
    */
@@ -298,7 +292,6 @@ public class Position {
 
     // Save state for undoMove
     moveHistory[historyCounter] = move;
-
     castlingWK_History[historyCounter] = isCastlingWK();
     castlingWQ_History[historyCounter] = isCastlingWQ();
     castlingBK_History[historyCounter] = isCastlingBK();
@@ -318,23 +311,22 @@ public class Position {
     switch (Move.getMoveType(move)) {
       case NORMAL:
         invalidateCastlingRights(fromSquare, toSquare);
-        makeNormalMove(fromSquare, toSquare, piece, target);
-        // clear en passant
-        if (getEnPassantSquare() != Square.NOSQUARE) {
-          zobristKey =
-            getZobristKey() ^ enPassantSquare_Zobrist[getEnPassantSquare().ordinal()]; // out
-          enPassantSquare = Square.NOSQUARE;
+        if (target != Piece.NOPIECE) {
+          removePiece(toSquare, target);
+          halfMoveClock = 0; // reset half move clock because of capture
+        } else if (piece.getType() == PieceType.PAWN) {
+          halfMoveClock = 0; // reset half move clock because of pawn move
+        } else {
+          halfMoveClock++;
         }
+        movePiece(fromSquare, toSquare, piece);
+        clearEnPassant();
         break;
       case PAWNDOUBLE:
         assert fromSquare.isPawnBaseRow(piece.getColor());
         assert !piece.getColor().isNone();
         movePiece(fromSquare, toSquare, piece);
-        // clear old en passant
-        if (getEnPassantSquare() != Square.NOSQUARE) {
-          zobristKey =
-            getZobristKey() ^ enPassantSquare_Zobrist[getEnPassantSquare().ordinal()]; // in
-        }
+        clearEnPassant();
         // set new en passant target field - always one "behind" the toSquare
         enPassantSquare = piece.getColor().isWhite() ? toSquare.getSouth() : toSquare.getNorth();
         zobristKey =
@@ -349,22 +341,12 @@ public class Position {
           target.getColor().isWhite() ? toSquare.getNorth() : toSquare.getSouth();
         removePiece(targetSquare, target);
         movePiece(fromSquare, toSquare, piece);
-        // clear en passant
-        if (getEnPassantSquare() != Square.NOSQUARE) {
-          zobristKey =
-            getZobristKey() ^ enPassantSquare_Zobrist[getEnPassantSquare().ordinal()]; // out
-          enPassantSquare = Square.NOSQUARE;
-        }
+        clearEnPassant();
         halfMoveClock = 0; // reset half move clock because of pawn move
         break;
       case CASTLING:
         makeCastlingMove(fromSquare, toSquare, piece);
-        // clear en passant
-        if (getEnPassantSquare() != Square.NOSQUARE) {
-          zobristKey =
-            getZobristKey() ^ enPassantSquare_Zobrist[getEnPassantSquare().ordinal()]; // out
-          enPassantSquare = Square.NOSQUARE;
-        }
+        clearEnPassant();
         halfMoveClock++;
         break;
       case PROMOTION:
@@ -372,12 +354,7 @@ public class Position {
         invalidateCastlingRights(fromSquare, toSquare);
         removePiece(fromSquare, piece);
         putPiece(toSquare, promotion);
-        // clear en passant
-        if (getEnPassantSquare() != Square.NOSQUARE) {
-          zobristKey =
-            getZobristKey() ^ enPassantSquare_Zobrist[getEnPassantSquare().ordinal()]; // out
-          enPassantSquare = Square.NOSQUARE;
-        }
+        clearEnPassant();
         halfMoveClock = 0; // reset half move clock because of pawn move
         break;
       case NOMOVETYPE:
@@ -470,24 +447,11 @@ public class Position {
     hasMate = hasMateFlagHistory[historyCounter];
   }
 
-  /**
-   * @param fromSquare
-   * @param toSquare
-   * @param piece
-   * @param target
-   */
-  private void makeNormalMove(Square fromSquare, Square toSquare, Piece piece, Piece target) {
-
-    if (target != Piece.NOPIECE) {
-      removePiece(toSquare, target);
-      halfMoveClock = 0; // reset half move clock because of capture
-    } else if (piece.getType() == PieceType.PAWN) {
-      halfMoveClock = 0; // reset half move clock because of pawn move
-    } else {
-      halfMoveClock++;
+  private void clearEnPassant() {
+    if (getEnPassantSquare() != Square.NOSQUARE) {
+      zobristKey = getZobristKey() ^ enPassantSquare_Zobrist[getEnPassantSquare().ordinal()]; // out
+      enPassantSquare = Square.NOSQUARE;
     }
-
-    movePiece(fromSquare, toSquare, piece);
   }
 
   /**
@@ -537,9 +501,9 @@ public class Position {
   private void makeCastlingMove(Square fromSquare, Square toSquare, Piece piece) {
     assert piece.getType() == PieceType.KING;
 
-    Piece rook = Piece.NOPIECE;
-    Square rookFromSquare = Square.NOSQUARE;
-    Square rookToSquare = Square.NOSQUARE;
+    Piece rook;
+    Square rookFromSquare;
+    Square rookToSquare;
 
     switch (toSquare) {
       case g1: // white kingside
@@ -593,10 +557,9 @@ public class Position {
    * @param piece
    */
   private void undoCastlingMove(Square fromSquare, Square toSquare, Piece piece) {
-    // update castling rights
-    Piece rook = Piece.NOPIECE;
-    Square rookFromSquare = Square.NOSQUARE;
-    Square rookToSquare = Square.NOSQUARE;
+    Piece rook;
+    Square rookFromSquare;
+    Square rookToSquare;
 
     switch (toSquare) {
       case g1: // white kingside
@@ -653,10 +616,7 @@ public class Position {
     hasMate = Flag.TBD;
 
     // clear en passant
-    if (getEnPassantSquare() != Square.NOSQUARE) {
-      zobristKey = getZobristKey() ^ enPassantSquare_Zobrist[getEnPassantSquare().ordinal()]; // out
-      enPassantSquare = Square.NOSQUARE;
-    }
+    clearEnPassant();
 
     // increase half move clock
     halfMoveClock++;
@@ -770,10 +730,16 @@ public class Position {
     return old;
   }
 
-  public Piece getPiece(final int squareIdx) {
-    return x88Board[squareIdx];
-  }
+//  public Piece getPiece(final int squareIdx) {
+//    return x88Board[squareIdx];
+//  }
 
+  /**
+   * Retrieve piece on given square.
+   *
+   * @param square
+   * @return returns the piece or <code>NOPIECE</code> of the given square
+   */
   public Piece getPiece(final Square square) {
     return x88Board[square.ordinal()];
   }
@@ -852,7 +818,7 @@ public class Position {
     assert (square != Square.NOSQUARE);
     assert (!attackerColor.isNone());
 
-    final int os_Index = square.ordinal();
+    final int squareIndex = square.ordinal();
     final boolean isWhite = attackerColor.isWhite();
 
     /*
@@ -864,7 +830,7 @@ public class Position {
     final int pawnDir = isWhite ? -1 : 1;
     final Piece attackerPawn = isWhite ? Piece.WHITE_PAWN : Piece.BLACK_PAWN;
     for (int d : Square.pawnAttackDirections) {
-      final int i = os_Index + d * pawnDir;
+      final int i = squareIndex + d * pawnDir;
       if ((i & 0x88) == 0 && getX88Board()[i] == attackerPawn) return true;
     }
 
@@ -874,7 +840,7 @@ public class Position {
     if (!(getRookSquares()[attackerColorIndex].isEmpty() &&
           getQueenSquares()[attackerColorIndex].isEmpty())) {
       for (int d : Square.rookDirections) {
-        int i = os_Index + d;
+        int i = squareIndex + d;
         while ((i & 0x88) == 0) { // slide while valid square
           if (getX88Board()[i] != Piece.NOPIECE) { // not empty
             if (getX88Board()[i].getColor() == attackerColor // attacker piece
@@ -893,7 +859,7 @@ public class Position {
     if (!(getBishopSquares()[attackerColorIndex].isEmpty() &&
           getQueenSquares()[attackerColorIndex].isEmpty())) {
       for (int d : Square.bishopDirections) {
-        int i = os_Index + d;
+        int i = squareIndex + d;
         while ((i & 0x88) == 0) { // slide while valid square
           if (getX88Board()[i] != Piece.NOPIECE) { // not empty
             if (getX88Board()[i].getColor() == attackerColor // attacker piece
@@ -911,7 +877,7 @@ public class Position {
     // check knights if there are any
     if (!(getKnightSquares()[attackerColorIndex].isEmpty())) {
       for (int d : Square.knightDirections) {
-        int i = os_Index + d;
+        int i = squareIndex + d;
         if ((i & 0x88) == 0) { // valid square
           if (getX88Board()[i] != Piece.NOPIECE // not empty
               && getX88Board()[i].getColor() == attackerColor // attacker piece
@@ -924,7 +890,7 @@ public class Position {
 
     // check king
     for (int d : Square.kingDirections) {
-      int i = os_Index + d;
+      int i = squareIndex + d;
       if ((i & 0x88) == 0) { // valid square
         if (getX88Board()[i] != Piece.NOPIECE // not empty
             && getX88Board()[i].getColor() == attackerColor // attacker piece
@@ -942,10 +908,10 @@ public class Position {
           && this.getEnPassantSquare().getSouth() ==
              square) { // this is indeed the en passant attacked square
         // left
-        int i = os_Index + Square.W;
+        int i = squareIndex + Square.W;
         if ((i & 0x88) == 0 && getX88Board()[i] == Piece.WHITE_PAWN) return true;
         // right
-        i = os_Index + Square.E;
+        i = squareIndex + Square.E;
         if ((i & 0x88) == 0 && getX88Board()[i] == Piece.WHITE_PAWN) return true;
       } else if (!isWhite // black is attacker (assume not noColor)
                  && getX88Board()[getEnPassantSquare().getNorth().ordinal()] == Piece.WHITE_PAWN
@@ -953,10 +919,10 @@ public class Position {
                  && this.getEnPassantSquare().getNorth() ==
                     square) { // this is indeed the en passant attacked square
         // attack from left
-        int i = os_Index + Square.W;
+        int i = squareIndex + Square.W;
         if ((i & 0x88) == 0 && getX88Board()[i] == Piece.BLACK_PAWN) return true;
         // attack from right
-        i = os_Index + Square.E;
+        i = squareIndex + Square.E;
         if ((i & 0x88) == 0 && getX88Board()[i] == Piece.BLACK_PAWN) return true;
       }
     }

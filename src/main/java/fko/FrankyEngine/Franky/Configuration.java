@@ -154,6 +154,8 @@ public class Configuration {
   //Mode _OB_Mode = Mode.PGN;
   //Mode _OB_Mode = Mode.SAN;
   //Mode _OB_Mode = Mode.SIMPLE;
+
+
   @Override
   public String toString() {
     return "Configuration{" + "PERFT=" + PERFT + ", HASH_SIZE=" + HASH_SIZE + ", PONDER=" + PONDER +

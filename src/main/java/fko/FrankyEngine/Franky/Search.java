@@ -106,9 +106,7 @@ public class Search implements Runnable {
   private       long         uciUpdateTicker;
 
   /**
-   * /**
    * Creates a search object and stores a back reference to the engine object.<br>
-   * Hash is setup up to the given hash size.
    *
    * @param engine
    * @param config
@@ -282,7 +280,7 @@ public class Search implements Runnable {
    * This starts the actual iterative search.
    *
    * @param position
-   * @return the best move
+   * @return search result
    */
   private SearchResult iterativeSearch(Position position) {
 

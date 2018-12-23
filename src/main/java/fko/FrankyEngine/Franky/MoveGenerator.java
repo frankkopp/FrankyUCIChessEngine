@@ -43,9 +43,6 @@ public class MoveGenerator {
   private static final boolean CACHE = false;
   private static final boolean SORT  = true;
 
-  // remember the last position to control cache validity
-  private long zobristLastPosition = 0;
-
   // the current position we generate the move for
   // is set in the getMoves methods
   private Position position = null;
@@ -239,10 +236,6 @@ public class MoveGenerator {
 
     captureMovesOnly = false;
 
-    // remember the last position to see when it has changed
-    // if changed the cache is always invalid
-    this.zobristLastPosition = position.getZobristKey();
-
     // clear all lists
     clearLists();
 
@@ -295,16 +288,10 @@ public class MoveGenerator {
 
     captureMovesOnly = false;
 
-    // remember the last position to see when it has changed
-    // if changed the cache is always invalid
-    this.zobristLastPosition = position.getZobristKey();
-
     // clear all lists
     clearLists();
 
-    /*
-     * call the move generators
-     */
+    // call the move generators
     generatePseudoLegaMoves();
 
     // return a clone of the list as we will continue to reuse
@@ -335,19 +322,8 @@ public class MoveGenerator {
     this.position = position;
     activePlayer = this.position.getNextPlayer();
 
-    // TODO improve qsearch extensions by selecting only relevant moves
-    if (position.hasCheck()) {
-      // when in check generate all moves - they will be later filtered for these
-      // moves which evade the check anyway.
-      captureMovesOnly = false;
-    } else {
-      // when no check only generate captures
-      captureMovesOnly = true;
-    }
-
-    // remember the last position to see when it has changed
-    // if changed the cache is always invalid
-    this.zobristLastPosition = position.getZobristKey();
+    // if not in check generate only capturing moves for qsearch
+    captureMovesOnly = !position.hasCheck();
 
     // clear all lists
     clearLists();
@@ -355,12 +331,21 @@ public class MoveGenerator {
     // call the move generators
     generatePseudoLegaMoves();
 
-    // TODO: Filter only "good" qsearch captures
+    // lower amount of captures searched in qsearch by only looking at "good" captures
     MoveList qSearchMoves = new MoveList();
     for (int move : pseudoLegalMoves) {
-//      if (Move.getPiece(move).getType().getValue() <= Move.getTarget(move).getType().getValue()) {
+      // pawn captures
+      if (Move.getPiece(move).getType().equals(PieceType.PAWN)) {
         qSearchMoves.add(move);
-//      }
+      }
+      // Lower value piece captures higher value piece (with a margin)
+      else if (Move.getPiece(move).getType().getValue() +200 < Move.getTarget(move).getType().getValue()) {
+        qSearchMoves.add(move);
+      }
+      // undefended pieces captures are good
+      else if (!position.isAttacked(position.getOpponent(), Move.getEnd(move))) {
+        qSearchMoves.add(move);
+      }
     }
 
     // return a clone of the list as we will continue to reuse
@@ -488,7 +473,7 @@ public class MoveGenerator {
             }
           }
           // no capture
-          else if (d == Square.N && !captureMovesOnly) { // straight
+          else if (!captureMovesOnly) { // straight
             if (target == Piece.NOPIECE) { // way needs to be free
               // promotion
               if (to > 111) { // rank 8
@@ -611,8 +596,7 @@ public class MoveGenerator {
     // get all possible x88 index values for piece's moves
     // these are basically int values to add or subtract from the
     // current square index. Very efficient with a x88 board.
-    int[] directions = pieceDirections;
-    for (int d : directions) {
+    for (int d : pieceDirections) {
       int to = square.ordinal() + d;
 
       while ((to & 0x88) == 0) { // slide while valid square
@@ -834,9 +818,8 @@ public class MoveGenerator {
    * @return true if a move has been found
    */
   private boolean findMove(PieceType type, Square square, int[] pieceDirections) {
-    int move = Move.NOMOVE;
-    int[] directions = pieceDirections;
-    for (int d : directions) {
+    int move;
+    for (int d : pieceDirections) {
       int to = square.ordinal() + d;
       while ((to & 0x88) == 0) { // slide while valid square
         final Piece target = position.getX88Board()[to];
@@ -873,7 +856,7 @@ public class MoveGenerator {
    * @return true if a move has been found
    */
   private boolean findPawnMove() {
-    int move = Move.NOMOVE;
+    int move;
 
     // reverse direction of pawns for black
     final int pawnDir = activePlayer.isBlack() ? -1 : 1;
@@ -917,7 +900,7 @@ public class MoveGenerator {
             }
           }
           // no capture
-          else if (d == Square.N) { // straight
+          else { // straight
             if (target == Piece.NOPIECE) { // way needs to be free
               move = Move.createMove(type, fromSquare, toSquare, piece, target, promotion);
               if (isLegalMove(move)) return true;

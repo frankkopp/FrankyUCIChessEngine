@@ -55,7 +55,6 @@ import static fko.FrankyEngine.Franky.Square.*;
  * TODO: Pawn Structure
  * TODO: King Safety
  * TODO: Board control
- * TODO: Piece Position
  */
 public class Evaluation {
 
@@ -108,7 +107,6 @@ public class Evaluation {
    * Creates an instance of the Evaluator
    */
   public Evaluation() {
-
   }
 
   /**
@@ -180,7 +178,7 @@ public class Evaluation {
 
     // GamePhase - a value between 0 and 24 depending on officer midGameMaterial of
     // the position
-    this.gamePhaseFactor = getGamePhaseFactor();
+    gamePhaseFactor = getGamePhaseFactor();
 
     /*
      * Ideally evaluate in 3 Stages to avoid doing certain loop multiple times
@@ -226,17 +224,22 @@ public class Evaluation {
   private void clearValues() {
     value = 0;
     gamePhaseFactor = 0;
+
     special = 0;
     material = 0;
     piecePosition = 0;
     mobility = 0;
     kingSafety = 0;
+
     midGameMaterial = 0;
     endGameMaterial = 0;
+
     midGamePiecePosition = 0;
     endGamePiecePosition = 0;
+
     midGameMobility = 0;
     endGameMobility = 0;
+
     midGameKingSafety = 0;
     endGameKingSafety = 0;
   }
@@ -328,8 +331,8 @@ public class Evaluation {
     { // ME
       Square nextToMoveKingSquare = kingSquares[nextToMove];
       final int index = nextToMoveKingSquare.ordinal();
-      assert (position.getPiece(nextToMoveKingSquare.ordinal()).getType().equals(PieceType.KING));
-      assert (position.getPiece(nextToMoveKingSquare.ordinal()).getColor().ordinal() == nextToMove);
+      assert (position.getPiece(nextToMoveKingSquare).getType().equals(PieceType.KING));
+      assert (position.getPiece(nextToMoveKingSquare).getColor().ordinal() == nextToMove);
 
       // position
       final int tableIndex =
@@ -337,105 +340,99 @@ public class Evaluation {
       this.midGamePiecePosition += kingMidGame[tableIndex];
       this.endGamePiecePosition += kingEndGame[tableIndex];
 
-      // king safety WHITE
-      if (nextToMove == WHITE && kingSquares[nextToMove].getRank().equals(r1)) {
+      // king safety - skip in endgame
+      if (gamePhaseFactor > GAME_PHASE_MAX/2) {
 
-        if (kingSquares[nextToMove].getFile().get() > e.get()) {
-          // king side castle
+        // king safety WHITE
+        if (nextToMove == WHITE && kingSquares[nextToMove].getRank().equals(r1)) {
 
-          // rook in the corner penalty
-          if (position.getPiece(h1).equals(WHITE_ROOK)) {
-            midGamePiecePosition += CORNERED_ROOK_PENALTY;
-          }
-          // pawns in front
-          if (position.getPiece(f2).equals(WHITE_PAWN)) {
-            midGameKingSafety += 2 * KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(g2).equals(WHITE_PAWN) ||
-              position.getPiece(g3).equals(WHITE_PAWN)) {
-            midGameKingSafety += KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(h2).equals(WHITE_PAWN) ||
-              position.getPiece(h3).equals(WHITE_PAWN)) {
-            midGameKingSafety += KING_SAFETY_PAWNSHIELD;
-          }
-        } else if (kingSquares[nextToMove].getFile().get() < e.get()) {
-          // queen side castle
+          if (kingSquares[nextToMove].getFile().get() > f.get()) {
+            // king side castle
 
-          // queen side castle is weaker as king is more exposed
-          this.midGameKingSafety += -KING_SAFETY_PAWNSHIELD;
+            // rook in the corner penalty
+            if (position.getPiece(h1).equals(WHITE_ROOK)) {
+              midGamePiecePosition += CORNERED_ROOK_PENALTY;
+            }
+            // pawns in front
+            if (position.getPiece(f2).equals(WHITE_PAWN)) {
+              midGameKingSafety += 2 * KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(g2).equals(WHITE_PAWN) || position.getPiece(g3).equals(WHITE_PAWN)) {
+              midGameKingSafety += KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(h2).equals(WHITE_PAWN) || position.getPiece(h3).equals(WHITE_PAWN)) {
+              midGameKingSafety += KING_SAFETY_PAWNSHIELD;
+            }
+          } else if (kingSquares[nextToMove].getFile().get() < d.get()) {
+            // queen side castle
 
-          // rook in the corner penalty
-          if (position.getPiece(a1).equals(WHITE_ROOK) ||
-              position.getPiece(b1).equals(WHITE_ROOK)) {
-            midGamePiecePosition += EvaluationConfig.CORNERED_ROOK_PENALTY;
-          }
-          // extra bonus for queen side castle and king on b or a file
-          if (kingSquares[nextToMove].getFile().get() < c.get()) {
-            this.midGameKingSafety += KING_SAFETY_PAWNSHIELD;
-          }
-          // pawns in front
-          if (position.getPiece(c2).getType().equals(PAWN)) {
-            this.midGameKingSafety += 2 * KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(b2).getType().equals(PAWN) ||
-              position.getPiece(b3).getType().equals(PAWN)) {
-            this.midGameKingSafety += KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(a2).getType().equals(PAWN) ||
-              position.getPiece(a3).getType().equals(PAWN)) {
-            this.midGameKingSafety += KING_SAFETY_PAWNSHIELD;
+            // queen side castle is weaker as king is more exposed
+            this.midGameKingSafety += -KING_SAFETY_PAWNSHIELD;
+
+            // rook in the corner penalty
+            if (position.getPiece(a1).equals(WHITE_ROOK) || position.getPiece(b1).equals(WHITE_ROOK)) {
+              midGamePiecePosition += EvaluationConfig.CORNERED_ROOK_PENALTY;
+            }
+            // extra bonus for queen side castle and king on b or a file
+            if (kingSquares[nextToMove].getFile().get() < c.get()) {
+              this.midGameKingSafety += KING_SAFETY_PAWNSHIELD;
+            }
+            // pawns in front
+            if (position.getPiece(c2).getType().equals(PAWN)) {
+              this.midGameKingSafety += 2 * KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(b2).getType().equals(PAWN) || position.getPiece(b3).getType().equals(PAWN)) {
+              this.midGameKingSafety += KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(a2).getType().equals(PAWN) || position.getPiece(a3).getType().equals(PAWN)) {
+              this.midGameKingSafety += KING_SAFETY_PAWNSHIELD;
+            }
           }
         }
-      }
-      // king safety BLACK
-      else if (nextToMove == BLACK && kingSquares[nextToMove].getRank() == r8) {
+        // king safety BLACK
+        else if (nextToMove == BLACK && kingSquares[nextToMove].getRank() == r8) {
 
-        if (kingSquares[nextToMove].getFile().get() > e.get()) {
-          // king side castle
+          if (kingSquares[nextToMove].getFile().get() > e.get()) {
+            // king side castle
 
-          // rook in the corner penalty
-          if (position.getPiece(h8).equals(BLACK_ROOK)) {
-            midGamePiecePosition += CORNERED_ROOK_PENALTY;
-          }
-          // pawns in front
-          if (position.getPiece(f7).equals(BLACK_PAWN)) {
-            midGameKingSafety += 2 * KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(g7).equals(BLACK_PAWN) ||
-              position.getPiece(g6).equals(BLACK_PAWN)) {
-            midGameKingSafety += KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(h7).equals(BLACK_PAWN) ||
-              position.getPiece(h6).equals(BLACK_PAWN)) {
-            midGameKingSafety += KING_SAFETY_PAWNSHIELD;
-          }
-        } else if (kingSquares[nextToMove].getFile().get() < d.get()) {
-          // queen side castle
+            // rook in the corner penalty
+            if (position.getPiece(h8).equals(BLACK_ROOK)) {
+              midGamePiecePosition += CORNERED_ROOK_PENALTY;
+            }
+            // pawns in front
+            if (position.getPiece(f7).equals(BLACK_PAWN)) {
+              midGameKingSafety += 2 * KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(g7).equals(BLACK_PAWN) || position.getPiece(g6).equals(BLACK_PAWN)) {
+              midGameKingSafety += KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(h7).equals(BLACK_PAWN) || position.getPiece(h6).equals(BLACK_PAWN)) {
+              midGameKingSafety += KING_SAFETY_PAWNSHIELD;
+            }
+          } else if (kingSquares[nextToMove].getFile().get() < d.get()) {
+            // queen side castle
 
-          // queen side castle is weaker as king is more exposed
-          this.midGameKingSafety += -KING_SAFETY_PAWNSHIELD;
+            // queen side castle is weaker as king is more exposed
+            this.midGameKingSafety += -KING_SAFETY_PAWNSHIELD;
 
-          // rook in the corner penalty
-          if (position.getPiece(a8).equals(BLACK_ROOK) ||
-              position.getPiece(b8).equals(BLACK_ROOK)) {
-            midGamePiecePosition += EvaluationConfig.CORNERED_ROOK_PENALTY;
-          }
-          // extra bonus for queen side castle and king on b or a file
-          if (kingSquares[nextToMove].getFile().get() < c.get()) {
-            this.midGameKingSafety += KING_SAFETY_PAWNSHIELD;
-          }
-          // pawns in front
-          if (position.getPiece(c7).equals(BLACK_PAWN)) {
-            this.midGameKingSafety += 2 * KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(b7).equals(BLACK_PAWN) ||
-              position.getPiece(b6).equals(BLACK_PAWN)) {
-            this.midGameKingSafety += KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(a7).equals(BLACK_PAWN) ||
-              position.getPiece(a6).equals(BLACK_PAWN)) {
-            this.midGameKingSafety += KING_SAFETY_PAWNSHIELD;
+            // rook in the corner penalty
+            if (position.getPiece(a8).equals(BLACK_ROOK) || position.getPiece(b8).equals(BLACK_ROOK)) {
+              midGamePiecePosition += EvaluationConfig.CORNERED_ROOK_PENALTY;
+            }
+            // extra bonus for queen side castle and king on b or a file
+            if (kingSquares[nextToMove].getFile().get() < c.get()) {
+              this.midGameKingSafety += KING_SAFETY_PAWNSHIELD;
+            }
+            // pawns in front
+            if (position.getPiece(c7).equals(BLACK_PAWN)) {
+              this.midGameKingSafety += 2 * KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(b7).equals(BLACK_PAWN) || position.getPiece(b6).equals(BLACK_PAWN)) {
+              this.midGameKingSafety += KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(a7).equals(BLACK_PAWN) || position.getPiece(a6).equals(BLACK_PAWN)) {
+              this.midGameKingSafety += KING_SAFETY_PAWNSHIELD;
+            }
           }
         }
       }
@@ -444,8 +441,8 @@ public class Evaluation {
     { // OPPONENT
       Square opponentKingSquare = kingSquares[opponent];
       final int index = opponentKingSquare.ordinal();
-      assert (position.getPiece(opponentKingSquare.ordinal()).getType().equals(PieceType.KING));
-      assert (position.getPiece(opponentKingSquare.ordinal()).getColor().ordinal() == opponent);
+      assert (position.getPiece(opponentKingSquare).getType().equals(PieceType.KING));
+      assert (position.getPiece(opponentKingSquare).getColor().ordinal() == opponent);
 
       // position
       final int tableIndex =
@@ -453,105 +450,99 @@ public class Evaluation {
       this.midGamePiecePosition -= kingMidGame[tableIndex];
       this.endGamePiecePosition -= kingEndGame[tableIndex];
 
-      // king safety WHITE
-      if (opponent == WHITE && kingSquares[opponent].getRank().equals(r1)) {
+      // king safety - skip in endgame
+      if (gamePhaseFactor > GAME_PHASE_MAX/2) {
 
-        if (kingSquares[opponent].getFile().get() > e.get()) {
-          // king side castle
+        // king safety WHITE
+        if (opponent == WHITE && kingSquares[opponent].getRank().equals(r1)) {
 
-          // rook in the corner penalty
-          if (position.getPiece(h1).equals(WHITE_ROOK)) {
-            midGamePiecePosition -= CORNERED_ROOK_PENALTY;
-          }
-          // pawns in front
-          if (position.getPiece(f2).equals(WHITE_PAWN)) {
-            midGameKingSafety -= 2 * KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(g2).equals(WHITE_PAWN) ||
-              position.getPiece(g3).equals(WHITE_PAWN)) {
-            midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(h2).equals(WHITE_PAWN) ||
-              position.getPiece(h3).equals(WHITE_PAWN)) {
-            midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
-          }
-        } else if (kingSquares[opponent].getFile().get() < e.get()) {
-          // queen side castle
+          if (kingSquares[opponent].getFile().get() > e.get()) {
+            // king side castle
 
-          // queen side castle is weaker as king is more exposed
-          this.midGameKingSafety += -KING_SAFETY_PAWNSHIELD;
+            // rook in the corner penalty
+            if (position.getPiece(h1).equals(WHITE_ROOK)) {
+              midGamePiecePosition -= CORNERED_ROOK_PENALTY;
+            }
+            // pawns in front
+            if (position.getPiece(f2).equals(WHITE_PAWN)) {
+              midGameKingSafety -= 2 * KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(g2).equals(WHITE_PAWN) || position.getPiece(g3).equals(WHITE_PAWN)) {
+              midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(h2).equals(WHITE_PAWN) || position.getPiece(h3).equals(WHITE_PAWN)) {
+              midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
+            }
+          } else if (kingSquares[opponent].getFile().get() < e.get()) {
+            // queen side castle
 
-          // rook in the corner penalty
-          if (position.getPiece(a1).equals(WHITE_ROOK) ||
-              position.getPiece(b1).equals(WHITE_ROOK)) {
-            midGamePiecePosition -= EvaluationConfig.CORNERED_ROOK_PENALTY;
-          }
-          // extra bonus for queen side castle and king on b or a file
-          if (kingSquares[opponent].getFile().get() < c.get()) {
-            this.midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
-          }
-          // pawns in front
-          if (position.getPiece(c2).getType().equals(PAWN)) {
-            this.midGameKingSafety -= 2 * KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(b2).getType().equals(PAWN) ||
-              position.getPiece(b3).getType().equals(PAWN)) {
-            this.midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(a2).getType().equals(PAWN) ||
-              position.getPiece(a3).getType().equals(PAWN)) {
-            this.midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
+            // queen side castle is weaker as king is more exposed
+            this.midGameKingSafety += -KING_SAFETY_PAWNSHIELD;
+
+            // rook in the corner penalty
+            if (position.getPiece(a1).equals(WHITE_ROOK) || position.getPiece(b1).equals(WHITE_ROOK)) {
+              midGamePiecePosition -= EvaluationConfig.CORNERED_ROOK_PENALTY;
+            }
+            // extra bonus for queen side castle and king on b or a file
+            if (kingSquares[opponent].getFile().get() < c.get()) {
+              this.midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
+            }
+            // pawns in front
+            if (position.getPiece(c2).getType().equals(PAWN)) {
+              this.midGameKingSafety -= 2 * KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(b2).getType().equals(PAWN) || position.getPiece(b3).getType().equals(PAWN)) {
+              this.midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(a2).getType().equals(PAWN) || position.getPiece(a3).getType().equals(PAWN)) {
+              this.midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
+            }
           }
         }
-      }
-      // king safety BLACK
-      else if (opponent == BLACK && kingSquares[opponent].getRank() == r8) {
+        // king safety BLACK
+        else if (opponent == BLACK && kingSquares[opponent].getRank() == r8) {
 
-        if (kingSquares[opponent].getFile().get() > e.get()) {
-          // king side castle
+          if (kingSquares[opponent].getFile().get() > e.get()) {
+            // king side castle
 
-          // rook in the corner penalty
-          if (position.getPiece(h8).equals(BLACK_ROOK)) {
-            midGamePiecePosition -= CORNERED_ROOK_PENALTY;
-          }
-          // pawns in front
-          if (position.getPiece(f7).equals(BLACK_PAWN)) {
-            midGameKingSafety -= 2 * KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(g7).equals(BLACK_PAWN) ||
-              position.getPiece(g6).equals(BLACK_PAWN)) {
-            midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(h7).equals(BLACK_PAWN) ||
-              position.getPiece(h6).equals(BLACK_PAWN)) {
-            midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
-          }
-        } else if (kingSquares[opponent].getFile().get() < d.get()) {
-          // queen side castle
+            // rook in the corner penalty
+            if (position.getPiece(h8).equals(BLACK_ROOK)) {
+              midGamePiecePosition -= CORNERED_ROOK_PENALTY;
+            }
+            // pawns in front
+            if (position.getPiece(f7).equals(BLACK_PAWN)) {
+              midGameKingSafety -= 2 * KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(g7).equals(BLACK_PAWN) || position.getPiece(g6).equals(BLACK_PAWN)) {
+              midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(h7).equals(BLACK_PAWN) || position.getPiece(h6).equals(BLACK_PAWN)) {
+              midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
+            }
+          } else if (kingSquares[opponent].getFile().get() < d.get()) {
+            // queen side castle
 
-          // queen side castle is weaker as king is more exposed
-          this.midGameKingSafety -= -KING_SAFETY_PAWNSHIELD;
+            // queen side castle is weaker as king is more exposed
+            this.midGameKingSafety -= -KING_SAFETY_PAWNSHIELD;
 
-          // rook in the corner penalty
-          if (position.getPiece(a8).equals(BLACK_ROOK) ||
-              position.getPiece(b8).equals(BLACK_ROOK)) {
-            midGamePiecePosition -= EvaluationConfig.CORNERED_ROOK_PENALTY;
-          }
-          // extra bonus for queen side castle and king on b or a file
-          if (kingSquares[opponent].getFile().get() < c.get()) {
-            this.midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
-          }
-          // pawns in front
-          if (position.getPiece(c7).equals(BLACK_PAWN)) {
-            this.midGameKingSafety -= 2 * KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(b7).equals(BLACK_PAWN) ||
-              position.getPiece(b6).equals(BLACK_PAWN)) {
-            this.midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
-          }
-          if (position.getPiece(a7).equals(BLACK_PAWN) ||
-              position.getPiece(a6).equals(BLACK_PAWN)) {
-            this.midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
+            // rook in the corner penalty
+            if (position.getPiece(a8).equals(BLACK_ROOK) || position.getPiece(b8).equals(BLACK_ROOK)) {
+              midGamePiecePosition -= EvaluationConfig.CORNERED_ROOK_PENALTY;
+            }
+            // extra bonus for queen side castle and king on b or a file
+            if (kingSquares[opponent].getFile().get() < c.get()) {
+              this.midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
+            }
+            // pawns in front
+            if (position.getPiece(c7).equals(BLACK_PAWN)) {
+              this.midGameKingSafety -= 2 * KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(b7).equals(BLACK_PAWN) || position.getPiece(b6).equals(BLACK_PAWN)) {
+              this.midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
+            }
+            if (position.getPiece(a7).equals(BLACK_PAWN) || position.getPiece(a6).equals(BLACK_PAWN)) {
+              this.midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
+            }
           }
         }
       }
@@ -562,8 +553,8 @@ public class Evaluation {
     for (int i = 0; i < queenSquares[nextToMove].size(); i++) {
       Square square = queenSquares[nextToMove].get(i);
       final int index = square.ordinal();
-      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.QUEEN));
-      assert (position.getPiece(square.ordinal()).getColor().ordinal() == nextToMove);
+      assert (position.getPiece(square).getType().equals(PieceType.QUEEN));
+      assert (position.getPiece(square).getColor().ordinal() == nextToMove);
 
       // midGameMobility
       midGameMobility +=
@@ -578,8 +569,8 @@ public class Evaluation {
     for (int i = 0; i < queenSquares[opponent].size(); i++) {
       Square square = queenSquares[opponent].get(i);
       final int index = square.ordinal();
-      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.QUEEN));
-      assert (position.getPiece(square.ordinal()).getColor().ordinal() == opponent);
+      assert (position.getPiece(square).getType().equals(PieceType.QUEEN));
+      assert (position.getPiece(square).getColor().ordinal() == opponent);
 
       // midGameMobility
       midGameMobility -=
@@ -597,8 +588,8 @@ public class Evaluation {
     for (int i = 0; i < rookSquares[nextToMove].size(); i++) {
       Square square = rookSquares[nextToMove].get(i);
       final int index = square.ordinal();
-      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.ROOK));
-      assert (position.getPiece(square.ordinal()).getColor().ordinal() == nextToMove);
+      assert (position.getPiece(square).getType().equals(PieceType.ROOK));
+      assert (position.getPiece(square).getColor().ordinal() == nextToMove);
 
       // midGameMobility
       midGameMobility +=
@@ -613,8 +604,8 @@ public class Evaluation {
     for (int i = 0; i < rookSquares[opponent].size(); i++) {
       Square square = rookSquares[opponent].get(i);
       final int index = square.ordinal();
-      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.ROOK));
-      assert (position.getPiece(square.ordinal()).getColor().ordinal() == opponent);
+      assert (position.getPiece(square).getType().equals(PieceType.ROOK));
+      assert (position.getPiece(square).getColor().ordinal() == opponent);
 
       // midGameMobility
       midGameMobility -=
@@ -632,8 +623,8 @@ public class Evaluation {
     for (int i = 0; i < bishopSquares[nextToMove].size(); i++) {
       Square square = bishopSquares[nextToMove].get(i);
       final int index = square.ordinal();
-      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.BISHOP));
-      assert (position.getPiece(square.ordinal()).getColor().ordinal() == nextToMove);
+      assert (position.getPiece(square).getType().equals(PieceType.BISHOP));
+      assert (position.getPiece(square).getColor().ordinal() == nextToMove);
 
       // midGameMobility
       midGameMobility +=
@@ -649,8 +640,8 @@ public class Evaluation {
     for (int i = 0; i < bishopSquares[opponent].size(); i++) {
       Square square = bishopSquares[opponent].get(i);
       final int index = square.ordinal();
-      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.BISHOP));
-      assert (position.getPiece(square.ordinal()).getColor().ordinal() == opponent);
+      assert (position.getPiece(square).getType().equals(PieceType.BISHOP));
+      assert (position.getPiece(square).getColor().ordinal() == opponent);
 
       // midGameMobility
       midGameMobility -=
@@ -668,8 +659,8 @@ public class Evaluation {
     for (int i = 0; i < knightSquares[nextToMove].size(); i++) {
       Square square = knightSquares[nextToMove].get(i);
       final int index = square.ordinal();
-      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.KNIGHT));
-      assert (position.getPiece(square.ordinal()).getColor().ordinal() == nextToMove);
+      assert (position.getPiece(square).getType().equals(PieceType.KNIGHT));
+      assert (position.getPiece(square).getColor().ordinal() == nextToMove);
 
       // midGameMobility
       midGameMobility +=
@@ -685,8 +676,8 @@ public class Evaluation {
     for (int i = 0; i < knightSquares[opponent].size(); i++) {
       Square square = knightSquares[opponent].get(i);
       final int index = square.ordinal();
-      assert (position.getPiece(square.ordinal()).getType().equals(PieceType.KNIGHT));
-      assert (position.getPiece(square.ordinal()).getColor().ordinal() == opponent);
+      assert (position.getPiece(square).getType().equals(PieceType.KNIGHT));
+      assert (position.getPiece(square).getColor().ordinal() == opponent);
 
       // midGameMobility
       midGameMobility -=
@@ -704,8 +695,8 @@ public class Evaluation {
     for (int i = 0; i < pawnSquares[nextToMove].size(); i++) {
       Square square = pawnSquares[nextToMove].get(i);
       final int index = square.ordinal();
-      assert (position.getPiece(index).getType().equals(PAWN));
-      assert (position.getPiece(index).getColor().ordinal() == nextToMove);
+      assert (position.getPiece(square).getType().equals(PAWN));
+      assert (position.getPiece(square).getColor().ordinal() == nextToMove);
 
       // position
       final int tableIndex =
@@ -717,8 +708,8 @@ public class Evaluation {
     for (int i = 0; i < pawnSquares[opponent].size(); i++) {
       Square square = pawnSquares[opponent].get(i);
       final int index = square.ordinal();
-      assert (position.getPiece(index).getType().equals(PAWN));
-      assert (position.getPiece(index).getColor().ordinal() == opponent);
+      assert (position.getPiece(square).getType().equals(PAWN));
+      assert (position.getPiece(square).getColor().ordinal() == opponent);
 
       // position
       final int tableIndex =
@@ -818,7 +809,7 @@ public class Evaluation {
     for (int d : pieceDirections) {
       int to = square.ordinal() + d;
       while ((to & 0x88) == 0) { // slide while valid square
-        final Piece target = position.getPiece(to);
+        final Piece target = position.getPiece(Square.getSquare(to));
         // free square - non capture
         if (target == NOPIECE) {
           numberOfMoves++;
