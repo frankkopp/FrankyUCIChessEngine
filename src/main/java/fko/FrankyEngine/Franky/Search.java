@@ -120,13 +120,15 @@ public class Search implements Runnable {
     this.engine = engine;
     this.config = config;
 
+    // set opening book - will be initialized in each search
     this.book = new OpeningBookImpl(config.OB_FolderPath + config.OB_fileNamePlain, config.OB_Mode);
 
     // set hash sizes
     setHashSize(this.config.HASH_SIZE);
 
-    // Move Generators - each depth in search gets it own
-    // to avoid object creation during search
+    // Move Generators - each depth in search gets it own to avoid object creation
+    // during search. This is in preparation for move generators which keep a state
+    // per depth
     for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
       moveGenerators[i] = new MoveGenerator();
     }
@@ -161,13 +163,14 @@ public class Search implements Runnable {
       throw e;
     }
 
-    // create a deep copy of the position
+    // create a deep copy of the position to not change the original position given
     this.currentPosition = new Position(position);
 
+    // convenience fields
     this.myColor = currentPosition.getNextPlayer();
     this.searchMode = searchMode;
 
-    // setup latch
+    // setup latch - used to wait until run() has finished initialization
     waitForInitializationLatch = new CountDownLatch(1);
 
     // reset the stop search flag

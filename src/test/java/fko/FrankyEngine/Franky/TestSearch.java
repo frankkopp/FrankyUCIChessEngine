@@ -285,30 +285,6 @@ public class TestSearch {
   }
 
   @Test
-  @Disabled
-  public void testExtMateSearch() {
-
-//    testMateSearch();
-
-    String fen;
-    Position position;
-    SearchMode searchMode;
-
-    // mate in 4 (7 plys)
-//    fen = "r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - - 0 1";
-//    position = new Position(fen);
-//    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
-//    search.startSearch(position, searchMode);
-//    waitWhileSearching();
-//    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
-//    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
-//    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-//    assertEquals(Evaluation.CHECKMATE - 7, search.getLastSearchResult().resultValue);
-
-  }
-
-
-  @Test
   public void testMovesSearch() {
 
     String fen = Position.STANDARD_BOARD_FEN;
@@ -440,27 +416,27 @@ public class TestSearch {
   public void sizeOfSearchTreeTest() {
 
     int depth = 5;
-    List<String> values = new ArrayList<>();
+    List<String> resultStrings = new ArrayList<>();
     List<String> fens = new ArrayList<>();
 
     LOG.info("Start SIZE Test for depth {}", depth);
 
     fens.add(Position.STANDARD_BOARD_FEN);
     fens.add("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    fens.add("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1");
-    fens.add("r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - - 3 10");
-    fens.add("1r1r2k1/2p1qp1p/6p1/ppQB1b2/5Pn1/2R1P1P1/PP5P/R1B3K1 b");
+    fens.add("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -");
+    fens.add("r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -");
+    fens.add("1r1r2k1/2p1qp1p/6p1/ppQB1b2/5Pn1/2R1P1P1/PP5P/R1B3K1 b - -");
 
     for (String fen : fens) {
-      values.add("");
-      values.add(fen);
-      featureMeasurements(depth, values, fen);
-      values.add("");
+      resultStrings.add("");
+      resultStrings.add(fen);
+      featureMeasurements(depth, resultStrings, fen);
+      resultStrings.add("");
     }
 
     LOG.info("");
     LOG.info("################## RESULTS ####################");
-    for (String value : values) {
+    for (String value : resultStrings) {
       LOG.info(value);
     }
   }
