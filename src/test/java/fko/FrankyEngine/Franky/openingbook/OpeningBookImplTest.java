@@ -48,7 +48,7 @@ public class OpeningBookImplTest {
 
     long memStart = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 
-    OpeningBook book = new OpeningBookImpl("/book/8moves_GM_LB.pgn", OpeningBookImpl.Mode.PGN);
+    OpeningBook book = new OpeningBookImpl("/book/pgn_test.pgn", OpeningBookImpl.Mode.PGN);
 
     ((OpeningBookImpl) book)._config.FORCE_CREATE = true;
 
@@ -85,6 +85,42 @@ public class OpeningBookImplTest {
     long memStart = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 
     OpeningBook book = new OpeningBookImpl("/book/book_smalltest.txt", OpeningBookImpl.Mode.SIMPLE);
+
+    ((OpeningBookImpl) book)._config.FORCE_CREATE = true;
+
+    book.initialize();
+
+    System.out.format("Testing Book...");
+    Position currentBoard = new Position(OpeningBookImpl.STANDARD_BOARD_FEN);
+    int bookMove;
+    while ((bookMove = book.getBookMove(currentBoard.toFENString())) != NOMOVE) {
+      //System.out.format("%s ==> %s%n",currentBoard.toFENString(),bookMove);
+      currentBoard.makeMove(bookMove);
+    }
+    assertNotEquals(OpeningBookImpl.STANDARD_BOARD_FEN, currentBoard.toFENString());
+    System.out.format("Book OK%n%n");
+
+    long memMid = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+
+    book = null;
+
+    System.gc();
+
+    long memEnd = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+
+    System.out.println("Test End");
+    System.out.format("Memory used at Start: %s MB %n", HelperTools.getMBytes(memStart));
+    System.out.format("Memory used at Mid: %s MB %n", HelperTools.getMBytes(memMid));
+    System.out.format("Memory used at End: %s MB%n%n", HelperTools.getMBytes(memEnd));
+
+  }
+
+  @Test
+  public void testSANBook() {
+
+    long memStart = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+
+    OpeningBook book = new OpeningBookImpl("/book/book_graham.txt", OpeningBookImpl.Mode.SAN);
 
     ((OpeningBookImpl) book)._config.FORCE_CREATE = true;
 

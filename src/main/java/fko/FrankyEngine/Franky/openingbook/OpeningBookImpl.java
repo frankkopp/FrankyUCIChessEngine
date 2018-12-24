@@ -398,6 +398,8 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
 
       // ignore numbering
       if (item.matches("\\d+\\.")) continue;
+      // ignore result
+      if (item.matches("(1/2|1|0)-(1/2|1|0)")) continue;
 
       // try to create a move from it
       int move = Move.fromSANNotation(currentPosition, item);

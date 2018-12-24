@@ -46,7 +46,7 @@ import static fko.FrankyEngine.Franky.Move.NOMOVE;
  * the search is finished it calls <code>engine.sendResult</code> ith the best move and a ponder
  * move if it has one.
  * <p>
- * TODO: - SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
+ * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: KILLER Moves - search quiet moves previoulsy causing cut-offs first
  */
 public class Search implements Runnable {

@@ -277,12 +277,14 @@ public class Move {
     // pattern recognition
     Pattern pattern =
       Pattern.compile("([NBRQK])?([a-h])?([1-8])?([a-h][1-8]|O-O-O|O-O)(=([NBRQ]))?([+#])?");
-    // "\\[(\\w+) +\"(([^\\\\\"]+|\\\\([btnfr\"'\\\\]|[0-3]?[0-7]{1,2}|u[0-9a-fA-F]{4}))*)\"\\]");
 
     Matcher matcher = pattern.matcher(sanMove);
 
     // find one or more tag pairs
-    matcher.find();
+    if (!matcher.find()) {
+      LOG.warn("Could not match a SAN move in this string: {}", sanMove);
+      return NOMOVE;
+    };
     String piece = matcher.group(1);
     String disambFile = matcher.group(2);
     String disambRank = matcher.group(3);
