@@ -22,9 +22,8 @@
  * SOFTWARE.
  *
  */
-package fko.FrankyEngine.openingbook;
+package fko.FrankyEngine.Franky.openingbook;
 
-import fko.FrankyEngine.openingbook.OpeningBookImpl.Mode;
 
 /**
  * @author fkopp
@@ -46,9 +45,9 @@ public class Openingbook_Configuration {
     /** default value for serialization folder */
     public String               _serPath       = "./var/book_cache";
     /** default opening book */
-    public String               _fileNamePlain = "Test_PGN/perle.pgn";
+    public String               _fileNamePlain = "ecoe.pgn";
     /** default mode */
-    public Mode _mode          = Mode.PGN;
+    public OpeningBookImpl.Mode _mode          = OpeningBookImpl.Mode.PGN;
 
     /** Creates opening book configuration object */
     public Openingbook_Configuration() {}

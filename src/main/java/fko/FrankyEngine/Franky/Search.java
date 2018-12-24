@@ -27,14 +27,13 @@ package fko.FrankyEngine.Franky;
 
 import fko.FrankyEngine.Franky.TranspositionTable.TT_Entry;
 import fko.FrankyEngine.Franky.TranspositionTable.TT_EntryType;
-import fko.FrankyEngine.openingbook.OpeningBook;
-import fko.FrankyEngine.openingbook.OpeningBookImpl;
+import fko.FrankyEngine.Franky.openingbook.OpeningBook;
+import fko.FrankyEngine.Franky.openingbook.OpeningBookImpl;
 import fko.UCI.IUCIEngine;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 

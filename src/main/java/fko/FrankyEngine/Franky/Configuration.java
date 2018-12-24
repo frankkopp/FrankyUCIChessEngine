@@ -25,7 +25,7 @@
 
 package fko.FrankyEngine.Franky;
 
-import fko.FrankyEngine.openingbook.OpeningBookImpl;
+import fko.FrankyEngine.Franky.openingbook.*;
 
 /**
  * This is the engines configuration. All fields are package visible

@@ -24,7 +24,7 @@
  */
 
 /** */
-package fko.FrankyEngine.openingbook;
+package fko.FrankyEngine.Franky.openingbook;
 
 import org.junit.jupiter.api.Test;
 

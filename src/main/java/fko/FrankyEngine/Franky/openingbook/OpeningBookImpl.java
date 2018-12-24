@@ -22,7 +22,7 @@
  * SOFTWARE.
  *
  */
-package fko.FrankyEngine.openingbook;
+package fko.FrankyEngine.Franky.openingbook;
 
 import fko.FrankyEngine.Franky.Move;
 import fko.FrankyEngine.Franky.Position;
@@ -56,10 +56,10 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(OpeningBookImpl.class);
 
-  private static final long serialVersionUID = -6462934049609479248L;
+  private static final long serialVersionUID   = 4938373551716723214L;
 
   /* Standard Board Setup as FEN */
-  public static final String STANDARD_BOARD_FEN =
+  public static final  String STANDARD_BOARD_FEN =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
   Openingbook_Configuration _config = new Openingbook_Configuration();
@@ -81,7 +81,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
   private final Object _counterLock = new Object();
 
   /**
-   * Constructor
+   * Constructor using configuration from Openingbook_Configuration.java
    */
   public OpeningBookImpl() {
     _path = _config._folderPath + _config._fileNamePlain;
@@ -112,10 +112,11 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
 
     if (bookMap.containsKey(fen)) {
       ArrayList<Integer> moveList;
-      moveList = bookMap.get(fen).moves;
+      OpeningBook_Entry bookEntry = bookMap.get(fen);
+      moveList = bookEntry.moves;
       if (moveList.isEmpty()) return Move.NOMOVE;
-      Collections.shuffle(moveList);
-      move = moveList.get(0);
+      final int random = new Random().nextInt(moveList.size());
+      move = moveList.get(random);
     }
 
     return move;
@@ -358,7 +359,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     }
 
     OpeningBook_Entry rootEntry = bookMap.get(STANDARD_BOARD_FEN);
-    rootEntry.occurenceCounter.getAndIncrement();
+    rootEntry.occurrenceCounter.getAndIncrement();
 
     switch (_config._mode) {
       case SAN:
@@ -452,7 +453,6 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     item = item.trim();
 
     // try to create a move from it
-    // try to create a move from it
     int move = Move.fromUCINotation(currentPosition, item);
     if (move == Move.NOMOVE) return false;
 
@@ -480,21 +480,26 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
 
     // add the new entry to map or increase occurrence counter to existing
     // entry
+    OpeningBook_Entry currentEntry;
     if (bookMap.containsKey(currentFen)) {
-      OpeningBook_Entry currentEntry = bookMap.get(currentFen);
+      currentEntry = bookMap.get(currentFen);
       // Collision detection
       if (!currentFen.equals(currentEntry.position)) {
-        throw new RuntimeException("Hashtable Collision!");
+        RuntimeException runtimeException = new RuntimeException("Hashtable Collision!");
+        LOG.error("Hashtable Collision!", runtimeException);
+        throw runtimeException;
       }
-      currentEntry.occurenceCounter.getAndIncrement();
+      currentEntry.occurrenceCounter.getAndIncrement();
     } else {
-      bookMap.put(currentFen, new OpeningBook_Entry(currentFen));
+      currentEntry = new OpeningBook_Entry(currentFen);
+      bookMap.put(currentFen, currentEntry);
     }
 
     // add move to last book entry (lastPosition)
     OpeningBook_Entry lastEntry = bookMap.get(lastFen);
     if (!lastEntry.moves.contains(bookMove)) {
       lastEntry.moves.add(bookMove);
+      lastEntry.nextPosition.add(currentEntry);
     }
   }
 
@@ -537,12 +542,12 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
           readBookfromSERFile(openingBookInputStream);
           return true;
         } catch (IOException e) {
-          LOG.error(String.format("While reading book cache file: File %s could not read.",
-                                  cacheFolder.toString()));
+          LOG.error("While reading book cache file: File {} could not read.",
+                                  cacheFolder.toString());
         }
       } else {
         if (_config.VERBOSE) {
-          LOG.info(String.format("Cache file exists but ignored as FORCE_CREATE is set."));
+          LOG.info("Cache file exists but ignored as FORCE_CREATE is set.");
         }
       }
     }
@@ -578,6 +583,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
       LOG.error("file format error: " + openingBookInputStream + " " + e.toString());
       return false;
     } catch (ClassNotFoundException e) {
+      LOG.error("Cache file not found",e);
       e.printStackTrace();
       return false;
     }
@@ -593,7 +599,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
   }
 
   /**
-   * @return
+   * @return if saving was succful, false otherwise
    */
   boolean saveOpeningBooktoSERFile(String pathString) {
 
@@ -617,7 +623,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
       result = true;
 
     } catch (FileAlreadyExistsException x) {
-      System.err.format("file named %s" + " already exists: ", cacheFile);
+      LOG.error(String.format("file named %s" + " already exists: ", cacheFile));
       try {
         Files.delete(cacheFile);
       } catch (IOException e1) {
@@ -625,7 +631,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
       }
       result = false;
     } catch (IOException e) {
-      System.err.format("Create file error: %s %s ", cacheFile, e.toString());
+      LOG.error(String.format("Create file error: %s %s ", cacheFile, e.toString()));
       try {
         Files.delete(cacheFile);
       } catch (IOException e1) {
@@ -637,14 +643,13 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     if (result) {
       if (_config.VERBOSE) {
         time = System.currentTimeMillis() - start;
-        LOG.info(String.format("successful.(%f sec)", (time / 1000f)));
+        LOG.info(String.format("...successful.(%f sec)", (time / 1000f)));
       }
     } else {
       if (_config.VERBOSE) {
-        System.out.format("failed.");
-      } else {
-        System.err.format("Saving Opening Book to cache file failed. (%s)", cacheFile);
+        LOG.info("...failed.");
       }
+      LOG.error(String.format("Saving Opening Book to cache file failed. (%s)", cacheFile));
     }
 
     return result;
@@ -663,18 +668,8 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
   }
 
   /**
-   * Different possible mode for book files. BIN - will be serialization of
-   * java SAN - uses a line by line listing of move lists in SAN notation PNG
-   * - uses a file of at least one PNG game SIMLE - uses a line with full
-   * from-to description without - or ' '
-   *
-   * @author fkopp
-   */
-  public enum Mode {SER, SAN, PGN, SIMPLE}
-
-  /**
    * Represents one book entry for our opening book. This is bacically a fen
-   * notation of the position, the number of occurences of this position in
+   * notation of the position, the number of occurrences of this position in
    * the book file and the moves as SAN notation to the subsequent position.
    *
    * @author fkopp
@@ -687,19 +682,31 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     // as fen notation
     String             position;
     // how often did this position occur in the opening book
-    AtomicInteger      occurenceCounter = new AtomicInteger(0);
+    AtomicInteger      occurrenceCounter = new AtomicInteger(0);
     // list of moves to next positions
-    ArrayList<Integer> moves            = new ArrayList<>(5);
+    ArrayList<Integer> moves             = new ArrayList<>(5);
+    // link to next position
+    ArrayList<OpeningBook_Entry> nextPosition = new ArrayList<>(5);
 
     // Constructor
     OpeningBook_Entry(String fen) {
       this.position = fen;
-      this.occurenceCounter.set(1);
+      this.occurrenceCounter.set(1);
     }
 
     @Override
     public String toString() {
-      return position + " (" + occurenceCounter + ") " + moves.toString();
+      StringBuilder s = new StringBuilder(position + " (" + occurrenceCounter + ") ");
+
+      assert (moves.size() == nextPosition.size());
+      for (int i = 0; i < moves.size(); i++) {
+        s.append("[");
+        s.append(Move.toString(moves.get(i)));
+        s.append(" (").append(nextPosition.get(i).occurrenceCounter).append(")");
+        s.append("] ");
+      }
+
+      return s.toString();
     }
 
     /*
@@ -709,7 +716,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
      */
     @Override
     public int compareTo(OpeningBook_Entry b) {
-      return b.occurenceCounter.get() - this.occurenceCounter.get();
+      return b.occurrenceCounter.get() - this.occurrenceCounter.get();
     }
 
     /*
@@ -717,7 +724,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
      */
     @Override
     public int compare(OpeningBook_Entry o1, OpeningBook_Entry o2) {
-      return o2.occurenceCounter.get() - o1.occurenceCounter.get();
+      return o2.occurrenceCounter.get() - o1.occurrenceCounter.get();
     }
 
     /* (non-Javadoc)
@@ -754,5 +761,18 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     }
   }
 
-
+  /**
+   * Different possible mode for book files. BIN - will be serialization of
+   * java SAN - uses a line by line listing of move lists in SAN notation PNG
+   * - uses a file of at least one PNG game SIMLE - uses a line with full
+   * from-to description without - or ' '
+   *
+   * @author fkopp
+   */
+  public enum Mode {
+    SER,
+    SAN,
+    PGN,
+    SIMPLE
+  }
 }

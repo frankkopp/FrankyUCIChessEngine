@@ -77,7 +77,7 @@ public class Move {
   /**
    * Create a Move.
    */
-  static int createMove(MoveType movetype, Square start, Square end, Piece piece, Piece target,
+  public static int createMove(MoveType movetype, Square start, Square end, Piece piece, Piece target,
                         Piece promotion) {
     int move = 0;
     // Encode start
@@ -101,7 +101,7 @@ public class Move {
    * @param move the move.
    * @return start position of the move.
    */
-  static Square getStart(int move) {
+  public static Square getStart(int move) {
     assert move != NOMOVE;
     int position = (move & START_SQUARE_MASK) >>> START_SQUARE_SHIFT;
     assert (position & 0x88) == 0;
@@ -114,7 +114,7 @@ public class Move {
    * @param move the move.
    * @return the end position of the move.
    */
-  static Square getEnd(int move) {
+  public static Square getEnd(int move) {
     assert move != NOMOVE;
     int position = (move & END_SQUARE_MASK) >>> END_SQUARE_SHIFT;
     assert (position & 0x88) == 0;
@@ -127,7 +127,7 @@ public class Move {
    * @param move the IntMove.
    * @return the piece
    */
-  static Piece getPiece(int move) {
+  public static Piece getPiece(int move) {
     assert move != NOMOVE;
     int chessman = (move & PIECE_MASK) >>> PIECE_SHIFT;
     return Piece.values[chessman];
@@ -139,7 +139,7 @@ public class Move {
    * @param move the move.
    * @return the target piece.
    */
-  static Piece getTarget(int move) {
+  public static Piece getTarget(int move) {
     if (move == NOMOVE) return Piece.NOPIECE;
     int chessman = (move & TARGET_MASK) >>> TARGET_SHIFT;
     return Piece.values[chessman];
@@ -151,7 +151,7 @@ public class Move {
    * @param move the move.
    * @return the promotion piece.
    */
-  static Piece getPromotion(int move) {
+  public static Piece getPromotion(int move) {
     assert move != NOMOVE;
     int promotion = ((move & PROMOTION_MASK) >>> PROMOTION_SHIFT);
     return Piece.values[promotion];
@@ -163,7 +163,7 @@ public class Move {
    * @param move the move.
    * @return the type.
    */
-  static MoveType getMoveType(int move) {
+  public static MoveType getMoveType(int move) {
     if (move == NOMOVE) return MoveType.NOMOVETYPE;
     int type = ((move & MOVETYPE_MASK) >>> MOVETYPE_SHIFT);
     return MoveType.values[type];
@@ -175,7 +175,7 @@ public class Move {
    * @param move
    * @return String for move
    */
-  static String toString(int move) {
+  public static String toString(int move) {
     if (move == NOMOVE) return "NOMOVE";
     String s = "";
     if (getMoveType(move) == MoveType.CASTLING) {

@@ -22,7 +22,7 @@
  * SOFTWARE.
  *
  */
-package fko.FrankyEngine.openingbook;
+package fko.FrankyEngine.Franky.openingbook;
 
 /**
  * Interface for opening books gor Chessly.

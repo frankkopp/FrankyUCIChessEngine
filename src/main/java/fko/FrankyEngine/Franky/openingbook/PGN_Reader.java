@@ -22,7 +22,7 @@
  * SOFTWARE.
  *
  */
-package fko.FrankyEngine.openingbook;
+package fko.FrankyEngine.Franky.openingbook;
 
 import java.util.ArrayList;
 import java.util.HashMap;
