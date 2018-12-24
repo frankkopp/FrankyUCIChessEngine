@@ -1218,7 +1218,7 @@ public class Search implements Runnable {
   /**
    * Clears the hashtables
    */
-  public void clearHashtables() {
+  public void clearHashTables() {
     transpositionTable.clear();
   }
 
