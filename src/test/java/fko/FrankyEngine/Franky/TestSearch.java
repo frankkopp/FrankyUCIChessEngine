@@ -515,7 +515,7 @@ public class TestSearch {
                                final List<String> values, final String feature,
                                final boolean clearTT) {
 
-    if (clearTT) search.clearHashtables();
+    if (clearTT) search.clearHashTables();
     search.startSearch(position, searchMode);
     waitWhileSearching();
     values.add(String.format("SIZE %-12s : %,14d >> %-14s (%4d) >> %s ", feature,
