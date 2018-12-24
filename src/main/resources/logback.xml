@@ -26,12 +26,10 @@
   -->
 
 <configuration>
-    <!-- debugOption="true" scan="true" -->
-    <contextName>JavaUCIEngineFramework</contextName>
+    <contextName>FrankyUCIChessEngine</contextName>
 
     <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
 
-    <!-- Send debugOption messages to System.out -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%-20.-20thread] %-5.5level %-15.15logger{0} > %msg%n</pattern>
@@ -59,15 +57,11 @@
     <logger name="ComLog" level="DEBUG" additivity="true">
         <appender-ref ref="COMLOG"/>
     </logger>
-    <logger name="fko.javaUCIEngineFramework" level="WARN" additivity="true">
+    <logger name="fko.UCI" level="DEBUG" additivity="true">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </logger>
-    <logger name="fko.javaUCIEngineFramework.UCI" level="DEBUG" additivity="false">
-        <appender-ref ref="FILE"/>
-        <appender-ref ref="STDOUT"/>
-    </logger>
-    <logger name="fko.FrankyEngine.Franky" level="DEBUG" additivity="false">
+    <logger name="fko.FrankyEngine" level="DEBUG" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </logger>

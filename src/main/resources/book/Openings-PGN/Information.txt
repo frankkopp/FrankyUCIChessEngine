@@ -1,0 +1,137 @@
+MLmfl (Marc LaCrosse most frequent lines) - “ MLmfl ” has “ mfl ” standing for “ most frequent lines ”.
+These are the 32 positions that have been reached at least 1200 times and from which no  “ child ” position has been played more than 1000 times in a high-quality database of ~200.000 games played between january 2000 and may 2006 (85 000 grandmaster games, 15 000 correspondence games, 100 000 top-class slow-timing computer games).
+When compared with other testing startpositions collections such as the Nunn and Noomen ones, this set has one singular merit : the relative frequency of the different openings is closer to the real relative frequency of opening choices in "real" competition play (1.e4 is played as often as the sum of all other openings; against 1.e4 the Sicilian is played more often than all other defences combined; among 1.e4 e5 games the Ruy is by far the most frequent one, followed by the Petroff; and so on).  
+
+https://sites.google.com/site/chessbazaar/2007-01-2008-fast-engine-testing-the-mlmfl-test
+
+
+NebulaE and NebulaH (Dragan Zdravkovic) - Nebula chess engine test sets contain some of the most popular lines/positions found in the engine and human games. Instead of going for the diversity of opening lines, these test sets focus on the most frequently played ones. As a result, they should better estimate the real-world performance of the engine.
+
+Test sets are divided into 2 groups, each having 3 test sets (6 in total). NebulaE group is based on the 750,000 engine vs engine games played on the PlayChess server. NebulaH group is based on the 150,000 human vs human games played since the year 1990 by humans with ELO rating of at least 2550.
+
+Each group has one test set with the short lines that go up to 12 half-moves, one with the medium lines up to 18 half-moves and one with the long lines up to 32 half-moves. Opening lines are sorted by frequency at which the end position appears in the games database (more frequent lines listed first).
+
+The test sets were created by automated process in 3 steps:
+Step 1 - Go through all the games and find most frequently reached positions up to certain ply. Keep track of number of draws and decisive games for each position. Pick only positions that are not too drawish (must lead to a win in at least 30% of cases) and not too decisive (must lead to a draw in at least 25% of cases).
+Step 2 - Find opening lines that lead to each position picked in step 1. If multiple lines lead to the same position, pick the one most frequently found.
+Step 3 - Remove similar lines from the list created in step 2. If two lines are similar, pick the one leading to the more frequently found position. Generate opening statistics for the games database (e.g. "1. e4 c5" played 40% of times, "1. d4 Nf6" played 20% of times etc.) and make sure test set contains similar ratio of openings (discard all openings that appear less than 1% of the time in the games database).
+
+https://sites.google.com/site/nebulachess/testsets
+
+
+Noomen Testsuite 2012 (Jeroen Noomen)- The 2012 version of Jeroen Noomen's set of opening positions. Intended for engine vs engine testing, gives a balanced representation of modern chess
+Noomen Topical Testsuite 2012 - 50 topical, trendy, sharp, modern and sometimes murky positions, for engine testing
+
+http://www.rybkachess.com/index.php?auswahl=Downloads
+
+
+Nunn Test Positions (John Nunn)- http://chessprogramming.wikispaces.com/John+Nunn
+
+
+Silver Positions (Albert Silver)- The Silver Openings Suite By Albert Silver
+
+Before GM John Nunn published his first “Nunn Positions”, trying to find out a chess engine’s strength as opposed to another was an unsure task at best. Programs were usually pitted against each other in long matches, results were compiled, and their ratings calculated. A recurring issue was that new programs could often kill older ones straight from the opening thanks to more up-to-date opening books, sometimes even prepared specifically against them. This made it hard to answer the question of which was the best engine to analyze one’s games.
+
+Nunn’s idea was quickly accepted as simple and brilliant, helping provide a controlled testing environment for engines. Instead of their opening books, engines would be tested against each other using a set of pre-selected opening positions, played as both white and then black, so that only the engine’s playing strength was tested, and not the quality of its openings book. Nowadays, all the major playing interfaces support this, including Fritz, for which instructions are provided below.
+
+Over time, the concept has validated itself repeatedly, and the original suites have become a deserved standard, though a few shortcomings have also appeared: the chosen positions, while excellent, don’t actually cover the full gamut of openings or types of positions encountered in the opening phase, and thus the middlegame. Also, some positions have been known to initially play out almost always the same way in the first moves, as the top engines all agree on a specific continuation. The following openings suite was designed to address some of these issues, and provide a complementary testbed for engine testing.
+
+This openings suite is comprised of 50 positions, leading to a round 100-game match, covering not only the major openings, but also standard pawn structures and opening systems. Therefore not only will you find an Alekhine, some French Defenses, and several flavors of the Sicilian, but there are also a Hedgehog, a Stonewall, a Colle, and a King’s Indian Attack for example.
+
+To determine their frequency, the number of positions for each opening found in the suite is proportionate to the number of times played as per statistics culled from Mega Database 2010. In other words, the number of Sicilians found in the suite (9), is roughly proportionate to the number found in the 4.5 million game database. This isn’t true in an absolute sense, as minor concessions were made to favor variety as well.
+
+Finally, to ensure diversity, the positions lead to junctures in theory, where each engine is free to choose the direction it prefers. Each and every position was tested with several top engines (notably Rybka 3, Fritz 12, Shredder 12, and Stockfish 1.6.3) for a few minutes, and their choices were compared. If they all chose the same continuation, the position was rejected. This preliminary testing, followed by several test matches, overseeing the games, helped refine the positions chosen.
+
+http://en.chessbase.com/post/test-your-engines-the-silver-openings-suite
+
+
+GBDC12013 (Graham Banks, Dann Corbit) - A condensed version of the Graham2014-1F opening book, based on very strict criteria to do with exit point evaluations and mega-database win/draw/loss ratios. 
+The lines were selected by myself and checked for validity by Dann Corbit, who has an extensive database with associated statistical data. 
+Lines with exit point evaluations close to those we set were checked in further depth to see whether or not we could safely include them in the book. 
+
+Bird - 10 
+Sicilian - 40 
+Ponziani - 17 
+Petroff - 2 
+Scandinavian - 7 
+Alekhine - 2 
+French - 7 
+Pirc - 5 
+Caro Kann - 7 
+Centre Game - 6 
+Robatsch - 1 
+Queens Gambit Declined - 4 
+Trompowsky - 3 
+Queens Pawn - 2 
+English - 14 
+1. Nf3 - 6 
+Larsen - 5 
+Dutch - 6 
+Polish - 3 
+Barcza - 2 
+
+http://talkchess.com/forum/viewtopic.php?t=50541
+
+
+2moves_LT (Lyudmil Tsvetkov) - Unbelievable as it might seem, I have prepared a very short 2 moves openings book for engine testing. The desire to do so was born out of the necessity to have an extremely short and perfectly equal book so that engines could play themselves a larger share of the game with no bias in the starting positions. 
+
+Some facts about the book: 
+
+- it contains 913 (edit - 1000 positions) unique starting positions 
+- all of the lines are perfectly equal, i.e. there are no positions where one of the sides is lost; I guess the advantage in all cases is in the range of 20-30 centipawns at most, it is true that some engines might see bigger advantages, but I would definitely state that if there are any lost positions at all, there are below 1% 
+- for the sake of equal play, I have included lines like 1.d3 d5 2.c3 e5, which is still not lost for white, but excluded lines like 1. g4 or 1.b4, where white is already exposed beyond repair 
+- there are a lot of lines that should be rare or extremely rare, but still equal 
+
+The book is targeted at testing top engines, where already every single mistake counts, and so using a suboptimal book with losing variations very much distorts unbiassed testing. But of course, you can use with whatever engine. 
+
+Why the book is 2 moves short and not 1 move or 3 moves? Well, a 1 move book would not provide the sufficient variety of openings for proper testing, while a 3 moves book already unnecessarily takes another move of free choice for the engines. 
+
+Why I did not try to create a 2 moves book by using grandmaster games or games of lower rated players? Well, I suppose that openings in GM play would not provide sufficient variety, while in a larger sample of games of lower rated players there would surely be many suboptimal lines like 1. g4 and 1.b4 for example, so that you would still have to do some manual corrections.
+
+http://talkchess.com/forum/viewtopic.php?t=50382&highlight=moves
+
+
+GrandPQRS-3moves-2358 (Norm Pollock, Aser Huerga, Cody Rowland) - 2358 openings (3 moves deep) gathered from the collection of grand master games found at Norm Pollock's site ( http://www.hoflink.com/~npollock/chess.html ) and filtered by Aser Huerga (with help from a script provided by Cody Rowland).
+
+
+Blitz_testing_4moves (Adam Hair) - Procedure for creating PGN:
+
+1. Collected engine-engine games and GM games.
+2. Truncated to 4 moves and removed duplicates.
+3. Used as the openings for games played by top level programs (circa 2011) with search limited to 8 ply,
+   games limited to 40 moves.
+4. Used resultSplit.exe (Norm Pollock) to extract draws.
+5. Used steady.exe (Norm Pollock) to select games with engine evaluations +/- 0.75 
+   and games lasting to at least 32 moves.
+6. Truncated to 4 moves.
+7. Removed duplicates.
+8. Removed some odd openings.
+
+The result is 13,356 unique games/positions 4 moves deep. Hopefully, bad openings
+have been removed by this process. That is, the remaining positions will hopefully
+be good for blitz testing of weaker chess engines. 
+
+
+8moves_GM_LB (Norm Pollock, Adam Hair, Dariusz Orzechowski, Lucas Braesch) - 44,624 openings (8 moves deep) gathered from the collection of grand master games found at Norm Pollock's site ( http://www.hoflink.com/~npollock/chess.html ). Have been verified by Stockfish and Critter to be fair (+/- 50 cp for White) at depth 16.
+
+http://talkchess.com/forum/viewtopic.php?t=48874
+
+
+swcr-fq-openings-v4.1 (Norm Pollock, Frank Quisinsky) - 3395 positions (8 moves deep) gathered from the collection of grand master games found at Norm Pollock's site ( http://www.hoflink.com/~npollock/chess.html ) and filtered by Frank Quisinsky.
+
+Also try out the PGN Selection tool suggested and hosted by Frank (written by Volker Annuss). Can be used to randomly select a set of positions (distributed from ECO A through E) from a pgn file (which must contain ECO tags).
+
+http://www.amateurschach.de/
+
+
+engineTest - epd file created by Norm Pollock ( http://www.hoflink.com/~npollock/chess.html )  containing 43,880 positions (8 moves deep). Have been verified by Houdini to be fair (+/- 30 cp for White)
+Can be downloaded at http://dl.dropbox.com/u/66249444/engineTest.7z 
+
+
+Kirr's Chess Opening Sampler (Kirill Kryukov and contributors) - How many times you thought "Why even in 50 games match do I get double openings with this huge opening book? Should I try an even larger book? Or may be tweak the variety slider? (Thus getting more frequent unbalanced openings too)"
+
+Here is one possible solution. This site provides a random duplicate-free sample from your favorite opening suite. Just select an opening suite, and the number of positions, and click "Sample".
+
+Copy-paste the output into a .pgn file (Ctrl+A, Ctrl+C, etc.) and choose it as an opening database in your tournament GUI. If you'll use each position twice with alternating colors, you need just N/2 positions obviously.
+
+http://kirill-kryukov.com/chess/tools/opening-sampler/
