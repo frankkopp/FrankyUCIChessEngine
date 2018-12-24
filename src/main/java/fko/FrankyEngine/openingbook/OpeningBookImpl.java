@@ -44,11 +44,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static fko.FrankyEngine.Franky.Move.NOMOVE;
-
 /**
- * Implements an Opening Book for Chessly. Reads different formats and caches
+ * Implements an Opening Book for chess engines. Reads different formats and caches
  * result in serialized bin files. Implemented are PGN, SAN, SIMPLE and SER.
+ * <p>
+ * Returns a random move from the loaded book.
  *
  * @author Frank Kopp
  */
@@ -62,7 +62,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
   public static final String STANDARD_BOARD_FEN =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-  protected Openingbook_Configuration _config = new Openingbook_Configuration();
+  Openingbook_Configuration _config = new Openingbook_Configuration();
 
   /**
    * this is the book mapping itself - Key, Value
@@ -77,8 +77,8 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
   private boolean _isInitialized = false;
 
   // -- helps with process output
-  private int    _counter     = 0;
-  private Object _counterLock = new Object();
+  private       int    _counter     = 0;
+  private final Object _counterLock = new Object();
 
   /**
    * Constructor
@@ -108,12 +108,12 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
   @Override
   public int getBookMove(String fen) {
 
-    int move = NOMOVE;
+    int move = Move.NOMOVE;
 
     if (bookMap.containsKey(fen)) {
       ArrayList<Integer> moveList;
       moveList = bookMap.get(fen).moves;
-      if (moveList.isEmpty()) return NOMOVE;
+      if (moveList.isEmpty()) return Move.NOMOVE;
       Collections.shuffle(moveList);
       move = moveList.get(0);
     }
@@ -130,7 +130,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     if (_isInitialized) return;
 
     if (_config.VERBOSE) {
-      LOG.info(String.format("Opening Book initialization..."));
+      LOG.info("Opening Book initialization...");
     }
 
     System.gc();
@@ -226,9 +226,9 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
 
     long start = System.currentTimeMillis();
     Charset charset = Charset.forName("ISO-8859-1");
-    List<String> lines = null;
+    List<String> lines;
 
-    if (_config.VERBOSE) LOG.info(String.format("Reading Opening Book..."));
+    if (_config.VERBOSE) LOG.info("Reading Opening Book...");
 
     InputStreamReader isr = new InputStreamReader(bookFileInputStream, charset);
     BufferedReader br = new BufferedReader(isr);
@@ -237,8 +237,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     long time = System.currentTimeMillis() - start;
 
     if (_config.VERBOSE) {
-      LOG.info(
-        String.format("Finished reading %d lines. (%f sec)", lines.size(), (time / 1000f)));
+      LOG.info(String.format("Finished reading %d lines. (%f sec)", lines.size(), (time / 1000f)));
     }
 
     return lines;
@@ -254,9 +253,9 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
 
     long start = System.currentTimeMillis();
     Charset charset = Charset.forName("ISO-8859-1");
-    Stream<String> lines = null;
+    Stream<String> lines;
 
-    if (_config.VERBOSE) LOG.info(String.format("Reading Opening Book."));
+    if (_config.VERBOSE) LOG.info("Reading Opening Book.");
 
     InputStreamReader isr = new InputStreamReader(bookFileInputStream, charset);
     BufferedReader br = new BufferedReader(isr);
@@ -290,7 +289,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
 
     long start = System.currentTimeMillis();
     if (_config.VERBOSE) {
-      LOG.info(String.format("Creating internal book..."));
+      LOG.info("Creating internal book...");
     }
 
     synchronized (_counterLock) {
@@ -299,7 +298,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
 
     // parallel lambda expression - very fast and cool - needs some synchronizing though
     gameList.parallelStream().forEach(game -> {
-    //gameList.stream().forEach(game -> {
+      //gameList.stream().forEach(game -> {
       String moves = game.getMoves().toString();
       moves = moves.replaceAll("[\\[\\],]", "");
       processLine(moves);
@@ -307,8 +306,8 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
 
     long time = System.currentTimeMillis() - start;
     if (_config.VERBOSE) {
-      LOG.info(String.format("Opening Book ready! %d Positions (%f sec)", bookMap.size(),
-                             (time / 1000f)));
+      LOG.info(
+        String.format("Opening Book ready! %d Positions (%f sec)", bookMap.size(), (time / 1000f)));
     }
   }
 
@@ -324,7 +323,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
 
     long start = System.currentTimeMillis();
     if (_config.VERBOSE) {
-      LOG.info(String.format("Creating internal book..."));
+      LOG.info("Creating internal book...");
     }
 
     synchronized (_counterLock) {
@@ -335,8 +334,8 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
 
     long time = System.currentTimeMillis() - start;
     if (_config.VERBOSE) {
-      LOG.info(String.format("Opening Book ready! %d Positions (%f sec)", bookMap.size(),
-                             (time / 1000f)));
+      LOG.info(
+        String.format("Opening Book ready! %d Positions (%f sec)", bookMap.size(), (time / 1000f)));
     }
   }
 
@@ -353,9 +352,9 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     }
     if (_config.VERBOSE && c % 1000 == 0) {
       LOG.info(String.format("%7d ", c));
-//      if (_config.VERBOSE && c % 10000 == 0) {
-//        LOG.info(String.format("%n"));
-//      }
+      //      if (_config.VERBOSE && c % 10000 == 0) {
+      //        LOG.info(String.format("%n"));
+      //      }
     }
 
     OpeningBook_Entry rootEntry = bookMap.get(STANDARD_BOARD_FEN);
@@ -401,7 +400,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
 
       // try to create a move from it
       int move = Move.fromSANNotation(currentPosition, item);
-      if (move == NOMOVE) return;
+      if (move == Move.NOMOVE) return;
 
       // remember last position
       Position lastPosition = new Position(currentPosition);
@@ -437,8 +436,8 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     Position currentPosition = new Position(STANDARD_BOARD_FEN);
 
     // iterate over line items - not parallel / actually slower as we would have to copy the board.
-    lineItems.stream().forEach(item -> {
-      if (!processSIMPLELineItem(item, currentPosition)) return;
+    lineItems.forEach(item -> {
+      processSIMPLELineItem(item, currentPosition);
     });
 
   }
@@ -455,7 +454,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     // try to create a move from it
     // try to create a move from it
     int move = Move.fromUCINotation(currentPosition, item);
-    if (move == NOMOVE) return false;
+    if (move == Move.NOMOVE) return false;
 
     // remember last position
     Position lastPosition = new Position(currentPosition);
@@ -507,7 +506,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
    * @param pathString
    * @return true if cache file exists and has been read, false otherwise
    */
-  protected boolean tryFromCache(String pathString) {
+  boolean tryFromCache(String pathString) {
 
     // path of cache files always is external from JAR so we can use Files.exist()
     InputStream openingBookInputStream = null;
@@ -561,7 +560,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     try (ObjectInputStream ois = new ObjectInputStream(
       new BufferedInputStream(openingBookInputStream))) {
       if (_config.VERBOSE) {
-        LOG.info(String.format("Reading Opening Book from cachefile."));
+        LOG.info("Reading Opening Book from cachefile.");
       }
 
       bookMap = (Map<String, OpeningBook_Entry>) ois.readObject();
@@ -585,8 +584,8 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     long time = System.currentTimeMillis() - start;
 
     if (_config.VERBOSE) {
-      LOG.info(String.format("Opening Book ready! %d Positions (%f sec)", bookMap.size(),
-                             (time / 1000f)));
+      LOG.info(
+        String.format("Opening Book ready! %d Positions (%f sec)", bookMap.size(), (time / 1000f)));
     }
 
     return true;
@@ -596,7 +595,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
   /**
    * @return
    */
-  protected boolean saveOpeningBooktoSERFile(String pathString) {
+  boolean saveOpeningBooktoSERFile(String pathString) {
 
     boolean result;
     long start = 0, time = 0;
@@ -686,9 +685,9 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     private static final long serialVersionUID = 1573629955690947725L;
 
     // as fen notation
-    String            position;
+    String             position;
     // how often did this position occur in the opening book
-    AtomicInteger     occurenceCounter = new AtomicInteger(0);
+    AtomicInteger      occurenceCounter = new AtomicInteger(0);
     // list of moves to next positions
     ArrayList<Integer> moves            = new ArrayList<>(5);
 
@@ -700,11 +699,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
 
     @Override
     public String toString() {
-      StringBuffer s = new StringBuffer(position);
-      s.append(" (").append(occurenceCounter).append(") ");
-      s.append(moves.toString());
-      // s.append(System.lineSeparator());
-      return s.toString();
+      return position + " (" + occurenceCounter + ") " + moves.toString();
     }
 
     /*
@@ -752,13 +747,10 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
       }
       OpeningBook_Entry other = (OpeningBook_Entry) obj;
       if (this.position == null) {
-        if (other.position != null) {
-          return false;
-        }
-      } else if (!this.position.equals(other.position)) {
-        return false;
+        return other.position == null;
+      } else {
+        return this.position.equals(other.position);
       }
-      return true;
     }
   }
 
