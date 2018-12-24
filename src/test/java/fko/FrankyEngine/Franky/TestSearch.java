@@ -548,7 +548,7 @@ public class TestSearch {
     search.config.USE_RAZOR_PRUNING = true;
 
     depth = 8;
-    fen = "r1bnkbnr/ppppqppp/8/3Pp3/2B1P3/5N2/PPP2PPP/RNBQK2R b KQkq -"; // bm Bxd6+
+    fen = "r3k2r/pqpb2pp/3b4/5p2/1NQ5/P1Pp4/1P3PPP/R1B1K2R b KQkq -";
     position = new Position(fen);
     searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
     search.startSearch(position, searchMode);
