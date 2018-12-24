@@ -25,6 +25,8 @@
 
 package fko.FrankyEngine.Franky;
 
+import fko.FrankyEngine.openingbook.OpeningBookImpl;
+
 /**
  * This is the engines configuration. All fields are package visible
  * and can be changed during runtime. They are deliberately not static
@@ -56,6 +58,11 @@ public class Configuration {
    * UCI Options
    */
   boolean UCI_ShowCurrLine = true;
+
+  /**
+   * If set to true we will use the opening book
+   */
+  boolean USE_BOOK = true;
 
   /** ##################################################
    * OPTIMIZATIONS
@@ -132,10 +139,6 @@ public class Configuration {
    */
   boolean USE_ASPIRATION_WINDOW = false;
 
-  /**
-   * If set to true we will use the opening book
-   */
-  boolean _USE_BOOK = false;
 
   /**
    * value for folder to books
@@ -151,7 +154,7 @@ public class Configuration {
   /**
    * default opening book value
    */
-  //Mode _OB_Mode = Mode.PGN;
+  OpeningBookImpl.Mode _OB_Mode = OpeningBookImpl.Mode.PGN;
   //Mode _OB_Mode = Mode.SAN;
   //Mode _OB_Mode = Mode.SIMPLE;
 

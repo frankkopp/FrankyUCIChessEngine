@@ -231,17 +231,19 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
       return;
     }
 
-    String value;
-    if (scanner.hasNext() && (token=scanner.next()).equals("value")) {
-      if (scanner.hasNext()) {
-        value = scanner.next();
+    String value = "";
+    if (scanner.hasNext()) {
+      if ((token = scanner.next()).equals("value")) {
+        if (scanner.hasNext()) {
+          value = scanner.next();
+        } else {
+          LOG.error("Command setoption is malformed - expected value");
+          return;
+        }
       } else {
-        LOG.error("Command setoption is malformed - expected value");
+        LOG.error("Command setoption is malformed - expected token value received: " + token);
         return;
       }
-    } else {
-      LOG.error("Command setoption is malformed - expected token value received: " + token);
-      return;
     }
 
     uciEngine.setOption(name, value);

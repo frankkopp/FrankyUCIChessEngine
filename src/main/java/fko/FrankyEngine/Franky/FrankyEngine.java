@@ -120,9 +120,23 @@ public class FrankyEngine implements IUCIEngine {
                 "512",
                 ""));
     iUciOptions.add(
+        new UCIOption("Clear_Hash",
+                UCIOptionType.button,
+                "",
+                "",
+                "",
+                ""));
+    iUciOptions.add(
         new UCIOption("Ponder",
                 UCIOptionType.check,
                 Boolean.toString(config.PONDER),
+                "",
+                "",
+                ""));
+    iUciOptions.add(
+        new UCIOption("OwnBook",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_BOOK),
                 "",
                 "",
                 ""));
@@ -235,9 +249,21 @@ public class FrankyEngine implements IUCIEngine {
       case "Hash":
         setHashSizeOption(value);
         break;
+      case "Clear_Hash":
+        search.clearHashTables();
+        msg = "Hash cleared";
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
       case "Ponder":
         config.PONDER = Boolean.valueOf(value);
         msg = "Engine Ponder set to " + (config.PONDER ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "OwnBook":
+        config.USE_BOOK = Boolean.valueOf(value);
+        msg = "Engine Book set to " + (config.PONDER ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;

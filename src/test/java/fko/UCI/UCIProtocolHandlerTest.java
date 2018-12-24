@@ -111,6 +111,9 @@ class UCIProtocolHandlerTest {
     semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
     assertFalse(engine.getPonderOption());
 
+    toHandlerPrinter.println("setoption name Clear_Hash");
+    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+
     toHandlerPrinter.println("quit");
   }
 
