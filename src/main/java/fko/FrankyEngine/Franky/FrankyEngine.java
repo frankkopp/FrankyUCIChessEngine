@@ -336,10 +336,10 @@ public class FrankyEngine implements IUCIEngine {
   }
 
   @Override
-  public void doMove(final String move) {
-    LOG.info("Engine got doMove command: " + move);
-    final int omegaMove = Move.fromUCINotation(position, move);
-    position.makeMove(omegaMove);
+  public void doMove(final String moveUCI) {
+    LOG.info("Engine got doMove command: " + moveUCI);
+    final int move = Move.fromUCINotation(position, moveUCI);
+    position.makeMove(move);
   }
 
   @Override

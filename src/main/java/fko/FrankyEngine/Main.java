@@ -46,7 +46,6 @@ public class Main {
    * @param args command line options
    */
   public static void main(final String[] args) {
-
     LOG.debug("Start UCI Engine Framework " + Instant.now());
 
     final IUCIEngine uciEngine = new FrankyEngine();

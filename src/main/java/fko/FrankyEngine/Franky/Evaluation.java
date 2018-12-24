@@ -189,15 +189,14 @@ public class Evaluation {
 
     // Stage 1
     staticEvaluations();
-    // Stage 2
-    iterateOverPieces();
-    // Stage 3
-    iterateOverSquares();
 
-    // ######################################
-    // Sum up per game phase
     material = midGameMaterial * (gamePhaseFactor / GAME_PHASE_MAX) +
                endGameMaterial * (1 - gamePhaseFactor / GAME_PHASE_MAX);
+
+    // TODO: LAZY EVALUATION
+
+    // Stage 2
+    iterateOverPieces();
 
     piecePosition = midGamePiecePosition * (gamePhaseFactor / GAME_PHASE_MAX) +
                     endGamePiecePosition * (1 - gamePhaseFactor / GAME_PHASE_MAX);
@@ -208,6 +207,13 @@ public class Evaluation {
     kingSafety = midGameKingSafety * (gamePhaseFactor / GAME_PHASE_MAX) +
                  endGameKingSafety * (1 - gamePhaseFactor / GAME_PHASE_MAX);
 
+    // TODO: LAZY EVALUATION
+
+    // Stage 3
+    iterateOverSquares();
+
+    // ######################################
+    // Sum up
     // @formatter:off
     value = material      * MATERIAL_WEIGHT +
             piecePosition * POSITION_WEIGHT +

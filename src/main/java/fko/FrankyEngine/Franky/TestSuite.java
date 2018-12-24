@@ -562,7 +562,7 @@ public class TestSuite {
     NOT_TESTED,
     SUCCESS,
     FAILED,
-    SKIPPED}
-
+    SKIPPED
+  }
 
 }

@@ -42,10 +42,9 @@ import java.util.concurrent.CountDownLatch;
  * the search is finished it calls <code>engine.sendResult</code> ith the best move and a ponder
  * move if it has one.
  * <p>
- * DONE: - QUIESCENCE (https://www.chessprogramming.org/Quiescence_Search)
  * TODO: - SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
- * DONE: - Mate Distance Pruning (https://www.chessprogramming.org/Mate_Distance_Pruning)
- * DONE: - NULL MOVE PRUNING
+ * TODO: KILLER Moves - search quiet moves previoulsy causing cut-offs first
+ *
  */
 public class Search implements Runnable {
 
@@ -724,9 +723,6 @@ public class Search implements Runnable {
       int move = moves.get(i);
       int value;
 
-      // TODO: Delta Cutoff
-      //  https://www.chessprogramming.org/Delta_Pruning
-
       // Minor Promotion Pruning
       if (config.USE_MINOR_PROMOTION_PRUNING && !isPerftSearch()) {
         // @formatter:off
@@ -741,12 +737,6 @@ public class Search implements Runnable {
         // @formatter:on
       }
 
-      // TODO Razoring
-      //  https://www.chessprogramming.org/Razoring
-
-      // TODO Futility Pruning
-      //  https://www.chessprogramming.org/Futility_Pruning
-
       position.makeMove(move);
 
       // Skip illegal moves
@@ -757,9 +747,6 @@ public class Search implements Runnable {
 
       // needed to remember if we even had a legal move
       hadLegaMove = true;
-
-      // TODO Futility Pruning
-      //  https://www.chessprogramming.org/Futility_Pruning
 
       // keep track of current variation
       currentVariation.add(move);
@@ -797,18 +784,19 @@ public class Search implements Runnable {
 
       // PRUNING START
       if (value > pvValue) { // to find first PV
+        pvValue = value;
         if (value > alpha) { // improved?
           if (value >= beta) { // fail-high
             if (config.USE_ALPHABETA_PRUNING && !isPerftSearch()) {
-              storeTT(position, depthLeft, TT_EntryType.BETA, beta);
+              // TODO KILLER MOVES
               searchCounter.prunings++;
-              return beta; // TODO: return value or beta???
+              storeTT(position, depthLeft, TT_EntryType.BETA, beta);
+              return beta;
             }
           }
           // alpha improved
-          pvValue = value;
-          MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
           alpha = value;
+          MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
           ttType = TT_EntryType.EXACT;
         }
       }
