@@ -106,14 +106,14 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
    * @see OpeningBook#getBookMove(String)
    */
   @Override
-  public String getBookMove(String fen) {
+  public int getBookMove(String fen) {
 
-    String move = null;
+    int move = NOMOVE;
 
     if (bookMap.containsKey(fen)) {
-      ArrayList<String> moveList;
+      ArrayList<Integer> moveList;
       moveList = bookMap.get(fen).moves;
-      if (moveList.isEmpty()) return null;
+      if (moveList.isEmpty()) return NOMOVE;
       Collections.shuffle(moveList);
       move = moveList.get(0);
     }
@@ -414,7 +414,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
       // get fen notation from position
       String currentFen = currentPosition.toFENString();
 
-      addToBook(item, item, lastFen, currentFen);
+      addToBook(move, lastFen, currentFen);
 
     }
   }
@@ -468,18 +468,16 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     // get fen notation from position
     String currentFen = currentPosition.toFENString();
 
-    addToBook(item, item, lastFen, currentFen);
+    addToBook(move, lastFen, currentFen);
     return true;
   }
 
   /**
-   * @param item
    * @param bookMove
    * @param lastFen
    * @param currentFen
    */
-  private synchronized void addToBook(String item, String bookMove, String lastFen,
-                                      String currentFen) {
+  private synchronized void addToBook(int bookMove, String lastFen, String currentFen) {
 
     // add the new entry to map or increase occurrence counter to existing
     // entry
@@ -692,7 +690,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     // how often did this position occur in the opening book
     AtomicInteger     occurenceCounter = new AtomicInteger(0);
     // list of moves to next positions
-    ArrayList<String> moves            = new ArrayList<>(5);
+    ArrayList<Integer> moves            = new ArrayList<>(5);
 
     // Constructor
     OpeningBook_Entry(String fen) {

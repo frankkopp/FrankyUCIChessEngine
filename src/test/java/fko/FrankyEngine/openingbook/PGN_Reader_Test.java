@@ -104,7 +104,7 @@ public class PGN_Reader_Test {
   private List<String> readAllLinesFromFile() {
 
     final String folderPath = "/book/";
-    final String fileNamePlain = "Openings-PGN/8moves_GM_LB.pgn";
+    final String fileNamePlain = "8moves_GM_LB.pgn";
 
     Path path = FileSystems.getDefault().getPath(folderPath, fileNamePlain);
     Charset charset = Charset.forName("ISO-8859-1");

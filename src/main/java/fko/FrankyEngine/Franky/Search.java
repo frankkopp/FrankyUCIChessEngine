@@ -27,13 +27,18 @@ package fko.FrankyEngine.Franky;
 
 import fko.FrankyEngine.Franky.TranspositionTable.TT_Entry;
 import fko.FrankyEngine.Franky.TranspositionTable.TT_EntryType;
+import fko.FrankyEngine.openingbook.OpeningBook;
+import fko.FrankyEngine.openingbook.OpeningBookImpl;
 import fko.UCI.IUCIEngine;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
+
+import static fko.FrankyEngine.Franky.Move.NOMOVE;
 
 /**
  * Search implements the actual search for best move of a given position.
@@ -44,7 +49,6 @@ import java.util.concurrent.CountDownLatch;
  * <p>
  * TODO: - SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: KILLER Moves - search quiet moves previoulsy causing cut-offs first
- *
  */
 public class Search implements Runnable {
 
@@ -66,6 +70,9 @@ public class Search implements Runnable {
   // back reference to the engine
   private final IUCIEngine    engine;
   final         Configuration config;
+
+  // opening book
+  private final OpeningBook book;
 
   // the thread in which we will do the actual search
   private Thread searchThread = null;
@@ -113,6 +120,8 @@ public class Search implements Runnable {
   public Search(IUCIEngine engine, Configuration config) {
     this.engine = engine;
     this.config = config;
+
+    this.book = new OpeningBookImpl(config.OB_FolderPath + config.OB_fileNamePlain, config.OB_Mode);
 
     // set hash sizes
     setHashSize(this.config.HASH_SIZE);
@@ -241,6 +250,27 @@ public class Search implements Runnable {
     // release latch so the caller can continue
     waitForInitializationLatch.countDown();
 
+    // Opening book move
+    if (config.USE_BOOK) {
+      if (searchMode.isTimeControl()) {
+        LOG.info("Time controlled search => Using book");
+        // initialize book - only happens the first time
+        book.initialize();
+        // retrieve a move from the book
+        int bookMove = book.getBookMove(currentPosition.toFENString());
+        if (bookMove != NOMOVE && Move.isValid(bookMove)) {
+          LOG.info("Book move found: {}", Move.toString(bookMove));
+          lastSearchResult.bestMove = bookMove;
+          engine.sendResult(lastSearchResult.bestMove, NOMOVE);
+          return;
+        } else {
+          LOG.info("No Book move found");
+        }
+      } else {
+        LOG.info("Non time controlled search => not using book");
+      }
+    }
+
     // run the search itself
     lastSearchResult = iterativeSearch(currentPosition);
 
@@ -293,7 +323,7 @@ public class Search implements Runnable {
     // no legal root moves - game already ended!
     if (legalMoves.size() == 0) {
       final SearchResult searchResult = new SearchResult();
-      searchResult.bestMove = Move.NOMOVE;
+      searchResult.bestMove = NOMOVE;
       if (position.hasCheck()) {
         searchResult.resultValue = Evaluation.CHECKMATE;
       } else {
@@ -391,11 +421,10 @@ public class Search implements Runnable {
 
     // retrieved ponder move from pv
     int p_move;
-    if (principalVariation[0].size() > 1 &&
-        (p_move = principalVariation[0].get(1)) != Move.NOMOVE) {
+    if (principalVariation[0].size() > 1 && (p_move = principalVariation[0].get(1)) != NOMOVE) {
       searchResult.ponderMove = p_move;
     } else {
-      searchResult.ponderMove = Move.NOMOVE;
+      searchResult.ponderMove = NOMOVE;
     }
 
     stopTime = System.currentTimeMillis();
@@ -1227,8 +1256,8 @@ public class Search implements Runnable {
    */
   static final class SearchResult {
 
-    int  bestMove    = Move.NOMOVE;
-    int  ponderMove  = Move.NOMOVE;
+    int  bestMove    = NOMOVE;
+    int  ponderMove  = NOMOVE;
     int  resultValue = 0;
     long time        = -1;
     int  depth       = 0;
@@ -1247,7 +1276,7 @@ public class Search implements Runnable {
   public class SearchCounter {
 
     // Info values
-    int  currentBestRootMove     = Move.NOMOVE;
+    int  currentBestRootMove     = NOMOVE;
     int  currentBestRootValue    = Evaluation.NOVALUE;
     int  currentIterationDepth   = 0;
     int  currentSearchDepth      = 0;

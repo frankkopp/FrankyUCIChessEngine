@@ -41,6 +41,6 @@ public interface OpeningBook {
      * @param fen
      * @return returns book move or null if there is none
      */
-    String getBookMove(String fen);
+    int getBookMove(String fen);
 
 }

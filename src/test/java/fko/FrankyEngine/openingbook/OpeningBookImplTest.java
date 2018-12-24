@@ -38,6 +38,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.FileSystems;
 
+import static fko.FrankyEngine.Franky.Move.NOMOVE;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -59,10 +60,10 @@ public class OpeningBookImplTest {
 
     System.out.format("Testing Book...");
     Position currentBoard = new Position(OpeningBookImpl.STANDARD_BOARD_FEN);
-    String bookMove = null;
-    while ((bookMove = book.getBookMove(currentBoard.toFENString())) != null) {
+    int bookMove = NOMOVE;
+    while ((bookMove = book.getBookMove(currentBoard.toFENString())) != NOMOVE) {
       //System.out.format("%s ==> %s%n",currentBoard.toFENString(),bookMove);
-      currentBoard.makeMove(Move.fromSANNotation(currentBoard, bookMove));
+      currentBoard.makeMove(bookMove);
     }
     assertNotEquals(OpeningBookImpl.STANDARD_BOARD_FEN, currentBoard.toFENString());
     System.out.format("Book OK%n%n");
@@ -95,10 +96,10 @@ public class OpeningBookImplTest {
 
     System.out.format("Testing Book...");
     Position currentBoard = new Position(OpeningBookImpl.STANDARD_BOARD_FEN);
-    String bookMove = null;
-    while ((bookMove = book.getBookMove(currentBoard.toFENString())) != null) {
+    int bookMove = NOMOVE;
+    while ((bookMove = book.getBookMove(currentBoard.toFENString())) != NOMOVE) {
       //System.out.format("%s ==> %s%n",currentBoard.toFENString(),bookMove);
-      currentBoard.makeMove(Move.fromUCINotation(currentBoard, bookMove));
+      currentBoard.makeMove(bookMove);
     }
     assertNotEquals(OpeningBookImpl.STANDARD_BOARD_FEN, currentBoard.toFENString());
     System.out.format("Book OK%n%n");

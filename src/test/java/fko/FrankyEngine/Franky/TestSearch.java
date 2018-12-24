@@ -57,6 +57,32 @@ public class TestSearch {
     engine = new FrankyEngine();
     search = ((FrankyEngine) engine).getSearch();
 
+    search.config.USE_BOOK = false;
+
+  }
+
+  @Test
+  public void testBookSearch() {
+    search.config.USE_BOOK = true;
+    String fen = Position.STANDARD_BOARD_FEN;
+    Position position = new Position(fen);
+
+    // timed search - should use book
+    SearchMode searchMode =
+      new SearchMode(300000, 300000, 0, 0, 0, 0, 0, 0, 0, null, false, false, false);
+    search.startSearch(position, searchMode);
+    waitWhileSearching();
+    assertEquals(0, search.getSearchCounter().leafPositionsEvaluated);
+    assertEquals(0, search.getSearchCounter().currentIterationDepth);
+    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+
+    // non timed search - should not use book
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 4, 0, 0, 0, null, false, false, false);
+    search.startSearch(position, searchMode);
+    waitWhileSearching();
+    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+
   }
 
   @Test
