@@ -169,6 +169,10 @@ public class SearchMode {
     setupLimits();
   }
 
+  public void ponderStop() {
+    ponder = false;
+  }
+
   public Duration getRemainingTime(Color color) {
     if (color == Color.NOCOLOR) {
       String msg = "Color ust be either WHITE or BLACK";

@@ -34,6 +34,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 
@@ -197,6 +198,25 @@ public class Search implements Runnable {
    * The search will stop gracefully by sending the best move so far
    */
   public void stopSearch() {
+
+    // stop pondering if we are
+    if (searchMode.isPonder()) {
+      if (searchThread == null || !searchThread.isAlive()) {
+        // ponder search has finished before we stopped ot got a hit
+        // need to send the result anyway althoug a miss
+        LOG.info("Pondering has been stopped after ponder search has finished. " +
+                 "Send obsolete result");
+        LOG.info("Search result was: {} PV {}",
+                 lastSearchResult.toString(), principalVariation[0].toNotationString());
+        engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
+      } else {
+        LOG.info("Pondering has been stopped. Ponder Miss!");
+      }
+      searchMode.ponderStop();
+    } else {
+      LOG.info("Search has been stopped");
+    }
+
     // set stop flag - search needs to check regularly and stop accordingly
     stopSearch = true;
 
@@ -204,9 +224,6 @@ public class Search implements Runnable {
     if (searchThread == null) {
       return;
     }
-
-    LOG.info("Search has been stopped");
-
     // Wait for the thread to die
     try {
       this.searchThread.join();
@@ -229,6 +246,9 @@ public class Search implements Runnable {
 
     if (isPerftSearch()) {
       LOG.info("****** PERFT SEARCH *******");
+    }
+    if (searchMode.isTimeControl()) {
+      LOG.info("****** TIMED SEARCH *******");
     }
     if (searchMode.isPonder()) {
       LOG.info("****** PONDER SEARCH *******");
@@ -278,7 +298,8 @@ public class Search implements Runnable {
 
     // if the mode still is ponder at this point we have a ponder miss
     if (searchMode.isPonder()) {
-      LOG.info("Ponder Miss!");
+      LOG.info("Ponder Search finished! Waiting for Ponderhit to send result");
+      return;
     }
 
     LOG.info("Search result was: {} PV {}", lastSearchResult.toString(),
@@ -294,13 +315,24 @@ public class Search implements Runnable {
    * If we were not pondering start searching.
    */
   public void ponderHit() {
-    if (isSearching() && searchMode.isPonder()) {
+    if (searchMode.isPonder()) {
       LOG.info("****** PONDERHIT *******");
-      startTime = System.currentTimeMillis();
-      searchMode.ponderHit();
-      // if time based game setup the time soft and hard time limits
-      if (searchMode.isTimeControl()) {
-        configureTimeLimits();
+      if (isSearching()) {
+        LOG.info("Ponderhit when ponder search still running. Continue searching.");
+        startTime = System.currentTimeMillis();
+        searchMode.ponderHit();
+        String threadName = "Engine: " + myColor.toString();
+        threadName += " (PHit)";
+        searchThread.setName(threadName);
+        // if time based game setup the time soft and hard time limits
+        if (searchMode.isTimeControl()) {
+          configureTimeLimits();
+        }
+      } else {
+        LOG.info("Ponderhit when ponder search already ended. Sending result.");
+        LOG.info("Search result was: {} PV {}",
+                 lastSearchResult.toString(), principalVariation[0].toNotationString());
+        engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
       }
     } else {
       LOG.warn("Ponderhit when not pondering!");
