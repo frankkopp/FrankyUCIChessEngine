@@ -202,8 +202,8 @@ public class Search implements Runnable {
     // stop pondering if we are
     if (searchMode.isPonder()) {
       if (searchThread == null || !searchThread.isAlive()) {
-        // ponder search has finished before we stopped ot got a hit
-        // need to send the result anyway althoug a miss
+        // ponder search has finished before we stopped
+        // need to send the result anyway although a miss
         LOG.info("Pondering has been stopped after ponder search has finished. " +
                  "Send obsolete result");
         LOG.info("Search result was: {} PV {}",
@@ -245,7 +245,7 @@ public class Search implements Runnable {
     }
 
     if (isPerftSearch()) {
-      LOG.info("****** PERFT SEARCH *******");
+      LOG.info("****** PERFT SEARCH (" + searchMode.getMaxDepth() + ") *******");
     }
     if (searchMode.isTimeControl()) {
       LOG.info("****** TIMED SEARCH *******");
@@ -296,7 +296,9 @@ public class Search implements Runnable {
     // run the search itself
     lastSearchResult = iterativeSearch(currentPosition);
 
-    // if the mode still is ponder at this point we have a ponder miss
+    // if the mode still is ponder at this point we finished the ponder
+    // search early before a miss or hit has been signaled. We need to
+    // wait with sending the result until we get a miss (stop) or a hit.
     if (searchMode.isPonder()) {
       LOG.info("Ponder Search finished! Waiting for Ponderhit to send result");
       return;
@@ -312,7 +314,6 @@ public class Search implements Runnable {
   /**
    * Is called when our last ponder suggestion has been executed by opponent.
    * If we are already pondering just continue the search but switch to time control.
-   * If we were not pondering start searching.
    */
   public void ponderHit() {
     if (searchMode.isPonder()) {
