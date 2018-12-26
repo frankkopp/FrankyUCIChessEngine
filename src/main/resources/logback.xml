@@ -54,14 +54,14 @@
         </encoder>
     </appender>
 
-    <logger name="ComLog" level="DEBUG" additivity="true">
+    <logger name="ComLog" level="INFO" additivity="true">
         <appender-ref ref="COMLOG"/>
     </logger>
     <logger name="fko.UCI" level="WARN" additivity="true">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </logger>
-    <logger name="fko.FrankyEngine" level="INFO" additivity="false">
+    <logger name="fko.FrankyEngine" level="WARN" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </logger>
