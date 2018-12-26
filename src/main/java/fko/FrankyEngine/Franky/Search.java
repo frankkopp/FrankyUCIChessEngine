@@ -812,9 +812,10 @@ public class Search implements Runnable {
 
     // if we have already a PV move from the last iteration push it to the head
     // of the move list to be evaluated first for more cutoffs
+    // TODO: optimize as pushToHead pushes another move back
     if (config.USE_PVS_MOVE_ORDERING) {
       if (principalVariation[ply].size() > 0) {
-        moves.pushToHead(principalVariation[ply].getFirst());
+        moves.pushToHeadStable(principalVariation[ply].getFirst());
       }
     }
 
@@ -1010,7 +1011,7 @@ public class Search implements Runnable {
     // of the move list to be evaluated first for more cutoffs
     if (config.USE_PVS_MOVE_ORDERING) {
       if (principalVariation[ply].size() > 0) {
-        moves.pushToHead(principalVariation[ply].getFirst());
+        moves.pushToHeadStable(principalVariation[ply].getFirst());
       }
     }
 

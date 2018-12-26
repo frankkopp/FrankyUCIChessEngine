@@ -410,7 +410,7 @@ public class MoveGenerator {
       for (int i = 0; i < killerMoves.length; i++) {
         if (killerMoves[i] != Move.NOMOVE) {
           // removing from MoveList is a super fast operation
-          if (nonCapturingMoves.pushToHead(killerMoves[i])) {
+          if (nonCapturingMoves.pushToHeadStable(killerMoves[i])) {
             nonCapturingMoves.removeFirst();
             // adding the killerMove to pseudoLegal list at the right place
             pseudoLegalMoves.add(killerMoves[i]);

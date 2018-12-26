@@ -435,7 +435,7 @@ public class TestSearch {
     measureTreeSize(position, searchMode, values, "NMP", true);
 
     search.config.USE_STATIC_NULL_PRUNING = true;
-    measureTreeSize(position, searchMode, values, "EVALPRUN", true);
+    measureTreeSize(position, searchMode, values, "STATIC_NULL", true);
 
     search.config.USE_RAZOR_PRUNING = true;
     measureTreeSize(position, searchMode, values, "RAZOR", true);
