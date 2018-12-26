@@ -173,6 +173,64 @@ public class TestSimpleIntList {
   }
 
   @Test
+  public void testPushToHead() {
+    SimpleIntList list = new SimpleIntList();
+
+    // add 20 entries
+    for (int i = 100; i < 120; i++) {
+      list.add(i);
+    }
+
+    list.pushToHead(109);
+
+    assertEquals(109, list.get(0));
+    assertEquals(100, list.get(9));
+
+    System.out.println(list);
+  }
+
+  @Test
+  public void testPushToHeadStable() {
+    SimpleIntList list = new SimpleIntList();
+
+    // add 20 entries
+    for (int i = 100; i < 120; i++) {
+      list.add(i);
+    }
+
+    assertFalse(list.pushToHeadStable(99));
+
+    assertTrue(list.pushToHeadStable(100));
+    assertEquals(100, list.get(0));
+    assertEquals(101, list.get(1));
+    assertEquals(102, list.get(2));
+
+    assertTrue(list.pushToHeadStable(109));
+    assertEquals(109, list.get(0));
+    assertEquals(100, list.get(1));
+    assertEquals(101, list.get(2));
+    assertEquals(108, list.get(9));
+    assertEquals(110, list.get(10));
+
+    assertEquals(109,list.removeFirst());
+    assertEquals(19, list.size());
+    assertTrue(list.pushToHeadStable(113));
+    assertEquals(113, list.get(0));
+    assertEquals(100, list.get(1));
+    assertEquals(114, list.get(13));
+
+    assertEquals(119,list.removeLast());
+    assertEquals(18, list.size());
+    assertTrue(list.pushToHeadStable(118));
+    assertEquals(118, list.get(0));
+    assertEquals(113, list.get(1));
+    assertEquals(117, list.get(17));
+
+    System.out.println(list);
+  }
+
+
+  @Test
   public void testListWithInts() {
     SimpleIntList list = new SimpleIntList();
 
@@ -295,6 +353,7 @@ public class TestSimpleIntList {
 
     System.out.println(cloneList);
   }
+
 
   /** @param list */
   private static void testEmptyList(SimpleIntList list) {
