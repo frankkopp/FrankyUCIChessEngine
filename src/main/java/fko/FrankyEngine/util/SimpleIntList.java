@@ -213,8 +213,9 @@ public class SimpleIntList implements Iterable<Integer> {
    * If the number is not in the list nothing happens.
    *
    * @param number
+   * @return true if number has been found and pushed, false otherwise
    */
-  public void pushToHead(int number) {
+  public boolean pushToHead(int number) {
     int element = -1;
     // look for number in list
     for (int i = _head; i < _tail; i++) {
@@ -228,7 +229,9 @@ public class SimpleIntList implements Iterable<Integer> {
       final int tmp = _list[_head];
       _list[_head] = _list[element];
       _list[element] = tmp;
+      return true;
     }
+    return false;
   }
 
   /**

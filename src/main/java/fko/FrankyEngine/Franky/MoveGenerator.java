@@ -65,6 +65,7 @@ public class MoveGenerator {
 
   // These fields control the on demand generation of moves.
   private OnDemandState generationCycleState = OnDemandState.NEW;
+  private int[] killerMoves = null;
 
   private enum OnDemandState {
     NEW, PAWN, KNIGHTS, BISHOPS, ROOKS, QUEENS, KINGS, ALL
@@ -82,6 +83,14 @@ public class MoveGenerator {
    * Creates a new {@link MoveGenerator}
    */
   public MoveGenerator() {
+  }
+
+  /**
+   * sets killer moves which will be inserted after capturing moves
+   * @param killerMoves
+   */
+  public void setKillerMoves(int[] killerMoves) {
+    this.killerMoves = killerMoves.clone();
   }
 
   /**
@@ -195,7 +204,6 @@ public class MoveGenerator {
    */
   public void resetOnDemand() {
     onDemandMoveList.clear();
-    onDemandZobristLastPosition = 0;
   }
 
   /**
@@ -331,6 +339,7 @@ public class MoveGenerator {
     // call the move generators
     generatePseudoLegaMoves();
 
+    // if check return all moves - non evation moves will be filtered by legal check
     if (!captureMovesOnly) {
       return pseudoLegalMoves;
     }
@@ -391,10 +400,30 @@ public class MoveGenerator {
     pseudoLegalMoves.add(capturingMoves);
     if (captureMovesOnly) return;
 
-    // add castlings (never capture)
+    // generate castling moves late as they never capture
     generateCastlingMoves();
+    // append castling to non capture moves
+    nonCapturingMoves.add(castlingMoves);
+    // push killer moves to front
+    // insert killer moves
+    if (killerMoves != null) {
+      for (int i = 0; i < killerMoves.length; i++) {
+        if (killerMoves[i] != Move.NOMOVE) {
+          // removing from MoveList is a super fast operation
+          if (nonCapturingMoves.pushToHead(killerMoves[i])) {
+            nonCapturingMoves.removeFirst();
+            // adding the killerMove to pseudoLegal list at the right place
+            pseudoLegalMoves.add(killerMoves[i]);
+          }
+        }
+      }
+    }
 
-    pseudoLegalMoves.add(castlingMoves);
+    // TODO Sort nonCapturingMoves better? Maybe according to piece tables
+    //  Test if it is worth the extra time spent
+
+
+    // add non captures to pseudo list
     pseudoLegalMoves.add(nonCapturingMoves);
   }
 

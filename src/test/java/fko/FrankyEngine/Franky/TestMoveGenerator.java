@@ -85,7 +85,7 @@ public class TestMoveGenerator {
       if (!found) {
         System.out.print("---- ");
       }
-      found=false;
+      found = false;
       for (int qMove : qsearch_moves) {
         if (plMove == qMove) {
           System.out.print(Move.toSimpleString(qMove) + " ");
@@ -157,6 +157,38 @@ public class TestMoveGenerator {
     Position board = new Position(testFen);
     MoveGenerator moveGenerator = new MoveGenerator();
     MoveList moves = moveGenerator.getLegalMoves(board);
+    System.out.println(moves);
+    System.out.println(moveGenerator.hasLegalMove(board));
+
+  }
+
+  /**
+   * Tests the generated moves from board setup with killer moves sorting
+   */
+  @Test
+  public void testKillerFromStandardBoard() {
+
+    String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq - 0 113";
+    Position board = new Position(testFen);
+
+    int killer1 = 67178534; // 67178534 (NORMAL Rg3-a3)
+    int killer2 = 67178790; // 67178790 (NORMAL Rg3-c3)
+
+    MoveGenerator moveGenerator = new MoveGenerator();
+    moveGenerator.setKillerMoves(new int[]{killer1, killer2});
+    MoveList moves = moveGenerator.getLegalMoves(board);
+
+    int lastCapture = 0;
+    for (int i = 0; i < moves.size(); i++) {
+      // skip the captures
+      if (!Move.getTarget(moves.get(i)).equals(Piece.NOPIECE)) {
+        lastCapture = i;
+        continue;
+      }
+      // now we should have our two killers
+      assertTrue(i == lastCapture + 1 && moves.get(i) == killer1 && moves.get(i + 1) == killer2);
+      break;
+    }
     System.out.println(moves);
     System.out.println(moveGenerator.hasLegalMove(board));
 

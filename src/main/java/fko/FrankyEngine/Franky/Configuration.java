@@ -150,6 +150,13 @@ public class Configuration {
   int     RAZOR_PRUNING_DEPTH  = 3;
   int     RAZOR_PRUNING_MARGIN = 600;
 
+  /**
+   * Killer moves - move which caused cut offs in previous iterations
+   */
+  boolean USE_KILLER_MOVES = true;
+
+
+
   // TODO vvvvvvvv
 
   /**

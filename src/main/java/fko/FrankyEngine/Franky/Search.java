@@ -34,8 +34,10 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.IntStream;
 
 /**
  * Search implements the actual search for best move of a given position.
@@ -46,6 +48,8 @@ import java.util.concurrent.CountDownLatch;
  * <p>
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: KILLER Moves - search quiet moves previoulsy causing cut-offs first
+ * TODO: LMR (Late Move Reduction)
+ * TODO: Lazy Move Gen
  */
 public class Search implements Runnable {
 
@@ -106,6 +110,10 @@ public class Search implements Runnable {
   private final MoveList[]   principalVariation = new MoveList[MAX_SEARCH_DEPTH];
   private       long         uciUpdateTicker;
 
+  // killer move lists killerMoves[ply][killerMoveNumber]
+  private final int     noOfKillerMoves = 2;
+  private final int[][] killerMoves     = new int[MAX_SEARCH_DEPTH][noOfKillerMoves];
+
   /**
    * Creates a search object and stores a back reference to the engine object.<br>
    *
@@ -122,15 +130,13 @@ public class Search implements Runnable {
     // set hash sizes
     setHashSize(this.config.HASH_SIZE);
 
-    // Move Generators - each depth in search gets it own to avoid object creation
-    // during search. This is in preparation for move generators which keep a state
-    // per depth
-    for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
-      moveGenerators[i] = new MoveGenerator();
-    }
 
-    // prepare principal variation lists
     for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
+      // Move Generators - each depth in search gets it own to avoid object creation
+      // during search. This is in preparation for move generators which keep a state
+      // per depth
+      moveGenerators[i] = new MoveGenerator();
+      // prepare principal variation lists
       principalVariation[i] = new MoveList(MAX_SEARCH_DEPTH);
     }
 
@@ -350,6 +356,14 @@ public class Search implements Runnable {
     // remember the start of the search
     startTime = System.currentTimeMillis();
     uciUpdateTicker = System.currentTimeMillis();
+
+    // clear killer moves
+    for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
+      for (int j = 0; j < noOfKillerMoves; j++) {
+        killerMoves[i][j] = Move.NOMOVE;
+        killerMoves[i][j] = Move.NOMOVE;
+      }
+    }
 
     // generate all root moves
     MoveList legalMoves = moveGenerators[0].getLegalMoves(position);
@@ -790,6 +804,9 @@ public class Search implements Runnable {
     int numberOfSearchedMoves = 0;
 
     // Generate moves
+    if (config.USE_KILLER_MOVES) {
+      moveGenerators[ply].setKillerMoves(killerMoves[ply]);
+    }
     MoveList moves = moveGenerators[ply].getPseudoLegalMoves(position);
     searchCounter.movesGenerated += moves.size();
 
@@ -883,7 +900,17 @@ public class Search implements Runnable {
         if (value > alpha) { // improved?
           if (value >= beta) { // fail-high
             if (config.USE_ALPHABETA_PRUNING && !isPerftSearch()) {
-              // TODO KILLER MOVES
+
+              // SAVE KILLER MOVES
+              if (config.USE_KILLER_MOVES && Move.getTarget(move).equals(Piece.NOPIECE)) {
+                for (int k = 0; k < noOfKillerMoves; k++) {
+                  if (killerMoves[ply][k] == Move.NOMOVE || killerMoves[ply][k] == move) {
+                    killerMoves[ply][k] = move;
+                    break;
+                  }
+                }
+              }
+
               searchCounter.prunings++;
               storeTT(position, depthLeft, TT_EntryType.BETA, beta);
               return beta;
@@ -1446,7 +1473,8 @@ public class Search implements Runnable {
              ", pv_cutoffs=" + pv_cutoffs +
              ", mateDistancePrunings=" + mateDistancePrunings +
              ", minorPromotionPrunings=" + minorPromotionPrunings +
-             ", nullMovePrunings=" + nullMovePrunings + '}';
+             ", nullMovePrunings=" + nullMovePrunings +
+             '}';
       // @formatter:on
     }
   }

@@ -400,9 +400,11 @@ public class TestSearch {
     search.config.USE_QUIESCENCE = false;
     search.config.USE_NULL_MOVE_PRUNING = false;
     search.config.USE_PVS_MOVE_ORDERING = false;
+    search.config.USE_KILLER_MOVES = false;
     search.config.USE_STATIC_NULL_PRUNING = false;
     search.config.USE_RAZOR_PRUNING = false;
 
+    measureTreeSize(position, searchMode, values, "WARM UP", true);
     measureTreeSize(position, searchMode, values, "REFERENCE", true);
 
 //    search.config.USE_ASPIRATION_WINDOW = true;
@@ -426,6 +428,9 @@ public class TestSearch {
     search.config.USE_PVS_MOVE_ORDERING = true;
     measureTreeSize(position, searchMode, values, "PVS_ORDER", true);
 
+    search.config.USE_KILLER_MOVES = true;
+    measureTreeSize(position, searchMode, values, "KILLER_PUSH", true);
+
     search.config.USE_NULL_MOVE_PRUNING = true;
     measureTreeSize(position, searchMode, values, "NMP", true);
 
@@ -438,20 +443,9 @@ public class TestSearch {
     search.config.USE_TRANSPOSITION_TABLE = true;
     measureTreeSize(position, searchMode, values, "TT", true);
 
-//    search.config.USE_TRANSPOSITION_TABLE = false;
-//    search.config.USE_QUIESCENCE = true;
-//    measureTreeSize(position, searchMode, values, "QS-TT", true);
-
     search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_QUIESCENCE = true;
-    search.config.USE_PVS_MOVE_ORDERING = false;
-    measureTreeSize(position, searchMode, values, "QS-PVSO", true);
-
-    search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.USE_QUIESCENCE = true;
-    search.config.USE_PVS_MOVE_ORDERING = true;
-    measureTreeSize(position, searchMode, values, "QS+PVSO", true);
-
+    measureTreeSize(position, searchMode, values, "QS", true);
 
     // REPEAT
     measureTreeSize(position, searchMode, values, "REPEAT+TT", false);
@@ -464,10 +458,11 @@ public class TestSearch {
     if (clearTT) search.clearHashTables();
     search.startSearch(position, searchMode);
     waitWhileSearching();
-    values.add(String.format("SIZE %-12s : %,14d >> %-14s (%4d) >> %s ", feature,
+    values.add(String.format("SIZE %-12s : %,14d >> %-14s (%4d) >> mps %,.0f >> %s ", feature,
                              search.getSearchCounter().leafPositionsEvaluated,
                              Move.toString(search.getLastSearchResult().bestMove),
                              search.getLastSearchResult().resultValue,
+                             (1e3*search.getSearchCounter().nodesVisited)/search.getSearchCounter().lastSearchTime,
                              search.getSearchCounter().toString()));
   }
 
@@ -480,23 +475,24 @@ public class TestSearch {
 
     search.config.USE_ROOT_MOVES_SORT = true;
     search.config.USE_ALPHABETA_PRUNING = true;
-    search.config.USE_ASPIRATION_WINDOW = false;
+    search.config.USE_ASPIRATION_WINDOW = true;
     search.config.USE_PVS = true;
     search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_MATE_DISTANCE_PRUNING = true;
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
     search.config.USE_QUIESCENCE = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
-    search.config.USE_NULL_MOVE_PRUNING = false;
-    search.config.USE_STATIC_NULL_PRUNING = false;
-    search.config.USE_RAZOR_PRUNING = false;
+    search.config.USE_NULL_MOVE_PRUNING = true;
+    search.config.USE_STATIC_NULL_PRUNING = true;
+    search.config.USE_RAZOR_PRUNING = true;
+    search.config.USE_KILLER_MOVES = true;
 
-    int maxDepth = 0;
+    int maxDepth = 6;
     int moveTime = 0;
-    int mateIn = 4;
-    boolean infinite = false;
+    int mateIn = 0;
+    boolean infinite = true;
 
-    fen = "8/2P1P1P1/3PkP2/8/4K3/8/8/8 w - - ";
+    fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
     position = new Position(fen);
     searchMode = new SearchMode(0, 0, 0, 0, 0, maxDepth, 0, mateIn, moveTime, null, false, infinite, false);
     search.startSearch(position, searchMode);
@@ -506,9 +502,6 @@ public class TestSearch {
              search.getLastSearchResult().resultValue / 100f,
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
     LOG.debug(search.getSearchCounter().toString());
-
-    assertEquals(9993,
-                 search.getLastSearchResult().resultValue);
 
 //    depth = 4;
 //    fen = "1k3r2/pp6/3p4/8/8/n5B1/5PPP/5RK1 w - - 0 1"; // bm Bxd6+
