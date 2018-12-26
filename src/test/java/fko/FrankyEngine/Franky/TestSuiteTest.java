@@ -66,6 +66,12 @@ public class TestSuiteTest {
   }
 
   @Test
+  void startMateSuite() {
+    testSuite = new TestSuite("./testsets/mate_test_suite.epd");
+    testSuite.startTests(5000);
+  }
+
+  @Test
   @Disabled
   void startTestSuite() {
     testSuite.startTests(5000);
@@ -75,8 +81,12 @@ public class TestSuiteTest {
   void startOneTest() {
     assertTrue(
       testSuite
-        .startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
-                           5000));
+        .startOneTest("K6Q/1p6/pPq4P/P2p2P1/4pP1N/7k/n5R1/1n2BB2 w - - dm 4;", 0));
+
+//    assertTrue(
+//      testSuite
+//        .startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
+//                           5000));
   }
 
   @Test

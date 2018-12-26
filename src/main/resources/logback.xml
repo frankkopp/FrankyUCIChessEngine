@@ -25,7 +25,7 @@
   ~
   -->
 
-<configuration>
+<configuration scan="true" scanPeriod="30 seconds" >
     <contextName>FrankyUCIChessEngine</contextName>
 
     <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
@@ -54,14 +54,14 @@
         </encoder>
     </appender>
 
-    <logger name="ComLog" level="DEBUG" additivity="true">
+    <logger name="ComLog" level="INFO" additivity="true">
         <appender-ref ref="COMLOG"/>
     </logger>
     <logger name="fko.UCI" level="WARN" additivity="true">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </logger>
-    <logger name="fko.FrankyEngine" level="DEBUG" additivity="false">
+    <logger name="fko.FrankyEngine" level="WARN" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </logger>

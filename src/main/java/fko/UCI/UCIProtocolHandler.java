@@ -240,6 +240,8 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
           LOG.error("Command setoption is malformed - expected value");
           return;
         }
+      } else if (token.equals("Hash")) {
+        name += " Hash";
       } else {
         LOG.error("Command setoption is malformed - expected token value received: " + token);
         return;

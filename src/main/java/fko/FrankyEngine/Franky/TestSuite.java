@@ -268,8 +268,8 @@ public class TestSuite {
 
     Position position = new Position(testCase.fen);
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, mateDepth, 0, null, false, false,
-                                           false);
+    SearchMode searchMode =
+      new SearchMode(0, 0, 0, 0, 0, 0, 0, mateDepth, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching(search);
 
