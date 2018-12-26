@@ -120,7 +120,7 @@ public class FrankyEngine implements IUCIEngine {
                 "512",
                 ""));
     iUciOptions.add(
-        new UCIOption("Clear_Hash",
+        new UCIOption("Clear Hash",
                 UCIOptionType.button,
                 "",
                 "",
@@ -249,7 +249,7 @@ public class FrankyEngine implements IUCIEngine {
       case "Hash":
         setHashSizeOption(value);
         break;
-      case "Clear_Hash":
+      case "Clear Hash":
         search.clearHashTables();
         msg = "Hash cleared";
         LOG.info(msg);

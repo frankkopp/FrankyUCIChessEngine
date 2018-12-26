@@ -67,7 +67,7 @@ public class TestSuiteTest {
 
   @Test
   void startMateSuite() {
-    testSuite = new TestSuite("./testsets/mate_test_suite2.epd");
+    testSuite = new TestSuite("./testsets/mate_test_suite.epd");
     testSuite.startTests(5000);
   }
 

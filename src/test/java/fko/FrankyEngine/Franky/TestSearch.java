@@ -488,19 +488,20 @@ public class TestSearch {
     search.config.USE_QUIESCENCE = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
     search.config.USE_NULL_MOVE_PRUNING = false;
-    search.config.USE_STATIC_NULL_PRUNING = true;
-    search.config.USE_RAZOR_PRUNING = true;
+    search.config.USE_STATIC_NULL_PRUNING = false;
+    search.config.USE_RAZOR_PRUNING = false;
 
-    int maxDepth = 8;
+    int maxDepth = 0;
     int moveTime = 0;
-    boolean infinite = true;
+    int mateIn = 4;
+    boolean infinite = false;
 
-    fen = "K6Q/1p6/pPq4P/P2p2P1/4pP1N/7k/n5R1/1n2BB2 w - -";
+    fen = "8/2P1P1P1/3PkP2/8/4K3/8/8/8 w - - ";
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, maxDepth, 0, 0, moveTime, null, false, infinite, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, maxDepth, 0, mateIn, moveTime, null, false, infinite, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
-    LOG.info("Best Move: {} Value: {} Ponder {}",
+    LOG.warn("Best Move: {} Value: {} Ponder {}",
              Move.toSimpleString(search.getLastSearchResult().bestMove),
              search.getLastSearchResult().resultValue / 100f,
              Move.toSimpleString(search.getLastSearchResult().ponderMove));

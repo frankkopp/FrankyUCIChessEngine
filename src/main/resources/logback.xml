@@ -61,7 +61,7 @@
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </logger>
-    <logger name="fko.FrankyEngine" level="DEBUG" additivity="false">
+    <logger name="fko.FrankyEngine" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </logger>

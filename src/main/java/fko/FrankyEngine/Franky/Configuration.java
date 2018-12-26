@@ -129,7 +129,7 @@ public class Configuration {
   /**
    * Null Move Pruning
    */
-  boolean USE_NULL_MOVE_PRUNING            = false;
+  boolean USE_NULL_MOVE_PRUNING            = true;
   int     NULL_MOVE_DEPTH                  = 2;
   //boolean USE_VERIFY_NMP                   = false;
   //int     NULL_MOVE_REDUCTION_VERIFICATION = 3;
