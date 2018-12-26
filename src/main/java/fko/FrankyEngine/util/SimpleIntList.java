@@ -235,6 +235,40 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
+   * Puts the first occurrence of number as first element. Keeps the current order stable.
+   * <p>
+   * Moves all other elements one up until the former place of the element.
+   * <p>
+   * Creates a new list with size <code>oldList.size() + DEFAULT_GROWTH_MARGIN</code>.
+   * <p>
+   * If the number is not in the list nothing happens.
+   *
+   * @param number to push to the head
+   * @return true if number has been found and pushed, false otherwise
+   */
+  public boolean pushToHeadStable(int number) {
+    int element = -1;
+    // look for number in list
+    for (int i = _head; i < _tail; i++) {
+      if (_list[i] == number) {
+        element = i;
+        break;
+      }
+    }
+    // already first?
+    if (element == _head) {
+      return true;
+    }
+    // put element to the front and copy other elements behind it in stable order
+    else if (element > -1) {
+      System.arraycopy(_list, _head, _list, _head+1, element - _head);
+      _list[_head] = number;
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Returns the size of the list
    *
    * @return number of elements
