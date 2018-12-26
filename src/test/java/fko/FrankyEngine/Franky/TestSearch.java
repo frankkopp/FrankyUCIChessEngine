@@ -165,7 +165,7 @@ public class TestSearch {
     waitWhileSearching();
     search.stopSearch();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
-    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+    //assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
     assertEquals(Evaluation.CHECKMATE - 3, search.getLastSearchResult().resultValue);
 
@@ -400,7 +400,7 @@ public class TestSearch {
     search.config.USE_QUIESCENCE = false;
     search.config.USE_NULL_MOVE_PRUNING = false;
     search.config.USE_PVS_MOVE_ORDERING = false;
-    search.config.USE_EVAL_PRUNING = false;
+    search.config.USE_STATIC_NULL_PRUNING = false;
     search.config.USE_RAZOR_PRUNING = false;
 
     measureTreeSize(position, searchMode, values, "REFERENCE", true);
@@ -429,7 +429,7 @@ public class TestSearch {
     search.config.USE_NULL_MOVE_PRUNING = true;
     measureTreeSize(position, searchMode, values, "NMP", true);
 
-    search.config.USE_EVAL_PRUNING = true;
+    search.config.USE_STATIC_NULL_PRUNING = true;
     measureTreeSize(position, searchMode, values, "EVALPRUN", true);
 
     search.config.USE_RAZOR_PRUNING = true;
@@ -474,7 +474,6 @@ public class TestSearch {
   @Test
   @Disabled
   public void evaluationTest() {
-    int depth;
     String fen = Position.STANDARD_BOARD_FEN;
     SearchMode searchMode;
     Position position;
@@ -489,21 +488,26 @@ public class TestSearch {
     search.config.USE_QUIESCENCE = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
     search.config.USE_NULL_MOVE_PRUNING = true;
-    search.config.USE_EVAL_PRUNING = true;
+    search.config.USE_STATIC_NULL_PRUNING = true;
     search.config.USE_RAZOR_PRUNING = true;
 
-    depth = 8;
-    fen = "r3k2r/pqpb2pp/3b4/5p2/1NQ5/P1Pp4/1P3PPP/R1B1K2R b KQkq -";
+    int maxDepth = 0;
+    int moveTime = 4000;
+    boolean infinite = false;
+
+    fen = "r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - -";
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, maxDepth, 0, 0, moveTime, null, false, infinite, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     LOG.info("Best Move: {} Value: {} Ponder {}",
              Move.toSimpleString(search.getLastSearchResult().bestMove),
              search.getLastSearchResult().resultValue / 100f,
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
-
     LOG.debug(search.getSearchCounter().toString());
+
+    assertEquals("f3h1",
+                 Move.toUCINotation(position, search.getLastSearchResult().bestMove));
 
 //    depth = 4;
 //    fen = "1k3r2/pp6/3p4/8/8/n5B1/5PPP/5RK1 w - - 0 1"; // bm Bxd6+

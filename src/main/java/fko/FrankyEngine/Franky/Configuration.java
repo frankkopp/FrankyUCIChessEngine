@@ -139,9 +139,9 @@ public class Configuration {
    * Reverse Futility Pruning
    * https://www.chessprogramming.org/Reverse_Futility_Pruning
    */
-  boolean USE_EVAL_PRUNING    = true;
-  int     EVAL_PRUNING_DEPTH  = 2;
-  int     EVAL_PRUNING_MARGIN = 120;
+  boolean USE_STATIC_NULL_PRUNING    = true;
+  int     STATIC_NULL_PRUNING_DEPTH  = 2;
+  int     STATIC_NULL_PRUNING_MARGIN = 300;
 
   /**
    * Razor  - early qsearch for low static evals
@@ -158,17 +158,23 @@ public class Configuration {
   boolean USE_ASPIRATION_WINDOW = false;
 
 
-
-
-
   @Override
   public String toString() {
     return "Configuration{" + "PERFT=" + PERFT + ", HASH_SIZE=" + HASH_SIZE + ", PONDER=" + PONDER +
-           ", DEBUG=" + DEBUG + ", UCI_ShowCurrLine=" + UCI_ShowCurrLine + ", USE_QUIESCENCE=" +
-           USE_QUIESCENCE + ", USE_ROOT_MOVES_SORT=" + USE_ROOT_MOVES_SORT +
-           ", USE_ALPHABETA_PRUNING=" + USE_ALPHABETA_PRUNING + ", USE_ASPIRATION_WINDOW=" +
-           USE_ASPIRATION_WINDOW + ", USE_PVS=" + USE_PVS + ", USE_TRANSPOSITION_TABLE=" +
-           USE_TRANSPOSITION_TABLE + ", USE_MATE_DISTANCE_PRUNING=" + USE_MATE_DISTANCE_PRUNING +
-           ", USE_MINOR_PROMOTION_PRUNING=" + USE_MINOR_PROMOTION_PRUNING + '}';
+           ", DEBUG=" + DEBUG + ", UCI_ShowCurrLine=" + UCI_ShowCurrLine + ", USE_BOOK=" +
+           USE_BOOK + ", OB_FolderPath='" + OB_FolderPath + '\'' + ", OB_fileNamePlain='" +
+           OB_fileNamePlain + '\'' + ", OB_Mode=" + OB_Mode + ", USE_QUIESCENCE=" + USE_QUIESCENCE +
+           ", USE_ROOT_MOVES_SORT=" + USE_ROOT_MOVES_SORT + ", USE_PVS_MOVE_ORDERING=" +
+           USE_PVS_MOVE_ORDERING + ", USE_ALPHABETA_PRUNING=" + USE_ALPHABETA_PRUNING +
+           ", USE_PVS=" + USE_PVS + ", USE_TRANSPOSITION_TABLE=" + USE_TRANSPOSITION_TABLE +
+           ", USE_MATE_DISTANCE_PRUNING=" + USE_MATE_DISTANCE_PRUNING +
+           ", USE_MINOR_PROMOTION_PRUNING=" + USE_MINOR_PROMOTION_PRUNING +
+           ", USE_NULL_MOVE_PRUNING=" + USE_NULL_MOVE_PRUNING + ", NULL_MOVE_DEPTH=" +
+           NULL_MOVE_DEPTH + ", USE_STATIC_NULL_PRUNING=" + USE_STATIC_NULL_PRUNING +
+           ", STATIC_NULL_PRUNING_DEPTH=" + STATIC_NULL_PRUNING_DEPTH +
+           ", STATIC_NULL_PRUNING_MARGIN=" + STATIC_NULL_PRUNING_MARGIN + ", USE_RAZOR_PRUNING=" +
+           USE_RAZOR_PRUNING + ", RAZOR_PRUNING_DEPTH=" + RAZOR_PRUNING_DEPTH +
+           ", RAZOR_PRUNING_MARGIN=" + RAZOR_PRUNING_MARGIN + ", USE_ASPIRATION_WINDOW=" +
+           USE_ASPIRATION_WINDOW + '}';
   }
 }

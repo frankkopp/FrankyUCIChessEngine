@@ -331,6 +331,10 @@ public class MoveGenerator {
     // call the move generators
     generatePseudoLegaMoves();
 
+    if (!captureMovesOnly) {
+      return pseudoLegalMoves;
+    }
+
     // lower amount of captures searched in qsearch by only looking at "good" captures
     MoveList qSearchMoves = new MoveList();
     for (int move : pseudoLegalMoves) {
@@ -339,7 +343,8 @@ public class MoveGenerator {
         qSearchMoves.add(move);
       }
       // Lower value piece captures higher value piece (with a margin)
-      else if (Move.getPiece(move).getType().getValue() +200 < Move.getTarget(move).getType().getValue()) {
+      else if (Move.getPiece(move).getType().getValue() + 200 <
+               Move.getTarget(move).getType().getValue()) {
         qSearchMoves.add(move);
       }
       // undefended pieces captures are good
@@ -507,7 +512,8 @@ public class MoveGenerator {
               } else {
                 // pawndouble
                 if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow() &&
-                    (position.getX88Board()[fromSquare.ordinal() + (2 * Square.N)]) == Piece.NOPIECE) {
+                    (position.getX88Board()[fromSquare.ordinal() + (2 * Square.N)]) ==
+                    Piece.NOPIECE) {
                   // on rank 2 && rank 4 is free(rank 3 already checked via target)
                   nonCapturingMoves.add(
                     Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getNorth(), piece,
@@ -654,7 +660,8 @@ public class MoveGenerator {
         // we will not check if d1 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
         if (position.getX88Board()[Square.d1.ordinal()] == Piece.NOPIECE // passing square free
-            && position.getX88Board()[Square.b1.ordinal()] == Piece.NOPIECE// rook passing square free
+            && position.getX88Board()[Square.b1.ordinal()] == Piece.NOPIECE
+            // rook passing square free
             && !position.isAttacked(activePlayer.getInverseColor(), Square.d1)
             // passing square not attacked
             && position.getX88Board()[Square.c1.ordinal()] == Piece.NOPIECE) // to square free
@@ -684,7 +691,8 @@ public class MoveGenerator {
         // we will not check if d8 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
         if (position.getX88Board()[Square.d8.ordinal()] == Piece.NOPIECE // passing square free
-            && position.getX88Board()[Square.b8.ordinal()] == Piece.NOPIECE// rook passing square free
+            && position.getX88Board()[Square.b8.ordinal()] == Piece.NOPIECE
+            // rook passing square free
             && !position.isAttacked(activePlayer.getInverseColor(), Square.d8)
             // passing square not attacked
             && position.getX88Board()[Square.c8.ordinal()] == Piece.NOPIECE) // to square free
