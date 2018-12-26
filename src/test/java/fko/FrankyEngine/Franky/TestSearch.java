@@ -487,15 +487,15 @@ public class TestSearch {
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
     search.config.USE_QUIESCENCE = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
-    search.config.USE_NULL_MOVE_PRUNING = true;
+    search.config.USE_NULL_MOVE_PRUNING = false;
     search.config.USE_STATIC_NULL_PRUNING = true;
     search.config.USE_RAZOR_PRUNING = true;
 
-    int maxDepth = 0;
-    int moveTime = 4000;
-    boolean infinite = false;
+    int maxDepth = 8;
+    int moveTime = 0;
+    boolean infinite = true;
 
-    fen = "r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - -";
+    fen = "K6Q/1p6/pPq4P/P2p2P1/4pP1N/7k/n5R1/1n2BB2 w - -";
     position = new Position(fen);
     searchMode = new SearchMode(0, 0, 0, 0, 0, maxDepth, 0, 0, moveTime, null, false, infinite, false);
     search.startSearch(position, searchMode);
@@ -506,8 +506,8 @@ public class TestSearch {
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
     LOG.debug(search.getSearchCounter().toString());
 
-    assertEquals("f3h1",
-                 Move.toUCINotation(position, search.getLastSearchResult().bestMove));
+    assertEquals(9993,
+                 search.getLastSearchResult().resultValue);
 
 //    depth = 4;
 //    fen = "1k3r2/pp6/3p4/8/8/n5B1/5PPP/5RK1 w - - 0 1"; // bm Bxd6+

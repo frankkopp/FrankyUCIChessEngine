@@ -25,7 +25,7 @@
   ~
   -->
 
-<configuration>
+<configuration scan="true" scanPeriod="30 seconds" >
     <contextName>FrankyUCIChessEngine</contextName>
 
     <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
