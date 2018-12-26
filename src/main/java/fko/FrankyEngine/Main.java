@@ -26,8 +26,8 @@
 package fko.FrankyEngine;
 
 import fko.FrankyEngine.Franky.FrankyEngine;
-import fko.javaUCIEngineFramework.UCI.IUCIEngine;
-import fko.javaUCIEngineFramework.UCI.UCIProtocolHandler;
+import fko.UCI.IUCIEngine;
+import fko.UCI.UCIProtocolHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,6 @@ public class Main {
    * @param args command line options
    */
   public static void main(final String[] args) {
-
     LOG.debug("Start UCI Engine Framework " + Instant.now());
 
     final IUCIEngine uciEngine = new FrankyEngine();

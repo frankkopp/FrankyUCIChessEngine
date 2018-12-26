@@ -219,6 +219,7 @@ public class TestSuite {
 
     FrankyEngine engine = new FrankyEngine();
     Search search = engine.getSearch();
+    search.config.USE_BOOK = false;
 
     Position position = new Position(testCase.fen);
     testCase.bestMoves = getMovesFromOperand(position, testCase.operand);
@@ -267,8 +268,8 @@ public class TestSuite {
 
     Position position = new Position(testCase.fen);
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, mateDepth, 0, null, false, false,
-                                           false);
+    SearchMode searchMode =
+      new SearchMode(0, 0, 0, 0, 0, 0, 0, mateDepth, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching(search);
 
@@ -562,7 +563,7 @@ public class TestSuite {
     NOT_TESTED,
     SUCCESS,
     FAILED,
-    SKIPPED}
-
+    SKIPPED
+  }
 
 }

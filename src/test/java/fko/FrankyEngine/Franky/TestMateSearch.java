@@ -26,7 +26,7 @@
 package fko.FrankyEngine.Franky;
 
 
-import fko.javaUCIEngineFramework.UCI.IUCIEngine;
+import fko.UCI.IUCIEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -252,6 +252,41 @@ class TestMateSearch {
     assertEquals(Evaluation.CHECKMATE - 15, search.getLastSearchResult().resultValue);
 
   }
+
+   /*
+    // Test - Mate in 2
+    //setupFromFEN("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1");
+
+    // Test - Mate in 3
+    //setupFromFEN("4rk2/p5p1/1p2P2N/7R/nP5P/5PQ1/b6K/q7 w - - 0 1");
+
+    // Test - Mate in 3
+    //setupFromFEN("4k2r/1q1p1pp1/p3p3/1pb1P3/2r3P1/P1N1P2p/1PP1Q2P/2R1R1K1 b k - 0 1");
+
+    // Test - Mate in 4
+    //setupFromFEN("r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - - 0 1");
+
+    // Test - Mate in 5 (1.Sc6+! bxc6 2.Dxa7+!! Kxa7 3.Ta1+ Kb6 4.Thb1+ Kc5 5.Ta5# 1-0)
+    //setupFromFEN("1kr4r/ppp2bq1/4n3/4P1pp/1NP2p2/2PP2PP/5Q1K/4R2R w - - 0 1");
+
+    // Test - Mate in 3
+    //setupFromFEN("1k1r4/pp1b1R2/3q2pp/4p3/2B5/4Q3/PPP2B2/2K5 b - - 0 1");
+
+    // Test - Mate in 11
+    //setupFromFEN("8/5k2/8/8/2N2N2/2B5/2K5/8 w - - 0 1");
+
+    // Test - Mate in 13
+    //setupFromFEN("8/8/6k1/8/8/8/P1K5/8 w - - 0 1");
+
+    // Test - Mate in 15
+    //setupFromFEN("8/5k2/8/8/8/8/1BK5/1B6 w - - 0 1");
+
+    // Test - HORIZONT EFFECT
+    //setupFromFEN("5r1k/4Qpq1/4p3/1p1p2P1/2p2P2/1p2P3/1K1P4/B7 w - - 0 1");
+
+    // Test Pruning
+    // 1r1r2k1/2p1qp1p/6p1/ppQB1b2/5Pn1/2R1P1P1/PP5P/R1B3K1 b ;bm Qe4
+    */
 
   private void waitWhileSearching() {
     while (search.isSearching()) {

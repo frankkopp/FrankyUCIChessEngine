@@ -25,6 +25,8 @@
 
 package fko.FrankyEngine.Franky;
 
+import fko.FrankyEngine.Franky.openingbook.*;
+
 /**
  * This is the engines configuration. All fields are package visible
  * and can be changed during runtime. They are deliberately not static
@@ -56,6 +58,29 @@ public class Configuration {
    * UCI Options
    */
   boolean UCI_ShowCurrLine = true;
+
+  /**
+   * If set to true we will use the opening book
+   */
+  boolean USE_BOOK = true;
+
+  /**
+   * value for folder to books
+   */
+  String OB_FolderPath    = "/book/";
+  /**
+   * opening book file
+   */
+  String OB_fileNamePlain = "8moves_GM_LB.pgn";
+  //String _OB_fileNamePlain = "book_graham.txt";
+  //String _OB_fileNamePlain = "book.txt";
+
+  /**
+   * default opening book value
+   */
+  OpeningBookImpl.Mode OB_Mode = OpeningBookImpl.Mode.PGN;
+  //Mode _OB_Mode = Mode.SAN;
+  //Mode _OB_Mode = Mode.SIMPLE;
 
   /** ##################################################
    * OPTIMIZATIONS
@@ -114,9 +139,9 @@ public class Configuration {
    * Reverse Futility Pruning
    * https://www.chessprogramming.org/Reverse_Futility_Pruning
    */
-  boolean USE_EVAL_PRUNING    = true;
-  int     EVAL_PRUNING_DEPTH  = 2;
-  int     EVAL_PRUNING_MARGIN = 120;
+  boolean USE_STATIC_NULL_PRUNING    = true;
+  int     STATIC_NULL_PRUNING_DEPTH  = 2;
+  int     STATIC_NULL_PRUNING_MARGIN = 300;
 
   /**
    * Razor  - early qsearch for low static evals
@@ -132,36 +157,24 @@ public class Configuration {
    */
   boolean USE_ASPIRATION_WINDOW = false;
 
-  /**
-   * If set to true we will use the opening book
-   */
-  boolean _USE_BOOK = false;
 
-  /**
-   * value for folder to books
-   */
-  String _OB_FolderPath    = "/book/";
-  /**
-   * opening book file
-   */
-  String _OB_fileNamePlain = "8moves_GM_LB.pgn";
-  //String _OB_fileNamePlain = "book_graham.txt";
-  //String _OB_fileNamePlain = "book.txt";
-
-  /**
-   * default opening book value
-   */
-  //Mode _OB_Mode = Mode.PGN;
-  //Mode _OB_Mode = Mode.SAN;
-  //Mode _OB_Mode = Mode.SIMPLE;
   @Override
   public String toString() {
     return "Configuration{" + "PERFT=" + PERFT + ", HASH_SIZE=" + HASH_SIZE + ", PONDER=" + PONDER +
-           ", DEBUG=" + DEBUG + ", UCI_ShowCurrLine=" + UCI_ShowCurrLine + ", USE_QUIESCENCE=" +
-           USE_QUIESCENCE + ", USE_ROOT_MOVES_SORT=" + USE_ROOT_MOVES_SORT +
-           ", USE_ALPHABETA_PRUNING=" + USE_ALPHABETA_PRUNING + ", USE_ASPIRATION_WINDOW=" +
-           USE_ASPIRATION_WINDOW + ", USE_PVS=" + USE_PVS + ", USE_TRANSPOSITION_TABLE=" +
-           USE_TRANSPOSITION_TABLE + ", USE_MATE_DISTANCE_PRUNING=" + USE_MATE_DISTANCE_PRUNING +
-           ", USE_MINOR_PROMOTION_PRUNING=" + USE_MINOR_PROMOTION_PRUNING + '}';
+           ", DEBUG=" + DEBUG + ", UCI_ShowCurrLine=" + UCI_ShowCurrLine + ", USE_BOOK=" +
+           USE_BOOK + ", OB_FolderPath='" + OB_FolderPath + '\'' + ", OB_fileNamePlain='" +
+           OB_fileNamePlain + '\'' + ", OB_Mode=" + OB_Mode + ", USE_QUIESCENCE=" + USE_QUIESCENCE +
+           ", USE_ROOT_MOVES_SORT=" + USE_ROOT_MOVES_SORT + ", USE_PVS_MOVE_ORDERING=" +
+           USE_PVS_MOVE_ORDERING + ", USE_ALPHABETA_PRUNING=" + USE_ALPHABETA_PRUNING +
+           ", USE_PVS=" + USE_PVS + ", USE_TRANSPOSITION_TABLE=" + USE_TRANSPOSITION_TABLE +
+           ", USE_MATE_DISTANCE_PRUNING=" + USE_MATE_DISTANCE_PRUNING +
+           ", USE_MINOR_PROMOTION_PRUNING=" + USE_MINOR_PROMOTION_PRUNING +
+           ", USE_NULL_MOVE_PRUNING=" + USE_NULL_MOVE_PRUNING + ", NULL_MOVE_DEPTH=" +
+           NULL_MOVE_DEPTH + ", USE_STATIC_NULL_PRUNING=" + USE_STATIC_NULL_PRUNING +
+           ", STATIC_NULL_PRUNING_DEPTH=" + STATIC_NULL_PRUNING_DEPTH +
+           ", STATIC_NULL_PRUNING_MARGIN=" + STATIC_NULL_PRUNING_MARGIN + ", USE_RAZOR_PRUNING=" +
+           USE_RAZOR_PRUNING + ", RAZOR_PRUNING_DEPTH=" + RAZOR_PRUNING_DEPTH +
+           ", RAZOR_PRUNING_MARGIN=" + RAZOR_PRUNING_MARGIN + ", USE_ASPIRATION_WINDOW=" +
+           USE_ASPIRATION_WINDOW + '}';
   }
 }

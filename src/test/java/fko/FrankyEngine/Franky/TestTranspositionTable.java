@@ -26,7 +26,7 @@
 package fko.FrankyEngine.Franky;
 
 import fko.FrankyEngine.Franky.TranspositionTable.TT_EntryType;
-import fko.javaUCIEngineFramework.UCI.IUCIEngine;
+import fko.UCI.IUCIEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

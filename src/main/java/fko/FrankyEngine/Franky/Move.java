@@ -25,6 +25,12 @@
 
 package fko.FrankyEngine.Franky;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * This class represents a move in the Omega Engine. The data structure is optimized for speed using
  * only int and enum.
@@ -33,44 +39,44 @@ package fko.FrankyEngine.Franky;
  */
 public class Move {
 
+  private static final Logger LOG = LoggerFactory.getLogger(Move.class);
+
   // NOMOVE
-  /** */
-  public static final int NOMOVE = -99;
+  public static final  int NOMOVE           = -99;
+
   // MASKs
-  private static final int SQUARE_bitMASK = 0x7F;
-  private static final int PIECE_bitMASK = 0xF;
+  private static final int SQUARE_bitMASK   = 0x7F;
+  private static final int PIECE_bitMASK    = 0xF;
   private static final int MOVETYPE_bitMASK = 0x7;
 
   // Bit operation values
   private static final int START_SQUARE_SHIFT = 0;
-  private static final int START_SQUARE_MASK = SQUARE_bitMASK << START_SQUARE_SHIFT;
+  private static final int START_SQUARE_MASK  = SQUARE_bitMASK << START_SQUARE_SHIFT;
 
   private static final int END_SQUARE_SHIFT = 7;
-  private static final int END_SQUARE_MASK = SQUARE_bitMASK << END_SQUARE_SHIFT;
+  private static final int END_SQUARE_MASK  = SQUARE_bitMASK << END_SQUARE_SHIFT;
 
   private static final int PIECE_SHIFT = 14;
-  private static final int PIECE_MASK = PIECE_bitMASK << PIECE_SHIFT;
+  private static final int PIECE_MASK  = PIECE_bitMASK << PIECE_SHIFT;
 
   private static final int TARGET_SHIFT = 18;
-  private static final int TARGET_MASK = PIECE_bitMASK << TARGET_SHIFT;
+  private static final int TARGET_MASK  = PIECE_bitMASK << TARGET_SHIFT;
 
   private static final int PROMOTION_SHIFT = 22;
-  private static final int PROMOTION_MASK = PIECE_bitMASK << PROMOTION_SHIFT;
+  private static final int PROMOTION_MASK  = PIECE_bitMASK << PROMOTION_SHIFT;
 
   private static final int MOVETYPE_SHIFT = 26;
-  private static final int MOVETYPE_MASK = MOVETYPE_bitMASK << MOVETYPE_SHIFT;
+  private static final int MOVETYPE_MASK  = MOVETYPE_bitMASK << MOVETYPE_SHIFT;
 
   // no instantiation of this class
-  private Move() {}
+  private Move() {
+  }
 
-  /** Create a Move. */
-  static int createMove(
-      MoveType movetype,
-      Square start,
-      Square end,
-      Piece piece,
-      Piece target,
-      Piece promotion) {
+  /**
+   * Create a Move.
+   */
+  public static int createMove(MoveType movetype, Square start, Square end, Piece piece, Piece target,
+                        Piece promotion) {
     int move = 0;
     // Encode start
     move |= start.ordinal() << START_SQUARE_SHIFT;
@@ -93,7 +99,7 @@ public class Move {
    * @param move the move.
    * @return start position of the move.
    */
-  static Square getStart(int move) {
+  public static Square getStart(int move) {
     assert move != NOMOVE;
     int position = (move & START_SQUARE_MASK) >>> START_SQUARE_SHIFT;
     assert (position & 0x88) == 0;
@@ -106,7 +112,7 @@ public class Move {
    * @param move the move.
    * @return the end position of the move.
    */
-  static Square getEnd(int move) {
+  public static Square getEnd(int move) {
     assert move != NOMOVE;
     int position = (move & END_SQUARE_MASK) >>> END_SQUARE_SHIFT;
     assert (position & 0x88) == 0;
@@ -119,7 +125,7 @@ public class Move {
    * @param move the IntMove.
    * @return the piece
    */
-  static Piece getPiece(int move) {
+  public static Piece getPiece(int move) {
     assert move != NOMOVE;
     int chessman = (move & PIECE_MASK) >>> PIECE_SHIFT;
     return Piece.values[chessman];
@@ -131,7 +137,7 @@ public class Move {
    * @param move the move.
    * @return the target piece.
    */
-  static Piece getTarget(int move) {
+  public static Piece getTarget(int move) {
     if (move == NOMOVE) return Piece.NOPIECE;
     int chessman = (move & TARGET_MASK) >>> TARGET_SHIFT;
     return Piece.values[chessman];
@@ -143,7 +149,7 @@ public class Move {
    * @param move the move.
    * @return the promotion piece.
    */
-  static Piece getPromotion(int move) {
+  public static Piece getPromotion(int move) {
     assert move != NOMOVE;
     int promotion = ((move & PROMOTION_MASK) >>> PROMOTION_SHIFT);
     return Piece.values[promotion];
@@ -155,7 +161,7 @@ public class Move {
    * @param move the move.
    * @return the type.
    */
-  static MoveType getMoveType(int move) {
+  public static MoveType getMoveType(int move) {
     if (move == NOMOVE) return MoveType.NOMOVETYPE;
     int type = ((move & MOVETYPE_MASK) >>> MOVETYPE_SHIFT);
     return MoveType.values[type];
@@ -167,7 +173,7 @@ public class Move {
    * @param move
    * @return String for move
    */
-  static String toString(int move) {
+  public static String toString(int move) {
     if (move == NOMOVE) return "NOMOVE";
     String s = "";
     if (getMoveType(move) == MoveType.CASTLING) {
@@ -209,6 +215,11 @@ public class Move {
     return s;
   }
 
+  /**
+   * @param position
+   * @param move
+   * @return move from the given UCI notation or NOMOVE if not valid move
+   */
   public static int fromUCINotation(final Position position, final String move) {
     Square from = Square.fromUCINotation(move.substring(0, 2));
     Square to = Square.fromUCINotation(move.substring(2, 4));
@@ -229,8 +240,8 @@ public class Move {
         if (promotion.isEmpty()) {
           return m;
         }
-        if (Move.getMoveType(m).equals(MoveType.PROMOTION)
-            && Move.getPromotion(m).getShortName().toLowerCase().equals(promotion)) {
+        if (Move.getMoveType(m).equals(MoveType.PROMOTION) &&
+            Move.getPromotion(m).getShortName().toLowerCase().equals(promotion)) {
           return m;
         }
       }
@@ -238,12 +249,149 @@ public class Move {
     return NOMOVE;
   }
 
+  /**
+   * @param position
+   * @param move
+   * @return UCI notation of given move
+   */
   public static String toUCINotation(final Position position, int move) {
     String promotion = "";
     if (Move.getMoveType(move) == MoveType.PROMOTION) {
       promotion = Move.getPromotion(move).getType().getShortName().toLowerCase();
     }
     return Move.getStart(move).toString() + Move.getEnd(move).toString() + promotion;
+  }
+
+  public static int fromSANNotation(final Position position, String san) {
+    // debugging
+    boolean trace = false;
+
+    // remove unnecessary characters from operand
+    String sanMove = san.replaceAll("x", "");
+    sanMove = sanMove.replaceAll("!", "");
+
+    //System.out.printf(" OPERAND clean: %s\n", movesString);
+
+    // pattern recognition
+    Pattern pattern =
+      Pattern.compile("([NBRQK])?([a-h])?([1-8])?([a-h][1-8]|O-O-O|O-O)(=([NBRQ]))?([+#])?");
+
+    Matcher matcher = pattern.matcher(sanMove);
+
+    // find one or more tag pairs
+    if (!matcher.find()) {
+      LOG.warn("Could not match a SAN move in this string: {}", sanMove);
+      return NOMOVE;
+    };
+    String piece = matcher.group(1);
+    String disambFile = matcher.group(2);
+    String disambRank = matcher.group(3);
+    String targetSquare = matcher.group(4);
+    String promotion = matcher.group(6);
+    String checkSign = matcher.group(7);
+
+    if (trace) {
+      System.out.printf("Piece: %s File: %s Row: %s Target: %s Promotion: %s CheckSign: %s\n",
+                        piece, disambFile, disambRank, targetSquare, promotion, checkSign);
+    }
+
+    // generate all legal moves from the position
+    // and try to find a matching move
+    MoveGenerator mg = new MoveGenerator();
+    MoveList moveList = mg.getLegalMoves(position);
+    int moveFromSAN = Move.NOMOVE;
+    int movesFound = 0;
+    for (int move : moveList) {
+      if (trace) {
+        System.out.printf("Move %s\n", Move.toString(move));
+      }
+
+      // castling
+      if (Move.getMoveType(move) == MoveType.CASTLING) {
+        if (trace) {
+          System.out.println("Castling");
+        }
+        if (!targetSquare.equals(Move.toString(move).toUpperCase())) {
+          continue;
+        }
+        if (trace) {
+          System.out.println("Castling MATCH " + Move.toString(move));
+        }
+        moveFromSAN = move;
+        movesFound++;
+        continue;
+      }
+
+      // same end square
+      if (Move.getEnd(move).name().equals(targetSquare)) {
+        if (piece != null && Move.getPiece(move).getType().getShortName().equals(piece)) {
+          if (trace) {
+            System.out.println("Piece MATCH " + Move.getPiece(move).getType().toString());
+          }
+        } else if (piece == null && Move.getPiece(move).getType().equals(PieceType.PAWN)) {
+          if (trace) {
+            System.out.println("Piece MATCH PAWN");
+          }
+        } else {
+          if (trace) {
+            System.out.println("Piece NO MATCH");
+          }
+          continue;
+        }
+
+        // Disambiguation
+        if (disambFile != null) {
+          if (Move.getStart(move).getFile().name().equals(disambFile)) {
+            if (trace) {
+              System.out.println("File MATCH " + Move.getStart(move).getFile().name());
+            }
+          } else {
+            if (trace) {
+              System.out.println("File NO MATCH " + Move.getStart(move).getFile().name());
+            }
+            continue;
+          }
+        }
+        if (disambRank != null) {
+          if (("" + Move.getStart(move).getRank().get()).equals(disambRank)) {
+            if (trace) {
+              System.out.println("Rank MATCH " + Move.getStart(move).getRank().get());
+            }
+          } else {
+            if (trace) {
+              System.out.println("Rank NO MATCH " + Move.getStart(move).getRank().get());
+            }
+            continue;
+          }
+        }
+
+        // promotion
+        if (promotion != null) {
+          if (Move.getPromotion(move).getType().getShortName().equals(promotion)) {
+            if (trace) {
+              System.out.println("Promotion MATCH");
+            }
+          } else {
+            if (trace) {
+              System.out.println("Promotion NO MATCH");
+            }
+            continue;
+          }
+        }
+        moveFromSAN = move;
+        movesFound++;
+      }
+    }
+
+    if (movesFound > 1) {
+      LOG.error("SAN move is ambiguous!");
+      return NOMOVE;
+    } else if (movesFound == 0 || !Move.isValid(moveFromSAN)) {
+      LOG.error("SAN move not valid! No such move at the current position: " + sanMove);
+      return NOMOVE;
+    }
+
+    return moveFromSAN;
   }
 
   /**

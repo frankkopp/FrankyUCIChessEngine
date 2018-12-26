@@ -71,7 +71,7 @@ public class TestMoveGenerator {
 
     assertEquals(49, pseudo_moves.size());
     assertEquals(48, legal_moves.size());
-    assertEquals(4, qsearch_moves.size());
+    assertEquals(1, qsearch_moves.size());
 
     for (int plMove : pseudo_moves) {
       boolean found = false;

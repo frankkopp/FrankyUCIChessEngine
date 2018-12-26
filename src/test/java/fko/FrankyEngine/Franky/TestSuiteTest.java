@@ -25,16 +25,12 @@
 
 package fko.FrankyEngine.Franky;
 
-import fko.javaUCIEngineFramework.UCI.IUCIEngine;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -70,21 +66,27 @@ public class TestSuiteTest {
   }
 
   @Test
+  void startMateSuite() {
+    testSuite = new TestSuite("./testsets/mate_test_suite.epd");
+    testSuite.startTests(5000);
+  }
+
+  @Test
+  @Disabled
   void startTestSuite() {
     testSuite.startTests(5000);
   }
 
   @Test
   void startOneTest() {
-    //    testSuite.startOneTest("r1q1r1k1/1p3pp1/2p1bn1p/p3N3/2P2P2/P1Q1R3/1PB3PP/4R1K1 w - - bm
-    //    h3; " +
-    //                           "id \"Crafty Test Pos.23\"; c0 \"GK/DB Philadelphia 1996, Game
-    //                           4, move" +
-    //                           " 21W (h3)\";", 5000);
-    //testSuite.startOneTest("1k1r3r/pp3pp1/1np1p1p1/4q3/1P1P4/5N2/P1P1RPPP/4R1K1 w - - bm Nxe5;
-    // ", 5000);
-    testSuite.startOneTest("r1bqkb1r/ppp1p1pp/1nnpp3/8/2PP4/5N2/PP3PPP/RNBQKB1R w KQkq - bm Ng5",
-                           5000);
+    assertTrue(
+      testSuite
+        .startOneTest("K6Q/1p6/pPq4P/P2p2P1/4pP1N/7k/n5R1/1n2BB2 w - - dm 4;", 0));
+
+//    assertTrue(
+//      testSuite
+//        .startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
+//                           5000));
   }
 
   @Test

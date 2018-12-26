@@ -25,10 +25,10 @@
 
 package fko.FrankyEngine.Franky;
 
-import fko.javaUCIEngineFramework.UCI.IUCIEngine;
-import fko.javaUCIEngineFramework.UCI.IUCIProtocolHandler;
-import fko.javaUCIEngineFramework.UCI.IUCISearchMode;
-import fko.javaUCIEngineFramework.UCI.UCIOption;
+import fko.UCI.IUCIEngine;
+import fko.UCI.IUCIProtocolHandler;
+import fko.UCI.IUCISearchMode;
+import fko.UCI.UCIOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,9 +120,23 @@ public class FrankyEngine implements IUCIEngine {
                 "512",
                 ""));
     iUciOptions.add(
+        new UCIOption("Clear Hash",
+                UCIOptionType.button,
+                "",
+                "",
+                "",
+                ""));
+    iUciOptions.add(
         new UCIOption("Ponder",
                 UCIOptionType.check,
                 Boolean.toString(config.PONDER),
+                "",
+                "",
+                ""));
+    iUciOptions.add(
+        new UCIOption("OwnBook",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_BOOK),
                 "",
                 "",
                 ""));
@@ -199,7 +213,7 @@ public class FrankyEngine implements IUCIEngine {
      iUciOptions.add(
         new UCIOption("Use_Eval_Pruning",
                 UCIOptionType.check,
-                Boolean.toString(config.USE_EVAL_PRUNING),
+                Boolean.toString(config.USE_STATIC_NULL_PRUNING),
                 "",
                 "",
                 ""));
@@ -235,9 +249,21 @@ public class FrankyEngine implements IUCIEngine {
       case "Hash":
         setHashSizeOption(value);
         break;
+      case "Clear Hash":
+        search.clearHashTables();
+        msg = "Hash cleared";
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
       case "Ponder":
         config.PONDER = Boolean.valueOf(value);
         msg = "Engine Ponder set to " + (config.PONDER ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "OwnBook":
+        config.USE_BOOK = Boolean.valueOf(value);
+        msg = "Engine Book set to " + (config.PONDER ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
@@ -299,8 +325,8 @@ public class FrankyEngine implements IUCIEngine {
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Eval_Pruning":
-        config.USE_EVAL_PRUNING = Boolean.valueOf(value);
-        msg = "Use Eval Pruning set to " + (config.USE_EVAL_PRUNING ? "On" : "Off");
+        config.USE_STATIC_NULL_PRUNING = Boolean.valueOf(value);
+        msg = "Use Eval Pruning set to " + (config.USE_STATIC_NULL_PRUNING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
@@ -336,10 +362,10 @@ public class FrankyEngine implements IUCIEngine {
   }
 
   @Override
-  public void doMove(final String move) {
-    LOG.info("Engine got doMove command: " + move);
-    final int omegaMove = Move.fromUCINotation(position, move);
-    position.makeMove(omegaMove);
+  public void doMove(final String moveUCI) {
+    LOG.info("Engine got doMove command: " + moveUCI);
+    final int move = Move.fromUCINotation(position, moveUCI);
+    position.makeMove(move);
   }
 
   @Override

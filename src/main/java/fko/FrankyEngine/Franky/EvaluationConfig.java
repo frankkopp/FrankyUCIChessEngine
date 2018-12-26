@@ -42,10 +42,13 @@ class EvaluationConfig {
   static final int ROOK_MOBILITY_FACTOR    = 2;
   static final int QUEEN_MOBILITY_FACTOR   = 1;
 
-  static final int MATERIAL_WEIGHT = 1;
-  static final int POSITION_WEIGHT = 1;
-  static final int MOBILITY_WEIGHT = 4;
+  static final int MATERIAL_WEIGHT    = 1;
+  static final int POSITION_WEIGHT    = 1;
+  static final int MOBILITY_WEIGHT    = 4;
+  static final int KING_SAFETY_WEIGHT = 1;
 
+  static final int KING_SAFETY_PAWNSHIELD = 10;
+  static final int CORNERED_ROOK_PENALTY  = -50;
 
   // @formatter:off
   // PAWN Tables
@@ -53,10 +56,10 @@ class EvaluationConfig {
      0,  0,  0,  0,  0,  0,  0,  0,
      0,  0,  0,  0,  0,  0,  0,  0,
      0,  5,  5,  5,  5,  5,  5,  0,
-     5,  5, 10, 27, 27, 10,  5,  5,
-     0,  0,  0, 25, 25,  0,  0,  0,
+     5,  5, 10, 30, 30, 10,  5,  5,
+     0,  0,  0, 20, 20,  0,  0,  0,
      5, -5,-10,  0,  0,-10, -5,  5,
-     5, 10, 10,-25,-25, 10, 10,  5,
+     5, 10, 10,-30,-30, 10, 10,  5,
      0,  0,  0,  0,  0,  0,  0,  0
   };
   static int[] pawnsEndGame  = new int[] {
@@ -120,7 +123,7 @@ class EvaluationConfig {
       0,  0,  0,  0,  0,  0,  0,  0,
       0,  0,  0,  0,  0,  0,  0,  0,
       0,  0,  0,  0,  0,  0,  0,  0,
-     -5,  0, 15,  5,  5, 15,  0, -5,
+    -15,-10, 15, 15, 15, 15,-10,-15,
   };
   static int[] rookEndGame   = new int[] {
     5,  5,  5,  5,  5,  5,  5,  5,
@@ -161,11 +164,11 @@ class EvaluationConfig {
     -30,-40,-40,-50,-50,-40,-40,-30,
     -20,-30,-30,-40,-40,-30,-30,-20,
     -10,-20,-20,-20,-20,-20,-20,-10,
-     20, 20,  0,  0,  0,  0, 20, 20,
-     20, 30, 50,  0,  0, 10, 50, 20
+      0,  0,  0,  0,  0,  0,  0,  0,
+     20, 50, 40,-10,  0,-10, 50, 20
   };
   static int[] kingEndGame   = new int[] {
-    -50,-40,-30,-20,-20,-30,-40,-50,
+    -50,-30,-30,-20,-20,-30,-30,-50,
     -30,-20,-10,  0,  0,-10,-20,-30,
     -30,-10, 20, 30, 30, 20,-10,-30,
     -30,-10, 30, 40, 40, 30,-10,-30,
