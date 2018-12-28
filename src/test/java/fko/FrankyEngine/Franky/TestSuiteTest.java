@@ -69,7 +69,7 @@ public class TestSuiteTest {
   @Test
   void startMateSuite() {
     testSuite = new TestSuite("./testsets/mate_test_suite.epd");
-    testSuite.setSearchTime(1000);
+    testSuite.setSearchTime(10000);
     testSuite.startTests();
   }
 
