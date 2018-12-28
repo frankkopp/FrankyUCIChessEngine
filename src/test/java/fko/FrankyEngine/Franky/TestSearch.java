@@ -588,6 +588,7 @@ public class TestSearch {
     float avg1 = ((float)sum/ITERATIONS) / 1e9f;
 
     i = 0;
+    sum = 0;
     while (++i <= ITERATIONS) {
       start = System.nanoTime();
       test2();
