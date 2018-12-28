@@ -130,7 +130,7 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
 
         // wait until a line is ready to be read
         final String readLine = in.readLine();
-        COMLOG.debug(">> {}", readLine);
+        COMLOG.info(">> {}", readLine);
 
         // Scanner parses the line to tokenize it
         Scanner scanner = new Scanner(readLine);
@@ -385,7 +385,7 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   }
 
   private void send(final String msg) {
-    COMLOG.debug("<< {}", msg);
+    COMLOG.info("<< {}", msg);
     outputStreamPrinter.println(msg);
   }
 
