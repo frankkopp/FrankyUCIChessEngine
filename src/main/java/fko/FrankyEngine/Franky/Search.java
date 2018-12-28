@@ -273,7 +273,7 @@ public class Search implements Runnable {
     waitForInitializationLatch.countDown();
 
     // Opening book move
-    if (config.USE_BOOK) {
+    if (config.USE_BOOK && !isPerftSearch()) {
       if (searchMode.isTimeControl()) {
         LOG.info("Time controlled search => Using book");
         // initialize book - only happens the first time
@@ -753,7 +753,6 @@ public class Search implements Runnable {
         return staticEval - evalMargin;
       }
     }
-
     // @formatter:on
     // EVAL PRUNING
     // ###############################################
@@ -909,13 +908,13 @@ public class Search implements Runnable {
       position.undoMove();
 
       // PRUNING START
-      if (value > bestValue) { // to find first PV
+      if (value > bestValue && !isPerftSearch()) { // to find first PV
         bestValue = value;
         MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
 
         if (value > alpha) { // improved?
           if (value >= beta) { // fail-high
-            if (config.USE_ALPHABETA_PRUNING && !isPerftSearch()) {
+            if (config.USE_ALPHABETA_PRUNING) {
               // save killer moves
               if (config.USE_KILLER_MOVES && Move.getTarget(move).equals(Piece.NOPIECE)) {
                 for (int k = 0; k < noOfKillerMoves; k++) {
@@ -982,8 +981,7 @@ public class Search implements Runnable {
       // quiescence is turned of
       // if we do not have a legal move then we have a mate
       if (position.hasCheckMate()) {
-        // as we will not enter evaluation we count it here
-        searchCounter.leafPositionsEvaluated++;
+       if (isPerftSearch()) evaluate(position, ply, alpha, beta); // ignore - just count captures et al
         if (position.hasCheck()) {
           // We have a check mate. Return a -CHECKMATE.
           int mateValue = -Evaluation.CHECKMATE + ply;
