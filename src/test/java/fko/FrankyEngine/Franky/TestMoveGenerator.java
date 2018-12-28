@@ -198,6 +198,40 @@ public class TestMoveGenerator {
    * Tests the generated moves from a standard board setup
    */
   @Test
+  public void testOnDemand() {
+    MoveGenerator moveGenerator = new MoveGenerator();
+    Position board = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3");
+
+    { // test all moves
+      int j = 0;
+      int move = moveGenerator.getNextPseudoLegalMove(board, false);
+      while (move != Move.NOMOVE) {
+        System.out.println((j++) + ". " + Move.toString(move));
+        move = moveGenerator.getNextPseudoLegalMove(board, false);
+      }
+      MoveList moves = moveGenerator.getPseudoLegalMoves(board);
+      System.out.println("OnDemand: " + j + " Bulk: " + moves.size());
+      System.out.println();
+      assert (j == moves.size());
+    }
+
+    { // test all moves
+      moveGenerator.resetOnDemand();
+      moveGenerator.setKillerMoves(new int[] {67320564, 67318516});
+      int j = 0;
+      int move = moveGenerator.getNextPseudoLegalMove(board, false);
+      while (move != Move.NOMOVE) {
+        System.out.println((j++) + ". " + Move.toString(move));
+        move = moveGenerator.getNextPseudoLegalMove(board, false);
+      }
+    }
+
+  }
+
+  /**
+   * Tests the generated moves from a standard board setup
+   */
+  @Test
   public void testOnDemandFromFenBoard() {
 
     MoveGenerator moveGenerator = new MoveGenerator();
@@ -278,10 +312,9 @@ public class TestMoveGenerator {
     while (fens[i] != null) {
       String testFen = fens[i];
       board = new Position(testFen);
-      //System.out.println(board);
 
       // Pseudo Legal Moves
-      MoveList moves = new MoveList();
+      MoveList moves;
       start = Instant.now();
       while (true) {
         ITERATIONS++;
@@ -289,11 +322,10 @@ public class TestMoveGenerator {
         if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) {
           break;
         }
-        ;
       }
       //System.out.println(moves);
       System.out.println(
-        String.format("   PseudoLegal: %,7d runs/s for %s (%,d)", ITERATIONS / DURATION, fens[i],
+        String.format("   PseudoLegal: %,10d runs/s for %s (%,d)", ITERATIONS / DURATION, fens[i],
                       moves.size()));
 
       // Legal Moves On Demand
@@ -312,10 +344,9 @@ public class TestMoveGenerator {
         if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) {
           break;
         }
-        ;
       }
       System.out.println(
-        String.format("OD PseudoLegal: %,7d runs/s for %s (%,d)", ITERATIONS / DURATION, fens[i],
+        String.format("OD PseudoLegal: %,10d runs/s for %s (%,d)", ITERATIONS / DURATION, fens[i],
                       moveCounter));
 
       // Legal Moves
@@ -331,7 +362,7 @@ public class TestMoveGenerator {
         ;
       }
       System.out.println(
-        String.format("         Legal: %,7d runs/s for %s (%,d)", ITERATIONS / DURATION, fens[i],
+        String.format("         Legal: %,10d runs/s for %s (%,d)", ITERATIONS / DURATION, fens[i],
                       moves.size()));
 
       i++;
@@ -342,8 +373,8 @@ public class TestMoveGenerator {
 
     int i = 0;
     String[] fen = new String[200];
-    fen[i++] = "R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"; // 218 moves to make
     fen[i++] = "r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113";
+    fen[i++] = "R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"; // 218 moves to make
     fen[i++] = "r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 b kq e3 0 113";
     fen[i++] = "r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq - 0 113";
     fen[i++] = "8/1P6/6k1/8/8/8/p1K5/8 w - - 0 1";
