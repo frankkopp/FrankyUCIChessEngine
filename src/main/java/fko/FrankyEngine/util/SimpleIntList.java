@@ -114,6 +114,22 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
+   * Adds an list to the front of the list.
+   *
+   * @param newList
+   */
+  public void addFront(SimpleIntList newList) {
+    final int oldListSize = this.size();
+    final int newListSize = newList.size();
+    final int newSize = oldListSize + newListSize + DEFAULT_GROWTH_MARGIN;
+    int[] tmpList = Arrays.copyOfRange(newList._list, newList._head, newSize);
+    System.arraycopy(this._list, this._head, tmpList, newListSize, oldListSize);
+    this._list = tmpList;
+    this._head = 0;
+    this._tail = oldListSize + newListSize;
+  }
+
+  /**
    * @param extra_size
    */
   private void grow(int extra_size) {
