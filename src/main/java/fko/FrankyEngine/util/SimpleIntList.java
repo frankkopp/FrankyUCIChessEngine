@@ -101,7 +101,7 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
-   * Adds an element to the end of the list.
+   * Adds an list to the end of the list.
    *
    * @param newList
    */
