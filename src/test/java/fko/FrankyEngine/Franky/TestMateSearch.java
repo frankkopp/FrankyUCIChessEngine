@@ -57,8 +57,6 @@ class TestMateSearch {
   @Test
   public void testMateSearch() {
 
-    // FIXME: This mate search seems to be wrong - Fritz says 8 (15ply) this says 12
-
     testMate0Search();
     testMate1Search();
     testMate2Search();
