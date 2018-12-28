@@ -59,7 +59,6 @@ public class MoveGenerator {
   private final MoveList capturingMoves    = new MoveList(); // only capturing moves
   private final MoveList nonCapturingMoves = new MoveList(); // only non capturing moves
   private final MoveList castlingMoves     = new MoveList(); // only castling moves
-  private final MoveList evasionMoves      = new MoveList(); // only evasion moves
 
   // These fields control the on demand generation of moves.
   private OnDemandState generationCycleState = OnDemandState.NEW;
@@ -416,7 +415,9 @@ public class MoveGenerator {
   private void pushKillerMoves() {
     if (killerMoves != null) {
       for (int i = killerMoves.length - 1; i >= 0; i--) {
-        if (killerMoves[i] != Move.NOMOVE && killerMoves[i] != nonCapturingMoves.get(0)) {
+        if (killerMoves[i] != Move.NOMOVE
+            && nonCapturingMoves.size() > 0
+            && killerMoves[i] != nonCapturingMoves.get(0)) {
           nonCapturingMoves.pushToHeadStable(killerMoves[i]);
         }
       }
@@ -971,7 +972,6 @@ public class MoveGenerator {
     onDemandMoveList.clear();
     legalMoves.clear();
     pseudoLegalMoves.clear();
-    evasionMoves.clear();
     capturingMoves.clear();
     nonCapturingMoves.clear();
     castlingMoves.clear();
