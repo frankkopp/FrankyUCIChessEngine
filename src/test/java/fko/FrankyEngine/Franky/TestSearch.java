@@ -567,38 +567,42 @@ public class TestSearch {
 
 
   @Test
+  @Disabled
   public void testTiming() {
 
     prepare();
 
+    int ROUNDS = 3;
     int ITERATIONS = 5;
 
-    long start=0, end=0, sum=0;
+    for (int round=0; round<ROUNDS; round++) {
+      long start=0, end=0, sum=0;
 
-    System.out.println("Running Timing Test Test 1 vs. Test 2");
-    System.gc();
+      System.out.println("Running Timing Test Test 1 vs. Test 2");
+      System.gc();
 
-    int i = 0;
-    while (++i <= ITERATIONS) {
-      start = System.nanoTime();
-      test1();
-      end = System.nanoTime();
-      sum += end - start;
+      int i = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        test1();
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg1 = ((float)sum/ITERATIONS) / 1e9f;
+
+      i = 0;
+      sum = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        test2();
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg2 = ((float)sum/ITERATIONS) / 1e9f;
+
+      System.out.println(String.format("Test 1: %,.3f sec", avg1));
+      System.out.println(String.format("Test 2: %,.3f sec", avg2));
     }
-    float avg1 = ((float)sum/ITERATIONS) / 1e9f;
-
-    i = 0;
-    sum = 0;
-    while (++i <= ITERATIONS) {
-      start = System.nanoTime();
-      test2();
-      end = System.nanoTime();
-      sum += end - start;
-    }
-    float avg2 = ((float)sum/ITERATIONS) / 1e9f;
-
-    System.out.println(String.format("Test 1: %,.3f sec", avg1));
-    System.out.println(String.format("Test 2: %,.3f sec", avg2));
 
   }
 
@@ -626,7 +630,5 @@ public class TestSearch {
     search.config.USE_NON_CAPTURE_MOVE_SORT = true;
     search.startSearch(position, searchMode);
     waitWhileSearching();
-
   }
-
 }
