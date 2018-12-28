@@ -229,6 +229,59 @@ public class TestSimpleIntList {
     System.out.println(list);
   }
 
+  @Test
+  public void testAddList() {
+
+    SimpleIntList list1 = new SimpleIntList();
+    // add 10 entries
+    for (int i = 100; i < 110; i++) {
+      list1.add(i);
+      assertEquals(i - 100 + 1, list1.size());
+    }
+    int size1 = list1.size();
+
+    SimpleIntList list2 = new SimpleIntList();
+    // add 10 entries
+    for (int i = 200; i < 210; i++) {
+      list2.add(i);
+      assertEquals(i - 200 + 1, list2.size());
+    }
+    int size2 = list2.size();
+
+    list1.add(list2);
+    assertEquals(size1 + size2, list1.size());
+    assertEquals(100, list1.get(0));
+    assertEquals(200, list1.get(10));
+
+  }
+
+  @Test
+  public void testAddListFront() {
+
+    SimpleIntList list1 = new SimpleIntList();
+    // add 10 entries
+    for (int i = 100; i < 110; i++) {
+      list1.add(i);
+      assertEquals(i - 100 + 1, list1.size());
+    }
+    int size1 = list1.size();
+
+    SimpleIntList list2 = new SimpleIntList();
+    // add 10 entries
+    for (int i = 200; i < 210; i++) {
+      list2.add(i);
+      assertEquals(i - 200 + 1, list2.size());
+    }
+    int size2 = list2.size();
+
+    list1.addFront(list2);
+    assertEquals(size1 + size2, list1.size());
+    assertEquals(200, list1.get(0));
+    assertEquals(100, list1.get(10));
+
+    list1.add(300);
+    assertEquals(300, list1.get(20));
+  }
 
   @Test
   public void testListWithInts() {
