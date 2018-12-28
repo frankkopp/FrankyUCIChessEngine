@@ -155,6 +155,10 @@ public class Configuration {
    */
   boolean USE_KILLER_MOVES = true;
 
+  /**
+   * Extra sorting of non capture moves
+   */
+  boolean USE_NON_CAPTURE_MOVE_SORT = true;
 
 
   // TODO vvvvvvvv

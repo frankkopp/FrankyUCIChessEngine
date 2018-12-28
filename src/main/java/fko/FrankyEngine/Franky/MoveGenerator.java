@@ -40,8 +40,10 @@ import java.util.stream.IntStream;
 @SuppressWarnings("unused")
 public class MoveGenerator {
 
-  private static final boolean CACHE = false;
-  private static final boolean SORT  = true;
+  private static final boolean CACHE                    = false;
+  private static final boolean SORT_CAPTURING_MOVES     = true;
+
+  private static boolean SORT_NON_CAPTURING_MOVES = true;
 
   // the current position we generate the move for
   // is set in the getMoves methods
@@ -65,19 +67,23 @@ public class MoveGenerator {
 
   // These fields control the on demand generation of moves.
   private OnDemandState generationCycleState = OnDemandState.NEW;
-  private int[] killerMoves = null;
+  private int[]         killerMoves          = null;
+
+
 
   private enum OnDemandState {
-    NEW, PAWN, KNIGHTS, BISHOPS, ROOKS, QUEENS, KINGS, ALL
+    NEW, PAWN, KNIGHTS, BISHOPS, ROOKS, QUEENS, KINGS, ALL;
   }
-
   private MoveList onDemandMoveList = new MoveList();
-  private long     onDemandZobristLastPosition;
 
+  private long     onDemandZobristLastPosition;
   // Comparator for move value victim least value attacker
+
   private static final Comparator<Integer> mvvlvaComparator = Comparator.comparingInt(
     (Integer a) -> (Move.getPiece(a).getType().getValue() -
                     Move.getTarget(a).getType().getValue()));
+   private final Comparator<Integer> nonCapturingMovesComperator =
+     (o1, o2) -> getMoveValue(o2) - getMoveValue(o1);
 
   /**
    * Creates a new {@link MoveGenerator}
@@ -87,6 +93,7 @@ public class MoveGenerator {
 
   /**
    * sets killer moves which will be inserted after capturing moves
+   *
    * @param killerMoves
    */
   public void setKillerMoves(int[] killerMoves) {
@@ -134,46 +141,43 @@ public class MoveGenerator {
         case NEW: // no moves yet generate pawn moves first
           // generate pawn moves
           generatePawnMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
           generationCycleState = OnDemandState.PAWN;
           break;
         case PAWN: // we have all moves but knight, bishop, rook, queen and king moves
           generateKnightMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
           generationCycleState = OnDemandState.KNIGHTS;
           break;
         case KNIGHTS: // we have all moves but bishop, rook, queen and king moves
           generateBishopMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
           generationCycleState = OnDemandState.BISHOPS;
           break;
         case BISHOPS: // we have all moves but rook, queen and king moves
           generateRookMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
           generationCycleState = OnDemandState.ROOKS;
           break;
         case ROOKS: // we have all moves but queen and king moves
           generateQueenMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
           generationCycleState = OnDemandState.QUEENS;
           break;
         case QUEENS: // we have all moves but king moves
           generateKingMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
           generationCycleState = OnDemandState.KINGS;
           break;
         case KINGS: // we have all non capturing
           generateCastlingMoves();
-          MoveList tmp = new MoveList(castlingMoves);
-          tmp.add(nonCapturingMoves);
-          nonCapturingMoves.clear();
-          nonCapturingMoves.add(tmp);
+          nonCapturingMoves.addFront(castlingMoves);
           pushKillerMoves();
           onDemandMoveList.add(nonCapturingMoves);
           generationCycleState = OnDemandState.ALL;
@@ -394,7 +398,7 @@ public class MoveGenerator {
     generateKingMoves();
 
     // sort the capturing moves for mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
-    if (SORT) capturingMoves.sort(mvvlvaComparator);
+    if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
 
     // now we have all capturing moves
     pseudoLegalMoves.add(capturingMoves);
@@ -403,22 +407,46 @@ public class MoveGenerator {
     // generate castling moves late as they never capture
     generateCastlingMoves();
     // append castling to non capture moves
-    nonCapturingMoves.add(castlingMoves);
+    final int oldSize = nonCapturingMoves.size();
+    nonCapturingMoves.addFront(castlingMoves);
+    assert (oldSize + castlingMoves.size() == nonCapturingMoves.size());
+
+    // extra sort of non captures
+    // TODO: test if worth the extra effort
+    if (SORT_NON_CAPTURING_MOVES) {
+      nonCapturingMoves.sort(nonCapturingMovesComperator);
+    }
 
     // push killer moves to front of non capturing lists
     pushKillerMoves();
-
-    // TODO Sort nonCapturingMoves better? Maybe according to piece tables
-    //  Test if it is worth the extra time spent
 
     // add non captures to pseudo list
     pseudoLegalMoves.add(nonCapturingMoves);
   }
 
+  private int getMoveValue(int move) {
+    final int moveValue;
+    if (Move.getPromotion(move).getType().equals(PieceType.QUEEN)) {
+      moveValue = 1000;
+    } else if (Move.getPromotion(move).getType().equals(PieceType.KNIGHT)) {
+      moveValue = 900;
+    } else if (Move.getPromotion(move).getType().equals(PieceType.ROOK)) {
+      moveValue = -900;
+    } else if (Move.getPromotion(move).getType().equals(PieceType.BISHOP)) {
+      moveValue = -900;
+    } else if (Move.getMoveType(move).equals(MoveType.CASTLING)) {
+      moveValue = 800;
+    } else {
+      moveValue = Evaluation.getPositionValue(position, move);
+    }
+    return moveValue;
+  }
+
   private void pushKillerMoves() {
     if (killerMoves != null) {
-      for (int i = killerMoves.length-1; i >= 0; i--) {
-        if (killerMoves[i] != Move.NOMOVE) {
+      for (int i = killerMoves.length - 1; i >= 0; i--) {
+        if (killerMoves[i] != Move.NOMOVE
+            && killerMoves[i] != nonCapturingMoves.get(0)) {
           nonCapturingMoves.pushToHeadStable(killerMoves[i]);
         }
       }
@@ -978,5 +1006,13 @@ public class MoveGenerator {
     capturingMoves.clear();
     nonCapturingMoves.clear();
     castlingMoves.clear();
+  }
+
+  public static boolean isSortNonCapturingMoves() {
+    return SORT_NON_CAPTURING_MOVES;
+  }
+
+  public static void setSortNonCapturingMoves(boolean sortNonCapturingMoves) {
+    SORT_NON_CAPTURING_MOVES = sortNonCapturingMoves;
   }
 }
