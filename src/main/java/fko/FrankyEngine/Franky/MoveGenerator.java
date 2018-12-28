@@ -391,7 +391,7 @@ public class MoveGenerator {
     generateKingMoves();
 
     // sort the capturing moves for mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
-    if (SORT) capturingMoves.sort(mvvlvaComparator);
+    if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
 
     // now we have all capturing moves
     pseudoLegalMoves.add(capturingMoves);
@@ -400,13 +400,15 @@ public class MoveGenerator {
     // generate castling moves late as they never capture
     generateCastlingMoves();
     // append castling to non capture moves
-    nonCapturingMoves.add(castlingMoves);
+    final int oldSize = nonCapturingMoves.size();
+    nonCapturingMoves.addFront(castlingMoves);
+    assert (oldSize + castlingMoves.size() == nonCapturingMoves.size());
+
+    // TODO: extra sort of non captures
+    // TODO: test if worth the extra effort - failed
 
     // push killer moves to front of non capturing lists
     pushKillerMoves();
-
-    // TODO Sort nonCapturingMoves better? Maybe according to piece tables
-    //  Test if it is worth the extra time spent
 
     // add non captures to pseudo list
     pseudoLegalMoves.add(nonCapturingMoves);
@@ -415,7 +417,8 @@ public class MoveGenerator {
   private void pushKillerMoves() {
     if (killerMoves != null) {
       for (int i = killerMoves.length - 1; i >= 0; i--) {
-        if (killerMoves[i] != Move.NOMOVE) {
+        if (killerMoves[i] != Move.NOMOVE
+            && killerMoves[i] != nonCapturingMoves.get(0)) {
           nonCapturingMoves.pushToHeadStable(killerMoves[i]);
         }
       }
