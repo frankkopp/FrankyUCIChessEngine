@@ -40,8 +40,8 @@ import java.util.stream.IntStream;
 @SuppressWarnings("unused")
 public class MoveGenerator {
 
-  private static final boolean CACHE                    = false;
-  private static final boolean SORT_CAPTURING_MOVES     = true;
+  private static final boolean CACHE                = false;
+  private static final boolean SORT_CAPTURING_MOVES = true;
 
   // the current position we generate the move for
   // is set in the getMoves methods
@@ -87,6 +87,7 @@ public class MoveGenerator {
 
   /**
    * sets killer moves which will be inserted after capturing moves
+   *
    * @param killerMoves
    */
   public void setKillerMoves(int[] killerMoves) {
@@ -417,8 +418,7 @@ public class MoveGenerator {
   private void pushKillerMoves() {
     if (killerMoves != null) {
       for (int i = killerMoves.length - 1; i >= 0; i--) {
-        if (killerMoves[i] != Move.NOMOVE
-            && killerMoves[i] != nonCapturingMoves.get(0)) {
+        if (killerMoves[i] != Move.NOMOVE && killerMoves[i] != nonCapturingMoves.get(0)) {
           nonCapturingMoves.pushToHeadStable(killerMoves[i]);
         }
       }

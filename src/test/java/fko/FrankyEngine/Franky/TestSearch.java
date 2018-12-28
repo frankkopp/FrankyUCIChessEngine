@@ -585,6 +585,7 @@ public class TestSearch {
     float avg1 = ((float)sum/ITERATIONS) / 1e9f;
 
     i = 0;
+    sum = 0;
     while (++i <= ITERATIONS) {
       start = System.nanoTime();
       test2();
@@ -607,9 +608,9 @@ public class TestSearch {
   private void test1() {
     Position position =
       new Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 8, 0, 0, 0, null, false, true, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 6, 0, 0, 0, null, false, true, false);
     search.clearHashTables();
-    search.config.USE_TRANSPOSITION_TABLE = false;
+    search.config.USE_KILLER_MOVES = true;
     search.startSearch(position, searchMode);
     waitWhileSearching();
   }
@@ -617,9 +618,9 @@ public class TestSearch {
   private void test2() {
     Position position =
       new Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 8, 0, 0, 0, null, false, true, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 6, 0, 0, 0, null, false, true, false);
     search.clearHashTables();
-    search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_KILLER_MOVES = false;
     search.startSearch(position, searchMode);
     waitWhileSearching();
 
