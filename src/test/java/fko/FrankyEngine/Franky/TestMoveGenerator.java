@@ -313,8 +313,7 @@ public class TestMoveGenerator {
       assertTrue(i == lastCapture + 1
                  && moves.get(i) == killer1
                  && moves.get(i + 1) == killer2
-                 && moves.get(i + 2) == 247578640 // queen promotion
-                 && moves.get(i + 3) == 247578898 // queen promotion
+                 && moves.get(i + 2) == 335755636 // queen promotion
                 );
       break;
     }

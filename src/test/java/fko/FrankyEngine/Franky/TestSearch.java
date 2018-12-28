@@ -563,11 +563,12 @@ public class TestSearch {
 
 
   @Test
+  @Disabled
   public void testTiming() {
 
     prepare();
 
-    int ITERATIONS = 5;
+    int ITERATIONS = 3;
 
     long start=0, end=0, sum=0;
 
@@ -608,7 +609,7 @@ public class TestSearch {
       new Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 8, 0, 0, 0, null, false, true, false);
     search.clearHashTables();
-    search.config.USE_NON_CAPTURE_MOVE_SORT = false;
+    search.config.USE_TRANSPOSITION_TABLE = false;
     search.startSearch(position, searchMode);
     waitWhileSearching();
   }
@@ -618,7 +619,7 @@ public class TestSearch {
       new Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 8, 0, 0, 0, null, false, true, false);
     search.clearHashTables();
-    search.config.USE_NON_CAPTURE_MOVE_SORT = true;
+    search.config.USE_TRANSPOSITION_TABLE = true;
     search.startSearch(position, searchMode);
     waitWhileSearching();
 
