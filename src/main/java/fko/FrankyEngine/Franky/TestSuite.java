@@ -54,6 +54,7 @@ public class TestSuite {
 
   private Path           filePath;
   private int            searchTime;
+  private int            searchDepth;
   private List<TestCase> testCases = new ArrayList<>();
 
   /**
@@ -81,6 +82,12 @@ public class TestSuite {
     if (searchTime <= 0) {
       searchTime = 60;
     }
+    // get search depth and make sure it is not <=0
+    searchDepth = Integer.valueOf(properties.getProperty("search_depth"));
+    if (searchDepth <= 0) {
+      searchDepth = 0; // not limited
+    }
+
   }
 
   /**
@@ -92,16 +99,6 @@ public class TestSuite {
   public TestSuite(String testFile) {
     this();
     setFilePath(testFile);
-  }
-
-  /**
-   * Starts a test with the given time per move
-   *
-   * @param searchTime time per move in ms
-   */
-  public void startTests(final int searchTime) {
-    this.searchTime = searchTime;
-    startTests();
   }
 
   /**
@@ -132,7 +129,7 @@ public class TestSuite {
     System.out.printf("Results with search time %,dms for file %s\n", searchTime, filePath);
     System.out.println(
       "==================================================================================");
-    System.out.println("No  | Result     | Engine   | Value | Best Move       | Fen ");
+    System.out.println("No  | Result     | Engine   | Value | Expected Result | Fen ");
     System.out.println(
       "==================================================================================");
     for (TestCase testCase : testCases) {
@@ -154,7 +151,8 @@ public class TestSuite {
                         testCase.result.toString(), Move.toSimpleString(testCase.engineMove),
                         testCase.engineValue == Evaluation.NOVALUE
                         ? "N/A"
-                        : "" + testCase.engineValue, testCase.bestMoves.toNotationString(),
+                        : "" + testCase.engineValue,
+                        testCase.opCode + " " + testCase.operand,
                         testCase.fen);
     }
     System.out.println(
@@ -173,10 +171,12 @@ public class TestSuite {
 
   /**
    * @param epd        An EPD line for the test to conducted
-   * @param searchTime search time per move in ms (ignored for mate search)
+   * @param searchTime search time per move in ms
+   * @param searchDepth search depth in plys
    */
-  public boolean startOneTest(final String epd, final int searchTime) {
+  public boolean startOneTest(final String epd, final int searchTime, int searchDepth) {
     this.searchTime = searchTime;
+    this.searchDepth = searchDepth;
     TestCase testCase = readOneEPD(epd);
     doOneTestCase(testCase);
     if (testCase.result == Result.SUCCESS) {
@@ -208,14 +208,15 @@ public class TestSuite {
   /**
    * Searches the fen position in the testCase for the best move and compares
    * the result with the expected result from the test case.
-   *
+   * <p>
    * Result will be stored into the given TestCase object.
    *
    * @param testCase TestCase object containing the fen and the test opcode. Result
    *                 will be stored back into this object.
    */
   private void searchBestMoveTest(final TestCase testCase) {
-    System.out.printf("Search for best move: %s\n", testCase.operand);
+    System.out.printf("Search for best move: %s in %,.1f sec and %,d search depth.\n",
+                      testCase.operand, searchTime/1e3, searchDepth);
 
     FrankyEngine engine = new FrankyEngine();
     Search search = engine.getSearch();
@@ -223,11 +224,10 @@ public class TestSuite {
 
     Position position = new Position(testCase.fen);
     testCase.bestMoves = getMovesFromOperand(position, testCase.operand);
-
     System.out.printf("Best Moves: %s\n", testCase.bestMoves);
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, searchTime, null, false, false,
-                                           false);
+    SearchMode searchMode =
+      new SearchMode(0, 0, 0, 0, 0, searchDepth, 0, 0, searchTime, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching(search);
 
@@ -261,15 +261,17 @@ public class TestSuite {
    */
   private void searchDirectMateTest(final TestCase testCase) {
     int mateDepth = Integer.valueOf(testCase.operand);
-    System.out.printf("Search for mate in %d moves\n", mateDepth);
+    System.out.printf("Search for mate in %,d moves within %,.1f sec and %,d search depth.%n",
+                      mateDepth, searchTime/1e3, searchDepth);
 
     FrankyEngine engine = new FrankyEngine();
     Search search = engine.getSearch();
+    search.config.USE_BOOK = false;
 
     Position position = new Position(testCase.fen);
 
     SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, 0, 0, mateDepth, 0, null, false, false, false);
+      new SearchMode(0, 0, 0, 0, 0, searchDepth, 0, mateDepth, searchTime, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching(search);
 
@@ -316,9 +318,8 @@ public class TestSuite {
       //System.out.printf(" OPERAND clean: %s\n", movesString);
 
       // pattern recognition
-      Pattern pattern = Pattern.compile(
-        "([NBRQK])?([a-h])?([1-8])?([a-h][1-8]|O-O-O|O-O)(=([NBRQ]))?([+#])?");
-      // "\\[(\\w+) +\"(([^\\\\\"]+|\\\\([btnfr\"'\\\\]|[0-3]?[0-7]{1,2}|u[0-9a-fA-F]{4}))*)\"\\]");
+      Pattern pattern =
+        Pattern.compile("([NBRQK])?([a-h])?([1-8])?([a-h][1-8]|O-O-O|O-O)(=([NBRQ]))?([+#])?");
 
       Matcher matcher = pattern.matcher(sanMove);
 
@@ -531,6 +532,30 @@ public class TestSuite {
     }
   }
 
+  public Path getFilePath() {
+    return filePath;
+  }
+
+  public void setFilePath(Path filePath) {
+    this.filePath = filePath;
+  }
+
+  public int getSearchTime() {
+    return searchTime;
+  }
+
+  public void setSearchTime(int searchTime) {
+    this.searchTime = searchTime;
+  }
+
+  public int getSearchDepth() {
+    return searchDepth;
+  }
+
+  public void setSearchDepth(int searchDepth) {
+    this.searchDepth = searchDepth;
+  }
+
   /**
    * Parameter object for TestCases
    */
@@ -559,11 +584,6 @@ public class TestSuite {
   /**
    * A test case is in one of these states
    */
-  enum Result {
-    NOT_TESTED,
-    SUCCESS,
-    FAILED,
-    SKIPPED
-  }
+  enum Result {NOT_TESTED, SUCCESS, FAILED, SKIPPED}
 
 }

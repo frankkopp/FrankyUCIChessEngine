@@ -62,37 +62,66 @@ public class TestSuiteTest {
   @Test
   void startFrankySuite() {
     testSuite = new TestSuite("./testsets/franky_tests.epd");
-    testSuite.startTests(5000);
+    testSuite.setSearchTime(1000);
+    testSuite.startTests();
   }
 
   @Test
   void startMateSuite() {
     testSuite = new TestSuite("./testsets/mate_test_suite.epd");
-    testSuite.startTests(5000);
+    testSuite.setSearchTime(1000);
+    testSuite.startTests();
+  }
+
+  @Test
+  void startOneTest() {
+
+    // bm test time limited
+    assertTrue(
+      testSuite
+        .startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
+                      5000, 0));
+
+    // bm test depth limited
+    assertTrue(
+      testSuite
+        .startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
+                      0, 8));
+
+    // bm test time & depth limited
+    assertTrue(
+      testSuite
+        .startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
+                      5000, 8));
+
+  }
+
+  @Test
+  void startOneMateTest() {
+    // dm test time limited
+    assertTrue(
+      testSuite
+        .startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;",
+                      5000, 0));
+
+    // dm test depth limited
+    assertTrue(
+      testSuite
+        .startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;",
+                      0, 10));
+
+    // dm test depth limited
+    assertTrue(
+      testSuite
+        .startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;",
+                      5000, 16));
   }
 
   @Test
   @Disabled
   void startTestSuite() {
-    testSuite.startTests(5000);
-  }
-
-  @Test
-  void startOneTest() {
-    assertTrue(
-      testSuite
-        .startOneTest("K6Q/1p6/pPq4P/P2p2P1/4pP1N/7k/n5R1/1n2BB2 w - - dm 4;", 0));
-
-//    assertTrue(
-//      testSuite
-//        .startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
-//                           5000));
-  }
-
-  @Test
-  void startOneMateTest() {
-    assertTrue(testSuite.startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;", 5000));
-    assertTrue(testSuite.startOneTest("8/8/8/8/4K3/8/R7/4k3 w - - dm 5;", 5000));
+    testSuite.setSearchTime(5000);
+    testSuite.startTests();
   }
 
 }
