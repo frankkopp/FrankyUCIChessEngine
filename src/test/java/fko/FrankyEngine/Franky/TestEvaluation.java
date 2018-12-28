@@ -232,6 +232,34 @@ public class TestEvaluation {
     LOG.info(evaluation.toString());
   }
 
+ @Test
+ public void testPositionValue() {
+   position = new Position();
+   int move;
+
+   move = Move.fromSANNotation(position, "e4");
+   assertEquals(20, Evaluation.getPositionValue(position, move));
+
+   move = Move.fromSANNotation(position, "c3");
+   assertEquals(-10, Evaluation.getPositionValue(position, move));
+
+   move = Move.fromSANNotation(position, "Na3");
+   assertEquals(-30, Evaluation.getPositionValue(position, move));
+
+   position = new Position("r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq -");
+
+   move = Move.fromSANNotation(position, "a6");
+   assertEquals(5, Evaluation.getPositionValue(position, move));
+
+   move = Move.fromSANNotation(position, "Qh4");
+   assertEquals(-5, Evaluation.getPositionValue(position, move));
+
+   move = Move.fromSANNotation(position, "Ke7");
+   assertEquals(-10, Evaluation.getPositionValue(position, move));
+
+
+ }
+
   @Test
   @Disabled
   public final void testNewEvals() {

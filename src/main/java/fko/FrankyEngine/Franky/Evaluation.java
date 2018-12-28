@@ -877,4 +877,60 @@ public class Evaluation {
            ", endGameMobility=" + endGameMobility + '}';
     // @formatter:on
   }
+
+  public static int getPositionValue(Position position, int move) {
+
+    final int nextToMove = position.getNextPlayer().ordinal();
+
+    final int index = Move.getEnd(move).ordinal();
+    final int tableIndex =
+      nextToMove == WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+
+    int midGame = 0;
+    int endGame = 0;
+
+    switch (Move.getPiece(move).getType()) {
+      case PAWN:
+        midGame += pawnsMidGame[tableIndex];
+        endGame += pawnsEndGame[tableIndex];
+        break;
+      case KNIGHT:
+        midGame += knightMidGame[tableIndex];
+        endGame += knightEndGame[tableIndex];
+        break;
+      case BISHOP:
+        midGame += bishopMidGame[tableIndex];
+        endGame += bishopEndGame[tableIndex];
+        break;
+      case ROOK:
+        midGame += rookMidGame[tableIndex];
+        endGame += rookEndGame[tableIndex];
+        break;
+      case QUEEN:
+        midGame += queenMidGame[tableIndex];
+        endGame += queenEndGame[tableIndex];
+        break;
+      case KING:
+        midGame += kingMidGame[tableIndex];
+        endGame += kingEndGame[tableIndex];
+        break;
+
+    }
+
+    // @formatter:off
+    final int gamePhaseFactor = Math.min(GAME_PHASE_MAX,
+                 position.getKnightSquares()[WHITE].size() +
+                 position.getKnightSquares()[BLACK].size() +
+                 position.getBishopSquares()[WHITE].size() +
+                 position.getBishopSquares()[BLACK].size() +
+             2 * position.getRookSquares()[WHITE].size() +
+             2 * position.getRookSquares()[BLACK].size() +
+             4 * position.getQueenSquares()[WHITE].size() +
+             4 * position.getQueenSquares()[BLACK].size());
+    // @formatter:on
+
+    return midGame * (gamePhaseFactor / GAME_PHASE_MAX) +
+                    endGame * (1 - gamePhaseFactor / GAME_PHASE_MAX);
+
+  }
 }
