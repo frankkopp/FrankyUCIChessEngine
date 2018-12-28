@@ -413,10 +413,9 @@ public class MoveGenerator {
   }
 
   private void pushKillerMoves() {
-    if (killerMoves != null) {
+    if (killerMoves != null && nonCapturingMoves.size() > 0) {
       for (int i = killerMoves.length - 1; i >= 0; i--) {
         if (killerMoves[i] != Move.NOMOVE
-            && nonCapturingMoves.size() > 0
             && killerMoves[i] != nonCapturingMoves.get(0)) {
           nonCapturingMoves.pushToHeadStable(killerMoves[i]);
         }
