@@ -37,10 +37,8 @@ import java.util.stream.IntStream;
  *
  * @author Frank Kopp
  */
-@SuppressWarnings("unused")
 public class MoveGenerator {
 
-  private static final boolean CACHE                = false;
   private static final boolean SORT_CAPTURING_MOVES = true;
 
   // the current position we generate the move for
@@ -562,7 +560,6 @@ public class MoveGenerator {
         }
       }
     }
-    // });
   }
 
   private void generateKnightMoves() {

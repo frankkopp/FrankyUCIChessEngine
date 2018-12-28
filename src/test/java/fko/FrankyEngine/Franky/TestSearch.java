@@ -561,41 +561,43 @@ public class TestSearch {
     }
   }
 
-
   @Test
   @Disabled
   public void testTiming() {
 
     prepare();
 
-    int ITERATIONS = 3;
+    int ROUNDS = 3;
+    int ITERATIONS = 5;
 
-    long start=0, end=0, sum=0;
+    for (int round=0; round<ROUNDS; round++) {
+      long start=0, end=0, sum=0;
 
-    System.out.println("Running Timing Test Test 1 vs. Test 2");
-    System.gc();
+      System.out.println("Running Timing Test Test 1 vs. Test 2");
+      System.gc();
 
-    int i = 0;
-    while (++i <= ITERATIONS) {
-      start = System.nanoTime();
-      test1();
-      end = System.nanoTime();
-      sum += end - start;
+      int i = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        test1();
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg1 = ((float)sum/ITERATIONS) / 1e9f;
+
+      i = 0;
+      sum = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        test2();
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg2 = ((float)sum/ITERATIONS) / 1e9f;
+
+      System.out.println(String.format("Test 1: %,.3f sec", avg1));
+      System.out.println(String.format("Test 2: %,.3f sec", avg2));
     }
-    float avg1 = ((float)sum/ITERATIONS) / 1e9f;
-
-    i = 0;
-    sum = 0;
-    while (++i <= ITERATIONS) {
-      start = System.nanoTime();
-      test2();
-      end = System.nanoTime();
-      sum += end - start;
-    }
-    float avg2 = ((float)sum/ITERATIONS) / 1e9f;
-
-    System.out.println(String.format("Test 1: %,.3f sec", avg1));
-    System.out.println(String.format("Test 2: %,.3f sec", avg2));
 
   }
 
@@ -610,7 +612,7 @@ public class TestSearch {
       new Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 6, 0, 0, 0, null, false, true, false);
     search.clearHashTables();
-    search.config.USE_KILLER_MOVES = true;
+    search.config.USE_KILLER_MOVES = false;
     search.startSearch(position, searchMode);
     waitWhileSearching();
   }
@@ -620,7 +622,7 @@ public class TestSearch {
       new Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 6, 0, 0, 0, null, false, true, false);
     search.clearHashTables();
-    search.config.USE_KILLER_MOVES = false;
+    search.config.USE_KILLER_MOVES = true;
     search.startSearch(position, searchMode);
     waitWhileSearching();
 
