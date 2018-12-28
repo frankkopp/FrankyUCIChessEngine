@@ -166,16 +166,17 @@ public class TestMoveGenerator {
    * Tests the generated moves from board setup with killer moves sorting
    */
   @Test
-  public void testKillerFromStandardBoard() {
+  public void testKiller() {
 
     String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq - 0 113";
     Position board = new Position(testFen);
 
-    int killer1 = 67178534; // 67178534 (NORMAL Rg3-a3)
-    int killer2 = 67178790; // 67178790 (NORMAL Rg3-c3)
+    int killer1 = 67178790; // 67178790 (NORMAL Rg3-c3)
+    int killer2 = 67178534; // 67178534 (NORMAL Rg3-a3)
+    int killer3 = 67130005; // already at first position
 
     MoveGenerator moveGenerator = new MoveGenerator();
-    moveGenerator.setKillerMoves(new int[]{killer1, killer2});
+    moveGenerator.setKillerMoves(new int[]{killer1, killer2, killer3});
     MoveList moves = moveGenerator.getLegalMoves(board);
 
     int lastCapture = 0;
@@ -215,9 +216,9 @@ public class TestMoveGenerator {
       assert (j == moves.size());
     }
 
-    { // test all moves
+    { // test all moves with killers sorted before non-captures
       moveGenerator.resetOnDemand();
-      moveGenerator.setKillerMoves(new int[] {67320564, 67318516});
+      moveGenerator.setKillerMoves(new int[]{67320564, 67318516});
       int j = 0;
       int move = moveGenerator.getNextPseudoLegalMove(board, false);
       while (move != Move.NOMOVE) {
@@ -262,9 +263,6 @@ public class TestMoveGenerator {
 
   }
 
-  /**
-   *
-   */
   @Test
   public void testMoveSorting() {
 
@@ -292,6 +290,37 @@ public class TestMoveGenerator {
     }
   }
 
+  @Test
+  public void testSingleMoveSorting() {
+
+    MoveGenerator moveGenerator = new MoveGenerator();
+    Position board = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
+
+    int killer1 = 67320564;
+    int killer2 = 67318516;
+
+    moveGenerator.setKillerMoves(new int[]{killer1, killer2});
+    MoveList moves = moveGenerator.getPseudoLegalMoves(board);
+
+    int lastCapture = 0;
+    for (int i = 0; i < moves.size(); i++) {
+      // skip the captures
+      if (!Move.getTarget(moves.get(i)).equals(Piece.NOPIECE)) {
+        lastCapture = i;
+        continue;
+      }
+      // now we should have our two killers
+      assertTrue(i == lastCapture + 1
+                 && moves.get(i) == killer1
+                 && moves.get(i + 1) == killer2
+                 && moves.get(i + 2) == 247578640 // queen promotion
+                 && moves.get(i + 3) == 247578898 // queen promotion
+                );
+      break;
+    }
+    System.out.println(moves.toString().replaceAll(", |\\[", "\n"));
+
+  }
 
   /**
    * Tests the timing

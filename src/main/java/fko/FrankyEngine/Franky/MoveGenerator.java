@@ -40,8 +40,8 @@ import java.util.stream.IntStream;
 @SuppressWarnings("unused")
 public class MoveGenerator {
 
-  private static final boolean CACHE = false;
-  private static final boolean SORT  = true;
+  private static final boolean CACHE                    = false;
+  private static final boolean SORT_CAPTURING_MOVES     = true;
 
   // the current position we generate the move for
   // is set in the getMoves methods
@@ -65,7 +65,7 @@ public class MoveGenerator {
 
   // These fields control the on demand generation of moves.
   private OnDemandState generationCycleState = OnDemandState.NEW;
-  private int[] killerMoves = null;
+  private int[]         killerMoves          = null;
 
   private enum OnDemandState {
     NEW, PAWN, KNIGHTS, BISHOPS, ROOKS, QUEENS, KINGS, ALL
@@ -134,46 +134,43 @@ public class MoveGenerator {
         case NEW: // no moves yet generate pawn moves first
           // generate pawn moves
           generatePawnMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
           generationCycleState = OnDemandState.PAWN;
           break;
         case PAWN: // we have all moves but knight, bishop, rook, queen and king moves
           generateKnightMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
           generationCycleState = OnDemandState.KNIGHTS;
           break;
         case KNIGHTS: // we have all moves but bishop, rook, queen and king moves
           generateBishopMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
           generationCycleState = OnDemandState.BISHOPS;
           break;
         case BISHOPS: // we have all moves but rook, queen and king moves
           generateRookMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
           generationCycleState = OnDemandState.ROOKS;
           break;
         case ROOKS: // we have all moves but queen and king moves
           generateQueenMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
           generationCycleState = OnDemandState.QUEENS;
           break;
         case QUEENS: // we have all moves but king moves
           generateKingMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
           generationCycleState = OnDemandState.KINGS;
           break;
         case KINGS: // we have all non capturing
           generateCastlingMoves();
-          MoveList tmp = new MoveList(castlingMoves);
-          tmp.add(nonCapturingMoves);
-          nonCapturingMoves.clear();
-          nonCapturingMoves.add(tmp);
+          nonCapturingMoves.addFront(castlingMoves);
           pushKillerMoves();
           onDemandMoveList.add(nonCapturingMoves);
           generationCycleState = OnDemandState.ALL;
@@ -417,7 +414,7 @@ public class MoveGenerator {
 
   private void pushKillerMoves() {
     if (killerMoves != null) {
-      for (int i = killerMoves.length-1; i >= 0; i--) {
+      for (int i = killerMoves.length - 1; i >= 0; i--) {
         if (killerMoves[i] != Move.NOMOVE) {
           nonCapturingMoves.pushToHeadStable(killerMoves[i]);
         }
@@ -979,4 +976,5 @@ public class MoveGenerator {
     nonCapturingMoves.clear();
     castlingMoves.clear();
   }
+
 }
