@@ -224,6 +224,13 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 "",
                 ""));
+     iUciOptions.add(
+        new UCIOption("Use_Killer_Moves",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_KILLER_MOVES),
+                "",
+                "",
+                ""));
    // @formatter:on
   }
 
@@ -330,9 +337,9 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      case "Use_Razor_Pruning":
-        config.USE_RAZOR_PRUNING = Boolean.valueOf(value);
-        msg = "Use Razor Pruning set to " + (config.USE_RAZOR_PRUNING ? "On" : "Off");
+      case "Use_Killer_Moves":
+        config.USE_KILLER_MOVES = Boolean.valueOf(value);
+        msg = "Use Razor Pruning set to " + (config.USE_KILLER_MOVES ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
@@ -363,7 +370,7 @@ public class FrankyEngine implements IUCIEngine {
 
   @Override
   public void doMove(final String moveUCI) {
-    LOG.info("Engine got doMove command: " + moveUCI);
+    LOG.debug("Engine got doMove command: " + moveUCI);
     final int move = Move.fromUCINotation(position, moveUCI);
     position.makeMove(move);
   }
