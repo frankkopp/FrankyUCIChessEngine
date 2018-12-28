@@ -115,13 +115,9 @@ public class Evaluation {
   /**
    * Sets the reference to the position this evaluation operates on.
    * <p>
-   * Attention: This does not create a deep copy. If the position changes after
-   * setting the reference the change will be reflected here. This does not
-   * create a deep copy.
-   *
    * @param position
    */
-  public void setPosition(final Position position) {
+  private void setPosition(final Position position) {
     this.position = position;
 
     // convenience fields
@@ -133,13 +129,6 @@ public class Evaluation {
     rookSquares = position.getRookSquares();
     queenSquares = position.getQueenSquares();
     kingSquares = position.getKingSquares();
-  }
-
-  /**
-   * @return the reference to the last position object used in evaluation
-   */
-  public Position getPosition() {
-    return position;
   }
 
   /**
@@ -157,17 +146,16 @@ public class Evaluation {
    */
   public int evaluate(Position position) {
     setPosition(position);
-    return evaluate();
+    return _evaluate();
   }
 
   /**
-   * Sets the position to evaluate and evaluates the position.
-   * Is equivalent to <code>setPosition(pos)</code> and <code>evaluate()</code>
+   * Evaluates the position.
    *
    * @return value of the position from active player's view.
    */
 
-  public int evaluate() {
+  private int _evaluate() {
 
     // protect against null position
     if (position == null) {
@@ -769,11 +757,17 @@ public class Evaluation {
    * are present the value is at maximum 24.
    *
    * @return a value depending on officer midGameMaterial of both sides between 0 and 24
+   * @param position
    */
-  public int getGamePhaseFactor() {
+  public int getGamePhaseFactor(Position position) {
+    setPosition(position);
+    return getGamePhaseFactor();
+  }
+
+  private int getGamePhaseFactor() {
 
     // protect against null position
-    if (position == null) {
+    if (this.position == null) {
       IllegalStateException e = new IllegalStateException();
       LOG.error("No position to evaluate. Set position before calling this", e);
       throw e;
@@ -794,37 +788,38 @@ public class Evaluation {
 
   /**
    * @return material balance from the view of the active player
+   * @param position
    */
-  public int material() {
+  public int material(Position position) {
     // clear old values
-    evaluate();
+    evaluate(position);
     return material;
   }
 
   /**
    * @return
    */
-  public int position() {
+  public int position(Position position) {
     // piece position is done in the piece iteration
-    evaluate();
+    evaluate(position);
     return piecePosition;
   }
 
   /**
    * @return number of pseudo legal moves for the next player
    */
-  public int mobility() {
+  public int mobility(Position position) {
     // midGameMobility is done in the squares iteration
-    evaluate();
+    evaluate(position);
     return mobility;
   }
 
   /**
    * @return number of pseudo legal moves for the next player
    */
-  public int kingSafety() {
+  public int kingSafety(Position position) {
     // midGameMobility is done in the squares iteration
-    evaluate();
+    evaluate(position);
     return kingSafety;
   }
 
