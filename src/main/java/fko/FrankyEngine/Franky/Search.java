@@ -460,16 +460,12 @@ public class Search implements Runnable {
 
       // check if we need to stop search - could be external or time.
       if (stopSearch || softTimeLimitReached() || hardTimeLimitReached()) {
-        LOG.trace("Search stopped before next depth");
         break;
       }
 
     } while (++depth <= searchMode.getMaxDepth());
     // ### ENDOF Iterative Deepening
     // #############################
-
-    assert (searchCounter.currentBestRootValue != Evaluation.NOVALUE);
-    assert (principalVariation[0].get(0) == searchCounter.currentBestRootMove);
 
     // create searchResult here
     searchResult.bestMove = searchCounter.currentBestRootMove;
@@ -610,15 +606,13 @@ public class Search implements Runnable {
 
       // TODO: && stopSearch is a workaround for now - need to find cause of issue
       //  when stopping via time to still send viable move back down.
-      if (stopSearch && depth > 1) {
-        break;
-      }
+      if (stopSearch) break;
 
       // write the value back to the root moves list
       rootMoves.set(i, move, value);
 
       // Evaluate the calculated value and compare to current best move
-      if (value > bestValue) {
+      if (value > bestValue && !stopSearch) {
         bestValue = value;
         MoveList.savePV(move, principalVariation[rootPly + 1], principalVariation[rootPly]);
         storeTT(position, depth, TT_EntryType.EXACT, bestValue);
@@ -676,6 +670,8 @@ public class Search implements Runnable {
       return qsearch(position, ply, alpha, beta);
     }
 
+    searchCounter.nodesVisited++;
+
     // check draw through 50-moves-rule, 3-fold-repetition, insufficient material
     if (!isPerftSearch()) {
       // @formatter:off
@@ -698,7 +694,6 @@ public class Search implements Runnable {
       stopSearch = true;
       return evaluate(position, ply, alpha, beta);
     }
-    searchCounter.nodesVisited++;
     // @formatter:on
 
     // ###############################################
@@ -934,6 +929,8 @@ public class Search implements Runnable {
         }
       }
       // PRUNING END
+
+      if (stopSearch) break;
     } // iteration over all moves
 
     // if we did not have a legal move then we have a mate
@@ -962,6 +959,8 @@ public class Search implements Runnable {
     if (searchCounter.currentExtraSearchDepth < ply) {
       searchCounter.currentExtraSearchDepth = ply;
     }
+
+    searchCounter.nodesVisited++;
 
     // check draw through 50-moves-rule, 3-fold-repetition, insufficient material
     if (!isPerftSearch()) {
@@ -1006,7 +1005,7 @@ public class Search implements Runnable {
       stopSearch = true;
       return evaluate(position, ply, alpha, beta);
     }
-    searchCounter.nodesVisited++;
+
     // @formatter:on
 
     // use evaluation as a standing pat (lower bound)
@@ -1099,10 +1098,12 @@ public class Search implements Runnable {
         }
       }
       // PRUNING END
+
+      if (stopSearch) break;
     } // iteration over all qmoves
 
     // if we did not have a legal move then we have a mate
-    if (numberOfSearchedMoves == 0 && position.hasCheck()) {
+    if (numberOfSearchedMoves == 0 && position.hasCheck() && !stopSearch) {
       // as we will not enter evaluation we count it here
       searchCounter.nonLeafPositionsEvaluated++;
       if (position.hasCheck()) {

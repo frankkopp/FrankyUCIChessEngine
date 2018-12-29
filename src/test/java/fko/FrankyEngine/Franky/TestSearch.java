@@ -196,7 +196,7 @@ public class TestSearch {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
     SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 2, Arrays.asList("h2h4"), false, false, false);
+      new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 1000, Arrays.asList("h2h4"), false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -456,7 +456,7 @@ public class TestSearch {
     }
     search.startSearch(position, searchMode);
     waitWhileSearching();
-    values.add(String.format("SIZE %-12s : %,14d >> %-14s (%4d) >> mps %,.0f >> %s ", feature,
+    values.add(String.format("SIZE %-12s : %,14d >> %-14s (%4d) >> nps %,.0f >> %s ", feature,
                              search.getSearchCounter().leafPositionsEvaluated,
                              Move.toString(search.getLastSearchResult().bestMove),
                              search.getLastSearchResult().resultValue,
