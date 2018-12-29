@@ -397,10 +397,8 @@ public class MoveGenerator {
 
     // generate castling moves late as they never capture
     generateCastlingMoves();
-    // append castling to non capture moves
-    final int oldSize = nonCapturingMoves.size();
+    // put castling to front of non capture moves
     nonCapturingMoves.addFront(castlingMoves);
-    assert (oldSize + castlingMoves.size() == nonCapturingMoves.size());
 
     // TODO: extra sort of non captures
     // TODO: test if worth the extra effort - failed
