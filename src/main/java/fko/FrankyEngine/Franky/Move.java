@@ -49,6 +49,22 @@ public class Move {
   private static final int PIECE_bitMASK    = 0xF;
   private static final int MOVETYPE_bitMASK = 0x7;
 
+  // @formatter:off
+  /*
+  BITMAP
+  3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
+  1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 Info          Mask        Values
+  ------------------------------------------------------------------------------------------------
+   																									1	1	1	1	1	1	1	Start Square	7F	1111111	127
+  																		1	1	1	1	1	1	1								End Square	  7F	1111111	127
+  														1	1	1	1															Piece	        f	  1111	  15
+  										1	1	1	1																			Target	      f 	1111	  15
+  						1	1	1	1																							Promotion	    f	  1111	  15
+  			1	1	1																											MoveType	    7	  111	    7
+  1	1	1																														Castling	    7	  111	    7
+  */
+  // @formatter:on
+
   // Bit operation values
   private static final int START_SQUARE_SHIFT = 0;
   private static final int START_SQUARE_MASK  = SQUARE_bitMASK << START_SQUARE_SHIFT;
