@@ -34,7 +34,6 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 
@@ -127,15 +126,6 @@ public class Search implements Runnable {
 
     // set hash sizes
     setHashSize(this.config.HASH_SIZE);
-
-    for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
-      // Move Generators - each depth in search gets it own to avoid object creation
-      // during search. This is in preparation for move generators which keep a state
-      // per depth
-      moveGenerators[i] = new MoveGenerator();
-      // prepare principal variation lists
-      principalVariation[i] = new MoveList(MAX_SEARCH_DEPTH);
-    }
 
     // create position evaluator
     evaluator = new Evaluation();
@@ -239,6 +229,16 @@ public class Search implements Runnable {
       final String s = "run() cannot be called directly!";
       UnsupportedOperationException e = new UnsupportedOperationException(s);
       LOG.error(s, e);
+    }
+
+    for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
+      // Move Generators - each depth in search gets it own to avoid object creation
+      // during search. This is in preparation for move generators which keep a state
+      // per depth
+      moveGenerators[i] = new MoveGenerator();
+      moveGenerators[i].SORT_MOVES = config.USE_SORT_ALL_MOVES;
+      // prepare principal variation lists
+      principalVariation[i] = new MoveList(MAX_SEARCH_DEPTH);
     }
 
     if (isPerftSearch()) {
