@@ -33,8 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -555,7 +553,7 @@ public class TestSearch {
   private void waitWhileSearching() {
     while (search.isSearching()) {
       try {
-        Thread.sleep(10);
+        Thread.sleep(1);
       } catch (InterruptedException ignored) {
       }
     }
@@ -566,6 +564,12 @@ public class TestSearch {
   public void testTiming() {
 
     ArrayList<String> result = new ArrayList<>();
+
+    final Position position =
+      new Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+
+    final SearchMode searchMode =
+      new SearchMode(0, 0, 0, 0, 0, 8, 0, 0, 0, null, false, true, false);
 
     prepare();
 
@@ -581,7 +585,7 @@ public class TestSearch {
       int i = 0;
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
-        test1();
+        test1(position, searchMode);
         end = System.nanoTime();
         sum += end - start;
       }
@@ -591,7 +595,7 @@ public class TestSearch {
       sum = 0;
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
-        test2();
+        test2(position, searchMode);
         end = System.nanoTime();
         sum += end - start;
       }
@@ -613,25 +617,18 @@ public class TestSearch {
     search.config.USE_BOOK = false;
   }
 
-  private void test1() {
-    Position position =
-      new Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 6, 0, 0, 0, null, false, true, false);
+  private void test1(final Position position, final SearchMode searchMode) {
+    search.config.USE_SORT_ALL_MOVES = false;
     search.clearHashTables();
-    search.config.USE_KILLER_MOVES = false;
     search.startSearch(position, searchMode);
     waitWhileSearching();
   }
 
-  private void test2() {
-    Position position =
-      new Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 6, 0, 0, 0, null, false, true, false);
+  private void test2(final Position position, final SearchMode searchMode) {
+    search.config.USE_SORT_ALL_MOVES = true;
     search.clearHashTables();
-    search.config.USE_KILLER_MOVES = true;
     search.startSearch(position, searchMode);
     waitWhileSearching();
-
   }
 
 }
