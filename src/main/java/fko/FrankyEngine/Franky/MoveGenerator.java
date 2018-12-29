@@ -170,7 +170,7 @@ public class MoveGenerator {
         case KINGS: // we have all non capturing
           generateCastlingMoves();
           nonCapturingMoves.addFront(castlingMoves);
-          pushKillerMoves(nonCapturingMoves);
+          moveListSort(nonCapturingMoves);
           onDemandMoveList.add(nonCapturingMoves);
           generationCycleState = OnDemandState.ALL;
           break;
@@ -409,12 +409,7 @@ public class MoveGenerator {
       // sort over all moves
       pseudoLegalMoves.add(capturingMoves);
       pseudoLegalMoves.add(nonCapturingMoves);
-
-      int[] sortIdx = new int[pseudoLegalMoves.size()];
-      for (int i = 0; i < pseudoLegalMoves.size(); i++) {
-        sortIdx[i] = getSortValue(pseudoLegalMoves.get(i));
-      }
-      insertionSort(pseudoLegalMoves, sortIdx);
+      moveListSort(pseudoLegalMoves);
 
     } else {
       // sort only capturing moves mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
@@ -467,11 +462,16 @@ public class MoveGenerator {
   }
 
   /**
-   * Special insertionSort to use index array as comparator
+   * Special moveListSort to use index array as comparator
    * @param moveList
-   * @param sortIdx
    */
-  private void insertionSort(MoveList moveList, int[] sortIdx) {
+  private void moveListSort(MoveList moveList) {
+    // create index array
+    int[] sortIdx = new int[moveList.size()];
+    for (int i = 0; i < moveList.size(); i++) {
+      sortIdx[i] = getSortValue(moveList.get(i));
+    }
+    // insertion sort
     int ts;
     for (int i = 0; i < moveList.size(); i++) {
       for (int j = i; j > 0; j--) {
