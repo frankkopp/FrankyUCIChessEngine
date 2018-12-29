@@ -436,7 +436,6 @@ public class Move {
     int target = (move & TARGET_MASK) >>> TARGET_SHIFT;
     if (!Piece.isValid(target)) return false;
     int promotion = (move & PROMOTION_MASK) >>> PROMOTION_SHIFT;
-    if (!Piece.isValid(promotion)) return false;
-    return true;
+    return Piece.isValid(promotion);
   }
 }
