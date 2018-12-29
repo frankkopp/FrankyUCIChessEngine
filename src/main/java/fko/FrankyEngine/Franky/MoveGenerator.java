@@ -388,25 +388,29 @@ public class MoveGenerator {
     generateQueenMoves();
     generateKingMoves();
 
-    // sort the capturing moves for mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
-    if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
-
-    // now we have all capturing moves
-    pseudoLegalMoves.add(capturingMoves);
-    if (captureMovesOnly) return;
+    // at this point we have all capturing moves - return if this is all we need
+    if (captureMovesOnly) {
+      // sort the capturing moves for mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
+      if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
+      // now we have all capturing moves
+      pseudoLegalMoves.add(capturingMoves);
+      return;
+    }
 
     // generate castling moves late as they never capture
     generateCastlingMoves();
+
     // put castling to front of non capture moves
     nonCapturingMoves.addFront(castlingMoves);
-
-    // TODO: extra sort of non captures
-    // TODO: test if worth the extra effort - failed
 
     // push killer moves to front of non capturing lists
     pushKillerMoves();
 
-    // add non captures to pseudo list
+    // sort the capturing moves for mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
+    if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
+
+    // add all moves to main list
+    pseudoLegalMoves.add(capturingMoves);
     pseudoLegalMoves.add(nonCapturingMoves);
   }
 

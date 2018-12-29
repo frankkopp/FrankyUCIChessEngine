@@ -565,6 +565,8 @@ public class TestSearch {
   @Disabled
   public void testTiming() {
 
+    ArrayList<String> result = new ArrayList<>();
+
     prepare();
 
     int ROUNDS = 3;
@@ -573,7 +575,7 @@ public class TestSearch {
     for (int round=0; round<ROUNDS; round++) {
       long start=0, end=0, sum=0;
 
-      System.out.println("Running Timing Test Test 1 vs. Test 2");
+      System.out.printf("Running round %d of Timing Test Test 1 vs. Test 2%n", round);
       System.gc();
 
       int i = 0;
@@ -595,8 +597,12 @@ public class TestSearch {
       }
       float avg2 = ((float)sum/ITERATIONS) / 1e9f;
 
-      System.out.println(String.format("Test 1: %,.3f sec", avg1));
-      System.out.println(String.format("Test 2: %,.3f sec", avg2));
+      result.add(String.format("Round %d Test 1 avg: %,.3f sec", round, avg1));
+      result.add(String.format("Round %d Test 2 avg: %,.3f sec", round, avg2));
+    }
+
+    for (String s : result) {
+      System.out.println(s);
     }
 
   }

@@ -45,7 +45,7 @@ import java.util.concurrent.CountDownLatch;
  * the search is finished it calls <code>engine.sendResult</code> ith the best move and a ponder
  * move if it has one.
  * <p>
- * DONE: KILLER Moves - search quiet moves previoulsy causing cut-offs first
+ * DONE: KILLER Moves - search quiet moves previously causing cut-offs first
  * TODO: LMR (Late Move Reduction)
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  */
@@ -55,7 +55,7 @@ public class Search implements Runnable {
 
   public static final int MAX_SEARCH_DEPTH = 100;
 
-  // Readabilty constants
+  // Readability constants
   private static final boolean DO_NULL = true;
   private static final boolean NO_NULL = false;
   private static final boolean IS_PV   = true;
