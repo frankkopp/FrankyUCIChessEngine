@@ -319,7 +319,12 @@ public class TestMoveGenerator {
                 );
       break;
     }
-    System.out.println(moves.toString().replaceAll(", |\\[", "\n"));
+
+    for (int move : moves) {
+      System.out.printf("%-20s (%d) %n",
+                        Move.toString(move),
+                        Evaluation.getPositionValue(board, move));
+    }
 
   }
 

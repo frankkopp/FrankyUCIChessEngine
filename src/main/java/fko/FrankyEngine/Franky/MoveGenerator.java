@@ -457,7 +457,7 @@ public class MoveGenerator {
         return 9200;
       }
       // all other moves
-      return 10000 + Evaluation.getPositionValue(position, move);
+      return 10000 - Evaluation.getPositionValue(position, move);
     }
   }
 

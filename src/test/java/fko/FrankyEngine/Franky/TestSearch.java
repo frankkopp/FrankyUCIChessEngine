@@ -395,6 +395,7 @@ public class TestSearch {
     search.config.USE_KILLER_MOVES = false;
     search.config.USE_STATIC_NULL_PRUNING = false;
     search.config.USE_RAZOR_PRUNING = false;
+    search.config.USE_SORT_ALL_MOVES = false;
 
     measureTreeSize(position, searchMode, values, "WARM UP", true);
     measureTreeSize(position, searchMode, values, "REFERENCE", true);
@@ -410,6 +411,9 @@ public class TestSearch {
 
     search.config.USE_PVS = true;
     measureTreeSize(position, searchMode, values, "PVS", true);
+
+    search.config.USE_SORT_ALL_MOVES = true;
+    measureTreeSize(position, searchMode, values, "SORTALL", true);
 
     search.config.USE_MATE_DISTANCE_PRUNING = true;
     measureTreeSize(position, searchMode, values, "MDP", true);
