@@ -27,7 +27,8 @@ package fko.FrankyEngine.util;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ConcurrentModificationException;
+import java.util.*;
+import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -394,9 +395,8 @@ public class TestSimpleIntList {
     sortList.add(10);
     sortList.add(5);
     sortList.add(80);
-    sortList.sort((a, b) -> a - b);
-
-    cloneList.sort((a, b) -> a - b);
+    sortList.sort(Comparator.comparingInt(a -> a));
+    cloneList.sort(Comparator.comparingInt(a -> a));
 
     // clear
     list.clear();
@@ -461,6 +461,57 @@ public class TestSimpleIntList {
     System.out.println(list.stream().average());
 
     list.stream().filter(i -> i % 2 == 0).forEach(System.out::println);
+  }
+
+  @Test
+  public void testSwap() {
+    SimpleIntList list = new SimpleIntList();
+
+    Random r = new Random();
+    final IntConsumer intConsumer = (int a) -> list.add(r.nextInt());
+
+    IntStream.rangeClosed(0, 100).forEach(intConsumer);
+
+    int before1 = list.get(3);
+    int before2 = list.get(97);
+    list.swap(3,97);
+    assertEquals(before1, list.get(97));
+    assertEquals(before2, list.get(3));
+
+  }
+
+    /** */
+  @Test
+  public void testSorting() {
+
+    SimpleIntList list = new SimpleIntList();
+
+    Random r = new Random();
+    final IntConsumer intConsumer = (int a) -> list.add(r.nextInt());
+
+    IntStream.rangeClosed(0, 4000).forEach(intConsumer);
+    list.sort(Comparator.comparingInt(a -> a));
+    list.forEach(System.out::println);
+    assertTrue(isSorted(list.toArray()));
+
+    System.out.println();
+
+    IntStream.rangeClosed(0, 40000).forEach(intConsumer);
+    list.sort(Comparator.comparingInt(a -> a));
+    list.forEach(System.out::println);
+    assertTrue(isSorted(list.toArray()));
+
+  }
+
+  public boolean isSorted(int[] array) {
+    int prev = array[0];
+    for (int i = 1; i < array.length; i++) {
+      if (array[i] < prev) {
+        return false;
+      }
+      prev = array[i];
+    }
+    return true;
   }
 
 }
