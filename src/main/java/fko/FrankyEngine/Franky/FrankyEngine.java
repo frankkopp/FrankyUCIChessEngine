@@ -231,6 +231,13 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 "",
                 ""));
+     iUciOptions.add(
+        new UCIOption("Use_Full_Move_Ordering",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_SORT_ALL_MOVES),
+                "",
+                "",
+                ""));
    // @formatter:on
   }
 
@@ -337,13 +344,13 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      case "Use_Killer_Moves":
+      case "Use_Full_Move_Ordering":
         config.USE_KILLER_MOVES = Boolean.valueOf(value);
-        msg = "Use Razor Pruning set to " + (config.USE_KILLER_MOVES ? "On" : "Off");
+        msg = "Use full move ordering set to " + (config.USE_SORT_ALL_MOVES ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      default:
+        default:
         LOG.error("Unknown option: {}", name);
         break;
     }

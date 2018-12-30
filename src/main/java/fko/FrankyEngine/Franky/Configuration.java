@@ -155,6 +155,13 @@ public class Configuration {
    */
   boolean USE_KILLER_MOVES = true;
 
+  /**
+   * Experimental sorting of moves in move generation.
+   * Generating moves already has good ordering - extra sorting is expensive
+   * and extra sorting can be worse than standard sorting
+   */
+  boolean USE_SORT_ALL_MOVES = true;
+
 
 
   // TODO vvvvvvvv

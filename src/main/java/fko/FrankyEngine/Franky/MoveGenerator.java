@@ -39,7 +39,8 @@ import java.util.stream.IntStream;
  */
 public class MoveGenerator {
 
-  private static final boolean SORT_CAPTURING_MOVES = true;
+  boolean SORT_CAPTURING_MOVES = true;
+  boolean SORT_MOVES           = true;
 
   // the current position we generate the move for
   // is set in the getMoves methods
@@ -73,8 +74,8 @@ public class MoveGenerator {
 
   // Comparator for move value victim least value attacker
   private static final Comparator<Integer> mvvlvaComparator = Comparator.comparingInt(
-    (Integer a) -> (Move.getPiece(a).getType().getValue() -
-                    Move.getTarget(a).getType().getValue()));
+    (Integer move) -> (Move.getPiece(move).getType().getValue() -
+                       Move.getTarget(move).getType().getValue()));
 
   /**
    * Creates a new {@link MoveGenerator}
@@ -169,7 +170,7 @@ public class MoveGenerator {
         case KINGS: // we have all non capturing
           generateCastlingMoves();
           nonCapturingMoves.addFront(castlingMoves);
-          pushKillerMoves();
+          moveListSort(nonCapturingMoves);
           onDemandMoveList.add(nonCapturingMoves);
           generationCycleState = OnDemandState.ALL;
           break;
@@ -403,23 +404,100 @@ public class MoveGenerator {
     // put castling to front of non capture moves
     nonCapturingMoves.addFront(castlingMoves);
 
-    // push killer moves to front of non capturing lists
-    pushKillerMoves();
+    // sort all moves
+    if (SORT_MOVES) {
+      // sort over all moves
+      pseudoLegalMoves.add(capturingMoves);
+      pseudoLegalMoves.add(nonCapturingMoves);
+      moveListSort(pseudoLegalMoves);
 
-    // sort the capturing moves for mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
-    if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
-
-    // add all moves to main list
-    pseudoLegalMoves.add(capturingMoves);
-    pseudoLegalMoves.add(nonCapturingMoves);
+    } else {
+      // sort only capturing moves mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
+      if (SORT_CAPTURING_MOVES) {
+        capturingMoves.sort(mvvlvaComparator);
+        pushKillerMoves(nonCapturingMoves);
+      }
+      pseudoLegalMoves.add(capturingMoves);
+      pseudoLegalMoves.add(nonCapturingMoves);
+    }
   }
 
-  private void pushKillerMoves() {
+  /**
+   * Sort value for all moves. Smaller values heapsort first
+   */
+  private int getSortValue(int move) {
+    // capturing moves
+    if (!Move.getTarget(move).equals(Piece.NOPIECE)) {
+      return 1000 + Move.getPiece(move).getType().getValue() -
+             Move.getTarget(move).getType().getValue();
+    }
+    // non capturing
+    else {
+      if (killerMoves != null) {
+        for (int i = killerMoves.length - 1; i >= 0; i--) {
+          if (killerMoves[i] == move) {
+            return 5000 + i;
+          }
+        }
+      }
+      // promotions
+      final PieceType pieceType = Move.getPromotion(move).getType();
+      if (!pieceType.equals(PieceType.NOTYPE)) {
+        switch (pieceType) {
+          case QUEEN:
+            return 9000;
+          case KNIGHT:
+            return 9100;
+          case ROOK:
+            return 10900;
+          case BISHOP:
+            return 10900;
+        }
+      }
+      // castling
+      else if (Move.getMoveType(move).equals(MoveType.CASTLING)) {
+        return 9200;
+      }
+      // all other moves
+      return 10000 - Evaluation.getPositionValue(position, move);
+    }
+  }
+
+  /**
+   * Special moveListSort to use index array as comparator
+   *
+   * @param moveList
+   */
+  private void moveListSort(MoveList moveList) {
+    // create index array
+    int[] sortIdx = new int[moveList.size()];
+    for (int i = 0; i < moveList.size(); i++) {
+      sortIdx[i] = getSortValue(moveList.get(i));
+    }
+    // insertion sort
+    int ts;
+    for (int i = 0; i < moveList.size(); i++) {
+      for (int j = i; j > 0; j--) {
+        if (sortIdx[j] - sortIdx[j - 1] < 0) {
+          moveList.swap(j - 1, j);
+          ts = sortIdx[j];
+          sortIdx[j] = sortIdx[j - 1];
+          sortIdx[j - 1] = ts;
+        }
+      }
+    }
+  }
+
+  /**
+   * Pushing killer moves to fron of moveList of there are any
+   *
+   * @param moveList
+   */
+  private void pushKillerMoves(final MoveList moveList) {
     if (killerMoves != null && nonCapturingMoves.size() > 0) {
       for (int i = killerMoves.length - 1; i >= 0; i--) {
-        if (killerMoves[i] != Move.NOMOVE
-            && killerMoves[i] != nonCapturingMoves.get(0)) {
-          nonCapturingMoves.pushToHeadStable(killerMoves[i]);
+        if (killerMoves[i] != Move.NOMOVE && killerMoves[i] != nonCapturingMoves.get(0)) {
+          moveList.pushToHeadStable(killerMoves[i]);
         }
       }
     }
@@ -756,12 +834,8 @@ public class MoveGenerator {
     /*
      * Find a move by finding at least one moves for a piece type
      */
-    if (findKingMove() || findPawnMove() || findKnightMove() || findQueenMove() || findRookMove() ||
-        findBishopMove()) {
-
-      return true;
-    }
-    return false;
+    return findKingMove() || findPawnMove() || findKnightMove() || findQueenMove() ||
+           findRookMove() || findBishopMove();
   }
 
   /**

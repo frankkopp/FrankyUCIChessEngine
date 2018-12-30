@@ -27,7 +27,8 @@ package fko.FrankyEngine.util;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ConcurrentModificationException;
+import java.util.*;
+import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,9 +36,67 @@ import static org.junit.jupiter.api.Assertions.*;
 /** @author Frank */
 public class TestSimpleIntList {
 
-  private SimpleIntList _list_1;
+  /** Test boundaries of public methods */
+  @Test
+  public void testBoundaries() {
+    // Constructor
+    new SimpleIntList(100);
+    new SimpleIntList(0);
+    assertThrows(java.lang.NegativeArraySizeException.class, () -> new SimpleIntList(-1));
+    assertThrows(java.lang.NullPointerException.class, () -> new SimpleIntList(null));
+    // add
+    final SimpleIntList list = new SimpleIntList();
+    list.add(Integer.MIN_VALUE);
+    list.add(Integer.MAX_VALUE);
+    list.add(list);
+    assertThrows(java.lang.NullPointerException.class, () -> list.add(null));
+    list.addFront(list);
+    assertThrows(java.lang.NullPointerException.class, () -> list.addFront(null));
+    // get
+    SimpleIntList listGet = new SimpleIntList(0);
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listGet.get(0));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listGet.get(-1));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listGet.get(10));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listGet.getFirst());
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listGet.getLast());
+    listGet.add(Integer.MIN_VALUE);
+    listGet.add(Integer.MAX_VALUE);
+    listGet.get(1);
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listGet.get(2));
+    // set
+    SimpleIntList listSet = new SimpleIntList(0);
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSet.set(0,Integer.MAX_VALUE));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSet.set(-1, Integer.MAX_VALUE));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSet.set(10, Integer.MAX_VALUE));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSet.set(10, Integer.MAX_VALUE));
+    listSet.add(Integer.MIN_VALUE);
+    listSet.add(Integer.MAX_VALUE);
+    listSet.set(1, Integer.MAX_VALUE-1);
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSet.set(2, Integer.MAX_VALUE));
+    // remove
+    SimpleIntList listRemove = new SimpleIntList(0);
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listRemove.removeFirst());
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listRemove.removeLast());
+    // swap
+    SimpleIntList listSwap = new SimpleIntList();
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSwap.swap(0, 0));
+    listSwap.add(Integer.MIN_VALUE);
+    listSwap.add(Integer.MAX_VALUE);
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSwap.swap(0, -1));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSwap.swap(-1, 0));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSwap.swap(0, 2));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSwap.swap(2, 0));
+    listSwap.swap(0,0);
+    listSwap.swap(0,1);
+    // sort
+    SimpleIntList listSort = new SimpleIntList();
+    listSort.add(Integer.MIN_VALUE);
+    listSort.add(Integer.MAX_VALUE);
+    listSort.sort(null);
+  }
 
-  /** Test Iterator in a simple case */
+
+    /** Test Iterator in a simple case */
   @Test
   public void testGrowing() {
 
@@ -394,9 +453,8 @@ public class TestSimpleIntList {
     sortList.add(10);
     sortList.add(5);
     sortList.add(80);
-    sortList.sort((a, b) -> a - b);
-
-    cloneList.sort((a, b) -> a - b);
+    sortList.sort(Comparator.comparingInt(a -> a));
+    cloneList.sort(Comparator.comparingInt(a -> a));
 
     // clear
     list.clear();
@@ -461,6 +519,57 @@ public class TestSimpleIntList {
     System.out.println(list.stream().average());
 
     list.stream().filter(i -> i % 2 == 0).forEach(System.out::println);
+  }
+
+  @Test
+  public void testSwap() {
+    SimpleIntList list = new SimpleIntList();
+
+    Random r = new Random();
+    final IntConsumer intConsumer = (int a) -> list.add(r.nextInt());
+
+    IntStream.rangeClosed(0, 100).forEach(intConsumer);
+
+    int before1 = list.get(3);
+    int before2 = list.get(97);
+    list.swap(3,97);
+    assertEquals(before1, list.get(97));
+    assertEquals(before2, list.get(3));
+
+  }
+
+    /** */
+  @Test
+  public void testSorting() {
+
+    SimpleIntList list = new SimpleIntList();
+
+    Random r = new Random();
+    final IntConsumer intConsumer = (int a) -> list.add(r.nextInt());
+
+    IntStream.rangeClosed(0, 4000).forEach(intConsumer);
+    list.sort(Comparator.comparingInt(a -> a));
+    list.forEach(System.out::println);
+    assertTrue(isSorted(list.toArray()));
+
+    System.out.println();
+
+    IntStream.rangeClosed(0, 40000).forEach(intConsumer);
+    list.sort(Comparator.comparingInt(a -> a));
+    list.forEach(System.out::println);
+    assertTrue(isSorted(list.toArray()));
+
+  }
+
+  public boolean isSorted(int[] array) {
+    int prev = array[0];
+    for (int i = 1; i < array.length; i++) {
+      if (array[i] < prev) {
+        return false;
+      }
+      prev = array[i];
+    }
+    return true;
   }
 
 }
