@@ -142,8 +142,7 @@ public class TestSearch {
   public void testBasicTimeControl_TimePerMove() {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
-    SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 2000, null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 2000, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -325,12 +324,12 @@ public class TestSearch {
     position.makeMove(Move.fromUCINotation(position, "g8h7"));
     // next white move would be 3-fold draw
 
-    SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 1000, null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 1000, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertEquals("d8h4", Move.toSimpleString(search.getLastSearchResult().bestMove));
-    assertEquals(0, search.getLastSearchResult().resultValue);
+    assertEquals(Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+                 search.getLastSearchResult().resultValue);
     LOG.warn("Best Move: {} Value: {} Ponder {}",
              Move.toSimpleString(search.getLastSearchResult().bestMove),
              search.getLastSearchResult().resultValue / 100f,
@@ -625,8 +624,8 @@ public class TestSearch {
     int ROUNDS = 3;
     int ITERATIONS = 5;
 
-    for (int round=0; round<ROUNDS; round++) {
-      long start=0, end=0, sum=0;
+    for (int round = 0; round < ROUNDS; round++) {
+      long start = 0, end = 0, sum = 0;
 
       System.out.printf("Running round %d of Timing Test Test 1 vs. Test 2%n", round);
       System.gc();
@@ -638,7 +637,7 @@ public class TestSearch {
         end = System.nanoTime();
         sum += end - start;
       }
-      float avg1 = ((float)sum/ITERATIONS) / 1e9f;
+      float avg1 = ((float) sum / ITERATIONS) / 1e9f;
 
       i = 0;
       sum = 0;
@@ -648,7 +647,7 @@ public class TestSearch {
         end = System.nanoTime();
         sum += end - start;
       }
-      float avg2 = ((float)sum/ITERATIONS) / 1e9f;
+      float avg2 = ((float) sum / ITERATIONS) / 1e9f;
 
       result.add(String.format("Round %d Test 1 avg: %,.3f sec", round, avg1));
       result.add(String.format("Round %d Test 2 avg: %,.3f sec", round, avg2));

@@ -673,7 +673,7 @@ public class Search implements Runnable {
       if (   position.check50Moves()
           || position.check3Repetitions()
           || position.checkInsufficientMaterial()) {
-        return Evaluation.DRAW; // TODO: implement contempt
+        return contempt(position); // TODO: implement contempt
       }
       // @formatter:on
     }
@@ -963,7 +963,7 @@ public class Search implements Runnable {
       if (   position.check50Moves()
           || position.check3Repetitions()
           || position.checkInsufficientMaterial()) {
-        return Evaluation.DRAW; // TODO: implement contempt
+        return contempt(position); // TODO: implement contempt
       }
       // @formatter:on
     }
@@ -1149,6 +1149,10 @@ public class Search implements Runnable {
 
     storeTT(position, 0, TT_EntryType.EXACT, value);
     return value;
+  }
+
+  private int contempt(Position position) {
+    return -Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR;
   }
 
   private boolean wasIllegalMove(final Position position) {
