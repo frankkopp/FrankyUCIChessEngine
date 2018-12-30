@@ -25,10 +25,8 @@
 
 package fko.FrankyEngine.Franky;
 
-import sun.jvm.hotspot.utilities.IntArray;
+import fko.FrankyEngine.util.SimpleIntList;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.stream.IntStream;
 
@@ -58,12 +56,16 @@ public class MoveGenerator {
 
   // these are are working lists as fields to avoid to have to
   // create them every time. Instead of creating the need to be cleared before use.
-  private final MoveList legalMoves        = new MoveList();
+  private final MoveList      legalMoves                  = new MoveList();
   // these are all pseudo legal
-  private final MoveList pseudoLegalMoves  = new MoveList(); // all moves
-  private final MoveList capturingMoves    = new MoveList(); // only capturing moves
-  private final MoveList nonCapturingMoves = new MoveList(); // only non capturing moves
-  private final MoveList castlingMoves     = new MoveList(); // only castling moves
+  private final MoveList      pseudoLegalMoves            = new MoveList(); // all moves
+  private final SimpleIntList pseudoLegalMovesSortValues  = new SimpleIntList();
+  private final MoveList      capturingMoves              = new MoveList(); // only capturing moves
+  private final SimpleIntList capturingMovesSortValues    = new SimpleIntList();
+  private final MoveList      nonCapturingMoves           = new MoveList();
+  private final SimpleIntList nonCapturingMovesSortValues = new SimpleIntList();
+  private final MoveList      castlingMoves               = new MoveList(); // only castling moves
+  private final SimpleIntList castlingMovesSortValues     = new SimpleIntList();
 
   // These fields control the on demand generation of moves.
   private OnDemandState generationCycleState = OnDemandState.NEW;
@@ -174,7 +176,7 @@ public class MoveGenerator {
         case KINGS: // we have all non capturing
           generateCastlingMoves();
           nonCapturingMoves.addFront(castlingMoves);
-          moveListSort(nonCapturingMoves);
+          moveListSort(nonCapturingMoves, nonCapturingMovesSortValues);
           onDemandMoveList.add(nonCapturingMoves);
           generationCycleState = OnDemandState.ALL;
           break;
@@ -200,10 +202,7 @@ public class MoveGenerator {
    */
   public void resetOnDemand() {
     onDemandZobristLastPosition = 0;
-    capturingMoves.clear();
-    nonCapturingMoves.clear();
-    castlingMoves.clear();
-    onDemandMoveList.clear();
+    clearLists();
   }
 
   /**
@@ -407,13 +406,16 @@ public class MoveGenerator {
 
     // put castling to front of non capture moves
     nonCapturingMoves.addFront(castlingMoves);
+    nonCapturingMovesSortValues.addFront(castlingMovesSortValues);
 
     // sort all moves
     if (SORT_MOVES) {
       // sort over all moves
       pseudoLegalMoves.add(capturingMoves);
+      pseudoLegalMovesSortValues.add(capturingMovesSortValues);
       pseudoLegalMoves.add(nonCapturingMoves);
-      moveListSort(pseudoLegalMoves);
+      pseudoLegalMovesSortValues.add(nonCapturingMovesSortValues);
+      moveListSort(pseudoLegalMoves, pseudoLegalMovesSortValues);
 
     } else {
       // sort only capturing moves mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
@@ -427,67 +429,26 @@ public class MoveGenerator {
   }
 
   /**
-   * Sort value for all moves. Smaller values heapsort first
-   */
-  private int getSortValue(int move) {
-
-    // capturing moves
-    if (!Move.getTarget(move).equals(Piece.NOPIECE)) {
-      return 1000 + Move.getPiece(move).getType().getValue() -
-             Move.getTarget(move).getType().getValue();
-    }
-    // non capturing
-    else {
-      if (killerMoves != null) {
-        for (int i = killerMoves.length - 1; i >= 0; i--) {
-          if (killerMoves[i] == move) {
-            return 5000 + i;
-          }
-        }
-      }
-      // promotions
-      final PieceType pieceType = Move.getPromotion(move).getType();
-      if (!pieceType.equals(PieceType.NOTYPE)) {
-        switch (pieceType) {
-          case QUEEN:
-            return 9000;
-          case KNIGHT:
-            return 9100;
-          case ROOK:
-            return 10900;
-          case BISHOP:
-            return 10900;
-        }
-      }
-      // castling
-      else if (Move.getMoveType(move).equals(MoveType.CASTLING)) {
-        return 9200;
-      }
-      // all other moves
-      return 10000 - Evaluation.getPositionValue(position, move);
-    }
-  }
-
-  /**
    * Special moveListSort to use index array as comparator
    *
    * @param moveList
    */
-  private void moveListSort(MoveList moveList) {
-    // create index array
-    int[] sortIdx = new int[moveList.size()];
-    for (int i = 0; i < moveList.size(); i++) {
-      sortIdx[i] = getSortValue(moveList.get(i));
-    }
+  private void moveListSort(MoveList moveList, SimpleIntList sortList) {
+    //    if (killerMoves != null) {
+    //      for (int i = killerMoves.length - 1; i >= 0; i--) {
+    //        if (killerMoves[i] == move) {
+    //          return 5000 + i;
+    //        }
+    //      }
+    //    }
+
     // insertion sort
     int ts;
     for (int i = 0; i < moveList.size(); i++) {
       for (int j = i; j > 0; j--) {
-        if (sortIdx[j] - sortIdx[j - 1] < 0) {
+        if (sortList.get(j) - sortList.get(j - 1) < 0) {
           moveList.swap(j - 1, j);
-          ts = sortIdx[j];
-          sortIdx[j] = sortIdx[j - 1];
-          sortIdx[j - 1] = ts;
+          sortList.swap(j - 1, j);
         }
       }
     }
@@ -538,6 +499,8 @@ public class MoveGenerator {
           final Piece target = position.getX88Board()[to];
           final Piece promotion = Piece.NOPIECE;
 
+          final int captureValue = PieceType.PAWN.getValue() - target.getType().getValue();
+
           // capture
           if (d != Square.N) { // not straight
             if (target != Piece.NOPIECE // not empty
@@ -549,32 +512,41 @@ public class MoveGenerator {
                 capturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.WHITE_QUEEN));
+                capturingMovesSortValues.add(-1000 + captureValue);
                 capturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.WHITE_KNIGHT));
+                capturingMovesSortValues.add(-900+captureValue);
                 capturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.WHITE_ROOK));
+                capturingMovesSortValues.add(10800 + captureValue);
                 capturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.WHITE_BISHOP));
+                capturingMovesSortValues.add(10900 + captureValue);
               } else if (to < 8) { // rank 1
                 assert activePlayer.isBlack(); // checking for  color is probably redundant
                 capturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.BLACK_QUEEN));
+                capturingMovesSortValues.add(-1000 + captureValue);
                 capturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.BLACK_KNIGHT));
+                capturingMovesSortValues.add(-900 + captureValue);
                 capturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.BLACK_ROOK));
+                capturingMovesSortValues.add(10800 + captureValue);
                 capturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.BLACK_BISHOP));
+                capturingMovesSortValues.add(10900 + captureValue);
               } else { // normal capture
                 capturingMoves.add(
                   Move.createMove(type, fromSquare, toSquare, piece, target, promotion));
+                capturingMovesSortValues.add(captureValue);
               }
             } else { // empty but maybe en passant
               if (toSquare == position.getEnPassantSquare()) { //  en passant capture
@@ -584,6 +556,7 @@ public class MoveGenerator {
                               : position.getEnPassantSquare().getNorth().ordinal();
                 capturingMoves.add(Move.createMove(MoveType.ENPASSANT, fromSquare, toSquare, piece,
                                                    position.getX88Board()[t], promotion));
+                capturingMovesSortValues.add(captureValue);
               }
             }
           }
@@ -596,49 +569,63 @@ public class MoveGenerator {
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.WHITE_QUEEN));
+                nonCapturingMovesSortValues.add(9000);
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.WHITE_KNIGHT));
+                nonCapturingMovesSortValues.add(9100);
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.WHITE_ROOK));
+                nonCapturingMovesSortValues.add(10800);
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.WHITE_BISHOP));
+                nonCapturingMovesSortValues.add(10900);
               } else if (to < 8) { // rank 1
                 assert activePlayer.isBlack(); // checking for color is probably redundant
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.BLACK_QUEEN));
+                nonCapturingMovesSortValues.add(9000);
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.BLACK_KNIGHT));
+                nonCapturingMovesSortValues.add(9100);
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.BLACK_ROOK));
+                nonCapturingMovesSortValues.add(10800);
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.BLACK_BISHOP));
+                nonCapturingMovesSortValues.add(10900);
               } else {
                 // pawndouble
                 if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow() &&
                     (position.getX88Board()[fromSquare.ordinal() + (2 * Square.N)]) ==
                     Piece.NOPIECE) {
                   // on rank 2 && rank 4 is free(rank 3 already checked via target)
-                  nonCapturingMoves.add(
+                  final int move =
                     Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getNorth(), piece,
-                                    target, promotion));
+                                    target, promotion);
+                  nonCapturingMoves.add(move);
+                  nonCapturingMovesSortValues.add(10000-Evaluation.getPositionValue(position, move));
                 } else if (activePlayer.isBlack() && fromSquare.isBlackPawnBaseRow() &&
                            position.getX88Board()[fromSquare.ordinal() + (2 * Square.S)] ==
                            Piece.NOPIECE) {
                   // on rank 7 && rank 5 is free(rank 6 already checked via target)
-                  nonCapturingMoves.add(
+                  final int move =
                     Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getSouth(), piece,
-                                    target, promotion));
+                                    target, promotion);
+                  nonCapturingMoves.add(move);
+                  nonCapturingMovesSortValues.add(10000-Evaluation.getPositionValue(position, move));
                 }
                 // normal pawn move
-                nonCapturingMoves.add(
-                  Move.createMove(type, fromSquare, toSquare, piece, target, promotion));
+                final int move =
+                  Move.createMove(type, fromSquare, toSquare, piece, target, promotion);
+                nonCapturingMoves.add(move);
+                nonCapturingMovesSortValues.add(10000-Evaluation.getPositionValue(position, move));
               }
             }
           }
@@ -717,13 +704,17 @@ public class MoveGenerator {
       while ((to & 0x88) == 0) { // slide while valid square
         final Piece target = position.getX88Board()[to];
 
+        final int captureValue = type.getValue() - target.getType().getValue();
+
         // free square - non capture
         if (target == Piece.NOPIECE) { // empty
           if (!captureMovesOnly) {
-            nonCapturingMoves.add(
-              Move.createMove(MoveType.NORMAL, Square.getSquare(square.ordinal()),
-                              Square.getSquare(to), Piece.getPiece(type, activePlayer), target,
-                              Piece.NOPIECE));
+            final int move = Move.createMove(MoveType.NORMAL, Square.getSquare(square.ordinal()),
+                                             Square.getSquare(to),
+                                             Piece.getPiece(type, activePlayer), target,
+                                             Piece.NOPIECE);
+            nonCapturingMoves.add(move);
+            nonCapturingMovesSortValues.add(10000-Evaluation.getPositionValue(position, move));
           }
         }
         // occupied square - capture if opponent and stop sliding
@@ -734,6 +725,7 @@ public class MoveGenerator {
                                                Square.getSquare(to),
                                                Piece.getPiece(type, activePlayer), target,
                                                Piece.NOPIECE));
+            capturingMovesSortValues.add(captureValue);
           }
           break; // stop sliding;
         }
@@ -762,6 +754,7 @@ public class MoveGenerator {
           castlingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e1, Square.g1, Piece.WHITE_KING,
                             Piece.NOPIECE, Piece.NOPIECE));
+          castlingMovesSortValues.add(9200);
         }
       }
       if (position.isCastlingWQ()) {
@@ -778,6 +771,7 @@ public class MoveGenerator {
           castlingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e1, Square.c1, Piece.WHITE_KING,
                             Piece.NOPIECE, Piece.NOPIECE));
+          castlingMovesSortValues.add(9200);
         }
       }
     } else {
@@ -793,6 +787,7 @@ public class MoveGenerator {
           castlingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e8, Square.g8, Piece.BLACK_KING,
                             Piece.NOPIECE, Piece.NOPIECE));
+          castlingMovesSortValues.add(9200);
         }
       }
       if (position.isCastlingBQ()) {
@@ -809,6 +804,7 @@ public class MoveGenerator {
           castlingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e8, Square.c8, Piece.BLACK_KING,
                             Piece.NOPIECE, Piece.NOPIECE));
+          castlingMovesSortValues.add(9200);
         }
       }
     }
@@ -1052,9 +1048,13 @@ public class MoveGenerator {
     onDemandMoveList.clear();
     legalMoves.clear();
     pseudoLegalMoves.clear();
+    pseudoLegalMovesSortValues.clear();
     capturingMoves.clear();
+    capturingMovesSortValues.clear();
     nonCapturingMoves.clear();
+    nonCapturingMovesSortValues.clear();
     castlingMoves.clear();
+    castlingMovesSortValues.clear();
   }
 
 }
