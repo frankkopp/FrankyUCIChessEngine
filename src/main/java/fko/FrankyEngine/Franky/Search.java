@@ -193,17 +193,15 @@ public class Search implements Runnable {
       if (searchThread == null || !searchThread.isAlive()) {
         // ponder search has finished before we stopped ot got a hit
         // need to send the result anyway althoug a miss
-        LOG.info("Pondering has been stopped after ponder search has finished. " +
-                 "Send obsolete result");
-        LOG.info("Search result was: {} PV {}",
-                 lastSearchResult.toString(), principalVariation[0].toNotationString());
+        LOG.info(
+          "Pondering has been stopped after ponder search has finished. " + "Send obsolete result");
+        LOG.info("Search result was: {} PV {}", lastSearchResult.toString(),
+                 principalVariation[0].toNotationString());
         engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
       } else {
         LOG.info("Pondering has been stopped. Ponder Miss!");
       }
       searchMode.ponderStop();
-    } else {
-      LOG.info("Search has been stopped");
     }
 
     // set stop flag - search needs to check regularly and stop accordingly
@@ -221,6 +219,8 @@ public class Search implements Runnable {
 
     // clear thread
     searchThread = null;
+
+    LOG.info("Search has been stopped");
   }
 
   @Override
@@ -258,8 +258,7 @@ public class Search implements Runnable {
       LOG.info("****** INFINITE SEARCH *******");
     }
     if (searchMode.getMate() > 0) {
-      LOG.info("****** MATE SEARCH (time: {} max depth {}) ) *******",
-               searchMode.getMoveTime(),
+      LOG.info("****** MATE SEARCH (time: {} max depth {}) ) *******", searchMode.getMoveTime(),
                searchMode.getMaxDepth());
     }
 
@@ -334,8 +333,8 @@ public class Search implements Runnable {
         }
       } else {
         LOG.info("Ponderhit when ponder search already ended. Sending result.");
-        LOG.info("Search result was: {} PV {}",
-                 lastSearchResult.toString(), principalVariation[0].toNotationString());
+        LOG.info("Search result was: {} PV {}", lastSearchResult.toString(),
+                 principalVariation[0].toNotationString());
         engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
       }
 
@@ -975,7 +974,9 @@ public class Search implements Runnable {
       // quiescence is turned of
       // if we do not have a legal move then we have a mate
       if (position.hasCheckMate()) {
-       if (isPerftSearch()) evaluate(position, ply, alpha, beta); // ignore - just count captures et al
+        if (isPerftSearch()) {
+          evaluate(position, ply, alpha, beta); // ignore - just count captures et al
+        }
         if (position.hasCheck()) {
           // We have a check mate. Return a -CHECKMATE.
           int mateValue = -Evaluation.CHECKMATE + ply;
@@ -1378,14 +1379,14 @@ public class Search implements Runnable {
   /**
    * Parameter class for the search result
    */
-  static final class SearchResult {
+  public static final class SearchResult {
 
-    int  bestMove    = Move.NOMOVE;
-    int  ponderMove  = Move.NOMOVE;
-    int  resultValue = Evaluation.NOVALUE;
-    long time        = -1;
-    int  depth       = 0;
-    int  extraDepth  = 0;
+    public int  bestMove    = Move.NOMOVE;
+    public int  ponderMove  = Move.NOMOVE;
+    public int  resultValue = Evaluation.NOVALUE;
+    public long time        = -1;
+    public int  depth       = 0;
+    public int  extraDepth  = 0;
 
     @Override
     public String toString() {
