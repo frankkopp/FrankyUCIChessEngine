@@ -325,6 +325,8 @@ public class TestMoveGenerator {
                         Evaluation.getPositionValue(board, move));
     }
 
+    System.out.println();
+
   }
 
   /**
@@ -464,8 +466,6 @@ public class TestMoveGenerator {
     final Position position =
       new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
 
-    prepare();
-
     int ROUNDS = 5;
     int ITERATIONS = 50;
     int REPETITIONS = 10000;
@@ -516,14 +516,11 @@ public class TestMoveGenerator {
 
   }
 
-  private void prepare() {
-  }
-
   private MoveList test1(final Position position) {
 
     final MoveGenerator mG = new MoveGenerator();
     mG.SORT_MOVES = false;
-    mG.SORT_CAPTURING_MOVES = false;
+    mG.SORT_CAPTURING_MOVES = true;
 
     final int killer1 = 67320564;
     final int killer2 = 67318516;

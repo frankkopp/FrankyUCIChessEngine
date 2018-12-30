@@ -25,6 +25,10 @@
 
 package fko.FrankyEngine.Franky;
 
+import sun.jvm.hotspot.utilities.IntArray;
+
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.stream.IntStream;
 
@@ -426,6 +430,7 @@ public class MoveGenerator {
    * Sort value for all moves. Smaller values heapsort first
    */
   private int getSortValue(int move) {
+
     // capturing moves
     if (!Move.getTarget(move).equals(Piece.NOPIECE)) {
       return 1000 + Move.getPiece(move).getType().getValue() -
