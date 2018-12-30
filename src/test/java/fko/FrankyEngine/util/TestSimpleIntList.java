@@ -36,9 +36,67 @@ import static org.junit.jupiter.api.Assertions.*;
 /** @author Frank */
 public class TestSimpleIntList {
 
-  private SimpleIntList _list_1;
+  /** Test boundaries of public methods */
+  @Test
+  public void testBoundaries() {
+    // Constructor
+    new SimpleIntList(100);
+    new SimpleIntList(0);
+    assertThrows(java.lang.NegativeArraySizeException.class, () -> new SimpleIntList(-1));
+    assertThrows(java.lang.NullPointerException.class, () -> new SimpleIntList(null));
+    // add
+    final SimpleIntList list = new SimpleIntList();
+    list.add(Integer.MIN_VALUE);
+    list.add(Integer.MAX_VALUE);
+    list.add(list);
+    assertThrows(java.lang.NullPointerException.class, () -> list.add(null));
+    list.addFront(list);
+    assertThrows(java.lang.NullPointerException.class, () -> list.addFront(null));
+    // get
+    SimpleIntList listGet = new SimpleIntList(0);
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listGet.get(0));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listGet.get(-1));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listGet.get(10));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listGet.getFirst());
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listGet.getLast());
+    listGet.add(Integer.MIN_VALUE);
+    listGet.add(Integer.MAX_VALUE);
+    listGet.get(1);
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listGet.get(2));
+    // set
+    SimpleIntList listSet = new SimpleIntList(0);
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSet.set(0,Integer.MAX_VALUE));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSet.set(-1, Integer.MAX_VALUE));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSet.set(10, Integer.MAX_VALUE));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSet.set(10, Integer.MAX_VALUE));
+    listSet.add(Integer.MIN_VALUE);
+    listSet.add(Integer.MAX_VALUE);
+    listSet.set(1, Integer.MAX_VALUE-1);
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSet.set(2, Integer.MAX_VALUE));
+    // remove
+    SimpleIntList listRemove = new SimpleIntList(0);
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listRemove.removeFirst());
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listRemove.removeLast());
+    // swap
+    SimpleIntList listSwap = new SimpleIntList();
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSwap.swap(0, 0));
+    listSwap.add(Integer.MIN_VALUE);
+    listSwap.add(Integer.MAX_VALUE);
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSwap.swap(0, -1));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSwap.swap(-1, 0));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSwap.swap(0, 2));
+    assertThrows(java.lang.ArrayIndexOutOfBoundsException.class, () -> listSwap.swap(2, 0));
+    listSwap.swap(0,0);
+    listSwap.swap(0,1);
+    // sort
+    SimpleIntList listSort = new SimpleIntList();
+    listSort.add(Integer.MIN_VALUE);
+    listSort.add(Integer.MAX_VALUE);
+    listSort.sort(null);
+  }
 
-  /** Test Iterator in a simple case */
+
+    /** Test Iterator in a simple case */
   @Test
   public void testGrowing() {
 

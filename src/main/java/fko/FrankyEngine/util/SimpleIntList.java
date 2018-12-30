@@ -172,13 +172,13 @@ public class SimpleIntList implements Iterable<Integer> {
    * @return element at index
    */
   public int get(int index) {
-    if (_tail <= _head) {
-      throw new ArrayIndexOutOfBoundsException("List is empty");
-    }
     if (index < 0) {
       throw new ArrayIndexOutOfBoundsException("Index < 0");
     }
-    if (_head + index > _tail) {
+    if (_tail <= _head) {
+      throw new ArrayIndexOutOfBoundsException("List is empty");
+    }
+    if (_head + index >= _tail) {
       throw new ArrayIndexOutOfBoundsException("Index too high");
     }
     return _list[_head + index];
@@ -191,19 +191,19 @@ public class SimpleIntList implements Iterable<Integer> {
    * @param j
    */
   public void swap(int i, int j) {
-    if (_tail <= _head) {
-      throw new ArrayIndexOutOfBoundsException("List is empty");
-    }
     if (i < 0) {
       throw new ArrayIndexOutOfBoundsException("Index i < 0");
-    }
-    if (_head + i > _tail) {
-      throw new ArrayIndexOutOfBoundsException("Index i too high");
     }
     if (j < 0) {
       throw new ArrayIndexOutOfBoundsException("Index j < 0");
     }
-    if (_head + j > _tail) {
+    if (_tail <= _head) {
+      throw new ArrayIndexOutOfBoundsException("List is empty");
+    }
+    if (_head + i >= _tail) {
+      throw new ArrayIndexOutOfBoundsException("Index i too high");
+    }
+    if (_head + j >= _tail) {
       throw new ArrayIndexOutOfBoundsException("Index j too high");
     }
     exchange(_head + i, _head + j);
@@ -223,7 +223,7 @@ public class SimpleIntList implements Iterable<Integer> {
     if (index < 0) {
       throw new ArrayIndexOutOfBoundsException("Index < 0");
     }
-    if (_head + index > _tail) {
+    if (_head + index >= _tail) {
       throw new ArrayIndexOutOfBoundsException("Index too high");
     }
     int old = _list[_head + index];
@@ -263,6 +263,7 @@ public class SimpleIntList implements Iterable<Integer> {
    * @return true if number has been found and pushed, false otherwise
    */
   public boolean pushToHead(int number) {
+    if (empty()) return false;
     int element = -1;
     // look for number in list
     for (int i = _head; i < _tail; i++) {
@@ -294,6 +295,7 @@ public class SimpleIntList implements Iterable<Integer> {
    * @return true if number has been found and pushed, false otherwise
    */
   public boolean pushToHeadStable(int number) {
+    if (empty()) return false;
     int element = -1;
     // look for number in list
     for (int i = _head; i < _tail; i++) {
@@ -367,9 +369,6 @@ public class SimpleIntList implements Iterable<Integer> {
   public SimpleIntList clone() {
     return new SimpleIntList(this);
   }
-  /* (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
 
   @Override
   public String toString() {
@@ -425,9 +424,7 @@ public class SimpleIntList implements Iterable<Integer> {
    * @param comparator
    */
   public void sort(Comparator<Integer> comparator) {
-    if (this.empty()) {
-      return;
-    }
+    if (this.empty()) return;
     sort(_head, _tail, comparator);
   }
 
@@ -439,8 +436,12 @@ public class SimpleIntList implements Iterable<Integer> {
    * @param comparator
    */
   private void sort(int head, int tail, Comparator<Integer> comparator) {
-    // TODO: 5000 are arbitrarly chosen - needs timing tests
-    if (tail - head < 5000) {
+    // Bigger arrays will be sorted with Arrays.sort. As Arrays.sort
+    // only accepts object[] when using a comparator we need to convert.
+    // Therefore small arrays will be sorted with local insertion sort as convertion
+    // is too expensive.
+    // TODO: 5000 are arbitrarily chosen - needs timing tests
+    if (tail - head < 5000 && comparator!=null) {
       insertionsort(head, tail, comparator);
     } else {
       final Integer[] tmp = Arrays.stream(_list).boxed().toArray(Integer[]::new);
