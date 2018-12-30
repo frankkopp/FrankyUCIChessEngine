@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -462,6 +461,8 @@ public class TestMoveGenerator {
 
     MoveList m1 = new MoveList();
     MoveList m2 = new MoveList();
+    final Position position =
+      new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
 
     prepare();
 
@@ -479,7 +480,7 @@ public class TestMoveGenerator {
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
         for (int j = 0; j < REPETITIONS; j++) {
-          m1 = test1();
+          m1 = test1(position);
         }
         end = System.nanoTime();
         sum += end - start;
@@ -491,7 +492,7 @@ public class TestMoveGenerator {
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
         for (int j = 0; j < REPETITIONS; j++) {
-          m2 = test2();
+          m2 = test2(position);
         }
         end = System.nanoTime();
         sum += end - start;
@@ -518,30 +519,28 @@ public class TestMoveGenerator {
   private void prepare() {
   }
 
-  private MoveList test1() {
-    Position position =
-      new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
+  private MoveList test1(final Position position) {
 
-    MoveGenerator mG = new MoveGenerator();
+    final MoveGenerator mG = new MoveGenerator();
     mG.SORT_MOVES = false;
+    mG.SORT_CAPTURING_MOVES = false;
 
-    int killer1 = 67320564;
-    int killer2 = 67318516;
+    final int killer1 = 67320564;
+    final int killer2 = 67318516;
     mG.setKillerMoves(new int[]{killer1, killer2});
 
     return mG.getPseudoLegalMoves(position);
 
   }
 
-  private MoveList test2() {
-    Position position =
-      new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
+  private MoveList test2(final Position position) {
 
-    MoveGenerator mG = new MoveGenerator();
+    final MoveGenerator mG = new MoveGenerator();
     mG.SORT_MOVES = true;
+    mG.SORT_CAPTURING_MOVES = true;
 
-    int killer1 = 67320564;
-    int killer2 = 67318516;
+    final int killer1 = 67320564;
+    final int killer2 = 67318516;
     mG.setKillerMoves(new int[]{killer1, killer2});
 
     return mG.getPseudoLegalMoves(position);

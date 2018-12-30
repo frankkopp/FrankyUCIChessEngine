@@ -413,8 +413,10 @@ public class MoveGenerator {
 
     } else {
       // sort only capturing moves mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
-      if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
-      pushKillerMoves(nonCapturingMoves);
+      if (SORT_CAPTURING_MOVES) {
+        capturingMoves.sort(mvvlvaComparator);
+        pushKillerMoves(nonCapturingMoves);
+      }
       pseudoLegalMoves.add(capturingMoves);
       pseudoLegalMoves.add(nonCapturingMoves);
     }
@@ -463,6 +465,7 @@ public class MoveGenerator {
 
   /**
    * Special moveListSort to use index array as comparator
+   *
    * @param moveList
    */
   private void moveListSort(MoveList moveList) {
@@ -476,7 +479,7 @@ public class MoveGenerator {
     for (int i = 0; i < moveList.size(); i++) {
       for (int j = i; j > 0; j--) {
         if (sortIdx[j] - sortIdx[j - 1] < 0) {
-          moveList.swap(j-1,j);
+          moveList.swap(j - 1, j);
           ts = sortIdx[j];
           sortIdx[j] = sortIdx[j - 1];
           sortIdx[j - 1] = ts;
