@@ -51,22 +51,22 @@ public class FrankyEngine implements IUCIEngine {
   private IUCIProtocolHandler uciProtocolHandler = null;
 
   // configuration parameters
+
   private final Configuration config = new Configuration();
-
   // the current search instance
-  private Search search;
 
+  private Search search;
   // ID of engine
+
   private String iDName   = "Franky";
   private String iDAuthor = "Frank Kopp";
-
   // options of engine
-  private List<IUCIEngine.IUCIOption> iUciOptions;
 
+  private List<IUCIEngine.IUCIOption> iUciOptions;
   // engine state
+
   private Position   position;
   private SearchMode searchMode;
-
   /**
    * Default Constructor
    */
@@ -501,6 +501,13 @@ public class FrankyEngine implements IUCIEngine {
    */
   public Search getSearch() {
     return search;
+  }
+
+  /**
+   * @return the configuration object this engine uses
+   */
+  public Configuration getConfig() {
+    return config;
   }
 
 

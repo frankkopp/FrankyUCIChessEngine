@@ -37,41 +37,41 @@ public class Configuration {
   /**
    * test the search without any pruning and count perft value
    */
-  boolean PERFT = false;
+  public boolean PERFT = false;
 
   /**
    * Hash Size
    */
-  int HASH_SIZE = 256;
+  public int HASH_SIZE = 256;
 
   /**
    * Ponder
    */
-  boolean PONDER = true;
+  public boolean PONDER = true;
 
   /**
    * Debug
    */
-  boolean DEBUG = false;
+  public boolean DEBUG = false;
 
   /**
    * UCI Options
    */
-  boolean UCI_ShowCurrLine = true;
+  public boolean UCI_ShowCurrLine = true;
 
   /**
    * If set to true we will use the opening book
    */
-  boolean USE_BOOK = true;
+  public boolean USE_BOOK = true;
 
   /**
    * value for folder to books
    */
-  String OB_FolderPath    = "/book/";
+  public String OB_FolderPath    = "/book/";
   /**
    * opening book file
    */
-  String OB_fileNamePlain = "8moves_GM_LB.pgn";
+  public String OB_fileNamePlain = "8moves_GM_LB.pgn";
   //String _OB_fileNamePlain = "book_graham.txt";
   //String _OB_fileNamePlain = "book.txt";
 
@@ -89,48 +89,48 @@ public class Configuration {
   /**
    * Do quiescence evaluation and search extension for non quiet positions
    */
-  boolean USE_QUIESCENCE = true;
+  public boolean USE_QUIESCENCE = true;
 
   /**
    * Sort root moves after iterations.
    */
-  boolean USE_ROOT_MOVES_SORT = true;
+  public boolean USE_ROOT_MOVES_SORT = true;
 
   /**
    * Push last PV move to search first position for iterations.
    */
-  boolean USE_PVS_MOVE_ORDERING = true;
+  public boolean USE_PVS_MOVE_ORDERING = true;
 
   /**
    * Use AlphaBeta Pruning
    */
-  boolean USE_ALPHABETA_PRUNING = true;
+  public boolean USE_ALPHABETA_PRUNING = true;
 
   /**
    * Principal Variation Search
    */
-  boolean USE_PVS = true;
+  public boolean USE_PVS = true;
 
   /**
    * Use Transposition Tables for visited nodes (needs extra memory)
    */
-  boolean USE_TRANSPOSITION_TABLE = true;
+  public boolean USE_TRANSPOSITION_TABLE = true;
 
   /**
    * Mate Distance Pruning
    */
-  boolean USE_MATE_DISTANCE_PRUNING = true;
+  public boolean USE_MATE_DISTANCE_PRUNING = true;
 
   /**
    * Minor Promotion Pruning
    */
-  boolean USE_MINOR_PROMOTION_PRUNING = true;
+  public boolean USE_MINOR_PROMOTION_PRUNING = true;
 
   /**
    * Null Move Pruning
    */
-  boolean USE_NULL_MOVE_PRUNING            = true;
-  int     NULL_MOVE_DEPTH                  = 2;
+  public boolean USE_NULL_MOVE_PRUNING            = true;
+  public int     NULL_MOVE_DEPTH                  = 2;
   //boolean USE_VERIFY_NMP                   = false;
   //int     NULL_MOVE_REDUCTION_VERIFICATION = 3;
 
@@ -139,28 +139,28 @@ public class Configuration {
    * Reverse Futility Pruning
    * https://www.chessprogramming.org/Reverse_Futility_Pruning
    */
-  boolean USE_STATIC_NULL_PRUNING    = true;
-  int     STATIC_NULL_PRUNING_DEPTH  = 2;
-  int     STATIC_NULL_PRUNING_MARGIN = 300;
+  public boolean USE_STATIC_NULL_PRUNING    = true;
+  public int     STATIC_NULL_PRUNING_DEPTH  = 2;
+  public int     STATIC_NULL_PRUNING_MARGIN = 300;
 
   /**
    * Razor  - early qsearch for low static evals
    */
-  boolean USE_RAZOR_PRUNING    = true;
-  int     RAZOR_PRUNING_DEPTH  = 3;
-  int     RAZOR_PRUNING_MARGIN = 600;
+  public boolean USE_RAZOR_PRUNING    = true;
+  public int     RAZOR_PRUNING_DEPTH  = 3;
+  public int     RAZOR_PRUNING_MARGIN = 600;
 
   /**
    * Killer moves - move which caused cut offs in previous iterations
    */
-  boolean USE_KILLER_MOVES = true;
+  public boolean USE_KILLER_MOVES = true;
 
   /**
    * Experimental sorting of moves in move generation.
    * Generating moves already has good ordering - extra sorting is expensive
    * and extra sorting can be worse than standard sorting
    */
-  boolean USE_SORT_ALL_MOVES = true;
+  public boolean USE_SORT_ALL_MOVES = true;
 
 
 
@@ -169,7 +169,7 @@ public class Configuration {
   /**
    * Use Aspiration Window in root search
    */
-  boolean USE_ASPIRATION_WINDOW = false;
+  public boolean USE_ASPIRATION_WINDOW = false;
 
 
   @Override
