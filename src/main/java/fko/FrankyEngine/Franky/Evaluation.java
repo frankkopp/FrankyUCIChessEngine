@@ -115,6 +115,7 @@ public class Evaluation {
   /**
    * Sets the reference to the position this evaluation operates on.
    * <p>
+   *
    * @param position
    */
   private void setPosition(final Position position) {
@@ -756,8 +757,8 @@ public class Evaluation {
    * In rare cases were through pawn promotions more officers than the opening position
    * are present the value is at maximum 24.
    *
-   * @return a value depending on officer midGameMaterial of both sides between 0 and 24
    * @param position
+   * @return a value depending on officer midGameMaterial of both sides between 0 and 24
    */
   public int getGamePhaseFactor(Position position) {
     setPosition(position);
@@ -787,8 +788,8 @@ public class Evaluation {
   }
 
   /**
-   * @return material balance from the view of the active player
    * @param position
+   * @return material balance from the view of the active player
    */
   public int material(Position position) {
     // clear old values
@@ -886,38 +887,42 @@ public class Evaluation {
     final int tableIndex =
       nextToMove == WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
 
-    int midGame = 0;
-    int endGame = 0;
+    final int midGame;
+    final int endGame;
 
     switch (Move.getPiece(move).getType()) {
       case PAWN:
-        midGame += pawnsMidGame[tableIndex];
-        endGame += pawnsEndGame[tableIndex];
+        midGame = pawnsMidGame[tableIndex];
+        endGame = pawnsEndGame[tableIndex];
         break;
       case KNIGHT:
-        midGame += knightMidGame[tableIndex];
-        endGame += knightEndGame[tableIndex];
+        midGame = knightMidGame[tableIndex];
+        endGame = knightEndGame[tableIndex];
         break;
       case BISHOP:
-        midGame += bishopMidGame[tableIndex];
-        endGame += bishopEndGame[tableIndex];
+        midGame = bishopMidGame[tableIndex];
+        endGame = bishopEndGame[tableIndex];
         break;
       case ROOK:
-        midGame += rookMidGame[tableIndex];
-        endGame += rookEndGame[tableIndex];
+        midGame = rookMidGame[tableIndex];
+        endGame = rookEndGame[tableIndex];
         break;
       case QUEEN:
-        midGame += queenMidGame[tableIndex];
-        endGame += queenEndGame[tableIndex];
+        midGame = queenMidGame[tableIndex];
+        endGame = queenEndGame[tableIndex];
         break;
       case KING:
-        midGame += kingMidGame[tableIndex];
-        endGame += kingEndGame[tableIndex];
+        midGame = kingMidGame[tableIndex];
+        endGame = kingEndGame[tableIndex];
         break;
-
+      default:
+        midGame = 0;
+        endGame = 0;
+        break;
     }
 
     // @formatter:off
+    // TODO: can be calculated in position and cached
     final int gamePhaseFactor = Math.min(GAME_PHASE_MAX,
                  position.getKnightSquares()[WHITE].size() +
                  position.getKnightSquares()[BLACK].size() +
@@ -930,7 +935,7 @@ public class Evaluation {
     // @formatter:on
 
     return midGame * (gamePhaseFactor / GAME_PHASE_MAX) +
-                    endGame * (1 - gamePhaseFactor / GAME_PHASE_MAX);
+           endGame * (1 - gamePhaseFactor / GAME_PHASE_MAX);
 
   }
 }
