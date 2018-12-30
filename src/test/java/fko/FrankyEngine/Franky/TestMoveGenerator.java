@@ -467,8 +467,8 @@ public class TestMoveGenerator {
       new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
 
     int ROUNDS = 5;
-    int ITERATIONS = 50;
-    int REPETITIONS = 10000;
+    int ITERATIONS = 25;
+    int REPETITIONS = 20000;
 
     for (int round=0; round<ROUNDS; round++) {
       long start=0, end=0, sum=0;

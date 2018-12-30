@@ -159,8 +159,12 @@ public class Configuration {
    * Experimental sorting of moves in move generation.
    * Generating moves already has good ordering - extra sorting is expensive
    * and extra sorting can be worse than standard sorting
+   *
+   * TODO: too slow yet
+   *  Round 4 Test 1 avg: 0,085 sec // OFF
+   *  Round 4 Test 2 avg: 0,174 sec // ON
    */
-  public boolean USE_SORT_ALL_MOVES = true;
+  public boolean USE_SORT_ALL_MOVES = false;
 
 
 
