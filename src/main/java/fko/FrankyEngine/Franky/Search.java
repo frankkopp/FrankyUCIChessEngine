@@ -200,12 +200,12 @@ public class Search implements Runnable {
     // stop pondering if we are
     if (searchMode.isPonder()) {
       if (searchThread == null || !searchThread.isAlive()) {
-        // ponder search has finished before we stopped
-        // need to send the result anyway although a miss
-        LOG.info(
-          "Pondering has been stopped after ponder search has finished. " + "Send obsolete result");
-        LOG.info("Search result was: {} PV {}", lastSearchResult.toString(),
-                 principalVariation[0].toNotationString());
+        // ponder search has finished before we stopped ot got a hit
+        // need to send the result anyway althoug a miss
+        LOG.info("Pondering has been stopped after ponder search has finished. " +
+                 "Send obsolete result");
+        LOG.info("Search result was: {} PV {}",
+                 lastSearchResult.toString(), principalVariation[0].toNotationString());
         engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
       } else {
         LOG.info("Pondering has been stopped. Ponder Miss!");
@@ -245,6 +245,9 @@ public class Search implements Runnable {
       LOG.info("****** PERFT SEARCH (" + searchMode.getMaxDepth() + ") *******");
     }
     if (searchMode.isTimeControl() && searchMode.getMate() <= 0) {
+      LOG.info("****** TIMED SEARCH *******");
+    }
+    if (searchMode.isTimeControl()) {
       LOG.info("****** TIMED SEARCH *******");
     }
     if (searchMode.isPonder()) {
@@ -318,28 +321,20 @@ public class Search implements Runnable {
     if (searchMode.isPonder()) {
       LOG.info("****** PONDERHIT *******");
       if (isSearching()) {
-
         LOG.info("Ponderhit when ponder search still running. Continue searching.");
-
         startTime = System.currentTimeMillis();
-        configureTimeLimits();
-        LOG.debug("Ponderhit: time configured soft: {} hard: {}", softTimeLimit, hardTimeLimit);
-
         searchMode.ponderHit();
-        LOG.debug("Ponderhit: reset searchMode");
-        if (searchMode.isTimeControl()) {
-          LOG.debug("Ponderhit: is time controlled");
-        }
-
         String threadName = "Engine: " + myColor.toString();
         threadName += " (PHit)";
-        if (searchThread != null && searchThread.isAlive()) searchThread.setName(threadName);
-        LOG.debug("Ponderhit: renamed thread");
-
+        searchThread.setName(threadName);
+        // if time based game setup the time soft and hard time limits
+        if (searchMode.isTimeControl()) {
+          configureTimeLimits();
+        }
       } else {
         LOG.info("Ponderhit when ponder search already ended. Sending result.");
-        LOG.info("Search result was: {} PV {}", lastSearchResult.toString(),
-                 principalVariation[0].toNotationString());
+        LOG.info("Search result was: {} PV {}",
+                 lastSearchResult.toString(), principalVariation[0].toNotationString());
         engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
       }
 

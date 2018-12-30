@@ -144,7 +144,8 @@ public class TestSearch {
   public void testBasicTimeControl_TimePerMove() {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 2000, null, false, false, false);
+    SearchMode searchMode =
+      new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 2000, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -157,8 +158,6 @@ public class TestSearch {
     String fen;
     Position position;
     SearchMode searchMode;
-
-    //search.config.USE_QUIESCENCE = false;
 
     // mate in 2 (3 plys)
     fen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1"; // Position
@@ -198,7 +197,8 @@ public class TestSearch {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
     SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 2, Arrays.asList("h2h4"), false, false, false);
+      new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 2,
+                     Arrays.asList("h2h4"), false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -249,6 +249,7 @@ public class TestSearch {
     search.startSearch(position, searchMode);
     Thread.sleep(1000);
     search.stopSearch();
+    // new search
     position = new Position(fen);
     position.makeMove(Move.fromUCINotation(position, "e2e4"));
     position.makeMove(Move.fromUCINotation(position, "c7c5"));
@@ -263,7 +264,6 @@ public class TestSearch {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
     position.makeMove(Move.fromUCINotation(position, "e2e4"));
-
     // Test start and stop search
     for (int i = 0; i < 10; i++) {
       SearchMode searchMode =
@@ -319,16 +319,16 @@ public class TestSearch {
 
     long[][] perftResults = {
       // @formatter:off
-    //N  Nodes        Captures   EP      Checks    Mates
-    { 0, 1,           0,         0,      0,        0},
-    { 1, 20,          0,         0,      0,        0},
-    { 2, 400,         0,         0,      0,        0},
-    { 3, 8902,        34,        0,      12,       0},
-    { 4, 197281,      1576,      0,      469,      8},
-    { 5, 4865609,     82719,     258,    27351,    347},
-    { 6, 119060324,   2812008,   5248,   809099,   10828},
-    { 7, 3195901860L, 108329926, 319617, 33103848, 435816 }};
-    // @formatter:on
+      //N  Nodes        Captures   EP      Checks    Mates
+      { 0, 1,           0,         0,      0,        0},
+      { 1, 20,          0,         0,      0,        0},
+      { 2, 400,         0,         0,      0,        0},
+      { 3, 8902,        34,        0,      12,       0},
+      { 4, 197281,      1576,      0,      469,      8},
+      { 5, 4865609,     82719,     258,    27351,    347},
+      { 6, 119060324,   2812008,   5248,   809099,   10828},
+      { 7, 3195901860L, 108329926, 319617, 33103848, 435816 }};
+      // @formatter:on
 
     final int depth = 5;
     LOG.info("Start PERFT Test for depth {}", depth);
