@@ -170,7 +170,7 @@ public class Evaluation {
 
     // GamePhase - a value between 0 and 24 depending on officer midGameMaterial of
     // the position
-    gamePhaseFactor = getGamePhaseFactor();
+    gamePhaseFactor = getGamePhaseFactor(position);
 
     /*
      * Ideally evaluate in 3 Stages to avoid doing certain loop multiple times
@@ -760,30 +760,25 @@ public class Evaluation {
    * @param position
    * @return a value depending on officer midGameMaterial of both sides between 0 and 24
    */
-  public int getGamePhaseFactor(Position position) {
-    setPosition(position);
-    return getGamePhaseFactor();
-  }
-
-  private int getGamePhaseFactor() {
+  public static int getGamePhaseFactor(Position position) {
 
     // protect against null position
-    if (this.position == null) {
-      IllegalStateException e = new IllegalStateException();
+    if (position == null) {
+      IllegalArgumentException e = new IllegalArgumentException();
       LOG.error("No position to evaluate. Set position before calling this", e);
       throw e;
     }
 
     // @formatter:off
     return Math.min(GAME_PHASE_MAX,
-                    knightSquares[WHITE].size() +
-                    knightSquares[BLACK].size() +
-                    bishopSquares[WHITE].size() +
-                    bishopSquares[BLACK].size() +
-                    2 * rookSquares[WHITE].size() +
-                    2 * rookSquares[BLACK].size() +
-                    4 * queenSquares[WHITE].size() +
-                    4 * queenSquares[BLACK].size());
+                    position.getKnightSquares()[WHITE].size() +
+                    position.getKnightSquares()[BLACK].size() +
+                    position.getBishopSquares()[WHITE].size() +
+                    position.getBishopSquares()[BLACK].size() +
+                    2 * position.getRookSquares()[WHITE].size() +
+                    2 * position.getRookSquares()[BLACK].size() +
+                    4 * position.getQueenSquares()[WHITE].size() +
+                    4 * position.getQueenSquares()[BLACK].size());
     // @formatter:on
   }
 
@@ -921,18 +916,7 @@ public class Evaluation {
         break;
     }
 
-    // @formatter:off
-    // TODO: can be calculated in position and cached
-    final int gamePhaseFactor = Math.min(GAME_PHASE_MAX,
-                 position.getKnightSquares()[WHITE].size() +
-                 position.getKnightSquares()[BLACK].size() +
-                 position.getBishopSquares()[WHITE].size() +
-                 position.getBishopSquares()[BLACK].size() +
-             2 * position.getRookSquares()[WHITE].size() +
-             2 * position.getRookSquares()[BLACK].size() +
-             4 * position.getQueenSquares()[WHITE].size() +
-             4 * position.getQueenSquares()[BLACK].size());
-    // @formatter:on
+    final int gamePhaseFactor = getGamePhaseFactor(position);
 
     return midGame * (gamePhaseFactor / GAME_PHASE_MAX) +
            endGame * (1 - gamePhaseFactor / GAME_PHASE_MAX);
