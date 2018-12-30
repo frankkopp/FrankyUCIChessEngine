@@ -312,6 +312,52 @@ public class TestSearch {
   }
 
   @Test
+  public void test3FoldRep() {
+    String fen = "8/p3Q1bk/1p4p1/5q2/P1N2p2/1P5p/2b4P/6K1 w - - 0 38";
+    Position position = new Position(fen);
+    position.makeMove(Move.fromUCINotation(position, "e7h4")); // #1
+    position.makeMove(Move.fromUCINotation(position, "h7g8"));
+    position.makeMove(Move.fromUCINotation(position, "h4d8"));
+    position.makeMove(Move.fromUCINotation(position, "g8h7"));
+    position.makeMove(Move.fromUCINotation(position, "d8h4")); // #2
+    position.makeMove(Move.fromUCINotation(position, "h7g8"));
+    position.makeMove(Move.fromUCINotation(position, "h4d8"));
+    position.makeMove(Move.fromUCINotation(position, "g8h7"));
+    // next white move would be 3-fold draw
+
+    SearchMode searchMode =
+      new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 1000, null, false, false, false);
+    search.startSearch(position, searchMode);
+    waitWhileSearching();
+    assertEquals("d8h4", Move.toSimpleString(search.getLastSearchResult().bestMove));
+    assertEquals(0, search.getLastSearchResult().resultValue);
+    LOG.warn("Best Move: {} Value: {} Ponder {}",
+             Move.toSimpleString(search.getLastSearchResult().bestMove),
+             search.getLastSearchResult().resultValue / 100f,
+             Move.toSimpleString(search.getLastSearchResult().ponderMove));
+
+    position = new Position(fen);
+    position.makeMove(Move.fromUCINotation(position, "e7h4")); // #1
+    position.makeMove(Move.fromUCINotation(position, "h7g8"));
+    position.makeMove(Move.fromUCINotation(position, "h4d8"));
+    position.makeMove(Move.fromUCINotation(position, "g8h7"));
+    position.makeMove(Move.fromUCINotation(position, "d8h4")); // #2
+    position.makeMove(Move.fromUCINotation(position, "h7g8"));
+    position.makeMove(Move.fromUCINotation(position, "h4d8"));
+    // black should not move Kg8 as this would enable white to  3-fold repetition
+    // although black is winning
+
+    search.startSearch(position, searchMode);
+    waitWhileSearching();
+    assertEquals("g7f8", Move.toSimpleString(search.getLastSearchResult().bestMove));
+    LOG.warn("Best Move: {} Value: {} Ponder {}",
+             Move.toSimpleString(search.getLastSearchResult().bestMove),
+             search.getLastSearchResult().resultValue / 100f,
+             Move.toSimpleString(search.getLastSearchResult().ponderMove));
+
+  }
+
+  @Test
   public void perftTest() {
 
     long[][] perftResults = {
