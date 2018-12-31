@@ -51,7 +51,9 @@ public class Search implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Search.class);
 
-  public static final int MAX_SEARCH_DEPTH = 100;
+  public static final int MAX_SEARCH_DEPTH = 128;
+
+  public static final int UCI_UPDATE_INTERVAL = 500;
 
   // Readability constants
   private static final boolean DO_NULL  = true;
@@ -1322,7 +1324,7 @@ public class Search implements Runnable {
 
   private void sendUCIUpdate(final Position position) {
     // send current root move info to UCI every x milli seconds
-    if (System.currentTimeMillis() - uciUpdateTicker >= 250) {
+    if (System.currentTimeMillis() - uciUpdateTicker >= UCI_UPDATE_INTERVAL) {
       // @formatter:off
       engine.sendInfoToUCI("depth " + searchCounter.currentSearchDepth
                              + " seldepth " + searchCounter.currentExtraSearchDepth

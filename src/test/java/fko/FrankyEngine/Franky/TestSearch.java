@@ -549,14 +549,6 @@ public class TestSearch {
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
     LOG.warn(search.getSearchCounter().toString());
 
-    search.startSearch(position, searchMode);
-    waitWhileSearching();
-    LOG.warn("Best Move: {} Value: {} Ponder {}",
-             Move.toSimpleString(search.getLastSearchResult().bestMove),
-             search.getLastSearchResult().resultValue / 100f,
-             Move.toSimpleString(search.getLastSearchResult().ponderMove));
-    LOG.warn(search.getSearchCounter().toString());
-
     //    depth = 4;
     //    fen = "1k3r2/pp6/3p4/8/8/n5B1/5PPP/5RK1 w - - 0 1"; // bm Bxd6+
     //    position = new Position(fen);

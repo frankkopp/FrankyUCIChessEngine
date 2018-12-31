@@ -67,7 +67,7 @@ public class Evaluation {
   public static final int MAX                 = 10000;
   public static final int DRAW                = 0;
   public static final int CHECKMATE           = MAX;
-  public static final int CHECKMATE_THRESHOLD = CHECKMATE - 100;
+  public static final int CHECKMATE_THRESHOLD = CHECKMATE - Search.MAX_SEARCH_DEPTH;
 
   // Convenience constants
   private static final int GAME_PHASE_MAX = 24;
