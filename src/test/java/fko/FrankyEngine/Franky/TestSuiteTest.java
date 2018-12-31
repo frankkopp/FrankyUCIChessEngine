@@ -74,6 +74,13 @@ public class TestSuiteTest {
   }
 
   @Test
+  @Disabled
+  void startTestSuite() {
+    testSuite.setSearchTime(5000);
+    testSuite.startTests();
+  }
+
+  @Test
   void startOneTest() {
 
     // bm test time limited
@@ -115,13 +122,6 @@ public class TestSuiteTest {
       testSuite
         .startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;",
                       5000, 16));
-  }
-
-  @Test
-  @Disabled
-  void startTestSuite() {
-    testSuite.setSearchTime(5000);
-    testSuite.startTests();
   }
 
 }
