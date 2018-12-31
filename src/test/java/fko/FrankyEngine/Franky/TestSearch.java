@@ -530,16 +530,25 @@ public class TestSearch {
     search.config.USE_KILLER_MOVES = true;
     search.config.USE_LMR = true;
 
-    int maxDepth = 6;
+    int maxDepth = 9;
     int moveTime = 0;
     int mateIn = 0;
     boolean infinite = true;
 
     fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+    fen = "r2q1rk1/1p1nbppp/3p1n2/1Pp2b2/p1P5/2N1Pp1P/PBNPB1P1/R2Q1RK1 w - -";
     //fen = "4k3/4p3/8/8/8/8/8/3KQ3 w - -";
     position = new Position(fen);
     searchMode =
       new SearchMode(0, 0, 0, 0, 0, maxDepth, 0, mateIn, moveTime, null, false, infinite, false);
+    search.startSearch(position, searchMode);
+    waitWhileSearching();
+    LOG.warn("Best Move: {} Value: {} Ponder {}",
+             Move.toSimpleString(search.getLastSearchResult().bestMove),
+             search.getLastSearchResult().resultValue / 100f,
+             Move.toSimpleString(search.getLastSearchResult().ponderMove));
+    LOG.warn(search.getSearchCounter().toString());
+
     search.startSearch(position, searchMode);
     waitWhileSearching();
     LOG.warn("Best Move: {} Value: {} Ponder {}",

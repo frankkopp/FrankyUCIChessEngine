@@ -44,9 +44,7 @@ import java.util.concurrent.CountDownLatch;
  * the search is finished it calls <code>engine.sendResult</code> ith the best move and a ponder
  * move if it has one.
  * <p>
- * DONE: KILLER Moves - search quiet moves previously causing cut-offs first
  * TODO: ASPIRATION WINDOWS
- * TODO: LMR (Late Move Reduction)
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  */
 public class Search implements Runnable {
@@ -701,7 +699,6 @@ public class Search implements Runnable {
     // TT Lookup
     int ttValue = probeTT(position, ply, depthLeft, alpha, beta);
     if (ttValue != Evaluation.NOVALUE) {
-      assert (ttValue != Evaluation.MIN);
       // in PV node only return ttValue if it was an exact hit
       if (!pvNode || (alpha < ttValue && ttValue < beta)) {
         return ttValue;
@@ -731,7 +728,7 @@ public class Search implements Runnable {
     ) {
       final int evalMargin = config.STATIC_NULL_PRUNING_MARGIN * depthLeft;
       if (staticEval - evalMargin > beta ){
-        return staticEval - evalMargin;
+        return beta; // fail-hard / fail-soft: staticEval - evalMargin;
       }
     }
     // @formatter:on
@@ -768,7 +765,7 @@ public class Search implements Runnable {
       // pruning
       if (nullValue >= beta) {
         searchCounter.nullMovePrunings++;
-        return nullValue;
+        return beta; // fail-hard, fail-soft: nullValue;
       }
     }
     // NULL MOVE PRUNING
@@ -797,9 +794,7 @@ public class Search implements Runnable {
     int numberOfSearchedMoves = 0;
 
     // Generate moves
-    if (config.USE_KILLER_MOVES) {
-      moveGenerators[ply].setKillerMoves(killerMoves[ply]);
-    }
+    if (config.USE_KILLER_MOVES) moveGenerators[ply].setKillerMoves(killerMoves[ply]);
     MoveList moves = moveGenerators[ply].getPseudoLegalMoves(position);
     searchCounter.movesGenerated += moves.size();
 
@@ -885,17 +880,13 @@ public class Search implements Runnable {
 
         // In a non root node we need to establish a best move for this ply
         // by using the first move (b/o good move sorting).
-        // We will the try to prove that all other moves are worse or at best equal
+        // We will then try to prove that all other moves are worse or at best equal
         // to alpha with a null window search. Alpha might have been set in a previous
         // sibling node. If we do not find a better move we can go to the next move.
         // If we found a better move we need to re-search the move to get the exact
         // value.
 
         value = -search(position, depthLeft - 1, ply + 1, -beta, -alpha, PV_NODE, DO_NULL);
-
-        // to make sure we have at least one best move in this ply
-        //if (principalVariation[ply].empty())
-        //  MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
 
       } else {
 
@@ -933,8 +924,9 @@ public class Search implements Runnable {
         bestNodeValue = value;
         bestNodeMove = move;
 
-        // If we found a move that is better or equal than beta this mean that the
-        // opponent can/will avoid this move altogether so we can stop search this node
+        // If we found a move that is better or equal than beta this means that the
+        // opponent can/will avoid this position altogether so we can stop search
+        // this node
         if (value >= beta) { // fail-high
           if (config.USE_ALPHABETA_PRUNING) {
             // save killer moves so they will be search earlier on following nodes
@@ -969,7 +961,7 @@ public class Search implements Runnable {
 
     // TODO: what happens when we never find a move higher then alpha in this ply??
     if (principalVariation[ply].empty()) {
-      int stop=1; // just to set a breakpoint while debugging
+      int stop = 1; // just to set a breakpoint while debugging
     }
 
     // if we did not have a legal move then we have a mate
@@ -1055,7 +1047,7 @@ public class Search implements Runnable {
       // Standing Pat
       if (value > alpha) {
         if (value >= beta) {
-          return value; // TODO: value or beta???
+          return beta; // fail-hard, fail-soft: value
         }
         alpha = value;
       }
@@ -1064,22 +1056,19 @@ public class Search implements Runnable {
     // needed to remember if we even had a legal move
     int numberOfSearchedMoves = 0;
 
-    // TODO QUIESCENCE
-    // TODO Check that there is no endless qsearch due to
-    // TODO endless captures or checks
-
     // Generate all PseudoLegalMoves for QSearch
     // Usually only capture moves and check evasions
     // will be determined in move generator
-    MoveList moves;
-    moves = moveGenerators[ply].getPseudoLegalQSearchMoves(position);
+    MoveList moves = moveGenerators[ply].getPseudoLegalQSearchMoves(position);
     searchCounter.movesGenerated += moves.size();
 
     // if we have already a PV move from the last iteration push it to the head
     // of the move list to be evaluated first for more cutoffs
     if (config.USE_PVS_MOVE_ORDERING) {
-      if (principalVariation[ply].size() > 0) {
-        moves.pushToHeadStable(principalVariation[ply].getFirst());
+      if (!principalVariation[0].empty()) {
+        if (principalVariation[0].size() > ply) {
+          moves.pushToHeadStable(principalVariation[0].get(ply));
+        }
       }
     }
 
@@ -1213,25 +1202,17 @@ public class Search implements Runnable {
 
   private void storeTT(final Position position, final int depthLeft, final TT_EntryType ttType,
                        final int value) {
+
     if (config.USE_TRANSPOSITION_TABLE && !isPerftSearch() && !stopSearch) {
       transpositionTable.put(position, value, ttType, depthLeft);
-      // if (Math.abs(value) > Evaluation.CHECKMATE - MAX_SEARCH_DEPTH &&
-      //   ttType == TT_EntryType.EXACT) {
-      //   // LOG.debug("STORE: ttType: {} ttValue: {} ttDepth: {} Depthleft: {}", ttType,
-      //   value,
-      //   // depthLeft, depthLeft);
-      // }
     }
   }
 
   private int probeTT(final Position position, final int ply, final int depthLeft, final int alpha,
                       final int beta) {
-    TT_Entry ttEntry;
-
-    // TODO: MATE value might need correction
 
     if (config.USE_TRANSPOSITION_TABLE && !isPerftSearch()) {
-      ttEntry = transpositionTable.get(position);
+      TT_Entry ttEntry = transpositionTable.get(position);
 
       if (ttEntry != null) {
         // hit
