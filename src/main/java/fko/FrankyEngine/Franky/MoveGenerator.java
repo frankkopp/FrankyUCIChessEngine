@@ -25,6 +25,8 @@
 
 package fko.FrankyEngine.Franky;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Comparator;
 import java.util.stream.IntStream;
 
@@ -210,10 +212,25 @@ public class MoveGenerator {
    * moves out of the provided list by checking each move if it leaves the king in check.<br>
    *
    * @param position
+   * @param fullSort true if list should sorted in full, false provides only pre-sorted list
+   * @return legal moves
+   */
+  public IntStream streamLegalMoves(Position position, boolean fullSort) {
+    return this.getLegalMoves(position, fullSort).stream();
+  }
+
+  /**
+   * Streams <b>all</b> legal moves for a position.<br>
+   * Legal moves have been checked if they leave the king in check or not. Repeated calls to this
+   * will return a cached list as long the position has not changed in between.<br>
+   * This method basically calls <code>getPseudoLegalMoves</code> and then filters the non legal
+   * moves out of the provided list by checking each move if it leaves the king in check.<br>
+   *
+   * @param position
    * @return legal moves
    */
   public IntStream streamLegalMoves(Position position) {
-    return this.getLegalMoves(position).stream();
+    return this.getLegalMoves(position, false).stream();
   }
 
   /**
@@ -227,9 +244,10 @@ public class MoveGenerator {
    * Make a clone if this is not desired.
    *
    * @param position
+   * @param fullSort true if list should sorted in full, false provides only pre-sorted list
    * @return reference to a list of legal moves
    */
-  public MoveList getLegalMoves(Position position) {
+  public MoveList getLegalMoves(Position position, boolean fullSort) {
     if (position == null) {
       throw new IllegalArgumentException("position may not be null to generate moves");
     }
@@ -250,8 +268,26 @@ public class MoveGenerator {
       if (isLegalMove(move)) legalMoves.add(move);
     }
 
-    // return a clone of the list as we will continue to use the list as a static list
+    if (fullSort) moveListSort(legalMoves);
+
     return legalMoves;
+  }
+
+  /**
+   * Generates <b>all</b> legal moves for a position. Legal moves have been checked if they leave
+   * the king in check or not. Repeated calls to this will return a cached list as long the position
+   * has not changed in between.<br>
+   * This method basically calls <code>getPseudoLegalMoves</code> and the filters the non legal
+   * moves out of the provided list by checking each move if it leaves the king in check.<br>
+   * <b>Attention:</b> returns a reference to the list of move which will change after calling this
+   * again.<br>
+   * Make a clone if this is not desired.
+   *
+   * @param position
+   * @return reference to a list of legal moves
+   */
+  public MoveList getLegalMoves(Position position) {
+    return getLegalMoves(position, false);
   }
 
   /**
