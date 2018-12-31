@@ -129,8 +129,8 @@ public class Configuration {
   /**
    * Null Move Pruning
    */
-  public boolean USE_NULL_MOVE_PRUNING            = true;
-  public int     NULL_MOVE_DEPTH                  = 2;
+  public boolean USE_NULL_MOVE_PRUNING = true;
+  public int     NULL_MOVE_DEPTH       = 2;
   //boolean USE_VERIFY_NMP                   = false;
   //int     NULL_MOVE_REDUCTION_VERIFICATION = 3;
 
@@ -159,14 +159,24 @@ public class Configuration {
    * Experimental sorting of moves in move generation.
    * Generating moves already has good ordering - extra sorting is expensive
    * and extra sorting can be worse than standard sorting
-   *
+   * <p>
    * TODO: too slow yet
-   *  Round 4 Test 1 avg: 0,085 sec // OFF
-   *  Round 4 Test 2 avg: 0,174 sec // ON
+   * Round 4 Test 1 avg: 0,085 sec // OFF
+   * Round 4 Test 2 avg: 0,174 sec // ON
+   * Same depth search:
+   * Round 2 Test 1 avg: 18,033 sec
+   *  Nodes visited: 6.508.055 Boards Evaluated: 6.449.511
+   * Round 2 Test 2 avg: 25,571 sec
+   *  Nodes visited: 6.625.362 Boards Evaluated: 6.566.329
    */
   public boolean USE_SORT_ALL_MOVES = false;
 
-
+  /**
+   * Late Move Reduction
+   */
+  public boolean USE_LMR       = true;
+  public int     LMR_MIN_DEPTH = 2;
+  public int     LMR_REDUCTION = 1;
 
   // TODO vvvvvvvv
 

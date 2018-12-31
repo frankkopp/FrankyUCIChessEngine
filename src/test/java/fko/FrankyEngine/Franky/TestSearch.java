@@ -399,6 +399,8 @@ public class TestSearch {
     List<String> resultStrings = new ArrayList<>();
     List<String> fens = new ArrayList<>();
 
+    search.config.USE_BOOK = false;
+
     LOG.info("Start SIZE Test for depth {}", depth);
 
     fens.add(Position.STANDARD_BOARD_FEN);
@@ -406,6 +408,10 @@ public class TestSearch {
     fens.add("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -");
     fens.add("r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -");
     fens.add("1r1r2k1/2p1qp1p/6p1/ppQB1b2/5Pn1/2R1P1P1/PP5P/R1B3K1 b - -");
+
+    measureTreeSize(new Position(),
+                    new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false),
+                    resultStrings, "WARM UP", true);
 
     for (String fen : fens) {
       resultStrings.add("");
@@ -439,51 +445,43 @@ public class TestSearch {
     search.config.USE_KILLER_MOVES = false;
     search.config.USE_STATIC_NULL_PRUNING = false;
     search.config.USE_RAZOR_PRUNING = false;
-    search.config.USE_SORT_ALL_MOVES = false;
+    //search.config.USE_SORT_ALL_MOVES = false;
+    search.config.USE_LMR = false;
 
-    measureTreeSize(position, searchMode, values, "WARM UP", true);
     measureTreeSize(position, searchMode, values, "REFERENCE", true);
+
+    search.config.USE_ALPHABETA_PRUNING = true;
+    search.config.USE_ROOT_MOVES_SORT = true;
+    search.config.USE_PVS = true;
+    search.config.USE_PVS_MOVE_ORDERING = true;
+    measureTreeSize(position, searchMode, values, "BASE", true);
 
     //    search.config.USE_ASPIRATION_WINDOW = true;
     //    measureTreeSize(position, searchMode, values, "Aspiration", true);
 
-    search.config.USE_ALPHABETA_PRUNING = true;
-    measureTreeSize(position, searchMode, values, "AlphaBeta", true);
-
-    search.config.USE_ROOT_MOVES_SORT = true;
-    measureTreeSize(position, searchMode, values, "RootMoveSort", true);
-
-    search.config.USE_PVS = true;
-    measureTreeSize(position, searchMode, values, "PVS", true);
-
-    search.config.USE_SORT_ALL_MOVES = true;
-    measureTreeSize(position, searchMode, values, "SORTALL", true);
-
-    search.config.USE_MATE_DISTANCE_PRUNING = true;
-    measureTreeSize(position, searchMode, values, "MDP", true);
-
-    search.config.USE_MINOR_PROMOTION_PRUNING = true;
-    measureTreeSize(position, searchMode, values, "MPP", true);
-
-    search.config.USE_PVS_MOVE_ORDERING = true;
-    measureTreeSize(position, searchMode, values, "PVS_ORDER", true);
-
     search.config.USE_KILLER_MOVES = true;
     measureTreeSize(position, searchMode, values, "KILLER_PUSH", true);
+
+    //search.config.USE_SORT_ALL_MOVES = true;
+    //measureTreeSize(position, searchMode, values, "SORTALL", true);
+
+    search.config.USE_MATE_DISTANCE_PRUNING = true;
+    search.config.USE_MINOR_PROMOTION_PRUNING = true;
+    measureTreeSize(position, searchMode, values, "MDP/MPP", true);
 
     search.config.USE_NULL_MOVE_PRUNING = true;
     measureTreeSize(position, searchMode, values, "NMP", true);
 
-    search.config.USE_STATIC_NULL_PRUNING = true;
-    measureTreeSize(position, searchMode, values, "STATIC_NULL", true);
+    search.config.USE_LMR = true;
+    measureTreeSize(position, searchMode, values, "LMR", true);
 
+    search.config.USE_STATIC_NULL_PRUNING = true;
     search.config.USE_RAZOR_PRUNING = true;
-    measureTreeSize(position, searchMode, values, "RAZOR", true);
+    measureTreeSize(position, searchMode, values, "STATIC/RAZOR", true);
 
     search.config.USE_TRANSPOSITION_TABLE = true;
     measureTreeSize(position, searchMode, values, "TT", true);
 
-    search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_QUIESCENCE = true;
     measureTreeSize(position, searchMode, values, "QS", true);
 
@@ -495,6 +493,7 @@ public class TestSearch {
                                final List<String> values, final String feature,
                                final boolean clearTT) {
 
+    System.out.println("Testing. "+feature);
     if (clearTT) {
       search.clearHashTables();
     }
@@ -512,7 +511,7 @@ public class TestSearch {
   @Test
   @Disabled
   public void evaluationTest() {
-    String fen = Position.STANDARD_BOARD_FEN;
+    String fen;
     SearchMode searchMode;
     Position position;
 
@@ -520,15 +519,16 @@ public class TestSearch {
     search.config.USE_ALPHABETA_PRUNING = true;
     search.config.USE_ASPIRATION_WINDOW = true;
     search.config.USE_PVS = true;
+    search.config.USE_PVS_MOVE_ORDERING = true;
     search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_MATE_DISTANCE_PRUNING = true;
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
     search.config.USE_QUIESCENCE = true;
-    search.config.USE_PVS_MOVE_ORDERING = true;
     search.config.USE_NULL_MOVE_PRUNING = true;
     search.config.USE_STATIC_NULL_PRUNING = true;
     search.config.USE_RAZOR_PRUNING = true;
     search.config.USE_KILLER_MOVES = true;
+    search.config.USE_LMR = true;
 
     int maxDepth = 6;
     int moveTime = 0;
@@ -536,6 +536,7 @@ public class TestSearch {
     boolean infinite = true;
 
     fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+    //fen = "4k3/4p3/8/8/8/8/8/3KQ3 w - -";
     position = new Position(fen);
     searchMode =
       new SearchMode(0, 0, 0, 0, 0, maxDepth, 0, mateIn, moveTime, null, false, infinite, false);
