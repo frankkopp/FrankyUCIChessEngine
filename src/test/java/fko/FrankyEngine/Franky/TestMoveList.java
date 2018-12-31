@@ -194,4 +194,28 @@ public class TestMoveList {
 
   }
 
+  @Test
+  void savePV() {
+    MoveList list1 = new MoveList(5);
+    MoveList list2 = new MoveList(5);
+
+    // add 10 entries
+    for (int i = 100; i < 110; i++) {
+      int move = Move.createMove(MoveType.NORMAL, Square.getValueList().get(i - 100),
+                                 Square.getValueList().get(i - 100 + 16), Piece.WHITE_PAWN,
+                                 Piece.NOPIECE, Piece.NOPIECE);
+      list1.add(move);
+      list2.add(move);
+    }
+
+    int pVMove = Move.createMove(MoveType.NORMAL, Square.getValueList().get(16),
+                               Square.getValueList().get(48), Piece.WHITE_PAWN,
+                               Piece.NOPIECE, Piece.NOPIECE);
+
+    MoveList.savePV(pVMove, list2, list1);
+
+    assertEquals(pVMove, list1.getFirst());
+    assertEquals(list2.getFirst(), list1.get(1));
+
+  }
 }

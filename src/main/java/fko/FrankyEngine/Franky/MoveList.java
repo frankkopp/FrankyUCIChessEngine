@@ -130,8 +130,8 @@ public class MoveList extends SimpleIntList {
      * @param dest
      */
     static void savePV(int move, MoveList src, MoveList dest) {
-        dest._list[0] = move;
-        System.arraycopy(src._list, src._head, dest._list, 1, src.size());
-        dest._tail = src.size() + 1;
+        dest.clear();
+        dest.add(move);
+        dest.add(src);
     }
 }
