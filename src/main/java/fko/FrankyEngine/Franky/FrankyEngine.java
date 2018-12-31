@@ -231,10 +231,17 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 "",
                 ""));
-     iUciOptions.add(
-        new UCIOption("Use_Full_Move_Ordering",
+//     iUciOptions.add(
+//        new UCIOption("Use_Full_Move_Ordering",
+//                UCIOptionType.check,
+//                Boolean.toString(config.USE_SORT_ALL_MOVES),
+//                "",
+//                "",
+//                ""));
+    iUciOptions.add(
+        new UCIOption("Use_Late_Move_Reduction",
                 UCIOptionType.check,
-                Boolean.toString(config.USE_SORT_ALL_MOVES),
+                Boolean.toString(config.USE_LMR),
                 "",
                 "",
                 ""));
@@ -344,9 +351,9 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      case "Use_Full_Move_Ordering":
+      case "Use_Late_Move_Reduction":
         config.USE_KILLER_MOVES = Boolean.valueOf(value);
-        msg = "Use full move ordering set to " + (config.USE_SORT_ALL_MOVES ? "On" : "Off");
+        msg = "Use Late Move Reduction set to " + (config.USE_LMR ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
