@@ -34,9 +34,6 @@ import org.slf4j.LoggerFactory;
  * are calculated by using the modulo of the max number of entries from the key.
  * <code>entries[key%maxNumberOfEntries]</code>. As long as key is randomly distributed
  * this works just fine.
- *
- * TODO: make the hashtable entries smaller to increase number of elements
- *  Use bits to store information
  */
 public class TranspositionTable {
 
@@ -49,7 +46,7 @@ public class TranspositionTable {
 
   private int  numberOfEntries    = 0;
   private long numberOfCollisions = 0L;
-  private long numberOfUpdates = 0L;
+  private long numberOfUpdates    = 0L;
 
   private final TT_Entry[] entries;
 
@@ -85,8 +82,7 @@ public class TranspositionTable {
       entries[i] = new TT_Entry();
     }
 
-    LOG.info("Transposition Table Size: {}MB",
-             String.format("%,d", sizeInByte / (KB * KB)));
+    LOG.info("Transposition Table Size: {}MB", String.format("%,d", sizeInByte / (KB * KB)));
   }
 
   /**
@@ -219,8 +215,10 @@ public class TranspositionTable {
    */
   public static final class TT_Entry {
 
+    // @formatter:off
     /**
      * fko.FrankyEngine.Franky.TranspositionTable$TT_Entry object internals:
+     *
      *  OFFSET  SIZE TYPE DESCRIPTION
      *       0    12                (object header)
      *      12     4            int TT_Entry.value
@@ -228,13 +226,16 @@ public class TranspositionTable {
      *      24     4            int TT_Entry.depth
      *      28     4   TT_EntryType TT_Entry.type
      * Instance size: 32 bytes
+     *
      */
-    static final int SIZE = 32;
+    // @formatter:on
+    static final int SIZE = 40;
 
-    long         key   = 0L;
-    int          value = Evaluation.NOVALUE;
-    int          depth = 0;
-    TT_EntryType type  = TT_EntryType.ALPHA;
+    long         key      = 0L;
+    int          value    = Evaluation.NOVALUE;
+    int          depth    = 0;
+    TT_EntryType type     = TT_EntryType.ALPHA;
+    int          bestMove = Move.NOMOVE;
   }
 
   /**
