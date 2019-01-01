@@ -34,9 +34,6 @@ import org.slf4j.LoggerFactory;
  * are calculated by using the modulo of the max number of entries from the key.
  * <code>entries[key%maxNumberOfEntries]</code>. As long as key is randomly distributed
  * this works just fine.
- *
- * TODO: make the hashtable entries smaller to increase number of elements
- *  Use bits to store information
  */
 public class TranspositionTable {
 
@@ -49,7 +46,7 @@ public class TranspositionTable {
 
   private int  numberOfEntries    = 0;
   private long numberOfCollisions = 0L;
-  private long numberOfUpdates = 0L;
+  private long numberOfUpdates    = 0L;
 
   private final TT_Entry[] entries;
 
@@ -85,19 +82,29 @@ public class TranspositionTable {
       entries[i] = new TT_Entry();
     }
 
-    LOG.info("Transposition Table Size: {}MB",
-             String.format("%,d", sizeInByte / (KB * KB)));
+    LOG.info("Transposition Table Size: {}MB", String.format("%,d", sizeInByte / (KB * KB)));
   }
 
   /**
    * Stores the node value and the depth it has been calculated at.
-   *
-   * @param position
+   *  @param position
    * @param value
    * @param type
    * @param depth
    */
   public void put(Position position, int value, TT_EntryType type, int depth) {
+    put(position, value, type, depth, Move.NOMOVE);
+  }
+
+  /**
+   * Stores the node value and the depth it has been calculated at.
+   *  @param position
+   * @param value
+   * @param type
+   * @param depth
+   * @param bestMove
+   */
+  public void put(Position position, int value, TT_EntryType type, int depth, int bestMove) {
 
     final int hash = getHash(position.getZobristKey());
 
@@ -109,6 +116,7 @@ public class TranspositionTable {
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
+      entries[hash].bestMove = bestMove;
     }
     // different position - overwrite
     else if (position.getZobristKey() != entries[hash].key) {
@@ -118,6 +126,7 @@ public class TranspositionTable {
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
+      entries[hash].bestMove = bestMove;
     }
     // Update
     else if (position.getZobristKey() == entries[hash].key  // same position
@@ -128,6 +137,7 @@ public class TranspositionTable {
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
+      entries[hash].bestMove = bestMove;
     }
     // ignore new values for cache
   }
@@ -148,7 +158,6 @@ public class TranspositionTable {
     // cache miss or collision
     return null;
   }
-
 
   /**
    * TODO: better hash function?
@@ -219,8 +228,10 @@ public class TranspositionTable {
    */
   public static final class TT_Entry {
 
+    // @formatter:off
     /**
      * fko.FrankyEngine.Franky.TranspositionTable$TT_Entry object internals:
+     *
      *  OFFSET  SIZE TYPE DESCRIPTION
      *       0    12                (object header)
      *      12     4            int TT_Entry.value
@@ -228,13 +239,16 @@ public class TranspositionTable {
      *      24     4            int TT_Entry.depth
      *      28     4   TT_EntryType TT_Entry.type
      * Instance size: 32 bytes
+     *
      */
-    static final int SIZE = 32;
+    // @formatter:on
+    static final int SIZE = 40;
 
-    long         key   = 0L;
-    int          value = Evaluation.NOVALUE;
-    int          depth = 0;
-    TT_EntryType type  = TT_EntryType.ALPHA;
+    long         key      = 0L;
+    int          value    = Evaluation.NOVALUE;
+    int          depth    = 0;
+    TT_EntryType type     = TT_EntryType.ALPHA;
+    int          bestMove = Move.NOMOVE;
   }
 
   /**

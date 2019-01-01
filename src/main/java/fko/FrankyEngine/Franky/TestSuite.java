@@ -339,8 +339,8 @@ public class TestSuite {
 
       // generate all legal moves from the position
       // and try to find a matching move
-      MoveGenerator mg = new MoveGenerator();
-      MoveList moveList = mg.getLegalMoves(position);
+      MoveGenerator mg = new MoveGenerator(position);
+      MoveList moveList = mg.getLegalMoves();
       int moveFromSAN = Move.NOMOVE;
       int movesFound = 0;
       for (int move : moveList) {

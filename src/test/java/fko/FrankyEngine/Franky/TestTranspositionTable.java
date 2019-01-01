@@ -29,6 +29,8 @@ import fko.FrankyEngine.Franky.TranspositionTable.TT_EntryType;
 import fko.UCI.IUCIEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.openjdk.jol.info.ClassLayout;
+import org.openjdk.jol.vm.VM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,9 +50,6 @@ public class TestTranspositionTable {
   void setUp() {
   }
 
-  /**
-   *
-   */
   @Test
   public final void test_Cache() {
     TranspositionTable cache = new TranspositionTable(32);
@@ -66,33 +65,6 @@ public class TestTranspositionTable {
     assertEquals(1, cache.getNumberOfEntries());
     cache.clear();
     assertEquals(0, cache.getNumberOfEntries());
-  }
-
-  /**
-   *
-   */
-  @Test
-  public void testSize() {
-
-    //    System.out.println(VM.current().details());
-    //    System.out.println(ClassLayout.parseClass(TranspositionTable.TT_Entry.class).toPrintable());
-    //    System.out.println(ClassLayout.parseClass(TranspositionTable.class).toPrintable());
-
-    System.out.println("Testing Transposition Table size:");
-    int[] megabytes = {0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 2048};
-    for (int i : megabytes) {
-      System.gc();
-      long usedMemoryBefore =
-        Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-      TranspositionTable tt = new TranspositionTable(i);
-      System.gc();
-      long usedMemoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-      long hashAllocation = (usedMemoryAfter - usedMemoryBefore) / (1024 * 1024);
-      System.out.format("TT Size (config): %dMB = %dMB real size - Nodes: %d%n", i, hashAllocation,
-                        tt.getMaxEntries());
-      tt = null;
-    }
-
   }
 
   @Test
@@ -159,10 +131,7 @@ public class TestTranspositionTable {
     search.config.USE_MATE_DISTANCE_PRUNING = false;
     search.config.USE_MINOR_PROMOTION_PRUNING = false;
     search.config.USE_QUIESCENCE = false;
-    SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0,
-                     depth, 0, 0, 0, null,
-                     false, true, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
 
     search.startSearch(position, searchMode);
 
@@ -189,6 +158,32 @@ public class TestTranspositionTable {
       } catch (InterruptedException ignored) {
       }
     }
+  }
+
+  @Test
+  public void testSize() {
+
+    System.out.println("Testing Transposition Table size:");
+    int[] megabytes = {0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 2048};
+    for (int i : megabytes) {
+      System.gc();
+      long usedMemoryBefore =
+        Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+      TranspositionTable tt = new TranspositionTable(i);
+      System.gc();
+      long usedMemoryAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+      long hashAllocation = (usedMemoryAfter - usedMemoryBefore) / (1024 * 1024);
+      System.out.format("TT Size (config): %dMB = %dMB real size - Nodes: %d%n", i, hashAllocation,
+                        tt.getMaxEntries());
+      tt = null;
+    }
+  }
+
+  @Test
+  public void showSize() {
+    System.out.println(VM.current().details());
+    System.out.println(ClassLayout.parseClass(TranspositionTable.TT_Entry.class).toPrintable());
+    System.out.println(ClassLayout.parseClass(TranspositionTable.class).toPrintable());
   }
 
 }

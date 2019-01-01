@@ -226,20 +226,22 @@ public class TestPosition {
   @Test
   public void testNullMove_moveGen() {
     String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
-    Position omegaBoard = new Position(fen);
-    MoveGenerator omg = new MoveGenerator();
+    Position position = new Position(fen);
 
-    MoveList moves = omg.getLegalMoves(omegaBoard);
+    MoveGenerator omg = new MoveGenerator(position);
+    MoveList moves = omg.getLegalMoves();
     assertEquals(81, moves.size());
 
-    omegaBoard.makeNullMove();
+    position.makeNullMove();
 
-    moves = omg.getLegalMoves(omegaBoard);
+    omg.setPosition(position);
+    moves = omg.getLegalMoves();
     assertEquals(26, moves.size());
 
-    omegaBoard.undoNullMove();
+    position.undoNullMove();
 
-    moves = omg.getLegalMoves(omegaBoard);
+    omg.setPosition(position);
+    moves = omg.getLegalMoves();
     assertEquals(81, moves.size());
   }
 

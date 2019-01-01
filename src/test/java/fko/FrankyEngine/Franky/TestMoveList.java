@@ -165,10 +165,10 @@ public class TestMoveList {
 
   @Test
   public void testSort() {
-    MoveGenerator moveGenerator = new MoveGenerator();
     Position board =
       new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
-    MoveList moves = moveGenerator.getPseudoLegalQSearchMoves(board);
+    MoveGenerator moveGenerator = new MoveGenerator(board);
+    MoveList moves = moveGenerator.getPseudoLegalQSearchMoves();
 
     // Comparator for move value victim least value attacker
     Comparator<Integer> reverseMvvlvaComparator = Comparator.comparingInt(
