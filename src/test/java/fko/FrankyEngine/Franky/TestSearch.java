@@ -686,9 +686,9 @@ public class TestSearch {
   @Test
   @Disabled
   public void showSize() {
-    System.out.println(VM.current().details());
+    //System.out.println(VM.current().details());
     System.out.println(ClassLayout.parseClass(Search.TTHit.class).toPrintable());
-    System.out.println(ClassLayout.parseClass(Search.class).toPrintable());
+    //System.out.println(ClassLayout.parseClass(Search.class).toPrintable());
   }
 
 }

@@ -159,7 +159,6 @@ public class TranspositionTable {
     return null;
   }
 
-
   /**
    * TODO: better hash function?
    * @param key
