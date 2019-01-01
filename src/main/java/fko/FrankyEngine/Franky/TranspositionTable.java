@@ -87,13 +87,24 @@ public class TranspositionTable {
 
   /**
    * Stores the node value and the depth it has been calculated at.
-   *
-   * @param position
+   *  @param position
    * @param value
    * @param type
    * @param depth
    */
   public void put(Position position, int value, TT_EntryType type, int depth) {
+    put(position, value, type, depth, Move.NOMOVE);
+  }
+
+  /**
+   * Stores the node value and the depth it has been calculated at.
+   *  @param position
+   * @param value
+   * @param type
+   * @param depth
+   * @param bestMove
+   */
+  public void put(Position position, int value, TT_EntryType type, int depth, int bestMove) {
 
     final int hash = getHash(position.getZobristKey());
 
@@ -105,6 +116,7 @@ public class TranspositionTable {
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
+      entries[hash].bestMove = bestMove;
     }
     // different position - overwrite
     else if (position.getZobristKey() != entries[hash].key) {
@@ -114,6 +126,7 @@ public class TranspositionTable {
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
+      entries[hash].bestMove = bestMove;
     }
     // Update
     else if (position.getZobristKey() == entries[hash].key  // same position
@@ -124,6 +137,7 @@ public class TranspositionTable {
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
+      entries[hash].bestMove = bestMove;
     }
     // ignore new values for cache
   }

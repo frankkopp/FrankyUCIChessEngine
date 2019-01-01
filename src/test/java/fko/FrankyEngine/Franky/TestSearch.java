@@ -30,6 +30,8 @@ import fko.UCI.IUCIEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.openjdk.jol.info.ClassLayout;
+import org.openjdk.jol.vm.VM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -679,6 +681,14 @@ public class TestSearch {
     search.clearHashTables();
     search.startSearch(position, searchMode);
     waitWhileSearching();
+  }
+
+  @Test
+  @Disabled
+  public void showSize() {
+    System.out.println(VM.current().details());
+    System.out.println(ClassLayout.parseClass(Search.TTHit.class).toPrintable());
+    System.out.println(ClassLayout.parseClass(Search.class).toPrintable());
   }
 
 }

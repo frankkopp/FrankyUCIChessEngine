@@ -27,6 +27,8 @@ package fko.FrankyEngine.Franky;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.openjdk.jol.info.ClassLayout;
+import org.openjdk.jol.vm.VM;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -226,31 +228,34 @@ public class TestMoveGenerator {
 
     // 83 moves to make
     final String fen = "r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3";
-    Position board = new Position(fen);
+    Position position = new Position(fen);
 
-    MoveGenerator moveGenerator = new MoveGenerator(board);
+    MoveGenerator moveGenerator = new MoveGenerator(position);
 
-    { // test all moves
-
-      MoveList moves = moveGenerator.getPseudoLegalMoves().clone();
-      assertEquals(85, moves.size());
-      int j = 0; int move;
-
-      moveGenerator.setPosition(board);
-      while ((move = moveGenerator.getNextPseudoLegalMove(false)) != Move.NOMOVE) {
-        System.out.printf("%3d. %-20s %-20s %n",j, Move.toString(move), Move.toString(moves.get(j)));
-        j++;
-      }
-      System.out.println("OnDemand: " + j + " Bulk: " + moves.size());
-      System.out.println();
-      assertEquals(moves.size(), j);
-    }
+//    { // test all moves
+//
+//      MoveList moves = moveGenerator.getPseudoLegalMoves().clone();
+//      assertEquals(85, moves.size());
+//
+//      int j = 0; int move;
+//
+//      moveGenerator.setPosition(position);
+//      while ((move = moveGenerator.getNextPseudoLegalMove(false)) != Move.NOMOVE) {
+//        System.out.printf("%3d. %-20s %-20s %n",j, Move.toString(move), Move.toString(moves.get(j)));
+//        j++;
+//      }
+//      System.out.println("OnDemand: " + j + " Bulk: " + moves.size());
+//      System.out.println();
+//      assertEquals(moves.size(), j);
+//    }
 
     { // test all moves with killers sorted before non-captures
-      moveGenerator.setKillerMoves(new int[]{67320564, 67318516});
       int j = 0;
       int move;
-      moveGenerator.setPosition(board);
+      moveGenerator.setPosition(position);
+      moveGenerator.setKillerMoves(new int[]{67320564, 67318516});
+      moveGenerator.setPVMove(67248483);
+
       while ((move = moveGenerator.getNextPseudoLegalMove(false)) != Move.NOMOVE) {
         System.out.println((j++) + ". " + Move.toString(move));
       }
@@ -269,28 +274,28 @@ public class TestMoveGenerator {
   public void testOnDemandFromFenBoard() {
 
     MoveGenerator moveGenerator = new MoveGenerator();
-    Position board = null;
+    Position position;
 
     int i = 0;
     String[] fens = getFENs();
     while (fens[i] != null) {
       String testFen = fens[i];
-      board = new Position(testFen);
+      position = new Position(testFen);
 
       int j = 0;
-      moveGenerator.setPosition(board);
-      int move = moveGenerator.getNextPseudoLegalMove(false);
-      while (move != Move.NOMOVE) {
+      moveGenerator.setPosition(position);
+      int move;
+      while ((move = moveGenerator.getNextPseudoLegalMove(false)) != Move.NOMOVE) {
         System.out.println((j++) + ". " + Move.toString(move));
-        move = moveGenerator.getNextPseudoLegalMove(false);
       }
 
-      MoveList moves = moveGenerator.getPseudoLegalMoves();
+      MoveList moves = moveGenerator.getPseudoLegalMoves().clone();
 
       System.out.println("OnDemand: " + j + " Bulk: " + moves.size());
       System.out.println();
 
       assertEquals(moves.size(), j);
+
       i++;
     }
 
@@ -328,25 +333,28 @@ public class TestMoveGenerator {
   public void testSingleMoveSorting() {
 
 
-    Position position = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
+    Position position = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3");
     MoveGenerator moveGenerator = new MoveGenerator(position);
 
     int killer1 = 67320564;
     int killer2 = 67318516;
     int pvMove = 67248483;
 
-    moveGenerator.setKillerMoves(new int[]{killer1, killer2});
-    moveGenerator.setPVMove(pvMove);
-    MoveList moves = moveGenerator.getPseudoLegalMoves().clone();
-
+    // OD list
     MoveList movesOD = new MoveList();
-    int m;
     moveGenerator.setPosition(position);
     moveGenerator.setKillerMoves(new int[]{killer1, killer2});
     moveGenerator.setPVMove(pvMove);
+    int m;
     while ((m = moveGenerator.getNextPseudoLegalMove(false)) != Move.NOMOVE) {
       movesOD.add(m);
     }
+
+    // direct list
+    moveGenerator.setPosition(position);
+    moveGenerator.setKillerMoves(new int[]{killer1, killer2});
+    moveGenerator.setPVMove(pvMove);
+    MoveList moves = moveGenerator.getPseudoLegalMoves().clone();
 
     assertEquals(moves.size(), movesOD.size());
 
@@ -592,6 +600,13 @@ public class TestMoveGenerator {
     mG.setKillerMoves(new int[]{killer1, killer2});
 
     return mG.getPseudoLegalMoves();
+  }
+
+  @Test
+  @Disabled
+  public void showSize() {
+    System.out.println(VM.current().details());
+    System.out.println(ClassLayout.parseClass(MoveGenerator.class).toPrintable());
   }
 
 }
