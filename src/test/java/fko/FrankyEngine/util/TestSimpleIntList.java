@@ -538,6 +538,39 @@ public class TestSimpleIntList {
 
   }
 
+  @Test
+  public void testRemoving() {
+    SimpleIntList list = new SimpleIntList();
+
+    IntStream.rangeClosed(0, 100).forEach(list::add);
+
+    // test remove first
+    int before1 = list.getFirst();
+    assertEquals(before1, list.removeFirst());
+    assertNotEquals(before1, list.getFirst());
+
+    int before2 = list.getFirst();
+    assertTrue(list.remove(before2));
+    assertNotEquals(before2, list.getFirst());
+
+    // test remove last
+    int before3 = list.getLast();
+    assertEquals(before3, list.removeLast());
+    assertNotEquals(before3, list.getLast());
+
+    int before4 = list.getLast();
+    assertTrue(list.remove(before4));
+    assertNotEquals(before4, list.getLast());
+
+    // test remove
+    int before5 = list.get(5);
+    int beforeSize = list.size();
+    assertTrue(list.remove(before5));
+    assertNotEquals(before4, list.get(5));
+    assertEquals(beforeSize-1, list.size());
+
+  }
+
     /** */
   @Test
   public void testSorting() {
