@@ -619,7 +619,7 @@ public class TestSearch {
       new Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
 
     final SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, 8, 0, 0, 0, null, false, true, false);
+      new SearchMode(0, 0, 0, 0, 0, 6, 0, 0, 0, null, false, true, false);
 
     prepare();
 
@@ -668,14 +668,14 @@ public class TestSearch {
   }
 
   private void test1(final Position position, final SearchMode searchMode) {
-    search.config.USE_SORT_ALL_MOVES = false;
+    //search.config.USE_SORT_ALL_MOVES = false;
     search.clearHashTables();
     search.startSearch(position, searchMode);
     waitWhileSearching();
   }
 
   private void test2(final Position position, final SearchMode searchMode) {
-    search.config.USE_SORT_ALL_MOVES = true;
+    //search.config.USE_SORT_ALL_MOVES = true;
     search.clearHashTables();
     search.startSearch(position, searchMode);
     waitWhileSearching();
