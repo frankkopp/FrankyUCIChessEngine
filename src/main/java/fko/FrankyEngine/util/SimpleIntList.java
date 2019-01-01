@@ -166,6 +166,45 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
+   * Removes an entry.
+   * If the list is empty it throws a ArrayIndexOutOfBoundsException
+   *
+   * @return boolean true of element has been found and removed
+   */
+  public boolean remove(int toRemove) {
+    if (empty()) return false;
+    int element = -1;
+
+    // look for number in list
+    for (int i = _head; i < _tail; i++) {
+      if (_list[i] == toRemove) {
+        element = i;
+        break;
+      }
+    }
+
+    // not found
+    if (element < 0) return false;
+
+    // first?
+    if (element == _head) {
+      _head++;
+      return true;
+    }
+    // last?
+    else if (element == _tail - 1) {
+      _tail--;
+      return true;
+    }
+    // remove element and move all elements behind one forward
+    else {
+      System.arraycopy(_list, element+1, _list, element, _tail-element-1);
+      _tail--;
+      return true;
+    }
+  }
+
+  /**
    * Gets entry at a specific index
    *
    * @param index
