@@ -110,7 +110,7 @@ public class TestSuiteTests {
     assertTrue(
       testSuite
         .startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;",
-                      0, 10));
+                      0, 12));
 
     // dm test time limited
     assertTrue(

@@ -447,7 +447,7 @@ public class Search implements Runnable {
       engine.sendInfoToUCI("depth " + searchCounter.currentSearchDepth
                            + " seldepth " + searchCounter.currentExtraSearchDepth
                            + " multipv 1"
-                           + " score cp " + searchCounter.currentBestRootValue
+                           + " " + getScoreString(searchCounter.currentBestRootValue)
                            + " nodes " + searchCounter.nodesVisited
                            + " nps " + 1000 * (searchCounter.nodesVisited / (elapsedTime()+2L))
                            + " time " + elapsedTime()
@@ -1208,10 +1208,10 @@ public class Search implements Runnable {
 
   // struct for multi return value for TTHit
   class TTHit {
+
     int value    = Evaluation.NOVALUE;
     int bestMove = Move.NOMOVE;
   }
-
   private TTHit probeTTValue(final Position position, final int ply, final int depthLeft, final int alpha,
                            final int beta) {
 
@@ -1333,6 +1333,18 @@ public class Search implements Runnable {
              position.getQueenSquares()[activePlayer].isEmpty());
   }
 
+  private static String getScoreString(int value) {
+    String scoreString;
+    if (Math.abs(value) >= Evaluation.CHECKMATE_THRESHOLD) {
+      scoreString = "score mate ";
+      scoreString += value < 0 ? "-" : "";
+      scoreString +=  (Evaluation.CHECKMATE - Math.abs(value) + 1) / 2;
+    } else {
+      scoreString = "score cp " + value;
+    }
+    return scoreString;
+  }
+
   private void sendUCIUpdate(final Position position) {
     // send current root move info to UCI every x milli seconds
     if (System.currentTimeMillis() - uciUpdateTicker >= UCI_UPDATE_INTERVAL) {
@@ -1425,7 +1437,7 @@ public class Search implements Runnable {
 
     @Override
     public String toString() {
-      return "Best Move: " + Move.toString(bestMove) + " (" + resultValue + ") " +
+      return "Best Move: " + Move.toString(bestMove) + " (" + getScoreString(resultValue) + ") " +
              " Ponder Move: " + Move.toString(ponderMove) + " Depth: " + depth + "/" + extraDepth;
     }
   }
