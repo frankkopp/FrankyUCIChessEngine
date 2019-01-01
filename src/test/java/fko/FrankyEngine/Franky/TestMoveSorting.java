@@ -42,7 +42,7 @@ public class TestMoveSorting {
 
     position = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
 
-    MoveGenerator mG = new MoveGenerator();
+    MoveGenerator mG = new MoveGenerator(position);
 
     int killer1 = 67320564;
     int killer2 = 67318516;
@@ -52,7 +52,7 @@ public class TestMoveSorting {
     mG.SORT_MOVES = false;
     mG.SORT_CAPTURING_MOVES = false;
 
-    MoveList m1 = mG.getPseudoLegalMoves(position);
+    MoveList m1 = mG.getPseudoLegalMoves();
     MoveList m2 = new MoveList(m1);
     m2.sort(movesComparator);
 
@@ -174,14 +174,14 @@ public class TestMoveSorting {
   private int[] test1() {
     position = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
 
-    MoveGenerator mG = new MoveGenerator();
+    MoveGenerator mG = new MoveGenerator(position);
     mG.SORT_MOVES = false;
     mG.SORT_CAPTURING_MOVES = true;
 
     killerMoves = new int[]{67320564, 67318516};
     mG.setKillerMoves(killerMoves);
 
-    final MoveList moves = mG.getPseudoLegalMoves(position);
+    final MoveList moves = mG.getPseudoLegalMoves();
     int[] m = moves.toArray();
     return m;
 
@@ -190,14 +190,14 @@ public class TestMoveSorting {
   private int[] test2() {
     position = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
 
-    MoveGenerator mG = new MoveGenerator();
+    MoveGenerator mG = new MoveGenerator(position);
     mG.SORT_MOVES = false;
     mG.SORT_CAPTURING_MOVES = false;
 
     killerMoves = new int[]{67320564, 67318516};
     mG.setKillerMoves(killerMoves);
 
-    final MoveList moves = mG.getPseudoLegalMoves(position);
+    final MoveList moves = mG.getPseudoLegalMoves();
 
     int[] m = moves.toArray();
     int[] sortIdx = new int[m.length];
@@ -238,12 +238,12 @@ public class TestMoveSorting {
 
     position = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
 
-    MoveGenerator mG = new MoveGenerator();
+    MoveGenerator mG = new MoveGenerator(position);
     mG.SORT_MOVES = false;
     mG.SORT_CAPTURING_MOVES = false;
 
-    int[] m1 = mG.getPseudoLegalMoves(position).toArray();
-    int[] m2 = mG.getPseudoLegalMoves(position).toArray();
+    int[] m1 = mG.getPseudoLegalMoves().toArray();
+    int[] m2 = mG.getPseudoLegalMoves().toArray().clone();
 
     int[] sortIdx = new int[m2.length];
     for (int i = 0; i < m2.length; i++) {

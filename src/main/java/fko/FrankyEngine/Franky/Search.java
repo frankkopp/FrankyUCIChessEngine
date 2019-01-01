@@ -358,7 +358,8 @@ public class Search implements Runnable {
     uciUpdateTicker = System.currentTimeMillis();
 
     // generate all root moves
-    MoveList legalMoves = moveGenerators[0].getLegalMoves(position, true);
+    moveGenerators[0].setPosition(position);
+    MoveList legalMoves = moveGenerators[0].getLegalMoves(true);
 
     // no legal root moves - game already ended!
     if (legalMoves.size() == 0) {
@@ -795,24 +796,6 @@ public class Search implements Runnable {
     // needed to remember if we even had a legal move
     int numberOfSearchedMoves = 0;
 
-    // Generate moves
-    if (config.USE_KILLER_MOVES) moveGenerators[ply].setKillerMoves(killerMoves[ply]);
-    MoveList moves = moveGenerators[ply].getPseudoLegalMoves(position);
-    searchCounter.movesGenerated += moves.size();
-
-    // if we have already a PV move from the last iteration push it to the head
-    // of the move list to be evaluated first for more cutoffs
-    if (config.USE_PVS_MOVE_ORDERING) {
-      if (!principalVariation[0].empty()) {
-        if (principalVariation[0].size() > ply) {
-          moves.pushToHeadStable(principalVariation[0].get(ply));
-        }
-      }
-    }
-
-    // clear principal Variation for this depth
-    principalVariation[ply].clear();
-
     // Initialize best values
     int bestNodeValue = -Evaluation.INFINITE;
     int bestNodeMove = Move.NOMOVE;
@@ -820,9 +803,23 @@ public class Search implements Runnable {
     // Prepare hash type
     TT_EntryType ttType = TT_EntryType.ALPHA;
 
+    // prepare move generator
+    moveGenerators[ply].setPosition(position);
+    if (config.USE_KILLER_MOVES) moveGenerators[ply].setKillerMoves(killerMoves[ply]);
+    if (config.USE_PVS_MOVE_ORDERING) {
+      if (!principalVariation[0].empty()) {
+        if (principalVariation[0].size() > ply) {
+          moveGenerators[ply].setPVMove(principalVariation[0].get(ply));
+        }
+      }
+    }
+
+    // clear principal Variation for this depth
+    principalVariation[ply].clear();
+
     // Search all generated moves
-    for (int i = 0; i < moves.size(); i++) {
-      int move = moves.get(i);
+    int move;
+    while ((move = moveGenerators[ply].getNextPseudoLegalMove(false)) != Move.NOMOVE) {
       int value;
 
       // ###############################################
@@ -1061,7 +1058,8 @@ public class Search implements Runnable {
     // Generate all PseudoLegalMoves for QSearch
     // Usually only capture moves and check evasions
     // will be determined in move generator
-    MoveList moves = moveGenerators[ply].getPseudoLegalQSearchMoves(position);
+    moveGenerators[ply].setPosition(position);
+    MoveList moves = moveGenerators[ply].getPseudoLegalQSearchMoves();
     searchCounter.movesGenerated += moves.size();
 
     // if we have already a PV move from the last iteration push it to the head

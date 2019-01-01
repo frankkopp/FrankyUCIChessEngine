@@ -62,7 +62,7 @@ public class TestSuiteTest {
   @Test
   void startFrankySuite() {
     testSuite = new TestSuite("./testsets/franky_tests.epd");
-    testSuite.setSearchTime(1000);
+    testSuite.setSearchTime(2000);
     testSuite.startTests();
   }
 

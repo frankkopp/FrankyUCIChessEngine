@@ -246,8 +246,8 @@ public class Move {
 
     // to find the move type it is easiest to generate all legal moves and then look
     // for a move with the same from and to
-    MoveGenerator omg = new MoveGenerator();
-    MoveList moves = omg.getLegalMoves(position);
+    MoveGenerator omg = new MoveGenerator(position);
+    MoveList moves = omg.getLegalMoves();
 
     for (int m : moves) {
       Square f = Move.getStart(m);
@@ -313,8 +313,8 @@ public class Move {
 
     // generate all legal moves from the position
     // and try to find a matching move
-    MoveGenerator mg = new MoveGenerator();
-    MoveList moveList = mg.getLegalMoves(position);
+    MoveGenerator mg = new MoveGenerator(position);
+    MoveList moveList = mg.getLegalMoves();
     int moveFromSAN = Move.NOMOVE;
     int movesFound = 0;
     for (int move : moveList) {

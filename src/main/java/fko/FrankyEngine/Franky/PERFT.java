@@ -73,14 +73,15 @@ public class PERFT {
             mg[i] = new MoveGenerator();
         }
 
-        Position board = new Position(_fen);
+        Position position = new Position(_fen);
 
-        long result = 0;
+        long result;
 
         long startTime = System.currentTimeMillis();
+        mg[0].setPosition(position);
         result = mg[0]
-                .streamLegalMoves(board)
-                .mapToLong((move) -> dividePerft(depth, mg, board, move))
+                .streamLegalMoves()
+                .mapToLong((move) -> dividePerft(depth, mg, position, move))
                 .sum();
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
@@ -120,7 +121,8 @@ public class PERFT {
         // some convenience fields
         Color _activePlayer = board.getNextPlayer();
         Color _passivePlayer = board.getNextPlayer().getInverseColor();
-        MoveList moves = mg[ply].getPseudoLegalMoves(board);
+        mg[ply].setPosition(board);
+        MoveList moves = mg[ply].getPseudoLegalMoves();
         for(int i = 0; i < moves.size(); i++) {
             int move = moves.get(i);
             board.makeMove(move);
