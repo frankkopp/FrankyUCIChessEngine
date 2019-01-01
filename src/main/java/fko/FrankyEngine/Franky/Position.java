@@ -83,6 +83,7 @@ public class Position {
   //
   // 0x88 Board
   private              Piece[]  x88Board     = new Piece[BOARDSIZE];
+
   // hash for pieces - piece, board
   private static final long[][] pieceZobrist = new long[Piece.values.length][Square.values.length];
 
@@ -103,7 +104,6 @@ public class Position {
   // en passant field - if NOSQUARE then we do not have an en passant option
   private              Square   enPassantSquare         = Square.NOSQUARE;
   private              Square[] enPassantSquare_History = new Square[MAX_HISTORY];
-  // hash for castling rights
   private static final long[]   enPassantSquare_Zobrist = new long[Square.values.length];
 
   // half move clock - number of half moves since last capture
@@ -113,7 +113,6 @@ public class Position {
 
   // next player color
   private              Color nextPlayer = Color.WHITE;
-  // hash for next player
   private static final long  nextPlayer_Zobrist;
   //
   // Board State END ------------------------------------------
@@ -729,10 +728,6 @@ public class Position {
     // return the remove piece
     return old;
   }
-
-//  public Piece getPiece(final int squareIdx) {
-//    return x88Board[squareIdx];
-//  }
 
   /**
    * Retrieve piece on given square.

@@ -101,7 +101,7 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
-   * Adds an element to the end of the list.
+   * Adds an list to the end of the list.
    *
    * @param newList
    */
@@ -111,6 +111,22 @@ public class SimpleIntList implements Iterable<Integer> {
     }
     System.arraycopy(newList._list, newList._head, this._list, this._tail, newList.size());
     this._tail += newList.size();
+  }
+
+  /**
+   * Adds an list to the front of the list.
+   *
+   * @param newList
+   */
+  public void addFront(SimpleIntList newList) {
+    final int oldListSize = this.size();
+    final int newListSize = newList.size();
+    final int newSize = oldListSize + newListSize + DEFAULT_GROWTH_MARGIN;
+    int[] tmpList = Arrays.copyOfRange(newList._list, newList._head, newSize);
+    System.arraycopy(this._list, this._head, tmpList, newListSize, oldListSize);
+    this._list = tmpList;
+    this._head = 0;
+    this._tail = oldListSize + newListSize;
   }
 
   /**
@@ -150,19 +166,86 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
+   * Removes an entry.
+   * If the list is empty it throws a ArrayIndexOutOfBoundsException
+   *
+   * @return boolean true of element has been found and removed
+   */
+  public boolean remove(int toRemove) {
+    if (empty()) return false;
+    int element = -1;
+
+    // look for number in list
+    for (int i = _head; i < _tail; i++) {
+      if (_list[i] == toRemove) {
+        element = i;
+        break;
+      }
+    }
+
+    // not found
+    if (element < 0) return false;
+
+    // first?
+    if (element == _head) {
+      _head++;
+      return true;
+    }
+    // last?
+    else if (element == _tail - 1) {
+      _tail--;
+      return true;
+    }
+    // remove element and move all elements behind one forward
+    else {
+      System.arraycopy(_list, element+1, _list, element, _tail-element-1);
+      _tail--;
+      return true;
+    }
+  }
+
+  /**
    * Gets entry at a specific index
    *
    * @param index
    * @return element at index
    */
   public int get(int index) {
-    if (index < 0 || _tail <= _head) {
+    if (index < 0) {
+      throw new ArrayIndexOutOfBoundsException("Index < 0");
+    }
+    if (_tail <= _head) {
       throw new ArrayIndexOutOfBoundsException("List is empty");
     }
-    if (_head + index > _tail) {
+    if (_head + index >= _tail) {
       throw new ArrayIndexOutOfBoundsException("Index too high");
     }
     return _list[_head + index];
+  }
+
+  /**
+   * Exchanges/swaps two entries
+   *
+   * @param i
+   * @param j
+   */
+  public void swap(int i, int j) {
+    if (i < 0) {
+      throw new ArrayIndexOutOfBoundsException("Index i < 0");
+    }
+    if (j < 0) {
+      throw new ArrayIndexOutOfBoundsException("Index j < 0");
+    }
+    if (_tail <= _head) {
+      throw new ArrayIndexOutOfBoundsException("List is empty");
+    }
+    if (_head + i >= _tail) {
+      throw new ArrayIndexOutOfBoundsException("Index i too high");
+    }
+    if (_head + j >= _tail) {
+      throw new ArrayIndexOutOfBoundsException("Index j too high");
+    }
+    exchange(_head + i, _head + j);
   }
 
   /**
@@ -173,10 +256,13 @@ public class SimpleIntList implements Iterable<Integer> {
    * @return old value at index
    */
   public int set(int index, int value) {
-    if (index < 0 || _tail <= _head) {
+    if (_tail <= _head) {
       throw new ArrayIndexOutOfBoundsException("List is empty");
     }
-    if (_head + index > _tail) {
+    if (index < 0) {
+      throw new ArrayIndexOutOfBoundsException("Index < 0");
+    }
+    if (_head + index >= _tail) {
       throw new ArrayIndexOutOfBoundsException("Index too high");
     }
     int old = _list[_head + index];
@@ -213,8 +299,10 @@ public class SimpleIntList implements Iterable<Integer> {
    * If the number is not in the list nothing happens.
    *
    * @param number
+   * @return true if number has been found and pushed, false otherwise
    */
-  public void pushToHead(int number) {
+  public boolean pushToHead(int number) {
+    if (empty()) return false;
     int element = -1;
     // look for number in list
     for (int i = _head; i < _tail; i++) {
@@ -228,7 +316,44 @@ public class SimpleIntList implements Iterable<Integer> {
       final int tmp = _list[_head];
       _list[_head] = _list[element];
       _list[element] = tmp;
+      return true;
     }
+    return false;
+  }
+
+  /**
+   * Puts the first occurrence of number as first element. Keeps the current order stable.
+   * <p>
+   * Moves all other elements one up until the former place of the element.
+   * <p>
+   * Creates a new list with size <code>oldList.size() + DEFAULT_GROWTH_MARGIN</code>.
+   * <p>
+   * If the number is not in the list nothing happens.
+   *
+   * @param number to push to the head
+   * @return true if number has been found and pushed, false otherwise
+   */
+  public boolean pushToHeadStable(int number) {
+    if (empty()) return false;
+    int element = -1;
+    // look for number in list
+    for (int i = _head; i < _tail; i++) {
+      if (_list[i] == number) {
+        element = i;
+        break;
+      }
+    }
+    // already first?
+    if (element == _head) {
+      return true;
+    }
+    // put element to the front and copy other elements behind it in stable order
+    else if (element > -1) {
+      System.arraycopy(_list, _head, _list, _head + 1, element - _head);
+      _list[_head] = number;
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -284,9 +409,6 @@ public class SimpleIntList implements Iterable<Integer> {
     return new SimpleIntList(this);
   }
 
-  /* (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     String s = "List size=" + size() + " available capacity=" + getAvailableCapacity() + " [";
@@ -299,10 +421,10 @@ public class SimpleIntList implements Iterable<Integer> {
     s += "]";
     return s;
   }
-
   /* (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -341,25 +463,29 @@ public class SimpleIntList implements Iterable<Integer> {
    * @param comparator
    */
   public void sort(Comparator<Integer> comparator) {
-    if (this.empty()) {
-      return;
-    }
+    if (this.empty()) return;
     sort(_head, _tail, comparator);
   }
 
   /**
    * Sort implementation to order the list according to the given comparator.<br>
-   * Uses insertionsort for smaller arrays and quicksort for larger arrays.
    *
    * @param head       (including)
    * @param tail       (excluding)
    * @param comparator
    */
   private void sort(int head, int tail, Comparator<Integer> comparator) {
-    if (tail - head < 150) {
+    // Bigger arrays will be sorted with Arrays.sort. As Arrays.sort
+    // only accepts object[] when using a comparator we need to convert.
+    // Therefore small arrays will be sorted with local insertion sort as convertion
+    // is too expensive.
+    // TODO: 5000 are arbitrarily chosen - needs timing tests
+    if (tail - head < 5000 && comparator!=null) {
       insertionsort(head, tail, comparator);
     } else {
-      quicksort(head, tail, comparator);
+      final Integer[] tmp = Arrays.stream(_list).boxed().toArray(Integer[]::new);
+      Arrays.sort(tmp, _head, _tail, comparator);
+      _list = Arrays.stream(tmp).mapToInt(o -> o).toArray();
     }
   }
 
@@ -379,38 +505,6 @@ public class SimpleIntList implements Iterable<Integer> {
           _list[j] = _list[j - 1];
           _list[j - 1] = temp;
         }
-      }
-    }
-  }
-
-  /**
-   * Quicksort algorithm for larger arrays.
-   *
-   * @param head
-   * @param tail
-   * @param comparator
-   */
-  private void quicksort(int head, int tail, Comparator<Integer> comparator) {
-    tail--; // tail is not included
-    int low = head, high = tail;
-    int midValue = _list[(head + tail) / 2];
-    while (low <= high) {
-      while (comparator.compare(_list[low], midValue) < 0) {
-        low++;
-      }
-      while (comparator.compare(_list[high], midValue) > 0) {
-        high--;
-      }
-      if (low <= high) {
-        exchange(low, high);
-        low++;
-        high--;
-      }
-      if (head < high) {
-        sort(head, high, comparator);
-      }
-      if (low < tail) {
-        sort(low, tail, comparator);
       }
     }
   }

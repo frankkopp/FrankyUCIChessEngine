@@ -44,11 +44,13 @@ class EvaluationConfig {
 
   static final int MATERIAL_WEIGHT    = 1;
   static final int POSITION_WEIGHT    = 1;
-  static final int MOBILITY_WEIGHT    = 4;
+  static final int MOBILITY_WEIGHT    = 2;
   static final int KING_SAFETY_WEIGHT = 1;
 
   static final int KING_SAFETY_PAWNSHIELD = 10;
   static final int CORNERED_ROOK_PENALTY  = -50;
+
+  public static int CONTEMPT_FACTOR = 2; // will be multiplied with game phase factor
 
   // @formatter:off
   // PAWN Tables
@@ -57,7 +59,7 @@ class EvaluationConfig {
      0,  0,  0,  0,  0,  0,  0,  0,
      0,  5,  5,  5,  5,  5,  5,  0,
      5,  5, 10, 30, 30, 10,  5,  5,
-     0,  0,  0, 20, 20,  0,  0,  0,
+     0,  0,  0, 25, 25,  0,  0,  0,
      5, -5,-10,  0,  0,-10, -5,  5,
      5, 10, 10,-30,-30, 10, 10,  5,
      0,  0,  0,  0,  0,  0,  0,  0
@@ -164,7 +166,7 @@ class EvaluationConfig {
     -30,-40,-40,-50,-50,-40,-40,-30,
     -20,-30,-30,-40,-40,-30,-30,-20,
     -10,-20,-20,-20,-20,-20,-20,-10,
-      0,  0,  0,  0,  0,  0,  0,  0,
+      0,  0,  0,-10,-10,-10,  0,  0,
      20, 50, 40,-10,  0,-10, 50, 20
   };
   static int[] kingEndGame   = new int[] {

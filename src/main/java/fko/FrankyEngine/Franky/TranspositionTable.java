@@ -232,7 +232,7 @@ public class TranspositionTable {
     static final int SIZE = 32;
 
     long         key   = 0L;
-    int          value = Integer.MIN_VALUE;
+    int          value = Evaluation.NOVALUE;
     int          depth = 0;
     TT_EntryType type  = TT_EntryType.ALPHA;
   }

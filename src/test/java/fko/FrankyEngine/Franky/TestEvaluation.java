@@ -78,38 +78,32 @@ public class TestEvaluation {
   @Test
   void getGamePhaseFactor() {
     position = new Position();
-    evaluation.setPosition(position);
-    assertEquals(24, evaluation.getGamePhaseFactor());
+    assertEquals(24, evaluation.getGamePhaseFactor(position));
 
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
-    evaluation.setPosition(position);
-    assertEquals(11, evaluation.getGamePhaseFactor());
+    assertEquals(11, evaluation.getGamePhaseFactor(position));
 
     position = new Position("k6n/7p/6P1/7K/8/8/8/8 w - - 0 1");
-    evaluation.setPosition(position);
-    assertEquals(1, evaluation.getGamePhaseFactor());
+    assertEquals(1, evaluation.getGamePhaseFactor(position));
   }
 
   @Test
   void material() {
     // Start position
     position = new Position(fenStandard);
-    evaluation.setPosition(position);
-    int value = evaluation.material();
+    int value = evaluation.material(position);
     assertEquals(0, value);
 
     // other positions
     String fen = "k6n/7p/6P1/7K/8/8/8/8 w - - 0 1"; // white
     position = new Position(fen);
-    evaluation.setPosition(position);
-    value = evaluation.material();
+    value = evaluation.material(position);
     // System.out.println(value);
     assertEquals(-320, value);
 
     fen = "8/8/8/8/k7/1p6/P7/N6K b - - 0 1"; // black
     position = new Position(fen);
-    evaluation.setPosition(position);
-    value = evaluation.material();
+    value = evaluation.material(position);
     // System.out.println(value);
     assertEquals(-320, value);
   }
@@ -118,30 +112,26 @@ public class TestEvaluation {
   void mobility() {
     // Start position
     position = new Position(fenStandard);
-    evaluation.setPosition(position);
-    int value = evaluation.mobility();
+    int value = evaluation.mobility(position);
     //System.out.println(value);
     assertEquals(0, value);
 
     // other positions
     String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
     position = new Position(fen);
-    evaluation.setPosition(position);
-    value = evaluation.mobility();
+    value = evaluation.mobility(position);
     //System.out.println(value);
     assertEquals(52, value);
 
     fen = "k6n/7p/6P1/7K/8/8/8/8 w - - 0 1"; // white
     position = new Position(fen);
-    evaluation.setPosition(position);
-    value = evaluation.mobility();
+    value = evaluation.mobility(position);
     //System.out.println(value);
     assertEquals(-4, value);
 
     fen = "8/8/8/8/k7/1p6/P7/N6K b - - 0 1"; // black
     position = new Position(fen);
-    evaluation.setPosition(position);
-    value = evaluation.mobility();
+    value = evaluation.mobility(position);
     //System.out.println(value);
     assertEquals(-4, value);
   }
@@ -150,37 +140,29 @@ public class TestEvaluation {
   void position() {
     // Start Position
     position = new Position();
-    evaluation.setPosition(position);
-    evaluation.evaluate();
-    assertEquals(0,evaluation.position());
+    assertEquals(0,evaluation.position(position));
 
     // All White pieces no Black pieces but King
     position = new Position("4k3/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1");
-    evaluation.setPosition(position);
-    evaluation.evaluate();
-    assertEquals(-35,evaluation.position());
+    assertEquals(-35,evaluation.position(position));
 
     // All Black pieces no White pieces but King
     position = new Position("rnbqkbnr/pppppppp/8/8/8/8/8/4K3 w kq - 0 1");
-    evaluation.setPosition(position);
-    evaluation.evaluate();
-    assertEquals(35,evaluation.position());
+    assertEquals(35,evaluation.position(position));
 
   }
 
   @Test
   public final void testNeutralPosition() {
     position = new Position("7k/7p/8/8/8/8/P7/K7 w - - 0 1");
-    evaluation.setPosition(position);
-    int mat = evaluation.material();
-    int mob = evaluation.mobility();
+    int mat = evaluation.material(position);
+    int mob = evaluation.mobility(position);
     System.out.println("Material: " + mat);
     System.out.println("Mobility: " + mob);
 
     position = new Position("7k/7p/8/8/8/8/P7/K7 b - - 0 1");
-    evaluation.setPosition(position);
-    mat = evaluation.material();
-    mob = evaluation.mobility();
+    mat = evaluation.material(position);
+    mob = evaluation.mobility(position);
     System.out.println("Material: " + mat);
     System.out.println("Mobility: " + mob);
 
@@ -234,32 +216,55 @@ public class TestEvaluation {
   @Test
   public final void testKingSafety() {
     position = new Position("rnbq1rk1/pppp1ppp/5n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w - -");
-    evaluation.setPosition(position);
-    assertEquals(0, evaluation.kingSafety());
+    assertEquals(0, evaluation.kingSafety(position));
     LOG.info(evaluation.toString());
 
     position = new Position("2kr1bnr/pppq1ppp/2np4/4p3/2B1P1b1/2NP1N2/PPP2PPP/R1BQ1RK1 w - -");
-    evaluation.setPosition(position);
-    assertEquals(10, evaluation.kingSafety());
+    assertEquals(10, evaluation.kingSafety(position));
     LOG.info(evaluation.toString());
 
     position = new Position("rnbq1rk1/pppp1ppp/5n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b - -");
-    evaluation.setPosition(position);
-    assertEquals(0, evaluation.kingSafety());
+    assertEquals(0, evaluation.kingSafety(position));
     LOG.info(evaluation.toString());
 
     position = new Position("2kr1bnr/pppq1ppp/2np4/4p3/2B1P1b1/2NP1N2/PPP2PPP/R1BQ1RK1 b - -");
-    evaluation.setPosition(position);
-    assertEquals(-10, evaluation.kingSafety());
+    assertEquals(-10, evaluation.kingSafety(position));
     LOG.info(evaluation.toString());
   }
+
+ @Test
+ public void testPositionValue() {
+   position = new Position();
+   int move;
+
+   move = Move.fromSANNotation(position, "e4");
+   assertEquals(20, Evaluation.getPositionValue(position, move));
+
+   move = Move.fromSANNotation(position, "c3");
+   assertEquals(-10, Evaluation.getPositionValue(position, move));
+
+   move = Move.fromSANNotation(position, "Na3");
+   assertEquals(-30, Evaluation.getPositionValue(position, move));
+
+   position = new Position("r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq -");
+
+   move = Move.fromSANNotation(position, "a6");
+   assertEquals(5, Evaluation.getPositionValue(position, move));
+
+   move = Move.fromSANNotation(position, "Qh4");
+   assertEquals(-5, Evaluation.getPositionValue(position, move));
+
+   move = Move.fromSANNotation(position, "Ke7");
+   assertEquals(-10, Evaluation.getPositionValue(position, move));
+
+
+ }
 
   @Test
   @Disabled
   public final void testNewEvals() {
     position = new Position("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1");
-    evaluation.setPosition(position);
-    evaluation.evaluate();
+    evaluation.evaluate(position);
   }
 
   @Test

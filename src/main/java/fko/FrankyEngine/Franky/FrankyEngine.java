@@ -51,22 +51,22 @@ public class FrankyEngine implements IUCIEngine {
   private IUCIProtocolHandler uciProtocolHandler = null;
 
   // configuration parameters
+
   private final Configuration config = new Configuration();
-
   // the current search instance
-  private Search search;
 
+  private Search search;
   // ID of engine
+
   private String iDName   = "Franky";
   private String iDAuthor = "Frank Kopp";
-
   // options of engine
-  private List<IUCIEngine.IUCIOption> iUciOptions;
 
+  private List<IUCIEngine.IUCIOption> iUciOptions;
   // engine state
+
   private Position   position;
   private SearchMode searchMode;
-
   /**
    * Default Constructor
    */
@@ -224,6 +224,27 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 "",
                 ""));
+     iUciOptions.add(
+        new UCIOption("Use_Killer_Moves",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_KILLER_MOVES),
+                "",
+                "",
+                ""));
+//     iUciOptions.add(
+//        new UCIOption("Use_Full_Move_Ordering",
+//                UCIOptionType.check,
+//                Boolean.toString(config.USE_SORT_ALL_MOVES),
+//                "",
+//                "",
+//                ""));
+    iUciOptions.add(
+        new UCIOption("Use_Late_Move_Reduction",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_LMR),
+                "",
+                "",
+                ""));
    // @formatter:on
   }
 
@@ -330,13 +351,13 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      case "Use_Razor_Pruning":
-        config.USE_RAZOR_PRUNING = Boolean.valueOf(value);
-        msg = "Use Razor Pruning set to " + (config.USE_RAZOR_PRUNING ? "On" : "Off");
+      case "Use_Late_Move_Reduction":
+        config.USE_KILLER_MOVES = Boolean.valueOf(value);
+        msg = "Use Late Move Reduction set to " + (config.USE_LMR ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      default:
+        default:
         LOG.error("Unknown option: {}", name);
         break;
     }
@@ -363,7 +384,7 @@ public class FrankyEngine implements IUCIEngine {
 
   @Override
   public void doMove(final String moveUCI) {
-    LOG.info("Engine got doMove command: " + moveUCI);
+    LOG.debug("Engine got doMove command: " + moveUCI);
     final int move = Move.fromUCINotation(position, moveUCI);
     position.makeMove(move);
   }
@@ -487,6 +508,13 @@ public class FrankyEngine implements IUCIEngine {
    */
   public Search getSearch() {
     return search;
+  }
+
+  /**
+   * @return the configuration object this engine uses
+   */
+  public Configuration getConfig() {
+    return config;
   }
 
 

@@ -25,6 +25,8 @@
 
 package fko.FrankyEngine.Franky;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Comparator;
 import java.util.stream.IntStream;
 
@@ -37,11 +39,10 @@ import java.util.stream.IntStream;
  *
  * @author Frank Kopp
  */
-@SuppressWarnings("unused")
 public class MoveGenerator {
 
-  private static final boolean CACHE = false;
-  private static final boolean SORT  = true;
+  boolean SORT_CAPTURING_MOVES = true;
+  boolean SORT_MOVES           = true;
 
   // the current position we generate the move for
   // is set in the getMoves methods
@@ -61,10 +62,10 @@ public class MoveGenerator {
   private final MoveList capturingMoves    = new MoveList(); // only capturing moves
   private final MoveList nonCapturingMoves = new MoveList(); // only non capturing moves
   private final MoveList castlingMoves     = new MoveList(); // only castling moves
-  private final MoveList evasionMoves      = new MoveList(); // only evasion moves
 
   // These fields control the on demand generation of moves.
   private OnDemandState generationCycleState = OnDemandState.NEW;
+  private int[]         killerMoves          = null;
 
   private enum OnDemandState {
     NEW, PAWN, KNIGHTS, BISHOPS, ROOKS, QUEENS, KINGS, ALL
@@ -75,13 +76,22 @@ public class MoveGenerator {
 
   // Comparator for move value victim least value attacker
   private static final Comparator<Integer> mvvlvaComparator = Comparator.comparingInt(
-    (Integer a) -> (Move.getPiece(a).getType().getValue() -
-                    Move.getTarget(a).getType().getValue()));
+    (Integer move) -> (Move.getPiece(move).getType().getValue() -
+                       Move.getTarget(move).getType().getValue()));
 
   /**
    * Creates a new {@link MoveGenerator}
    */
   public MoveGenerator() {
+  }
+
+  /**
+   * sets killer moves which will be inserted after capturing moves
+   *
+   * @param killerMoves
+   */
+  public void setKillerMoves(int[] killerMoves) {
+    this.killerMoves = killerMoves.clone();
   }
 
   /**
@@ -103,20 +113,13 @@ public class MoveGenerator {
         captureMovesOnly != capturingOnly) {
       generationCycleState = OnDemandState.NEW;
       clearLists();
+      // update position
+      this.position = position;
+      activePlayer = this.position.getNextPlayer();
+      captureMovesOnly = capturingOnly;
       // remember the last position to see when it has changed
       this.onDemandZobristLastPosition = position.getZobristKey();
     }
-
-    // update position
-    this.position = position;
-    activePlayer = this.position.getNextPlayer();
-
-    captureMovesOnly = capturingOnly;
-
-    // clear lists
-    capturingMoves.clear();
-    nonCapturingMoves.clear();
-    castlingMoves.clear();
 
     /*
      * If the list is currently empty and we have not generated all moves yet
@@ -124,53 +127,53 @@ public class MoveGenerator {
      * and there are no more moves to generate
      */
     while (onDemandMoveList.empty() && !(generationCycleState == OnDemandState.ALL)) {
+
+      capturingMoves.clear();
+      castlingMoves.clear();
+
       switch (generationCycleState) {
         case NEW: // no moves yet generate pawn moves first
           // generate pawn moves
           generatePawnMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
-          onDemandMoveList.add(nonCapturingMoves);
           generationCycleState = OnDemandState.PAWN;
           break;
         case PAWN: // we have all moves but knight, bishop, rook, queen and king moves
           generateKnightMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
-          onDemandMoveList.add(nonCapturingMoves);
           generationCycleState = OnDemandState.KNIGHTS;
           break;
         case KNIGHTS: // we have all moves but bishop, rook, queen and king moves
           generateBishopMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
-          onDemandMoveList.add(nonCapturingMoves);
           generationCycleState = OnDemandState.BISHOPS;
           break;
         case BISHOPS: // we have all moves but rook, queen and king moves
           generateRookMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
-          onDemandMoveList.add(nonCapturingMoves);
           generationCycleState = OnDemandState.ROOKS;
           break;
         case ROOKS: // we have all moves but queen and king moves
           generateQueenMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
-          onDemandMoveList.add(nonCapturingMoves);
           generationCycleState = OnDemandState.QUEENS;
           break;
         case QUEENS: // we have all moves but king moves
           generateKingMoves();
-          if (SORT) capturingMoves.sort(mvvlvaComparator);
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
           onDemandMoveList.add(capturingMoves);
-          onDemandMoveList.add(nonCapturingMoves);
           generationCycleState = OnDemandState.KINGS;
           break;
         case KINGS: // we have all non capturing
           generateCastlingMoves();
-          onDemandMoveList.add(castlingMoves);
+          nonCapturingMoves.addFront(castlingMoves);
+          moveListSort(nonCapturingMoves);
+          onDemandMoveList.add(nonCapturingMoves);
           generationCycleState = OnDemandState.ALL;
           break;
         case ALL:
@@ -180,7 +183,7 @@ public class MoveGenerator {
       }
     }
 
-    // return a move a delete it form the list
+    // return a move and delete it form the list
     if (!onDemandMoveList.empty()) {
       return onDemandMoveList.removeFirst();
     }
@@ -194,8 +197,26 @@ public class MoveGenerator {
    * manually.
    */
   public void resetOnDemand() {
-    onDemandMoveList.clear();
     onDemandZobristLastPosition = 0;
+    capturingMoves.clear();
+    nonCapturingMoves.clear();
+    castlingMoves.clear();
+    onDemandMoveList.clear();
+  }
+
+  /**
+   * Streams <b>all</b> legal moves for a position.<br>
+   * Legal moves have been checked if they leave the king in check or not. Repeated calls to this
+   * will return a cached list as long the position has not changed in between.<br>
+   * This method basically calls <code>getPseudoLegalMoves</code> and then filters the non legal
+   * moves out of the provided list by checking each move if it leaves the king in check.<br>
+   *
+   * @param position
+   * @param fullSort true if list should sorted in full, false provides only pre-sorted list
+   * @return legal moves
+   */
+  public IntStream streamLegalMoves(Position position, boolean fullSort) {
+    return this.getLegalMoves(position, fullSort).stream();
   }
 
   /**
@@ -209,7 +230,7 @@ public class MoveGenerator {
    * @return legal moves
    */
   public IntStream streamLegalMoves(Position position) {
-    return this.getLegalMoves(position).stream();
+    return this.getLegalMoves(position, false).stream();
   }
 
   /**
@@ -223,9 +244,10 @@ public class MoveGenerator {
    * Make a clone if this is not desired.
    *
    * @param position
+   * @param fullSort true if list should sorted in full, false provides only pre-sorted list
    * @return reference to a list of legal moves
    */
-  public MoveList getLegalMoves(Position position) {
+  public MoveList getLegalMoves(Position position, boolean fullSort) {
     if (position == null) {
       throw new IllegalArgumentException("position may not be null to generate moves");
     }
@@ -246,8 +268,26 @@ public class MoveGenerator {
       if (isLegalMove(move)) legalMoves.add(move);
     }
 
-    // return a clone of the list as we will continue to use the list as a static list
+    if (fullSort) moveListSort(legalMoves);
+
     return legalMoves;
+  }
+
+  /**
+   * Generates <b>all</b> legal moves for a position. Legal moves have been checked if they leave
+   * the king in check or not. Repeated calls to this will return a cached list as long the position
+   * has not changed in between.<br>
+   * This method basically calls <code>getPseudoLegalMoves</code> and the filters the non legal
+   * moves out of the provided list by checking each move if it leaves the king in check.<br>
+   * <b>Attention:</b> returns a reference to the list of move which will change after calling this
+   * again.<br>
+   * Make a clone if this is not desired.
+   *
+   * @param position
+   * @return reference to a list of legal moves
+   */
+  public MoveList getLegalMoves(Position position) {
+    return getLegalMoves(position, false);
   }
 
   /**
@@ -331,6 +371,7 @@ public class MoveGenerator {
     // call the move generators
     generatePseudoLegaMoves();
 
+    // if check return all moves - non evation moves will be filtered by legal check
     if (!captureMovesOnly) {
       return pseudoLegalMoves;
     }
@@ -384,18 +425,119 @@ public class MoveGenerator {
     generateQueenMoves();
     generateKingMoves();
 
-    // sort the capturing moves for mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
-    if (SORT) capturingMoves.sort(mvvlvaComparator);
+    // at this point we have all capturing moves - return if this is all we need
+    if (captureMovesOnly) {
+      // sort the capturing moves for mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
+      if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
+      // now we have all capturing moves
+      pseudoLegalMoves.add(capturingMoves);
+      return;
+    }
 
-    // now we have all capturing moves
-    pseudoLegalMoves.add(capturingMoves);
-    if (captureMovesOnly) return;
-
-    // add castlings (never capture)
+    // generate castling moves late as they never capture
     generateCastlingMoves();
 
-    pseudoLegalMoves.add(castlingMoves);
-    pseudoLegalMoves.add(nonCapturingMoves);
+    // put castling to front of non capture moves
+    nonCapturingMoves.addFront(castlingMoves);
+
+    // sort all moves
+    if (SORT_MOVES) {
+      // sort over all moves
+      pseudoLegalMoves.add(capturingMoves);
+      pseudoLegalMoves.add(nonCapturingMoves);
+      moveListSort(pseudoLegalMoves);
+
+    } else {
+      // sort only capturing moves mvvlva order (Most Valuable Victim - Least Valuable Aggressor)
+      if (SORT_CAPTURING_MOVES) {
+        capturingMoves.sort(mvvlvaComparator);
+        pushKillerMoves(nonCapturingMoves);
+      }
+      pseudoLegalMoves.add(capturingMoves);
+      pseudoLegalMoves.add(nonCapturingMoves);
+    }
+  }
+
+  /**
+   * Sort value for all moves. Smaller values heapsort first
+   */
+  private int getSortValue(int move) {
+
+    // capturing moves
+    if (!Move.getTarget(move).equals(Piece.NOPIECE)) {
+      return 1000 + Move.getPiece(move).getType().getValue() -
+             Move.getTarget(move).getType().getValue();
+    }
+    // non capturing
+    else {
+      if (killerMoves != null) {
+        for (int i = killerMoves.length - 1; i >= 0; i--) {
+          if (killerMoves[i] == move) {
+            return 5000 + i;
+          }
+        }
+      }
+      // promotions
+      final PieceType pieceType = Move.getPromotion(move).getType();
+      if (!pieceType.equals(PieceType.NOTYPE)) {
+        switch (pieceType) {
+          case QUEEN:
+            return 9000;
+          case KNIGHT:
+            return 9100;
+          case ROOK:
+            return 10900;
+          case BISHOP:
+            return 10900;
+        }
+      }
+      // castling
+      else if (Move.getMoveType(move).equals(MoveType.CASTLING)) {
+        return 9200;
+      }
+      // all other moves
+      return 10000 - Evaluation.getPositionValue(position, move);
+    }
+  }
+
+  /**
+   * Special moveListSort to use index array as comparator
+   *
+   * @param moveList
+   */
+  private void moveListSort(MoveList moveList) {
+    // create index array
+    int[] sortIdx = new int[moveList.size()];
+    for (int i = 0; i < moveList.size(); i++) {
+      sortIdx[i] = getSortValue(moveList.get(i));
+    }
+    // insertion sort
+    int ts;
+    for (int i = 0; i < moveList.size(); i++) {
+      for (int j = i; j > 0; j--) {
+        if (sortIdx[j] - sortIdx[j - 1] < 0) {
+          moveList.swap(j - 1, j);
+          ts = sortIdx[j];
+          sortIdx[j] = sortIdx[j - 1];
+          sortIdx[j - 1] = ts;
+        }
+      }
+    }
+  }
+
+  /**
+   * Pushing killer moves to fron of moveList of there are any
+   *
+   * @param moveList
+   */
+  private void pushKillerMoves(final MoveList moveList) {
+    if (killerMoves != null && nonCapturingMoves.size() > 0) {
+      for (int i = killerMoves.length - 1; i >= 0; i--) {
+        if (killerMoves[i] != Move.NOMOVE && killerMoves[i] != nonCapturingMoves.get(0)) {
+          moveList.pushToHeadStable(killerMoves[i]);
+        }
+      }
+    }
   }
 
   private void generatePawnMoves() {
@@ -441,13 +583,13 @@ public class MoveGenerator {
                                   Piece.WHITE_QUEEN));
                 capturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
+                                  Piece.WHITE_KNIGHT));
+                capturingMoves.add(
+                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.WHITE_ROOK));
                 capturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.WHITE_BISHOP));
-                capturingMoves.add(
-                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                  Piece.WHITE_KNIGHT));
               } else if (to < 8) { // rank 1
                 assert activePlayer.isBlack(); // checking for  color is probably redundant
                 capturingMoves.add(
@@ -455,13 +597,13 @@ public class MoveGenerator {
                                   Piece.BLACK_QUEEN));
                 capturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
+                                  Piece.BLACK_KNIGHT));
+                capturingMoves.add(
+                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.BLACK_ROOK));
                 capturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.BLACK_BISHOP));
-                capturingMoves.add(
-                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                  Piece.BLACK_KNIGHT));
               } else { // normal capture
                 capturingMoves.add(
                   Move.createMove(type, fromSquare, toSquare, piece, target, promotion));
@@ -488,13 +630,13 @@ public class MoveGenerator {
                                   Piece.WHITE_QUEEN));
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
+                                  Piece.WHITE_KNIGHT));
+                nonCapturingMoves.add(
+                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.WHITE_ROOK));
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.WHITE_BISHOP));
-                nonCapturingMoves.add(
-                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                  Piece.WHITE_KNIGHT));
               } else if (to < 8) { // rank 1
                 assert activePlayer.isBlack(); // checking for color is probably redundant
                 nonCapturingMoves.add(
@@ -502,13 +644,13 @@ public class MoveGenerator {
                                   Piece.BLACK_QUEEN));
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
+                                  Piece.BLACK_KNIGHT));
+                nonCapturingMoves.add(
+                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.BLACK_ROOK));
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.BLACK_BISHOP));
-                nonCapturingMoves.add(
-                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                  Piece.BLACK_KNIGHT));
               } else {
                 // pawndouble
                 if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow() &&
@@ -535,7 +677,6 @@ public class MoveGenerator {
         }
       }
     }
-    // });
   }
 
   private void generateKnightMoves() {
@@ -730,12 +871,8 @@ public class MoveGenerator {
     /*
      * Find a move by finding at least one moves for a piece type
      */
-    if (findKingMove() || findPawnMove() || findKnightMove() || findQueenMove() || findRookMove() ||
-        findBishopMove()) {
-
-      return true;
-    }
-    return false;
+    return findKingMove() || findPawnMove() || findKnightMove() || findQueenMove() ||
+           findRookMove() || findBishopMove();
   }
 
   /**
@@ -947,9 +1084,9 @@ public class MoveGenerator {
     onDemandMoveList.clear();
     legalMoves.clear();
     pseudoLegalMoves.clear();
-    evasionMoves.clear();
     capturingMoves.clear();
     nonCapturingMoves.clear();
     castlingMoves.clear();
   }
+
 }

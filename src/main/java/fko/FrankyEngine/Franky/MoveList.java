@@ -79,18 +79,15 @@ public class MoveList extends SimpleIntList {
     }
 
     @Override
+    public void addFront(SimpleIntList newList) {
+        if (!(newList instanceof MoveList))
+            throw new IllegalArgumentException("not a valid MoveList: "+newList);
+        super.addFront(newList);
+    }
+
+    @Override
     public void sort(Comparator<Integer> comparator) {
-        int temp;
-        for (int i = _head + 1; i < _tail; i++) {
-            for (int j = i; j > _head; j--) {
-                if (Move.getPiece(_list[j]).getType().getValue() - Move.getTarget(_list[j]).getType().getValue()
-                    - (Move.getPiece(_list[j - 1]).getType().getValue() - Move.getTarget(_list[j - 1]).getType().getValue()) < 0) {
-                    temp = _list[j];
-                    _list[j] = _list[j-1];
-                    _list[j-1] = temp;
-                }
-            }
-        }
+        super.sort(comparator);
     }
 
     @Override
@@ -133,8 +130,8 @@ public class MoveList extends SimpleIntList {
      * @param dest
      */
     static void savePV(int move, MoveList src, MoveList dest) {
-        dest._list[0] = move;
-        System.arraycopy(src._list, src._head, dest._list, 1, src.size());
-        dest._tail = src.size() + 1;
+        dest.clear();
+        dest.add(move);
+        dest.add(src);
     }
 }

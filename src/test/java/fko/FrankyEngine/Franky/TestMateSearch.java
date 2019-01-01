@@ -55,10 +55,7 @@ class TestMateSearch {
   }
 
   @Test
-  @Disabled
   public void testMateSearch() {
-
-    // FIXME: This mate search seems to be wrong - Fritz says 8 (15ply) this says 12
 
     testMate0Search();
     testMate1Search();
@@ -100,7 +97,7 @@ class TestMateSearch {
 
     fen = "8/8/8/8/8/6K1/R7/6k1 w - - 0 8"; // 9999
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 1, 0, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 2, 0, 1, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -120,7 +117,7 @@ class TestMateSearch {
 
     fen = "8/8/8/8/8/5K2/R7/7k w - - 0 7"; // 9997
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 2, 0, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 4, 0, 2, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -139,7 +136,7 @@ class TestMateSearch {
 
     fen = "8/8/8/8/8/4K3/R7/6k1 w - - 0 6"; // 9993
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 3, 0, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 6, 0, 3, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -158,7 +155,7 @@ class TestMateSearch {
 
     fen = "8/8/8/8/8/3K4/R7/5k2 w - - 0 5"; // 9993
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 8, 0, 4, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -186,7 +183,7 @@ class TestMateSearch {
 
     fen = "8/8/8/8/4K3/8/R7/4k3 w - - 0 4"; // 9991
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 5, 0, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 10, 0, 5, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -205,7 +202,7 @@ class TestMateSearch {
 
     fen = "8/8/8/5K2/8/8/R7/5k2 w - - 0 3"; // 9989
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 0, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 12, 0, 6, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -224,7 +221,7 @@ class TestMateSearch {
 
     fen = "8/8/6K1/8/8/8/R7/6k1 w - - 0 2"; // 9987
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 7, 0, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 14, 0, 7, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -243,7 +240,7 @@ class TestMateSearch {
 
     fen = "8/7K/8/8/8/8/R7/7k w - - 0 1"; // 9985
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 18, 0, 8, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);

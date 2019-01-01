@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -85,7 +86,7 @@ public class TestMoveGenerator {
       if (!found) {
         System.out.print("---- ");
       }
-      found=false;
+      found = false;
       for (int qMove : qsearch_moves) {
         if (plMove == qMove) {
           System.out.print(Move.toSimpleString(qMove) + " ");
@@ -163,6 +164,73 @@ public class TestMoveGenerator {
   }
 
   /**
+   * Tests the generated moves from board setup with killer moves sorting
+   */
+  @Test
+  public void testKiller() {
+
+    String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq - 0 113";
+    Position board = new Position(testFen);
+
+    int killer1 = 67178790; // 67178790 (NORMAL Rg3-c3)
+    int killer2 = 67178534; // 67178534 (NORMAL Rg3-a3)
+    int killer3 = 67130005; // already at first position
+
+    MoveGenerator moveGenerator = new MoveGenerator();
+    moveGenerator.setKillerMoves(new int[]{killer1, killer2, killer3});
+    MoveList moves = moveGenerator.getLegalMoves(board);
+
+    int lastCapture = 0;
+    for (int i = 0; i < moves.size(); i++) {
+      // skip the captures
+      if (!Move.getTarget(moves.get(i)).equals(Piece.NOPIECE)) {
+        lastCapture = i;
+        continue;
+      }
+      // now we should have our two killers
+      assertTrue(i == lastCapture + 1 && moves.get(i) == killer1 && moves.get(i + 1) == killer2);
+      break;
+    }
+    System.out.println(moves);
+    System.out.println(moveGenerator.hasLegalMove(board));
+
+  }
+
+  /**
+   * Tests the generated moves from a standard board setup
+   */
+  @Test
+  public void testOnDemand() {
+    MoveGenerator moveGenerator = new MoveGenerator();
+    Position board = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3");
+
+    { // test all moves
+      int j = 0;
+      int move = moveGenerator.getNextPseudoLegalMove(board, false);
+      while (move != Move.NOMOVE) {
+        System.out.println((j++) + ". " + Move.toString(move));
+        move = moveGenerator.getNextPseudoLegalMove(board, false);
+      }
+      MoveList moves = moveGenerator.getPseudoLegalMoves(board);
+      System.out.println("OnDemand: " + j + " Bulk: " + moves.size());
+      System.out.println();
+      assert (j == moves.size());
+    }
+
+    { // test all moves with killers sorted before non-captures
+      moveGenerator.resetOnDemand();
+      moveGenerator.setKillerMoves(new int[]{67320564, 67318516});
+      int j = 0;
+      int move = moveGenerator.getNextPseudoLegalMove(board, false);
+      while (move != Move.NOMOVE) {
+        System.out.println((j++) + ". " + Move.toString(move));
+        move = moveGenerator.getNextPseudoLegalMove(board, false);
+      }
+    }
+
+  }
+
+  /**
    * Tests the generated moves from a standard board setup
    */
   @Test
@@ -196,9 +264,6 @@ public class TestMoveGenerator {
 
   }
 
-  /**
-   *
-   */
   @Test
   public void testMoveSorting() {
 
@@ -226,13 +291,50 @@ public class TestMoveGenerator {
     }
   }
 
+  @Test
+  public void testSingleMoveSorting() {
+
+    MoveGenerator moveGenerator = new MoveGenerator();
+    Position board = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
+
+    int killer1 = 67320564;
+    int killer2 = 67318516;
+
+    moveGenerator.setKillerMoves(new int[]{killer1, killer2});
+    MoveList moves = moveGenerator.getPseudoLegalMoves(board);
+
+    int lastCapture = 0;
+    for (int i = 0; i < moves.size(); i++) {
+      // skip the captures
+      if (!Move.getTarget(moves.get(i)).equals(Piece.NOPIECE)) {
+        lastCapture = i;
+        continue;
+      }
+      // now we should have our two killers
+      assertTrue(i == lastCapture + 1
+                 && moves.get(i) == killer1
+                 && moves.get(i + 1) == killer2
+                 && moves.get(i + 2) == 247578640 // queen promotion
+                );
+      break;
+    }
+
+    for (int move : moves) {
+      System.out.printf("%-20s (%d) %n",
+                        Move.toString(move),
+                        Evaluation.getPositionValue(board, move));
+    }
+
+    System.out.println();
+
+  }
 
   /**
    * Tests the timing
    */
   @Test
   @Disabled
-  public void testTiming() {
+  public void testTimingOnDemand() {
 
     int ITERATIONS = 0;
     int DURATION = 1;
@@ -246,10 +348,9 @@ public class TestMoveGenerator {
     while (fens[i] != null) {
       String testFen = fens[i];
       board = new Position(testFen);
-      //System.out.println(board);
 
       // Pseudo Legal Moves
-      MoveList moves = new MoveList();
+      MoveList moves;
       start = Instant.now();
       while (true) {
         ITERATIONS++;
@@ -257,11 +358,10 @@ public class TestMoveGenerator {
         if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) {
           break;
         }
-        ;
       }
       //System.out.println(moves);
       System.out.println(
-        String.format("   PseudoLegal: %,7d runs/s for %s (%,d)", ITERATIONS / DURATION, fens[i],
+        String.format("   PseudoLegal: %,10d runs/s for %s (%,d)", ITERATIONS / DURATION, fens[i],
                       moves.size()));
 
       // Legal Moves On Demand
@@ -280,10 +380,9 @@ public class TestMoveGenerator {
         if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) {
           break;
         }
-        ;
       }
       System.out.println(
-        String.format("OD PseudoLegal: %,7d runs/s for %s (%,d)", ITERATIONS / DURATION, fens[i],
+        String.format("OD PseudoLegal: %,10d runs/s for %s (%,d)", ITERATIONS / DURATION, fens[i],
                       moveCounter));
 
       // Legal Moves
@@ -299,7 +398,7 @@ public class TestMoveGenerator {
         ;
       }
       System.out.println(
-        String.format("         Legal: %,7d runs/s for %s (%,d)", ITERATIONS / DURATION, fens[i],
+        String.format("         Legal: %,10d runs/s for %s (%,d)", ITERATIONS / DURATION, fens[i],
                       moves.size()));
 
       i++;
@@ -310,8 +409,8 @@ public class TestMoveGenerator {
 
     int i = 0;
     String[] fen = new String[200];
-    fen[i++] = "R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"; // 218 moves to make
     fen[i++] = "r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113";
+    fen[i++] = "R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"; // 218 moves to make
     fen[i++] = "r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 b kq e3 0 113";
     fen[i++] = "r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq - 0 113";
     fen[i++] = "8/1P6/6k1/8/8/8/p1K5/8 w - - 0 1";
@@ -354,6 +453,94 @@ public class TestMoveGenerator {
     //        fen[i++]="r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 b kq e3 0 113";
     return fen;
 
+  }
+
+  @Test
+  @Disabled
+  public void testTiming() {
+
+    ArrayList<String> result = new ArrayList<>();
+
+    MoveList m1 = new MoveList();
+    MoveList m2 = new MoveList();
+    final Position position =
+      new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
+
+    int ROUNDS = 5;
+    int ITERATIONS = 25;
+    int REPETITIONS = 20000;
+
+    for (int round=0; round<ROUNDS; round++) {
+      long start=0, end=0, sum=0;
+
+      System.out.printf("Running round %d of Timing Test Test 1 vs. Test 2%n", round);
+      System.gc();
+
+      int i = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          m1 = test1(position);
+        }
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg1 = ((float)sum/ITERATIONS) / 1e9f;
+
+      i = 0;
+      sum = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          m2 = test2(position);
+        }
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg2 = ((float)sum/ITERATIONS) / 1e9f;
+
+      result.add(String.format("Round %d Test 1 avg: %,.3f sec", round, avg1));
+      result.add(String.format("Round %d Test 2 avg: %,.3f sec", round, avg2));
+    }
+
+    System.out.println();
+    System.out.printf("%-20s %-20s %n", "Test 1", "Test 2");
+    for (int i = 0; i < m1.size(); i++) {
+      System.out.printf("%-20s %-20s %n", Move.toString(m1.get(i)), Move.toString(m2.get(i)));
+    }
+
+    System.out.println();
+    for (String s : result) {
+      System.out.println(s);
+    }
+
+  }
+
+  private MoveList test1(final Position position) {
+
+    final MoveGenerator mG = new MoveGenerator();
+    mG.SORT_MOVES = false;
+    mG.SORT_CAPTURING_MOVES = true;
+
+    final int killer1 = 67320564;
+    final int killer2 = 67318516;
+    mG.setKillerMoves(new int[]{killer1, killer2});
+
+    return mG.getPseudoLegalMoves(position);
+
+  }
+
+  private MoveList test2(final Position position) {
+
+    final MoveGenerator mG = new MoveGenerator();
+    mG.SORT_MOVES = true;
+    mG.SORT_CAPTURING_MOVES = true;
+
+    final int killer1 = 67320564;
+    final int killer2 = 67318516;
+    mG.setKillerMoves(new int[]{killer1, killer2});
+
+    return mG.getPseudoLegalMoves(position);
   }
 
 }

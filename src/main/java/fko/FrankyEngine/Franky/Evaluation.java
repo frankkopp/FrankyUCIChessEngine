@@ -67,7 +67,7 @@ public class Evaluation {
   public static final int MAX                 = 10000;
   public static final int DRAW                = 0;
   public static final int CHECKMATE           = MAX;
-  public static final int CHECKMATE_THRESHOLD = CHECKMATE - 100;
+  public static final int CHECKMATE_THRESHOLD = CHECKMATE - Search.MAX_SEARCH_DEPTH;
 
   // Convenience constants
   private static final int GAME_PHASE_MAX = 24;
@@ -115,13 +115,10 @@ public class Evaluation {
   /**
    * Sets the reference to the position this evaluation operates on.
    * <p>
-   * Attention: This does not create a deep copy. If the position changes after
-   * setting the reference the change will be reflected here. This does not
-   * create a deep copy.
    *
    * @param position
    */
-  public void setPosition(final Position position) {
+  private void setPosition(final Position position) {
     this.position = position;
 
     // convenience fields
@@ -133,13 +130,6 @@ public class Evaluation {
     rookSquares = position.getRookSquares();
     queenSquares = position.getQueenSquares();
     kingSquares = position.getKingSquares();
-  }
-
-  /**
-   * @return the reference to the last position object used in evaluation
-   */
-  public Position getPosition() {
-    return position;
   }
 
   /**
@@ -157,17 +147,16 @@ public class Evaluation {
    */
   public int evaluate(Position position) {
     setPosition(position);
-    return evaluate();
+    return _evaluate();
   }
 
   /**
-   * Sets the position to evaluate and evaluates the position.
-   * Is equivalent to <code>setPosition(pos)</code> and <code>evaluate()</code>
+   * Evaluates the position.
    *
    * @return value of the position from active player's view.
    */
 
-  public int evaluate() {
+  private int _evaluate() {
 
     // protect against null position
     if (position == null) {
@@ -181,7 +170,7 @@ public class Evaluation {
 
     // GamePhase - a value between 0 and 24 depending on officer midGameMaterial of
     // the position
-    gamePhaseFactor = getGamePhaseFactor();
+    gamePhaseFactor = getGamePhaseFactor(position);
 
     /*
      * Ideally evaluate in 3 Stages to avoid doing certain loop multiple times
@@ -768,63 +757,65 @@ public class Evaluation {
    * In rare cases were through pawn promotions more officers than the opening position
    * are present the value is at maximum 24.
    *
+   * @param position
    * @return a value depending on officer midGameMaterial of both sides between 0 and 24
    */
-  public int getGamePhaseFactor() {
+  public static int getGamePhaseFactor(Position position) {
 
     // protect against null position
     if (position == null) {
-      IllegalStateException e = new IllegalStateException();
+      IllegalArgumentException e = new IllegalArgumentException();
       LOG.error("No position to evaluate. Set position before calling this", e);
       throw e;
     }
 
     // @formatter:off
     return Math.min(GAME_PHASE_MAX,
-                    knightSquares[WHITE].size() +
-                    knightSquares[BLACK].size() +
-                    bishopSquares[WHITE].size() +
-                    bishopSquares[BLACK].size() +
-                    2 * rookSquares[WHITE].size() +
-                    2 * rookSquares[BLACK].size() +
-                    4 * queenSquares[WHITE].size() +
-                    4 * queenSquares[BLACK].size());
+                    position.getKnightSquares()[WHITE].size() +
+                    position.getKnightSquares()[BLACK].size() +
+                    position.getBishopSquares()[WHITE].size() +
+                    position.getBishopSquares()[BLACK].size() +
+                    2 * position.getRookSquares()[WHITE].size() +
+                    2 * position.getRookSquares()[BLACK].size() +
+                    4 * position.getQueenSquares()[WHITE].size() +
+                    4 * position.getQueenSquares()[BLACK].size());
     // @formatter:on
   }
 
   /**
+   * @param position
    * @return material balance from the view of the active player
    */
-  public int material() {
+  public int material(Position position) {
     // clear old values
-    evaluate();
+    evaluate(position);
     return material;
   }
 
   /**
    * @return
    */
-  public int position() {
+  public int position(Position position) {
     // piece position is done in the piece iteration
-    evaluate();
+    evaluate(position);
     return piecePosition;
   }
 
   /**
    * @return number of pseudo legal moves for the next player
    */
-  public int mobility() {
+  public int mobility(Position position) {
     // midGameMobility is done in the squares iteration
-    evaluate();
+    evaluate(position);
     return mobility;
   }
 
   /**
    * @return number of pseudo legal moves for the next player
    */
-  public int kingSafety() {
+  public int kingSafety(Position position) {
     // midGameMobility is done in the squares iteration
-    evaluate();
+    evaluate(position);
     return kingSafety;
   }
 
@@ -881,5 +872,54 @@ public class Evaluation {
            ", midGameMobility=" + midGameMobility +
            ", endGameMobility=" + endGameMobility + '}';
     // @formatter:on
+  }
+
+  public static int getPositionValue(Position position, int move) {
+
+    final int nextToMove = position.getNextPlayer().ordinal();
+
+    final int index = Move.getEnd(move).ordinal();
+    final int tableIndex =
+      nextToMove == WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
+
+    final int midGame;
+    final int endGame;
+
+    switch (Move.getPiece(move).getType()) {
+      case PAWN:
+        midGame = pawnsMidGame[tableIndex];
+        endGame = pawnsEndGame[tableIndex];
+        break;
+      case KNIGHT:
+        midGame = knightMidGame[tableIndex];
+        endGame = knightEndGame[tableIndex];
+        break;
+      case BISHOP:
+        midGame = bishopMidGame[tableIndex];
+        endGame = bishopEndGame[tableIndex];
+        break;
+      case ROOK:
+        midGame = rookMidGame[tableIndex];
+        endGame = rookEndGame[tableIndex];
+        break;
+      case QUEEN:
+        midGame = queenMidGame[tableIndex];
+        endGame = queenEndGame[tableIndex];
+        break;
+      case KING:
+        midGame = kingMidGame[tableIndex];
+        endGame = kingEndGame[tableIndex];
+        break;
+      default:
+        midGame = 0;
+        endGame = 0;
+        break;
+    }
+
+    final int gamePhaseFactor = getGamePhaseFactor(position);
+
+    return midGame * (gamePhaseFactor / GAME_PHASE_MAX) +
+           endGame * (1 - gamePhaseFactor / GAME_PHASE_MAX);
+
   }
 }

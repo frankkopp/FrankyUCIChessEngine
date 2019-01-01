@@ -108,7 +108,8 @@ public class SearchMode {
 
   }
 
-  private void setupLimits() {
+  private synchronized void setupLimits() {
+    LOG.trace("Setting up search mode limits");
     // time management necessary and set start and max depth?
     if (this.perft){
       // no limits
@@ -126,10 +127,17 @@ public class SearchMode {
       startDepth = 1;
       maxDepth =  this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
     } else if (this.mate > 0) {
-      // limits per mate depth only
-      timeControl = false;
-      startDepth = 1; // might start with mate depth directly??
-      maxDepth = this.mate * 2;
+      if (moveTime.toMillis() > 0) {
+        // limits per mate depth and move time
+        timeControl = true;
+        startDepth = 1;
+        maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
+      } else {
+        // limits per mate depth
+        timeControl = false;
+        startDepth = 1;
+        maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
+      }
     } else if (this.whiteTime.toMillis() > 0 && this.blackTime.toMillis() > 0) {
       // normal game with time for each player
       timeControl = true;
@@ -162,6 +170,7 @@ public class SearchMode {
       LOG.error(msg, e);
       throw e;
     }
+    LOG.trace("Finished up search mode limits");
   }
 
   public void ponderHit() {
@@ -237,23 +246,21 @@ public class SearchMode {
     return ponder;
   }
 
-  public boolean isInfinite() {
-    return infinite;
-  }
-
-  public boolean isTimeControl() {
-    return timeControl;
-  }
-
   public boolean isPerft() {
     return perft;
   }
 
-  public int getStartDepth() {
+  public boolean isInfinite() {
+    return infinite;
+  }
+
+  public synchronized boolean isTimeControl() { return timeControl; }
+
+  public synchronized int getStartDepth() {
     return startDepth;
   }
 
-  public int getMaxDepth() {
+  public synchronized int getMaxDepth() {
     return maxDepth;
   }
 
