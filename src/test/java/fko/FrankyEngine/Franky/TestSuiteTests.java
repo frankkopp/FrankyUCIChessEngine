@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * TestSuiteTest
+ * TestSuiteTests
  * <p>
  * https://www.chessprogramming.org/Test-Positions#Test_Suites
  * http://www.bergbomconsulting.se/chess/testsuites.html
@@ -44,9 +44,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * TODO: Implement reading test sets from file - Extended Position Description (EPD)
  * https://www.chessprogramming.org/Extended_Position_Description
  */
-public class TestSuiteTest {
+public class TestSuiteTests {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TestSuiteTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TestSuiteTests.class);
 
   TestSuite testSuite;
 
@@ -105,11 +105,6 @@ public class TestSuiteTest {
 
   @Test
   void startOneMateTest() {
-    // dm test time limited
-    assertTrue(
-      testSuite
-        .startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;",
-                      5000, 0));
 
     // dm test depth limited
     assertTrue(
@@ -117,11 +112,17 @@ public class TestSuiteTest {
         .startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;",
                       0, 10));
 
+    // dm test time limited
+    assertTrue(
+      testSuite
+        .startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;",
+                      10000, 0));
+
     // dm test depth limited
     assertTrue(
       testSuite
         .startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;",
-                      5000, 16));
+                      10000, 16));
   }
 
 }

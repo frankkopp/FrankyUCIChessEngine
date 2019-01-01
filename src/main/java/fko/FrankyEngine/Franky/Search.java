@@ -806,6 +806,8 @@ public class Search implements Runnable {
     // prepare move generator
     moveGenerators[ply].setPosition(position);
     if (config.USE_KILLER_MOVES) moveGenerators[ply].setKillerMoves(killerMoves[ply]);
+
+    // TODO: Replace this with a hash cashed best move
     if (config.USE_PVS_MOVE_ORDERING) {
       if (!principalVariation[0].empty()) {
         if (principalVariation[0].size() > ply) {
@@ -820,7 +822,6 @@ public class Search implements Runnable {
     // Search all generated moves
     int move;
     while ((move = moveGenerators[ply].getNextPseudoLegalMove(false)) != Move.NOMOVE) {
-      int value;
 
       // ###############################################
       // Minor Promotion Pruning
@@ -875,6 +876,7 @@ public class Search implements Runnable {
       // go one ply deeper into the search tree
       // ########################################
       // ### START PVS ###
+      int value;
       if (!config.USE_PVS || isPerftSearch() || (numberOfSearchedMoves == 0)) {
 
         // In a non root node we need to establish a best move for this ply

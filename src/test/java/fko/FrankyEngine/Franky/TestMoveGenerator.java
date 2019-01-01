@@ -247,7 +247,6 @@ public class TestMoveGenerator {
     }
 
     { // test all moves with killers sorted before non-captures
-      moveGenerator.resetOnDemand();
       moveGenerator.setKillerMoves(new int[]{67320564, 67318516});
       int j = 0;
       int move;
@@ -340,7 +339,6 @@ public class TestMoveGenerator {
     moveGenerator.setPVMove(pvMove);
     MoveList moves = moveGenerator.getPseudoLegalMoves().clone();
 
-    moveGenerator.resetOnDemand();
     MoveList movesOD = new MoveList();
     int m;
     moveGenerator.setPosition(position);

@@ -32,11 +32,17 @@ import java.util.Comparator;
 import java.util.stream.IntStream;
 
 /**
- * The move generator for Omega Engine.
+ * The move generator.
  * <p>
  * It generates pseudo legal and legal moves for a given position.
  * <p>
- * Moves are generated captures first with Most Valuable Victim - Least Valuable Aggressor order
+ * Either generate a MoveGenerator with a specific position or set the position with
+ * <code>setPosition</code> before doing any searches. After setting a position you can
+ * add killer moves <code>setKillerMoves</code> and pv moves <code>setPVMove</code>
+ * to consider during move generation.
+ * <p>
+ * Setting a position resets the internal state of the MoveGenerator. Especially
+ * for OnDemand move generation which needs to keep a state in between calls.
  *
  * @author Frank Kopp
  */
@@ -53,9 +59,6 @@ public class MoveGenerator {
 
   // which color do we generate moves for
   private Color activePlayer;
-
-  // should we only generate capturing moves
-  private boolean captureMovesOnly = false;
 
   // these are are working lists as fields to avoid to have to
   // create them every time. Instead of creating the need to be cleared before use.
@@ -81,12 +84,12 @@ public class MoveGenerator {
   private              int genMode         = GEN_ALL;
 
   private MoveList onDemandMoveList = new MoveList();
-  private long     onDemandZobristLastPosition;
 
   // Comparator for move value victim least value attacker
   private static final Comparator<Integer> mvvlvaComparator = Comparator.comparingInt(
-    (Integer move) -> (Move.getPiece(move).getType().getValue() -
-                       Move.getTarget(move).getType().getValue()));
+    (Integer move) -> (Move.getPiece(move).getType().getValue() - Move.getTarget(move)
+                                                                      .getType()
+                                                                      .getValue()));
 
   /**
    * Creates a new {@link MoveGenerator}
@@ -103,7 +106,7 @@ public class MoveGenerator {
 
   /**
    * Sets the position of this move generator.
-   *
+   * <p>
    * Setting the position resets the move generator. Killers or PV moves set via
    * <code>setKillerMoves</code> and <code>setPVMove</code> are deleted.
    *
@@ -113,7 +116,6 @@ public class MoveGenerator {
     assert position != null : "parameter null not allowed";
     this.position = position;
     this.activePlayer = position.getNextPlayer();
-    this.onDemandZobristLastPosition = position.getZobristKey();
     this.generationCycleState = OnDemandState.NEW;
     this.killerMoves = null;
     this.pvMove = Move.NOMOVE;
@@ -121,7 +123,12 @@ public class MoveGenerator {
   }
 
   /**
-   * Sets the PV move so it will be returned first
+   * Sets the PV move so it will be returned first. Need to be set after each call
+   * <code>setPosition</code> as this reset the killer moves.
+   * <p>
+   * Can't set a non capturing pvMove before capturing moves in on demand generation
+   * as it could be a non valid move in this position.
+   * TODO: Improve this.
    *
    * @param move
    */
@@ -130,7 +137,8 @@ public class MoveGenerator {
   }
 
   /**
-   * sets killer moves which will be inserted after capturing moves
+   * Sets killer moves which will be inserted after capturing moves. Need to be set after each call
+   * to <code>setPosition</code> as this reset the killer moves.
    *
    * @param killerMoves
    */
@@ -143,9 +151,9 @@ public class MoveGenerator {
    * Returns the next move of the current generation cycle.<br>
    * This method uses an on-demand generation of moves starting with potentially high value moves
    * first to improve cut off rates in AlphaBeta pruning and therefore avoiding the cost of
-   * generating all possible moves.<br>
-   * The generation cycle starts new if the position changes, capturingOnly is changed or if
-   * clearOnDemand() is called.<br>
+   * generating all possible moves.
+   * <p>
+   * The generation cycle starts new with each new call to <code>setPosition</code>.
    *
    * @return int representing the next legal Move. Return Move.NOMOVE if none available
    */
@@ -177,28 +185,29 @@ public class MoveGenerator {
             capturingMoves.sort(mvvlvaComparator);
           }
 
-          // setting pv move
+          // Setting pv move
+          // Cannot set a non-capturing move to front as we don't know if it is a valid move.
+          // TODO: improve
           if (pvMove != Move.NOMOVE && !Move.getTarget(pvMove).equals(Piece.NOPIECE)) {
             capturingMoves.pushToHeadStable(pvMove);
           }
 
-          // push pv move if any
+          // fill onDemand list
           onDemandMoveList.add(capturingMoves);
 
+          // all capturing moves are generated
           generationCycleState = OnDemandState.NON_CAPTURING;
-
           break;
-        case NON_CAPTURING: // we have all non capturing
+
+        case NON_CAPTURING:
           if (capturingOnly) break;
           genMode = GEN_NONCAPTURES;
-
           generatePawnMoves();
           generateKnightMoves();
           generateBishopMoves();
           generateRookMoves();
           generateQueenMoves();
           generateKingMoves();
-
           generateCastlingMoves();
           nonCapturingMoves.add(castlingMoves);
 
@@ -210,10 +219,10 @@ public class MoveGenerator {
           // full sort of non-capturing moves
           moveListSort(nonCapturingMoves);
 
+          // fill onDemand list
           onDemandMoveList.add(nonCapturingMoves);
 
           generationCycleState = OnDemandState.ALL;
-
           break;
         case ALL: // we have all moves - do nothing
         default:
@@ -221,27 +230,12 @@ public class MoveGenerator {
       }
     }
 
-    captureMovesOnly = capturingOnly;
-
     // return a move and delete it form the list
     if (!onDemandMoveList.empty()) {
       return onDemandMoveList.removeFirst();
     }
 
     return Move.NOMOVE;
-  }
-
-  /**
-   * Reset the on demand move generation use by <code>getNextLegalMove()</code>. The move generation
-   * cycle resets automatically if a new board position is used. Calling this method resets it
-   * manually.
-   */
-  public void resetOnDemand() {
-    onDemandZobristLastPosition = 0;
-    capturingMoves.clear();
-    nonCapturingMoves.clear();
-    castlingMoves.clear();
-    onDemandMoveList.clear();
   }
 
   /**
@@ -298,9 +292,8 @@ public class MoveGenerator {
       throw new IllegalStateException("Position not set. Set position before calling this");
     }
 
-    captureMovesOnly = false;
-
     // call the move generators
+    genMode = GEN_ALL;
     generatePseudoLegaMoves();
 
     // filter legal moves
@@ -344,6 +337,13 @@ public class MoveGenerator {
     if (position == null) {
       throw new IllegalStateException("Position not set. Set position before calling this");
     }
+
+    if (capturingOnly) {
+      genMode = GEN_CAPTURES;
+    } else {
+      genMode = GEN_ALL;
+    }
+
     return this.getPseudoLegalMoves().stream();
   }
 
@@ -364,9 +364,8 @@ public class MoveGenerator {
       throw new IllegalStateException("Position not set. Set position before calling this");
     }
 
-    this.captureMovesOnly = false;
-
     // call the move generators
+    genMode = GEN_ALL;
     generatePseudoLegaMoves();
 
     // return a clone of the list as we will continue to reuse
@@ -393,18 +392,17 @@ public class MoveGenerator {
       throw new IllegalStateException("Position not set. Set position before calling this");
     }
 
-    // if not in check generate only capturing moves for qsearch
-    captureMovesOnly = !position.hasCheck();
-
-    // call the move generators
-    generatePseudoLegaMoves();
-
-    // if check return all moves - non evation moves will be filtered by legal check
-    if (!captureMovesOnly) {
+    // if  in check generate all moves otherwise only capture moves
+    if (position.hasCheck()) {
+      genMode = GEN_ALL;
+    } else {
+      genMode = GEN_CAPTURES;
+      // call the move generators
+      generatePseudoLegaMoves();
       return pseudoLegalMoves;
     }
 
-    // lower amount of captures searched in qsearch by only looking at "good" captures
+    // lower amount of captures searched in quiescence search by only looking at "good" captures
     MoveList qSearchMoves = new MoveList();
     for (int move : pseudoLegalMoves) {
       // pawn captures
@@ -412,8 +410,9 @@ public class MoveGenerator {
         qSearchMoves.add(move);
       }
       // Lower value piece captures higher value piece (with a margin)
-      else if (Move.getPiece(move).getType().getValue() + 200 <
-               Move.getTarget(move).getType().getValue()) {
+      else if (Move.getPiece(move).getType().getValue() + 200 < Move.getTarget(move)
+                                                                    .getType()
+                                                                    .getValue()) {
         qSearchMoves.add(move);
       }
       // undefended pieces captures are good
@@ -447,8 +446,7 @@ public class MoveGenerator {
      */
 
     // at this point we have all capturing moves - return if this is all we need
-    if (captureMovesOnly) {
-      genMode = GEN_CAPTURES;
+    if (genMode == GEN_CAPTURES) {
       generatePawnMoves();
       generateKnightMoves();
       generateBishopMoves();
@@ -464,17 +462,17 @@ public class MoveGenerator {
     }
 
     genMode = GEN_ALL;
+
+    // castling are allways non capture and we can put them to the front of the list
+    generateCastlingMoves();
+    nonCapturingMoves.add(castlingMoves);
+
     generatePawnMoves();
     generateKnightMoves();
     generateBishopMoves();
     generateRookMoves();
     generateQueenMoves();
     generateKingMoves();
-    // generate castling moves late as they never capture
-    generateCastlingMoves();
-
-    // put castling to front of non capture moves
-    nonCapturingMoves.addFront(castlingMoves);
 
     // sort all moves
     if (SORT_MOVES) {
@@ -508,11 +506,13 @@ public class MoveGenerator {
 
     // capturing moves
     if (!Move.getTarget(move).equals(Piece.NOPIECE)) {
-      return 1000 + Move.getPiece(move).getType().getValue() -
-             Move.getTarget(move).getType().getValue();
+      return 1000 + Move.getPiece(move).getType().getValue() - Move.getTarget(move)
+                                                                   .getType()
+                                                                   .getValue();
     }
     // non capturing
     else {
+      // killer moves
       if (killerMoves != null) {
         for (int i = killerMoves.length - 1; i >= 0; i--) {
           if (killerMoves[i] == move) {
@@ -544,12 +544,14 @@ public class MoveGenerator {
   }
 
   /**
-   * Special moveListSort to use index array as comparator
+   * Sorts the given movelist in ascending order according the results
+   * of <code>getSortValue</code>.
    *
    * @param moveList
    */
   private void moveListSort(MoveList moveList) {
-    // create index array
+    // create index array - this is faster then to call getSortValue() every
+    // time a compare takes place
     int[] sortIdx = new int[moveList.size()];
     for (int i = 0; i < moveList.size(); i++) {
       sortIdx[i] = getSortValue(moveList.get(i));
@@ -569,7 +571,8 @@ public class MoveGenerator {
   }
 
   /**
-   * Pushing killer moves to fron of moveList of there are any
+   * Pushing killer moves to the front of the given moveList of there are any and
+   * if they are even in the list.
    *
    * @param moveList
    */
@@ -578,16 +581,6 @@ public class MoveGenerator {
       for (int i = killerMoves.length - 1; i >= 0; i--) {
         if (killerMoves[i] != Move.NOMOVE && killerMoves[i] != nonCapturingMoves.get(0)) {
           moveList.pushToHeadStable(killerMoves[i]);
-        }
-      }
-    }
-  }
-
-  private void generateKillerMoves() {
-    if (killerMoves != null) {
-      for (int i = killerMoves.length - 1; i >= 0; i--) {
-        if (killerMoves[i] != Move.NOMOVE && killerMoves[i] != nonCapturingMoves.get(0)) {
-          nonCapturingMoves.add(killerMoves[i]);
         }
       }
     }
@@ -625,7 +618,8 @@ public class MoveGenerator {
 
           // capture
           if (d != Square.N) { // not straight
-            if ((genMode & GEN_CAPTURES) > 0 && target != Piece.NOPIECE // not empty
+            if ((genMode & GEN_CAPTURES) > 0  // generating captures?
+                && target != Piece.NOPIECE // not empty
                 && (target.getColor() == activePlayer.getInverseColor())) { // opponents color
               assert target.getType() != PieceType.KING; // did we miss a check?
               // capture & promotion
@@ -674,8 +668,8 @@ public class MoveGenerator {
           }
           // no capture
           else { // straight
-            if ((genMode & GEN_NONCAPTURES) > 0 &&
-                target == Piece.NOPIECE) { // way needs to be free
+            if ((genMode & GEN_NONCAPTURES) > 0 // generate non captures
+                && target == Piece.NOPIECE) { // way needs to be free
               // promotion
               if (to > 111) { // rank 8
                 assert activePlayer.isWhite(); // checking for color is probably redundant
@@ -707,16 +701,16 @@ public class MoveGenerator {
                                   Piece.BLACK_BISHOP));
               } else {
                 // pawndouble
-                if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow() &&
-                    (position.getX88Board()[fromSquare.ordinal() + (2 * Square.N)]) ==
-                    Piece.NOPIECE) {
+                if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow()
+                    && (position.getX88Board()[fromSquare.ordinal() + (2 * Square.N)])
+                       == Piece.NOPIECE) {
                   // on rank 2 && rank 4 is free(rank 3 already checked via target)
                   nonCapturingMoves.add(
                     Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getNorth(), piece,
                                     target, promotion));
-                } else if (activePlayer.isBlack() && fromSquare.isBlackPawnBaseRow() &&
-                           position.getX88Board()[fromSquare.ordinal() + (2 * Square.S)] ==
-                           Piece.NOPIECE) {
+                } else if (activePlayer.isBlack() && fromSquare.isBlackPawnBaseRow()
+                           && position.getX88Board()[fromSquare.ordinal() + (2 * Square.S)]
+                              == Piece.NOPIECE) {
                   // on rank 7 && rank 5 is free(rank 6 already checked via target)
                   nonCapturingMoves.add(
                     Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getSouth(), piece,
@@ -734,7 +728,7 @@ public class MoveGenerator {
   }
 
   private void generateKnightMoves() {
-    PieceType type = PieceType.KNIGHT;
+    final PieceType type = PieceType.KNIGHT;
     // iterate over all squares where we have a piece
     final SquareList squareList = position.getKnightSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
@@ -746,7 +740,7 @@ public class MoveGenerator {
   }
 
   private void generateBishopMoves() {
-    PieceType type = PieceType.BISHOP;
+    final PieceType type = PieceType.BISHOP;
     // iterate over all squares where we have this piece type
     final SquareList squareList = position.getBishopSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
@@ -758,7 +752,7 @@ public class MoveGenerator {
   }
 
   private void generateRookMoves() {
-    PieceType type = PieceType.ROOK;
+    final PieceType type = PieceType.ROOK;
     // iterate over all squares where we have this piece type
     final SquareList squareList = position.getRookSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
@@ -770,7 +764,7 @@ public class MoveGenerator {
   }
 
   private void generateQueenMoves() {
-    PieceType type = PieceType.QUEEN;
+    final PieceType type = PieceType.QUEEN;
     // iterate over all squares where we have this piece type
     final SquareList squareList = position.getQueenSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
@@ -782,7 +776,7 @@ public class MoveGenerator {
   }
 
   private void generateKingMoves() {
-    PieceType type = PieceType.KING;
+    final PieceType type = PieceType.KING;
     Square square = position.getKingSquares()[activePlayer.ordinal()];
     assert position.getX88Board()[square.ordinal()].getType() == type;
     generateMoves(type, square, Square.kingDirections);
@@ -805,7 +799,7 @@ public class MoveGenerator {
 
         // free square - non capture
         if (target == Piece.NOPIECE) { // empty
-          if ((genMode & GEN_NONCAPTURES) > 0) {
+          if ((genMode & GEN_NONCAPTURES) > 0) { // generate non captures
             nonCapturingMoves.add(
               Move.createMove(MoveType.NORMAL, Square.getSquare(square.ordinal()),
                               Square.getSquare(to), Piece.getPiece(type, activePlayer), target,
@@ -814,7 +808,7 @@ public class MoveGenerator {
         }
         // occupied square - capture if opponent and stop sliding
         else {
-          if ((genMode & GEN_CAPTURES) > 0) {
+          if ((genMode & GEN_CAPTURES) > 0) { // generate captures
             if (target.getColor() == activePlayer.getInverseColor()) { // opponents color
               assert target.getType() != PieceType.KING; // did we miss a check?
               capturingMoves.add(
@@ -836,8 +830,11 @@ public class MoveGenerator {
   }
 
   private void generateCastlingMoves() {
-    // no castling if we are in check
-    if (position.hasCheck() || (genMode & GEN_NONCAPTURES) == 0) return;
+
+    if (position.hasCheck() // no castling if we are in check
+        || (genMode & GEN_NONCAPTURES) == 0) // only when generating non captures
+      return;
+
     // iterate over all available castlings at this position
     if (activePlayer.isWhite()) {
       if (position.isCastlingWK()) {
@@ -911,6 +908,8 @@ public class MoveGenerator {
    * position. It only has to check all moves if it is indeed a mate position which in general is a
    * rare case.
    *
+   * Sets a new position (see <code>setPosition</code>,
+   *
    * @param position
    * @return true if there is at least one legal move
    */
@@ -937,8 +936,8 @@ public class MoveGenerator {
     /*
      * Find a move by finding at least one moves for a piece type
      */
-    return findKingMove() || findPawnMove() || findKnightMove() || findQueenMove() ||
-           findRookMove() || findBishopMove();
+    return findKingMove() || findPawnMove() || findKnightMove() || findQueenMove() || findRookMove()
+           || findBishopMove();
   }
 
   /**
