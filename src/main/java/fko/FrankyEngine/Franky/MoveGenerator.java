@@ -104,14 +104,13 @@ public class MoveGenerator {
   /**
    * Sets the position of this move generator.
    *
+   * Setting the position resets the move generator. Killers or PV moves set via
+   * <code>setKillerMoves</code> and <code>setPVMove</code> are deleted.
+   *
    * @param position
    */
   public void setPosition(Position position) {
-    // protect against null position
-    if (position == null) {
-      IllegalStateException e = new IllegalStateException();
-      LOG.error("Position can't be null", e);
-    }
+    assert position != null : "parameter null not allowed";
     this.position = position;
     this.activePlayer = position.getNextPlayer();
     this.onDemandZobristLastPosition = position.getZobristKey();
@@ -136,6 +135,7 @@ public class MoveGenerator {
    * @param killerMoves
    */
   public void setKillerMoves(int[] killerMoves) {
+    assert killerMoves != null : "parameter null not allowed";
     this.killerMoves = killerMoves.clone();
   }
 
@@ -152,8 +152,7 @@ public class MoveGenerator {
   public int getNextPseudoLegalMove(boolean capturingOnly) {
     // protect against null position
     if (position == null) {
-      IllegalStateException e = new IllegalStateException();
-      LOG.error("Position not set. Set position before calling this", e);
+      throw new IllegalStateException("Position not set. Set position before calling this");
     }
 
     /*
@@ -258,8 +257,7 @@ public class MoveGenerator {
   public IntStream streamLegalMoves(boolean fullSort) {
     // protect against null position
     if (position == null) {
-      IllegalStateException e = new IllegalStateException();
-      LOG.error("Position not set. Set position before calling this", e);
+      throw new IllegalStateException("Position not set. Set position before calling this");
     }
     return this.getLegalMoves(fullSort).stream();
   }
@@ -276,8 +274,7 @@ public class MoveGenerator {
   public IntStream streamLegalMoves() {
     // protect against null position
     if (position == null) {
-      IllegalStateException e = new IllegalStateException();
-      LOG.error("Position not set. Set position before calling this", e);
+      throw new IllegalStateException("Position not set. Set position before calling this");
     }
     return this.getLegalMoves(false).stream();
   }
@@ -298,8 +295,7 @@ public class MoveGenerator {
   public MoveList getLegalMoves(boolean fullSort) {
     // protect against null position
     if (position == null) {
-      IllegalStateException e = new IllegalStateException();
-      LOG.error("Position not set. Set position before calling this", e);
+      throw new IllegalStateException("Position not set. Set position before calling this");
     }
 
     captureMovesOnly = false;
@@ -346,8 +342,7 @@ public class MoveGenerator {
   public IntStream streamPseudoLegalMoves(boolean capturingOnly) {
     // protect against null position
     if (position == null) {
-      IllegalStateException e = new IllegalStateException();
-      LOG.error("Position not set. Set position before calling this", e);
+      throw new IllegalStateException("Position not set. Set position before calling this");
     }
     return this.getPseudoLegalMoves().stream();
   }
@@ -366,8 +361,7 @@ public class MoveGenerator {
   public MoveList getPseudoLegalMoves() {
     // protect against null position
     if (position == null) {
-      IllegalStateException e = new IllegalStateException();
-      LOG.error("Position not set. Set position before calling this", e);
+      throw new IllegalStateException("Position not set. Set position before calling this");
     }
 
     this.captureMovesOnly = false;
@@ -396,8 +390,7 @@ public class MoveGenerator {
   public MoveList getPseudoLegalQSearchMoves() {
     // protect against null position
     if (position == null) {
-      IllegalStateException e = new IllegalStateException();
-      LOG.error("Position not set. Set position before calling this", e);
+      throw new IllegalStateException("Position not set. Set position before calling this");
     }
 
     // if not in check generate only capturing moves for qsearch
@@ -938,8 +931,7 @@ public class MoveGenerator {
   public boolean hasLegalMove() {
     // protect against null position
     if (position == null) {
-      IllegalStateException e = new IllegalStateException();
-      LOG.error("Position not set. Set position before calling this", e);
+      throw new IllegalStateException("Position not set. Set position before calling this");
     }
 
     /*
