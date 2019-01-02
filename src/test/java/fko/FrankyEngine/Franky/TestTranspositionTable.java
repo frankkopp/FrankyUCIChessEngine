@@ -106,10 +106,10 @@ public class TestTranspositionTable {
   @Test
   public void findSeed() {
 
-    int bestSeed = -1;
-    long bestCollisions = Integer.MAX_VALUE;
+    int bestSeed = 2157;
+    long bestCollisions = 4736;
 
-    for (int seed = 0; seed < Integer.MAX_VALUE; seed++) {
+    for (int seed = 2560; seed < Integer.MAX_VALUE; seed++) {
 
       Position.setZobristRandoms(seed);
       engine = new FrankyEngine();

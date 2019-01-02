@@ -158,7 +158,7 @@ public class Position {
   // Static Initialization for zobrist key generation
   // For testing purposes these fields are not final and also
   // accessible from external.
-  public static int SEED = 1234567890;
+  public static int SEED = 2157;
 
   static {
     setZobristRandoms(SEED);
