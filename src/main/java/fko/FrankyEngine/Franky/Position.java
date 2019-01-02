@@ -65,7 +65,7 @@ public class Position {
   private static final int MAX_HISTORY = 255;
 
   /* random generator for use with zobrist hash keys */
-  private static final Random random = new Random(0);
+  private static final Random random = new Random();
 
   /*
    * The zobrist key to use as a hash key in transposition tables
@@ -1271,8 +1271,8 @@ public class Position {
         nextPlayer = Color.WHITE;
       } else if (s.equals("b")) {
         nextPlayer = Color.BLACK;
-        zobristKey =
-          getZobristKey() ^ nextPlayer_Zobrist; // only when black to have the right in/out rhythm
+        // only when black to have the right in/out rhythm
+        zobristKey = getZobristKey() ^ nextPlayer_Zobrist;
       } else {
         throw new IllegalArgumentException("FEN Syntax not valid - expected w or b");
       }

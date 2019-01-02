@@ -119,6 +119,7 @@ public class TranspositionTable {
       entries[hash].bestMove = bestMove;
     }
     // different position - overwrite
+    // TODO: better replacement strategy
     else if (position.getZobristKey() != entries[hash].key) {
       numberOfCollisions++;
       entries[hash].key = position.getZobristKey();
