@@ -74,19 +74,11 @@ public class TestTranspositionTable {
 
     final int depth = 10;
 
-    LOG.info("Start SIZE Test for depth {}", depth);
+    LOG.info("Start COLLISION Test for depth {}", depth);
 
     String fen = "7k/8/8/8/8/8/P7/K7 b - - 0 1";
-    //    fen = Position.START_FEN;
-    Position position = new Position(fen);
+    Position position = new Position();
 
-    search.config.USE_ROOT_MOVES_SORT = false;
-    search.config.USE_ALPHABETA_PRUNING = false;
-    search.config.USE_PVS = false;
-    search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.USE_MATE_DISTANCE_PRUNING = false;
-    search.config.USE_MINOR_PROMOTION_PRUNING = false;
-    search.config.USE_QUIESCENCE = false;
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false);
 
     search.startSearch(position, searchMode);
@@ -100,15 +92,62 @@ public class TestTranspositionTable {
 
     if (search.config.USE_TRANSPOSITION_TABLE) {
       if (search.getTranspositionTable().getNumberOfEntries() > 0) {
-        LOG.info("TT Objects: {} ({})", search.getTranspositionTable().getNumberOfEntries(),
-                 search.getTranspositionTable().getMaxEntries());
-        LOG.info("TT Collisions: {} Updates: {}",
-                 search.getTranspositionTable().getNumberOfCollisions(),
-                 search.getTranspositionTable().getNumberOfUpdates());
+        LOG.info(String.format("TT Objects: %,d (%,d)",
+                               search.getTranspositionTable().getNumberOfEntries(),
+                               search.getTranspositionTable().getMaxEntries()));
+        LOG.info(String.format("TT Collisions: %,d Updates: %,d",
+                               search.getTranspositionTable().getNumberOfCollisions(),
+                               search.getTranspositionTable().getNumberOfUpdates()));
       }
     }
     System.out.println();
   }
+
+  @Test
+  public void findSeed() {
+
+    int bestSeed = -1;
+    long bestCollisions = Integer.MAX_VALUE;
+
+    for (int seed = 0; seed < Integer.MAX_VALUE; seed++) {
+
+      Position.setZobristRandoms(seed);
+      engine = new FrankyEngine();
+      search = ((FrankyEngine) engine).getSearch();
+
+      final int depth = 8;
+      System.out.printf("Start COLLISION Test for Seed %,d %n", seed);
+
+      Position position = new Position();
+
+      SearchMode searchMode =
+        new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false);
+
+      search.startSearch(position, searchMode);
+
+      waitWhileSearching();
+
+      LOG.info("Best Move: {} Value: {} Ponder {}",
+               Move.toSimpleString(search.getLastSearchResult().bestMove),
+               search.getLastSearchResult().resultValue / 100f,
+               Move.toSimpleString(search.getLastSearchResult().ponderMove));
+
+      System.out.printf("TT Objects: %,d (%,d) %n",
+                        search.getTranspositionTable().getNumberOfEntries(),
+                        search.getTranspositionTable().getMaxEntries());
+      System.out.printf("TT Collisions: %,d Updates: %,d %n",
+                        search.getTranspositionTable().getNumberOfCollisions(),
+                        search.getTranspositionTable().getNumberOfUpdates());
+
+      if (search.getTranspositionTable().getNumberOfCollisions() < bestCollisions) {
+        bestSeed = seed;
+        bestCollisions = search.getTranspositionTable().getNumberOfCollisions();
+      }
+      System.out.printf("Best Collisions %,d with seed %d %n", bestCollisions, bestSeed);
+      System.out.println();
+    }
+  }
+
 
   @Test
   public void TTUsageTest() {
