@@ -697,7 +697,7 @@ public class Search implements Runnable {
       alpha = Math.max(-Evaluation.CHECKMATE + ply, alpha);
       beta = Math.min(Evaluation.CHECKMATE - ply, beta);
       if (alpha >= beta) {
-        assert Math.abs(alpha) > Evaluation.CHECKMATE_THRESHOLD;
+        assert checkMateValue(alpha);
         searchCounter.mateDistancePrunings++;
         return alpha;
       }
@@ -735,10 +735,10 @@ public class Search implements Runnable {
         && depthLeft < config.STATIC_NULL_PRUNING_DEPTH
         && doNullMove
         && !position.hasCheck()
-        && Math.abs(beta) < Evaluation.CHECKMATE_THRESHOLD
+        && !checkMateValue(beta)
     ) {
       final int evalMargin = config.STATIC_NULL_PRUNING_MARGIN * depthLeft;
-      if (staticEval - evalMargin > beta ){
+      if (staticEval - evalMargin >= beta ){
         return beta; // fail-hard / fail-soft: staticEval - evalMargin;
       }
     }
@@ -769,8 +769,12 @@ public class Search implements Runnable {
       // TODO: NULL Verification
 
       // Do not return unproven mate values
-      if (nullValue > Evaluation.CHECKMATE_THRESHOLD) {
-        nullValue = Evaluation.CHECKMATE_THRESHOLD;
+      if (checkMateValue(nullValue)) {
+        if (nullValue > 0) {
+          nullValue = Evaluation.CHECKMATE_THRESHOLD-1;
+        } else {
+          nullValue = -Evaluation.CHECKMATE_THRESHOLD+1;
+        }
       }
 
       // pruning
@@ -1206,6 +1210,10 @@ public class Search implements Runnable {
     return value;
   }
 
+  /**
+   * @param position
+   * @return value depending on game phase to avoid easy draws
+   */
   private int contempt(Position position) {
     return -Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR;
   }
@@ -1228,9 +1236,9 @@ public class Search implements Runnable {
   // struct for multi return value for TTHit
   class TTHit {
     int value    = Evaluation.NOVALUE;
+
     int bestMove = Move.NOMOVE;
   }
-
   private TTHit probeTT(final Position position, final int ply, final int depthLeft,
                         final int alpha, final int beta) {
 
@@ -1337,33 +1345,6 @@ public class Search implements Runnable {
     }
   }
 
-  /**
-   * Returns true if at least on non pawn/king piece is on the
-   * board for the moving side.
-   *
-   * @param position
-   * @return
-   */
-  private static boolean bigPiecePresent(Position position) {
-    final int activePlayer = position.getNextPlayer().ordinal();
-    return !(position.getKnightSquares()[activePlayer].isEmpty()
-             && position.getBishopSquares()[activePlayer].isEmpty()
-             && position.getRookSquares()[activePlayer].isEmpty()
-             && position.getQueenSquares()[activePlayer].isEmpty());
-  }
-
-  private static String getScoreString(int value) {
-    String scoreString;
-    if (Math.abs(value) >= Evaluation.CHECKMATE_THRESHOLD) {
-      scoreString = "score mate ";
-      scoreString += value < 0 ? "-" : "";
-      scoreString += (Evaluation.CHECKMATE - Math.abs(value) + 1) / 2;
-    } else {
-      scoreString = "score cp " + value;
-    }
-    return scoreString;
-  }
-
   private void sendUCIUpdate(final Position position) {
     // send current root move info to UCI every x milli seconds
     if (System.currentTimeMillis() - uciUpdateTicker >= UCI_UPDATE_INTERVAL) {
@@ -1453,9 +1434,45 @@ public class Search implements Runnable {
   }
 
   /**
+   * Returns true if at least on non pawn/king piece is on the
+   * board for the moving side.
+   *
+   * @param position
+   * @return
+   */
+  private static boolean bigPiecePresent(Position position) {
+    final int activePlayer = position.getNextPlayer().ordinal();
+    return !(position.getKnightSquares()[activePlayer].isEmpty()
+             && position.getBishopSquares()[activePlayer].isEmpty()
+             && position.getRookSquares()[activePlayer].isEmpty()
+             && position.getQueenSquares()[activePlayer].isEmpty());
+  }
+
+  /**
+   * @param value
+   * @return true if absolute value is a mate value, false otherwise
+   */
+  private static boolean checkMateValue(int value) {
+    return Math.abs(value) > Evaluation.CHECKMATE_THRESHOLD;
+  }
+
+  private static String getScoreString(int value) {
+    String scoreString;
+    if (checkMateValue(value)) {
+      scoreString = "score mate ";
+      scoreString += value < 0 ? "-" : "";
+      scoreString += (Evaluation.CHECKMATE - Math.abs(value) + 1) / 2;
+    } else {
+      scoreString = "score cp " + value;
+    }
+    return scoreString;
+  }
+
+  /**
    * Parameter class for the search result
    */
   public static final class SearchResult {
+
 
     public int  bestMove    = Move.NOMOVE;
     public int  ponderMove  = Move.NOMOVE;
