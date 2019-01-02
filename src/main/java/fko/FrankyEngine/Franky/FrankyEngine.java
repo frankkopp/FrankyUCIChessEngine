@@ -67,6 +67,7 @@ public class FrankyEngine implements IUCIEngine {
 
   private Position   position;
   private SearchMode searchMode;
+
   /**
    * Default Constructor
    */
@@ -204,6 +205,13 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 ""));
      iUciOptions.add(
+        new UCIOption("Null_Move_Depth",
+                UCIOptionType.spin,
+                Integer.toString(config.NULL_MOVE_DEPTH),
+                "1",
+                "3",
+                ""));
+     iUciOptions.add(
         new UCIOption("Use_PVS_Move_Ordering",
                 UCIOptionType.check,
                 Boolean.toString(config.USE_PVS_MOVE_ORDERING),
@@ -231,6 +239,13 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 "",
                 ""));
+     iUciOptions.add(
+        new UCIOption("Number_Killer_Moves",
+                UCIOptionType.spin,
+                Integer.toString(config.NO_KILLER_MOVES),
+                "0",
+                "10",
+                ""));
 //     iUciOptions.add(
 //        new UCIOption("Use_Full_Move_Ordering",
 //                UCIOptionType.check,
@@ -244,6 +259,20 @@ public class FrankyEngine implements IUCIEngine {
                 Boolean.toString(config.USE_LMR),
                 "",
                 "",
+                ""));
+    iUciOptions.add(
+        new UCIOption("Late_Move_Reduction_Min_Depth",
+                UCIOptionType.spin,
+                Integer.toString(config.LMR_MIN_DEPTH),
+                "2",
+                "10",
+                ""));
+    iUciOptions.add(
+        new UCIOption("Late_Move_Reduction",
+                UCIOptionType.spin,
+                Integer.toString(config.LMR_REDUCTION),
+                "0",
+                "5",
                 ""));
    // @formatter:on
   }
@@ -328,14 +357,15 @@ public class FrankyEngine implements IUCIEngine {
         break;
       case "Use_Minor_Promotion_Pruning":
         config.USE_MINOR_PROMOTION_PRUNING = Boolean.valueOf(value);
-        msg = "Use Minor Promotion Pruning set to " +
-              (config.USE_MINOR_PROMOTION_PRUNING ? "On" : "Off");
+        msg = "Use Minor Promotion Pruning set to " + (config.USE_MINOR_PROMOTION_PRUNING
+                                                       ? "On"
+                                                       : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      case "Use_Null_Move_Pruning":
-        config.USE_NULL_MOVE_PRUNING = Boolean.valueOf(value);
-        msg = "Use Null Move Pruning set to " + (config.USE_NULL_MOVE_PRUNING ? "On" : "Off");
+      case "Null_Move_Depth":
+        config.NULL_MOVE_DEPTH = Integer.valueOf(value);
+        msg = "Null Move Depth set to " + (config.NULL_MOVE_DEPTH);
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
@@ -351,13 +381,37 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      case "Use_Late_Move_Reduction":
+      case "Use_Killer_Moves":
         config.USE_KILLER_MOVES = Boolean.valueOf(value);
+        msg = "Use Killer Moves set to " + (config.USE_KILLER_MOVES ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Number_Killer_Moves":
+        config.NO_KILLER_MOVES = Integer.valueOf(value);
+        msg = "Number of Killer Moves set to " + config.NO_KILLER_MOVES ;
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Late_Move_Reduction":
+        config.USE_LMR = Boolean.valueOf(value);
         msg = "Use Late Move Reduction set to " + (config.USE_LMR ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-        default:
+      case "Late_Move_Reduction_Min_Depth":
+        config.LMR_MIN_DEPTH = Integer.valueOf(value);
+        msg = "Late Move Reduction Min Depth set to " + config.LMR_MIN_DEPTH;
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Late_Move_Reduction":
+        config.LMR_REDUCTION = Integer.valueOf(value);
+        msg = "Late Move Reduction amount set to " + config.LMR_REDUCTION;
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      default:
         LOG.error("Unknown option: {}", name);
         break;
     }
@@ -455,8 +509,9 @@ public class FrankyEngine implements IUCIEngine {
 
   @Override
   public void sendResult(int bestMove, int ponderMove) {
-    LOG.info("Engine got Best Move: " + Move.toSimpleString(bestMove) + " [Ponder " +
-             Move.toSimpleString(ponderMove) + "]");
+    LOG.info(
+      "Engine got Best Move: " + Move.toSimpleString(bestMove) + " [Ponder " + Move.toSimpleString(
+        ponderMove) + "]");
 
     if (ponderMove == Move.NOMOVE) {
       if (uciProtocolHandler != null) {
