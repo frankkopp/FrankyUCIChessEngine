@@ -175,12 +175,12 @@ public class TestSearch {
     // mate in 2 (3 plys)
     fen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -"; // Position
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 5000, 0, 4, 2, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 10, 2, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     search.stopSearch();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
-    //assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
     assertEquals(Evaluation.CHECKMATE - 3, search.getLastSearchResult().resultValue);
 
@@ -189,7 +189,7 @@ public class TestSearch {
     // mate in 3 (5 plys)
     fen = "4rk2/p5p1/1p2P2N/7R/nP5P/5PQ1/b6K/q7 w - -";
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 3, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 3, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -511,7 +511,7 @@ public class TestSearch {
                                final List<String> values, final String feature,
                                final boolean clearTT) {
 
-    System.out.println("Testing. "+feature);
+    System.out.println("Testing. " + feature);
     if (clearTT) {
       search.clearHashTables();
     }
@@ -521,8 +521,8 @@ public class TestSearch {
                              search.getSearchCounter().leafPositionsEvaluated,
                              Move.toString(search.getLastSearchResult().bestMove),
                              search.getLastSearchResult().resultValue,
-                             (1e3 * search.getSearchCounter().nodesVisited) /
-                             search.getSearchCounter().lastSearchTime,
+                             (1e3 * search.getSearchCounter().nodesVisited)
+                             / search.getSearchCounter().lastSearchTime,
                              search.getSearchCounter().toString()));
   }
 
@@ -567,55 +567,6 @@ public class TestSearch {
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
     LOG.warn(search.getSearchCounter().toString());
 
-    //    depth = 4;
-    //    fen = "1k3r2/pp6/3p4/8/8/n5B1/5PPP/5RK1 w - - 0 1"; // bm Bxd6+
-    //    position = new Position(fen);
-    //    searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
-    //    search.startSearch(position, searchMode);
-    //    waitWhileSearching();
-    //    LOG.info("Best Move: {} Value: {} Ponder {}",
-    //             Move.toSimpleString(search.getLastSearchResult().bestMove),
-    //             search.getLastSearchResult().resultValue / 100f,
-    //             Move.toSimpleString(search.getLastSearchResult().ponderMove));
-    //    assertEquals("g3d6", Move.toSimpleString(search.getLastSearchResult().bestMove));
-
-    // Spanish Opening - next move should be 0-0
-    //    depth = 1;
-    //    fen = "r1bqkb1r/1ppp1ppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 5";
-    //    position = new Position(fen);
-    //    searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
-    //    search.startSearch(position, searchMode);
-    //    waitWhileSearching();
-    //    LOG.info("Best Move: {} Value: {} Ponder {}",
-    //             Move.toSimpleString(search.getLastSearchResult().bestMove),
-    //             search.getLastSearchResult().resultValue / 100f,
-    //             Move.toSimpleString(search.getLastSearchResult().ponderMove));
-    //    assertEquals("e1g1", Move.toSimpleString(search.getLastSearchResult().bestMove));
-
-    //    depth = 4;
-    //    fen = "rn1q1rk1/pbpp2pp/1p2pb2/4N3/3PN3/3B4/PPP2PPP/R2QK2R w KQ - 0 9"; // bm Dh5
-    //    position = new Position(fen);
-    //    searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
-    //    search.startSearch(position, searchMode);
-    //    waitWhileSearching();
-    //    LOG.info("Best Move: {} Value: {} Ponder {}",
-    //             Move.toSimpleString(search.getLastSearchResult().bestMove),
-    //             search.getLastSearchResult().resultValue / 100f,
-    //             Move.toSimpleString(search.getLastSearchResult().ponderMove));
-    //    assertEquals("d1h5", Move.toSimpleString(search.getLastSearchResult().bestMove));
-
-    // 2kr4/ppq2pp1/2b1pn2/2P4r/2P5/3BQN1P/P4PP1/R4RK1 b - - 0 1
-    //    depth = 8;
-    //    fen = "2kr4/ppq2pp1/2b1pn2/2P4r/2P5/3BQN1P/P4PP1/R4RK1 b - - 0 1"; // bm Nf6-g4
-    //    position = new Position(fen);
-    //    searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
-    //    search.startSearch(position, searchMode);
-    //    waitWhileSearching();
-    //    LOG.info("Best Move: {} Value: {} Ponder {}",
-    //             Move.toSimpleString(search.getLastSearchResult().bestMove),
-    //             search.getLastSearchResult().resultValue / 100f,
-    //             Move.toSimpleString(search.getLastSearchResult().ponderMove));
-    //    assertEquals("f6g4", Move.toSimpleString(search.getLastSearchResult().bestMove));
   }
 
   @Test
@@ -641,16 +592,23 @@ public class TestSearch {
     search.config.USE_LMR = true;
 
 
-    fen = "8/k7/3p4/p2P1p2/P2P1P2/8/8/K7"; // Position
-    position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 10000, 0, 0, 16, null, false, false, false);
-    search.startSearch(position, searchMode);
-    waitWhileSearching();
-    search.stopSearch();
-    //assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
-    //assertTrue(search.getSearchCounter().currentIterationDepth > 1);
-    //assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
-    //assertEquals(Evaluation.CHECKMATE - 3, search.getLastSearchResult().resultValue);
+    // FIXME
+    //  Sporadic fails here - suspect TT
+
+    int i = 0;
+    while (i++ < 1000) {
+      System.out.println("Test NR " + i);
+      fen = "8/8/8/8/4K3/8/R7/4k3 w - -"; // Position
+      position = new Position(fen);
+      searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 12, 5, null, false, false, false);
+      search.startSearch(position, searchMode);
+      waitWhileSearching();
+      search.stopSearch();
+      assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+      assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+      assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+      assertEquals(Evaluation.CHECKMATE - 9, search.getLastSearchResult().resultValue);
+    }
   }
 
 
