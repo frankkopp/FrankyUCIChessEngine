@@ -227,7 +227,7 @@ public class TestSuite {
     System.out.printf("Best Moves: %s\n", testCase.bestMoves);
 
     SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, searchDepth, 0, 0, searchTime, null, false, false, false);
+      new SearchMode(0, 0, 0, 0, 0, searchTime, 0, searchDepth, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching(search);
 
@@ -271,7 +271,7 @@ public class TestSuite {
     Position position = new Position(testCase.fen);
 
     SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, searchDepth, 0, mateDepth, searchTime, null, false, false, false);
+      new SearchMode(0, 0, 0, 0, 0, searchTime, 0, searchDepth, mateDepth, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching(search);
 

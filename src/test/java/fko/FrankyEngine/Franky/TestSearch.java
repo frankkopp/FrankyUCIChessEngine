@@ -31,7 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openjdk.jol.info.ClassLayout;
-import org.openjdk.jol.vm.VM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +77,7 @@ public class TestSearch {
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
 
     // non timed search - should not use book
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 4, 0, 0, 0, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -90,7 +89,7 @@ public class TestSearch {
   public void testDepthSearch() {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 4, 0, 0, 0, null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -144,7 +143,7 @@ public class TestSearch {
   public void testBasicTimeControl_TimePerMove() {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 2000, null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 2000, 0, 0, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -158,10 +157,25 @@ public class TestSearch {
     Position position;
     SearchMode searchMode;
 
+    search.config.USE_ROOT_MOVES_SORT = true;
+    search.config.USE_ALPHABETA_PRUNING = true;
+    search.config.USE_ASPIRATION_WINDOW = true;
+    search.config.USE_PVS = true;
+    search.config.USE_PVS_MOVE_ORDERING = true;
+    search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_MATE_DISTANCE_PRUNING = true;
+    search.config.USE_MINOR_PROMOTION_PRUNING = true;
+    search.config.USE_QUIESCENCE = true;
+    search.config.USE_NULL_MOVE_PRUNING = true;
+    search.config.USE_STATIC_NULL_PRUNING = true;
+    search.config.USE_RAZOR_PRUNING = true;
+    search.config.USE_KILLER_MOVES = true;
+    search.config.USE_LMR = true;
+
     // mate in 2 (3 plys)
-    fen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - - 0 1"; // Position
+    fen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -"; // Position
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 2, 2000, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 5000, 0, 4, 2, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     search.stopSearch();
@@ -170,10 +184,12 @@ public class TestSearch {
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
     assertEquals(Evaluation.CHECKMATE - 3, search.getLastSearchResult().resultValue);
 
+    System.out.println();
+
     // mate in 3 (5 plys)
-    fen = "4rk2/p5p1/1p2P2N/7R/nP5P/5PQ1/b6K/q7 w - - 0 1";
+    fen = "4rk2/p5p1/1p2P2N/7R/nP5P/5PQ1/b6K/q7 w - -";
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 6, 0, 3, 0, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 3, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -196,7 +212,7 @@ public class TestSearch {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
     SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 1000, Arrays.asList("h2h4"), false, false, false);
+      new SearchMode(0, 0, 0, 0, 0, 1000, 0, 0, 0, Arrays.asList("h2h4"), false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -210,7 +226,7 @@ public class TestSearch {
     // Test start and stop search
     for (int i = 0; i < 10; i++) {
       SearchMode searchMode =
-        new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 10000, null, false, false, false);
+        new SearchMode(0, 0, 0, 0, 0, 10000, 0, 0, 0, null, false, false, false);
       search.startSearch(position, searchMode);
       try {
         Thread.sleep(new Random().nextInt(1000));
@@ -242,7 +258,7 @@ public class TestSearch {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
     position.makeMove(Move.fromUCINotation(position, "e2e4"));
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 3000, null, true, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 3000, 0, 0, 0, null, true, false, false);
     position.makeMove(Move.fromUCINotation(position, "e7e5"));
     search.startSearch(position, searchMode);
     Thread.sleep(1000);
@@ -251,7 +267,7 @@ public class TestSearch {
     position = new Position(fen);
     position.makeMove(Move.fromUCINotation(position, "e2e4"));
     position.makeMove(Move.fromUCINotation(position, "c7c5"));
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 2000, null, false, false, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 2000, 0, 0, 0, null, false, false, false);
     // Start search after miss
     search.startSearch(position, searchMode);
     waitWhileSearching();
@@ -265,7 +281,7 @@ public class TestSearch {
     // Test start and stop search
     for (int i = 0; i < 10; i++) {
       SearchMode searchMode =
-        new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 1000, null, true, false, false);
+        new SearchMode(0, 0, 0, 0, 0, 1000, 0, 0, 0, null, true, false, false);
       position.makeMove(Move.fromUCINotation(position, "e7e5"));
       search.startSearch(position, searchMode);
       Thread.sleep(new Random().nextInt(100));
@@ -282,7 +298,7 @@ public class TestSearch {
     String fen = "8/8/8/8/8/4K3/R7/6k1 w - - 0 6"; // 9999
     Position position = new Position(fen);
     position.makeMove(Move.fromUCINotation(position, "e3f3"));
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 10000, null, true, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 10000, 0, 0, 0, null, true, false, false);
     // set last ponder move
     position.makeMove(Move.fromUCINotation(position, "g1h1"));
     // Start pondering
@@ -326,7 +342,7 @@ public class TestSearch {
     position.makeMove(Move.fromUCINotation(position, "g8h7"));
     // next white move would be 3-fold draw
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 1000, null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 1000, 0, 0, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     assertEquals("d8h4", Move.toSimpleString(search.getLastSearchResult().bestMove));
@@ -379,7 +395,7 @@ public class TestSearch {
 
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, false, true);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, false, true);
     search.startSearch(position, searchMode);
     waitWhileSearching();
 
@@ -412,7 +428,7 @@ public class TestSearch {
     fens.add("1r1r2k1/2p1qp1p/6p1/ppQB1b2/5Pn1/2R1P1P1/PP5P/R1B3K1 b - -");
 
     measureTreeSize(new Position(),
-                    new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false),
+                    new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false),
                     resultStrings, "WARM UP", true);
 
     for (String fen : fens) {
@@ -431,7 +447,7 @@ public class TestSearch {
 
   private void featureMeasurements(final int depth, final List<String> values, final String fen) {
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, depth, 0, 0, 0, null, false, true, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false);
 
     // turn off all optimizations to get a reference value of the search tree size
     search.config.USE_ROOT_MOVES_SORT = false;
@@ -542,7 +558,7 @@ public class TestSearch {
     //fen = "4k3/4p3/8/8/8/8/8/3KQ3 w - -";
     position = new Position(fen);
     searchMode =
-      new SearchMode(0, 0, 0, 0, 0, maxDepth, 0, mateIn, moveTime, null, false, infinite, false);
+      new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
     search.startSearch(position, searchMode);
     waitWhileSearching();
     LOG.warn("Best Move: {} Value: {} Ponder {}",
@@ -602,6 +618,42 @@ public class TestSearch {
     //    assertEquals("f6g4", Move.toSimpleString(search.getLastSearchResult().bestMove));
   }
 
+  @Test
+  @Disabled
+  public void testManualMateSearch() {
+    String fen;
+    Position position;
+    SearchMode searchMode;
+
+    search.config.USE_ROOT_MOVES_SORT = true;
+    search.config.USE_ALPHABETA_PRUNING = true;
+    search.config.USE_ASPIRATION_WINDOW = true;
+    search.config.USE_PVS = true;
+    search.config.USE_PVS_MOVE_ORDERING = true;
+    search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_MATE_DISTANCE_PRUNING = true;
+    search.config.USE_MINOR_PROMOTION_PRUNING = true;
+    search.config.USE_QUIESCENCE = true;
+    search.config.USE_NULL_MOVE_PRUNING = true;
+    search.config.USE_STATIC_NULL_PRUNING = true;
+    search.config.USE_RAZOR_PRUNING = true;
+    search.config.USE_KILLER_MOVES = true;
+    search.config.USE_LMR = true;
+
+
+    fen = "8/k7/3p4/p2P1p2/P2P1P2/8/8/K7"; // Position
+    position = new Position(fen);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 10000, 0, 0, 16, null, false, false, false);
+    search.startSearch(position, searchMode);
+    waitWhileSearching();
+    search.stopSearch();
+    //assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+    //assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+    //assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+    //assertEquals(Evaluation.CHECKMATE - 3, search.getLastSearchResult().resultValue);
+  }
+
+
   private void waitWhileSearching() {
     while (search.isSearching()) {
       try {
@@ -621,7 +673,7 @@ public class TestSearch {
       new Position("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
 
     final SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, 8, 0, 0, 0, null, false, true, false);
+      new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, true, false);
 
     prepare();
 
