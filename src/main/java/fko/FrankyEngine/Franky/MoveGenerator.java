@@ -129,7 +129,8 @@ public class MoveGenerator {
    * Sets the PV move so it will be returned first. Need to be set after each call
    * <code>setPosition</code> as this reset the killer moves.
    * <p>
-   * Attention needs to be a valid move in the current position otherwise will break!
+   * <b>Attention:</b> needs to be a valid move in the current position otherwise will break!
+   * This can be the case when TT Collision happend.
    *
    * @param move
    */
