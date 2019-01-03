@@ -61,13 +61,13 @@ public class Evaluation {
   private static final Logger LOG = LoggerFactory.getLogger(Evaluation.class);
 
   // Constants for evaluations
-  public static final int NOVALUE             = Integer.MIN_VALUE;
-  public static final int INFINITE            = Integer.MAX_VALUE;
+  public static final int NOVALUE             = Short.MIN_VALUE; // TT uses shorts
+  public static final int INFINITE            = Short.MAX_VALUE; // TT uses shorts
   public static final int MIN                 = -10000;
   public static final int MAX                 = 10000;
   public static final int DRAW                = 0;
   public static final int CHECKMATE           = MAX;
-  public static final int CHECKMATE_THRESHOLD = CHECKMATE - Search.MAX_SEARCH_DEPTH;
+  public static final int CHECKMATE_THRESHOLD = CHECKMATE - Byte.MAX_VALUE;
 
   // Convenience constants
   private static final int GAME_PHASE_MAX = 24;
