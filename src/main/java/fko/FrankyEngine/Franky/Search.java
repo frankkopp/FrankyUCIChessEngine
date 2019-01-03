@@ -1484,14 +1484,16 @@ public class Search implements Runnable {
   }
 
   /**
-   * Pauses the current thread while in search
-   * TODO: use semaphores for this
+   * Pauses the calling thread while in search.
+   *
+   * Uses join() on the search thread.
    */
   public void waitWhileSearching() {
     while (isSearching()) {
       try {
-        Thread.sleep(1);
-      } catch (InterruptedException ignored) {
+        searchThread.join();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
       }
     }
   }

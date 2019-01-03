@@ -62,6 +62,21 @@ public class TestSearch {
   }
 
   @Test
+  public void testWaitWhileSearch() {
+    String fen = Position.STANDARD_BOARD_FEN;
+    Position position = new Position(fen);
+    final int moveTime = 5000;
+    SearchMode searchMode =
+      new SearchMode(0, 0, 0, 0, 0, moveTime, 0, 0, 0, null, false, false, false);
+    search.startSearch(position, searchMode);
+    long startTime = System.currentTimeMillis();
+    search.waitWhileSearching();
+    final long endTime = System.currentTimeMillis() - startTime;
+    System.out.printf("MoveTime was %,d and Duration was %,d %n", moveTime, endTime);
+    assertTrue(endTime < moveTime+100);
+  }
+
+    @Test
   public void testBookSearch() {
     search.config.USE_BOOK = true;
     String fen = Position.STANDARD_BOARD_FEN;
@@ -71,7 +86,7 @@ public class TestSearch {
     SearchMode searchMode =
       new SearchMode(300000, 300000, 0, 0, 0, 0, 0, 0, 0, null, false, false, false);
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
     assertEquals(0, search.getSearchCounter().leafPositionsEvaluated);
     assertEquals(0, search.getSearchCounter().currentIterationDepth);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
@@ -79,7 +94,7 @@ public class TestSearch {
     // non timed search - should not use book
     searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
 
@@ -91,7 +106,7 @@ public class TestSearch {
     Position position = new Position(fen);
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
   }
@@ -104,7 +119,7 @@ public class TestSearch {
     SearchMode searchMode =
       new SearchMode(0, 0, 0, 0, 0, 0, nodes, 0, 0, null, false, false, false);
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
     assertEquals(nodes, search.getSearchCounter().nodesVisited);
@@ -118,7 +133,7 @@ public class TestSearch {
     SearchMode searchMode =
       new SearchMode(100000, 100000, 0, 0, 0, 0, 0, 0, 0, null, false, false, false);
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
@@ -131,7 +146,7 @@ public class TestSearch {
     SearchMode searchMode =
       new SearchMode(100000, 100000, 2000, 2000, 0, 0, 0, 0, 0, null, false, false, false);
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
     // TODO: Inc not implemented in search time estimations yet - so this is similar to non inc
     //  time control
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -145,7 +160,7 @@ public class TestSearch {
     Position position = new Position(fen);
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 2000, 0, 0, 0, null, false, false, false);
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
@@ -177,7 +192,7 @@ public class TestSearch {
     position = new Position(fen);
     searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 2, null, false, false, false);
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
     search.stopSearch();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
@@ -191,7 +206,7 @@ public class TestSearch {
     position = new Position(fen);
     searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 3, null, false, false, false);
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 0);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
@@ -204,7 +219,7 @@ public class TestSearch {
     Position position = new Position();
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 0, null, false, true, false);
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
   }
 
   @Test
@@ -214,7 +229,7 @@ public class TestSearch {
     SearchMode searchMode =
       new SearchMode(0, 0, 0, 0, 0, 1000, 0, 0, 0, Arrays.asList("h2h4"), false, false, false);
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertEquals("h2h4", Move.toUCINotation(position, search.getLastSearchResult().bestMove));
   }
@@ -270,7 +285,7 @@ public class TestSearch {
     searchMode = new SearchMode(0, 0, 0, 0, 0, 2000, 0, 0, 0, null, false, false, false);
     // Start search after miss
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
   }
 
   @Test
@@ -286,7 +301,7 @@ public class TestSearch {
       search.startSearch(position, searchMode);
       Thread.sleep(new Random().nextInt(100));
       search.ponderHit();
-      waitWhileSearching();
+      search.waitWhileSearching();
       assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
       assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
       position.undoMove();
@@ -307,7 +322,7 @@ public class TestSearch {
     Thread.sleep(3000);
     search.ponderHit();
     // test search
-    waitWhileSearching();
+    search.waitWhileSearching();
   }
 
   @Test
@@ -325,7 +340,7 @@ public class TestSearch {
     Thread.sleep(3000);
     search.stopSearch();
     // test search
-    waitWhileSearching();
+    search.waitWhileSearching();
   }
 
   @Test
@@ -344,7 +359,7 @@ public class TestSearch {
 
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 1000, 0, 0, 0, null, false, false, false);
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
     assertEquals("d8h4", Move.toSimpleString(search.getLastSearchResult().bestMove));
     assertEquals(Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
                  search.getLastSearchResult().resultValue);
@@ -365,7 +380,7 @@ public class TestSearch {
     // although black is winning
 
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
     assertEquals("g7f8", Move.toSimpleString(search.getLastSearchResult().bestMove));
     LOG.warn("Best Move: {} Value: {} Ponder {}",
              Move.toSimpleString(search.getLastSearchResult().bestMove),
@@ -397,7 +412,7 @@ public class TestSearch {
     Position position = new Position(fen);
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, false, true);
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
 
     assertEquals(perftResults[depth][1], search.getSearchCounter().leafPositionsEvaluated);
     assertEquals(perftResults[depth][2], search.getSearchCounter().captureCounter);
@@ -513,7 +528,7 @@ public class TestSearch {
       search.clearHashTables();
     }
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
     values.add(String.format("SIZE %-12s : %,14d >> %-18s (%4d) >> nps %,.0f >> %s ", feature,
                              search.getSearchCounter().leafPositionsEvaluated,
                              Move.toString(search.getLastSearchResult().bestMove),
@@ -561,7 +576,7 @@ public class TestSearch {
       new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
 
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
 
     LOG.warn("Best Move: {} Value: {} Ponder {}",
              Move.toSimpleString(search.getLastSearchResult().bestMove),
@@ -604,22 +619,12 @@ public class TestSearch {
       position = new Position(fen);
       searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 12, 5, null, false, false, false);
       search.startSearch(position, searchMode);
-      waitWhileSearching();
+      search.waitWhileSearching();
       search.stopSearch();
       assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
       assertTrue(search.getSearchCounter().currentIterationDepth > 1);
       assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
       assertEquals(Evaluation.CHECKMATE - 9, search.getLastSearchResult().resultValue);
-    }
-  }
-
-
-  private void waitWhileSearching() {
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(1);
-      } catch (InterruptedException ignored) {
-      }
     }
   }
 
@@ -685,14 +690,14 @@ public class TestSearch {
     //search.config.USE_SORT_ALL_MOVES = false;
     search.clearHashTables();
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
   }
 
   private void test2(final Position position, final SearchMode searchMode) {
     //search.config.USE_SORT_ALL_MOVES = true;
     search.clearHashTables();
     search.startSearch(position, searchMode);
-    waitWhileSearching();
+    search.waitWhileSearching();
   }
 
   @Test
