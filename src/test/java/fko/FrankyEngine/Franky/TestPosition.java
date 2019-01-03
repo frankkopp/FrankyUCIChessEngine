@@ -665,7 +665,6 @@ public class TestPosition {
         if (Duration.between(start, Instant.now()).getSeconds() == DURATION) {
           break;
         }
-        ;
       }
 
       //            System.out.println(board);

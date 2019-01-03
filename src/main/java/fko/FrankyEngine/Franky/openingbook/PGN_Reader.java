@@ -364,22 +364,18 @@ public class PGN_Reader {
       return s.toString();
     }
 
-    @SuppressWarnings("javadoc")
     public String getOrigNotation() {
       return _origNotation;
     }
 
-    @SuppressWarnings("javadoc")
     public void setOrigNotation(String origNotation) {
       this._origNotation = origNotation;
     }
 
-    @SuppressWarnings("javadoc")
     public HashMap<String, String> getTags() {
       return _tags;
     }
 
-    @SuppressWarnings("javadoc")
     public void addTags(String key, String value) {
       _tags.put(key, value);
     }

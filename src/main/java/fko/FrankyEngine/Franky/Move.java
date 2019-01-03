@@ -309,7 +309,7 @@ public class Move {
     if (!matcher.find()) {
       LOG.warn("Could not match a SAN move in this string: {}", sanMove);
       return NOMOVE;
-    };
+    }
     String piece = matcher.group(1);
     String disambFile = matcher.group(2);
     String disambRank = matcher.group(3);

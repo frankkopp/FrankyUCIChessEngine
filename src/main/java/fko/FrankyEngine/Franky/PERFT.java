@@ -188,27 +188,22 @@ public class PERFT {
         System.out.println();
     }
 
-    @SuppressWarnings("javadoc")
     public long get_nodes() {
         return _nodes;
     }
 
-    @SuppressWarnings("javadoc")
     public long get_checkCounter() {
         return _checkCounter;
     }
 
-    @SuppressWarnings("javadoc")
     public long get_checkMateCounter() {
         return _checkMateCounter;
     }
 
-    @SuppressWarnings("javadoc")
     public long get_captureCounter() {
         return _captureCounter;
     }
 
-    @SuppressWarnings("javadoc")
     public long get_enpassantCounter() {
         return _enpassantCounter;
     }
