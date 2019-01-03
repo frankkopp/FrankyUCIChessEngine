@@ -1469,6 +1469,19 @@ public class Search implements Runnable {
   }
 
   /**
+   * Pauses the current thread while in search
+   * TODO: use semaphores for this
+   */
+  public void waitWhileSearching() {
+    while (isSearching()) {
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException ignored) {
+      }
+    }
+  }
+
+  /**
    * Parameter class for the search result
    */
   public static final class SearchResult {

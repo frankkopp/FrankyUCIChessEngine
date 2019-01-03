@@ -155,8 +155,8 @@ public class Move {
    */
   public static Piece getTarget(int move) {
     if (move == NOMOVE) return Piece.NOPIECE;
-    int chessman = (move & TARGET_MASK) >>> TARGET_SHIFT;
-    return Piece.values[chessman];
+    int piece = (move & TARGET_MASK) >>> TARGET_SHIFT;
+    return Piece.values[piece];
   }
 
   /**
@@ -181,6 +181,17 @@ public class Move {
     if (move == NOMOVE) return MoveType.NOMOVETYPE;
     int type = ((move & MOVETYPE_MASK) >>> MOVETYPE_SHIFT);
     return MoveType.values[type];
+  }
+
+  /**
+   * Determines if a move is a capturing move
+   * @param move
+   * @return true if move is capturing
+   */
+  public static boolean isCapturing(final int move) {
+    if (move == NOMOVE) return false;
+    final int piece = (move & TARGET_MASK) >>> TARGET_SHIFT;
+    return !Piece.values[piece].equals(Piece.NOPIECE);
   }
 
   /**
