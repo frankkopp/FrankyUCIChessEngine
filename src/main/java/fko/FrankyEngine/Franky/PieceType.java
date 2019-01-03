@@ -37,7 +37,7 @@ public enum PieceType {
     BISHOP ("B", true,  330),  // 3
     ROOK   ("R", true,  500),  // 4
     QUEEN  ("Q", true,  900),  // 5
-    KING   ("K", false, 20000);// 6
+    KING   ("K", false, 2000); // 6
 
     static final PieceType[] values = {
             NOTYPE,
