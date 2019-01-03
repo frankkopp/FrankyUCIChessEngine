@@ -151,7 +151,7 @@ public class Position {
 
   // Flag for boolean states with undetermined state
   private enum Flag {
-    TBD, TRUE, FALSE;
+    TBD, TRUE, FALSE
   }
 
   // **********************************************************
@@ -1471,7 +1471,7 @@ public class Position {
       boardString.append("    ---------------------------------\n");
 
       // rank number
-      boardString.append(' ').append(Integer.toString(rank)).append(": |");
+      boardString.append(' ').append(rank).append(": |");
 
       // fields
       for (int file = 1; file <= 8; file++) {
