@@ -86,6 +86,7 @@ public class FrankyEngine implements IUCIEngine {
     iDName = properties.getProperty("artifactId") + " v" + properties.getProperty("version");
 
     initOptions();
+
     search = new Search(this, config);
     position = new Position(); // default is standard start board
   }
@@ -176,6 +177,13 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 "",
                 ""));
+     iUciOptions.add(
+        new UCIOption("Use_PVS_Move_Ordering",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_PVS_MOVE_ORDERING),
+                "",
+                "",
+                ""));
     iUciOptions.add(
         new UCIOption("Use_TranspositionTable",
                 UCIOptionType.check,
@@ -210,13 +218,6 @@ public class FrankyEngine implements IUCIEngine {
                 Integer.toString(config.NULL_MOVE_DEPTH),
                 "1",
                 "3",
-                ""));
-     iUciOptions.add(
-        new UCIOption("Use_PVS_Move_Ordering",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_PVS_MOVE_ORDERING),
-                "",
-                "",
                 ""));
      iUciOptions.add(
         new UCIOption("Use_Eval_Pruning",
@@ -329,16 +330,15 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      case "Use_Aspiration_Window_Search":
-        config.USE_ASPIRATION_WINDOW = Boolean.valueOf(value);
-        msg =
-          "Use Aspiration Window Search set to " + (config.USE_ASPIRATION_WINDOW ? "On" : "Off");
-        LOG.info(msg);
-        uciProtocolHandler.sendInfoStringToUCI(msg);
-        break;
       case "Use_PVS":
         config.USE_PVS = Boolean.valueOf(value);
         msg = "Use PVSearch set to " + (config.USE_PVS ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_PVS_Move_Ordering":
+        config.USE_PVS_MOVE_ORDERING = Boolean.valueOf(value);
+        msg = "Use PVS Ordering set to " + (config.USE_PVS_MOVE_ORDERING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
@@ -363,15 +363,21 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
+      case "Use_Null_Move_Pruning":
+        config.USE_NULL_MOVE_PRUNING = Boolean.valueOf(value);
+        msg = "Use Null Move Pruning set to " + (config.USE_NULL_MOVE_PRUNING ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
       case "Null_Move_Depth":
         config.NULL_MOVE_DEPTH = Integer.valueOf(value);
         msg = "Null Move Depth set to " + (config.NULL_MOVE_DEPTH);
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      case "Use_PVS_Move_Ordering":
-        config.USE_PVS_MOVE_ORDERING = Boolean.valueOf(value);
-        msg = "Use PVS Ordering set to " + (config.USE_PVS_MOVE_ORDERING ? "On" : "Off");
+      case "Use_Razor_Pruning":
+        config.USE_RAZOR_PRUNING = Boolean.valueOf(value);
+        msg = "Use Razor Pruning set to " + (config.USE_RAZOR_PRUNING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
@@ -411,6 +417,13 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
+//      case "Use_Aspiration_Window_Search":
+//        config.USE_ASPIRATION_WINDOW = Boolean.valueOf(value);
+//        msg =
+//          "Use Aspiration Window Search set to " + (config.USE_ASPIRATION_WINDOW ? "On" : "Off");
+//        LOG.info(msg);
+//        uciProtocolHandler.sendInfoStringToUCI(msg);
+//        break;
       default:
         LOG.error("Unknown option: {}", name);
         break;
