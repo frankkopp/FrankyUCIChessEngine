@@ -30,7 +30,6 @@ import fko.UCI.IUCIEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openjdk.jol.info.ClassLayout;
-import org.openjdk.jol.vm.VM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,11 +55,11 @@ public class TestTranspositionTable {
     Position position = new Position();
     //    assertEquals(762600, cache.getMaxEntries());
     assertEquals(32 * 1024 * 1024, cache.getSize());
-    cache.put(position, 999, TT_EntryType.EXACT, 5);
+    cache.put(position, (byte) 999, TT_EntryType.EXACT, (byte) 5);
     assertEquals(1, cache.getNumberOfEntries());
     assertEquals(999, cache.get(position).value);
     assertEquals(999, cache.get(position).value);
-    cache.put(position, 1111, TT_EntryType.EXACT, 15);
+    cache.put(position, (byte) 1111, TT_EntryType.EXACT, (byte) 15);
     assertEquals(1111, cache.get(position).value);
     assertEquals(1, cache.getNumberOfEntries());
     cache.clear();
@@ -106,16 +105,24 @@ public class TestTranspositionTable {
   @Test
   public void findSeed() {
 
-    int bestSeed = 2157;
-    long bestCollisions = 4736;
+    // depth 8
+    // best: 2157, coll 4736, idx 4060
 
-    for (int seed = 2560; seed < Integer.MAX_VALUE; seed++) {
+//    Start COLLISION Test for Seed 61
+//    TT Objects: 3.464.890 (6.100.805)
+//    TT Collisions: 1.878.548 Updates: 987.937
+//    Best Collisions 1.696.168 with seed 40
+
+    int bestSeed = 0;
+    long bestCollisions = 1696168;
+
+    for (int seed = 2157; seed < Integer.MAX_VALUE; seed++) {
 
       Position.setZobristRandoms(seed);
       engine = new FrankyEngine();
       search = ((FrankyEngine) engine).getSearch();
 
-      final int depth = 8;
+      final int depth = 10;
       System.out.printf("Start COLLISION Test for Seed %,d %n", seed);
 
       Position position = new Position();
@@ -220,9 +227,10 @@ public class TestTranspositionTable {
 
   @Test
   public void showSize() {
-    System.out.println(VM.current().details());
+    //System.out.println(VM.current().details());
+    TranspositionTable.TT_Entry test = new TranspositionTable.TT_Entry();
     System.out.println(ClassLayout.parseClass(TranspositionTable.TT_Entry.class).toPrintable());
-    System.out.println(ClassLayout.parseClass(TranspositionTable.class).toPrintable());
+    System.out.println(ClassLayout.parseClass(test.getClass()).toPrintable());
   }
 
 }
