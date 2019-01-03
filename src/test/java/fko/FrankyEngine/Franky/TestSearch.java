@@ -172,21 +172,6 @@ public class TestSearch {
     Position position;
     SearchMode searchMode;
 
-    search.config.USE_ROOT_MOVES_SORT = true;
-    search.config.USE_ALPHABETA_PRUNING = true;
-    search.config.USE_ASPIRATION_WINDOW = true;
-    search.config.USE_PVS = true;
-    search.config.USE_PVS_MOVE_ORDERING = true;
-    search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.USE_MATE_DISTANCE_PRUNING = true;
-    search.config.USE_MINOR_PROMOTION_PRUNING = true;
-    search.config.USE_QUIESCENCE = true;
-    search.config.USE_NULL_MOVE_PRUNING = true;
-    search.config.USE_STATIC_NULL_PRUNING = true;
-    search.config.USE_RAZOR_PRUNING = true;
-    search.config.USE_KILLER_MOVES = true;
-    search.config.USE_LMR = true;
-
     // mate in 2 (3 plys)
     fen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -"; // Position
     position = new Position(fen);
@@ -549,25 +534,25 @@ public class TestSearch {
     search.config.USE_ROOT_MOVES_SORT = true;
     search.config.USE_PVS = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
+    search.config.USE_KILLER_MOVES = true;
 
-    search.config.USE_TRANSPOSITION_TABLE = false;
+    search.config.USE_TRANSPOSITION_TABLE = true;
 
-    search.config.USE_MATE_DISTANCE_PRUNING = false;
-    search.config.USE_MINOR_PROMOTION_PRUNING = false;
-    search.config.USE_NULL_MOVE_PRUNING = false;
-    search.config.USE_KILLER_MOVES = false;
-    search.config.USE_STATIC_NULL_PRUNING = false;
-    search.config.USE_RAZOR_PRUNING = false;
+    search.config.USE_MATE_DISTANCE_PRUNING = true;
+    search.config.USE_MINOR_PROMOTION_PRUNING = true;
+    search.config.USE_NULL_MOVE_PRUNING = true;
+    search.config.USE_STATIC_NULL_PRUNING = true;
+    search.config.USE_RAZOR_PRUNING = true;
     search.config.USE_LMR = false;
 
     search.config.USE_QUIESCENCE = false;
 
-    int maxDepth = 5;
+    int maxDepth = 6;
     int moveTime = 0;
     int mateIn = 0;
     boolean infinite = true;
 
-    fen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -";
+    fen = "4r1b1/1p4B1/pN2pR2/RB2k3/1P2N2p/2p3b1/n2P1p1r/5K1n w - -";
     //    fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
     //    fen = "r2q1rk1/1p1nbppp/3p1n2/1Pp2b2/p1P5/2N1Pp1P/PBNPB1P1/R2Q1RK1 w - -";
     //    fen = "4k3/4p3/8/8/8/8/8/3KQ3 w - -";
@@ -584,6 +569,8 @@ public class TestSearch {
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
 
     LOG.warn(search.getSearchCounter().toString());
+
+    assertEquals(Evaluation.CHECKMATE - 5, search.getLastSearchResult().resultValue);
 
   }
 
@@ -611,7 +598,6 @@ public class TestSearch {
 
     // FIXME
     //  Sporadic fails here - suspect TT
-
     int i = 0;
     while (i++ < 1000) {
       System.out.println("Test NR " + i);

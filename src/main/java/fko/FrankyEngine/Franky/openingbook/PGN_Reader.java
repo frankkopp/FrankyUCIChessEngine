@@ -120,7 +120,6 @@ public class PGN_Reader {
 
     // now we have something to return;
     if (result) _readyFlag = true;
-    ;
 
     if (VERBOSE) {
       time = System.currentTimeMillis() - start;
@@ -263,7 +262,7 @@ public class PGN_Reader {
 
   private int handleMoveSection(int currentLine, pgnGame tmpGame) {
 
-    StringBuffer moveSection = new StringBuffer();
+    StringBuilder moveSection = new StringBuilder();
 
     // get all in concatenated
     while (currentLine < _lines.size()) {
@@ -347,18 +346,22 @@ public class PGN_Reader {
 
     @Override
     public String toString() {
-      String s = "";
+      StringBuilder s = new StringBuilder();
       for (String key : _tags.keySet()) {
-        s += "[" + key + " \"" + _tags.get(key) + "\"]" + System.lineSeparator();
+        s.append("[")
+         .append(key)
+         .append(" \"")
+         .append(_tags.get(key))
+         .append("\"]")
+         .append(System.lineSeparator());
       }
-      s += System.lineSeparator() + _moves + System.lineSeparator();
-      s +=
-        System.lineSeparator()
-        + "Orignal Notation:"
-        + System.lineSeparator()
-        + _origNotation
-        + System.lineSeparator();
-      return s;
+      s.append(System.lineSeparator()).append(_moves).append(System.lineSeparator());
+      s.append(System.lineSeparator())
+       .append("Orignal Notation:")
+       .append(System.lineSeparator())
+       .append(_origNotation)
+       .append(System.lineSeparator());
+      return s.toString();
     }
 
     @SuppressWarnings("javadoc")
@@ -391,26 +394,26 @@ public class PGN_Reader {
     }
   }
 
-  /**
-   * # perl regular expressions for game parsing my $re_result = qr{(?:1\-0|0\-1|1\/2\-1\/2|\*)}; my
-   * $re_move = qr{[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:\=?[QRBN])?}; # piece ^^^^^ # unambiguous
-   * column or line ^^^ ^^^ # capture ^ # destination square ^^^ ^^^ # promotion ^ ^^^^^ my
-   * $re_castling = qr/O\-O(?:\-O)?/; my $re_check = qr/(?:(?:\#|\+(\+)?))?/; my $re_any_move =
-   * qr/(?:$re_move|$re_castling)$re_check/; my $re_nag = qr/\$\d+/; my $re_number =
-   * qr/\d+\.(?:\.\.)?/; my $re_escape = qr/^\%[^\n]*\n/; my $re_eol_comment= qr/;.*$/; my $re_rav =
-   * $re_parens; my $re_comment = $re_brace;
-   *
-   * <p># ============================================== # These two regular expressions were
-   * produced by # Damian Conway's module Regexp::Common #
-   * ---------------------------------------------- # On the author's suggestion, these lines # #
-   * use Regexp::Common; # print "$RE{balanced}{-parens=>'()'}\n"; # print
-   * "$RE{balanced}{-parens=>'{}'}\n"; # # produced the RegEx code, which was edited # and inserted
-   * here for efficiency reasons. # ==============================================
-   *
-   * <p>our $re_parens; ## no critic $re_parens = qr/ (?:(?:(?:[(](?:(?>[^)(]+)
-   * |(??{$re_parens}))*[)])) |(?:(?!))) /x;
-   *
-   * <p>our $re_brace; ## no critic $re_brace = qr/
-   * (?:(?:(?:[{](?:(?>[^}{]+)|(??{$re_brace}))*[}]))|(?:(?!))) /x;
+  /*
+    # perl regular expressions for game parsing my $re_result = qr{(?:1\-0|0\-1|1\/2\-1\/2|\*)}; my
+    $re_move = qr{[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:\=?[QRBN])?}; # piece ^^^^^ # unambiguous
+    column or line ^^^ ^^^ # capture ^ # destination square ^^^ ^^^ # promotion ^ ^^^^^ my
+    $re_castling = qr/O\-O(?:\-O)?/; my $re_check = qr/(?:(?:\#|\+(\+)?))?/; my $re_any_move =
+    qr/(?:$re_move|$re_castling)$re_check/; my $re_nag = qr/\$\d+/; my $re_number =
+    qr/\d+\.(?:\.\.)?/; my $re_escape = qr/^\%[^\n]*\n/; my $re_eol_comment= qr/;.*$/; my $re_rav =
+    $re_parens; my $re_comment = $re_brace;
+
+    <p># ============================================== # These two regular expressions were
+    produced by # Damian Conway's module Regexp::Common #
+    ---------------------------------------------- # On the author's suggestion, these lines # #
+    use Regexp::Common; # print "$RE{balanced}{-parens=>'()'}\n"; # print
+    "$RE{balanced}{-parens=>'{}'}\n"; # # produced the RegEx code, which was edited # and inserted
+    here for efficiency reasons. # ==============================================
+
+    <p>our $re_parens; ## no critic $re_parens = qr/ (?:(?:(?:[(](?:(?>[^)(]+)
+    |(??{$re_parens}))*[)])) |(?:(?!))) /x;
+
+    <p>our $re_brace; ## no critic $re_brace = qr/
+    (?:(?:(?:[{](?:(?>[^}{]+)|(??{$re_brace}))*[}]))|(?:(?!))) /x;
    */
 }

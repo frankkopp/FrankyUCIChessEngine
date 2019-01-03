@@ -120,7 +120,7 @@ public class TranspositionTable {
     if (entries[hash].key == 0) {
       numberOfEntries++;
       entries[hash].key = position.getZobristKey();
-      //entries[hash].fen = position.toFENString();
+      entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
@@ -134,7 +134,7 @@ public class TranspositionTable {
     ) {
       numberOfCollisions++;
       entries[hash].key = position.getZobristKey();
-      //entries[hash].fen = position.toFENString();
+      entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
@@ -145,8 +145,18 @@ public class TranspositionTable {
     else if (position.getZobristKey() == entries[hash].key  // same position
              && depth > entries[hash].depth) { // Overwrite only when new value from deeper search
       numberOfUpdates++;
+
+      // FIXME DEBUG
+      if (Math.abs(entries[hash].value) >= Evaluation.CHECKMATE_THRESHOLD
+          && entries[hash].value == TT_EntryType.EXACT) {
+        if (Math.abs(value) < Evaluation.CHECKMATE_THRESHOLD) {
+          System.err.println("We are erasing a MATE in the TT");
+          System.err.println();
+        }
+      }
+
       entries[hash].key = position.getZobristKey();
-      //entries[hash].fen = position.toFENString();
+      entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
@@ -278,6 +288,7 @@ public class TranspositionTable {
     byte  type     = TT_EntryType.NONE;
     int   bestMove = Move.NOMOVE;
     byte  age      = 0;
+    String fen = "";
   }
 
   /**

@@ -806,7 +806,8 @@ public class Search implements Runnable {
       final int threshold = alpha - config.RAZOR_PRUNING_MARGIN;
       if (staticEval < threshold ){
         final int qsearchVal = qsearch(position, ply, alpha, beta);
-        if (qsearchVal < threshold) return alpha;
+        if (qsearchVal < threshold)
+          return alpha;
       }
     }
     // @formatter:on
