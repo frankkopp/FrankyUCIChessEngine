@@ -28,12 +28,14 @@ package fko.FrankyEngine.Franky;
 import fko.FrankyEngine.Franky.TranspositionTable.TT_EntryType;
 import fko.UCI.IUCIEngine;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openjdk.jol.info.ClassLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Frank
@@ -53,13 +55,11 @@ public class TestTranspositionTable {
   public final void test_Cache() {
     TranspositionTable cache = new TranspositionTable(32);
     Position position = new Position();
-    //    assertEquals(762600, cache.getMaxEntries());
     assertEquals(32 * 1024 * 1024, cache.getSize());
-    cache.put(position, (byte) 999, TT_EntryType.EXACT, (byte) 5);
+    cache.put(position, (short) 999, TT_EntryType.EXACT, (byte) 5);
     assertEquals(1, cache.getNumberOfEntries());
     assertEquals(999, cache.get(position).value);
-    assertEquals(999, cache.get(position).value);
-    cache.put(position, (byte) 1111, TT_EntryType.EXACT, (byte) 15);
+    cache.put(position, (short) 1111, TT_EntryType.EXACT, (byte) 15);
     assertEquals(1111, cache.get(position).value);
     assertEquals(1, cache.getNumberOfEntries());
     cache.clear();
@@ -81,8 +81,7 @@ public class TestTranspositionTable {
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false);
 
     search.startSearch(position, searchMode);
-
-    waitWhileSearching();
+    search.waitWhileSearching();
 
     LOG.info("Best Move: {} Value: {} Ponder {}",
              Move.toSimpleString(search.getLastSearchResult().bestMove),
@@ -102,16 +101,21 @@ public class TestTranspositionTable {
     System.out.println();
   }
 
+  /**
+   *  different randoms influence tt collisions greatly
+   *  tried to find a good seed here
+   */
   @Test
+  @Disabled
   public void findSeed() {
 
     // depth 8
     // best: 2157, coll 4736, idx 4060
 
-//    Start COLLISION Test for Seed 61
-//    TT Objects: 3.464.890 (6.100.805)
-//    TT Collisions: 1.878.548 Updates: 987.937
-//    Best Collisions 1.696.168 with seed 40
+    //    Start COLLISION Test for Seed 61
+    //    TT Objects: 3.464.890 (6.100.805)
+    //    TT Collisions: 1.878.548 Updates: 987.937
+    //    Best Collisions 1.696.168 with seed 40
 
     int bestSeed = 0;
     long bestCollisions = 1696168;
@@ -132,7 +136,7 @@ public class TestTranspositionTable {
 
       search.startSearch(position, searchMode);
 
-      waitWhileSearching();
+      search.waitWhileSearching();
 
       LOG.info("Best Move: {} Value: {} Ponder {}",
                Move.toSimpleString(search.getLastSearchResult().bestMove),
@@ -156,32 +160,26 @@ public class TestTranspositionTable {
   }
 
 
+  /**
+   * General test of TT usage
+   */
   @Test
   public void TTUsageTest() {
 
     engine = new FrankyEngine();
     search = ((FrankyEngine) engine).getSearch();
 
-    final int depth = 10;
+    final int depth = 6;
 
     LOG.info("Start SIZE Test for depth {}", depth);
 
-    String fen = "7k/8/8/8/8/8/P7/K7 w - - 0 1";
-    //    fen = Position.START_FEN;
-    Position position = new Position(fen);
+    Position position = new Position();
 
-    search.config.USE_ROOT_MOVES_SORT = false;
-    search.config.USE_ALPHABETA_PRUNING = false;
-    search.config.USE_PVS = false;
     search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.USE_MATE_DISTANCE_PRUNING = false;
-    search.config.USE_MINOR_PROMOTION_PRUNING = false;
-    search.config.USE_QUIESCENCE = false;
+
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false);
-
     search.startSearch(position, searchMode);
-
-    waitWhileSearching();
+    search.waitWhileSearching();
 
     LOG.info("Best Move: {} Value: {} Ponder {}",
              Move.toSimpleString(search.getLastSearchResult().bestMove),
@@ -195,15 +193,11 @@ public class TestTranspositionTable {
     }
     LOG.info(search.getSearchCounter().toString());
 
-  }
-
-  private void waitWhileSearching() {
-    while (search.isSearching()) {
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException ignored) {
-      }
-    }
+    assertTrue(search.getTranspositionTable().getNumberOfEntries() > 0);
+    assertTrue(search.getTranspositionTable().getNumberOfCollisions() > 0);
+    assertTrue(search.getTranspositionTable().getNumberOfUpdates() > 0);
+    assertTrue(search.getSearchCounter().nodeCache_Hits > 0);
+    assertTrue(search.getSearchCounter().nodeCache_Misses > 0);
   }
 
   @Test
