@@ -51,7 +51,7 @@ public class Search implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Search.class);
 
-  public static final int MAX_SEARCH_DEPTH = 128;
+  public static final int MAX_SEARCH_DEPTH = Byte.MAX_VALUE;
 
   public static final int UCI_UPDATE_INTERVAL = 500;
 
@@ -716,10 +716,11 @@ public class Search implements Runnable {
     TTHit ttHit = probeTT(position, ply, depthLeft, alpha, beta);
     if (ttHit != null) {
       // in PV node only return ttHit if it was an exact hit
-      if (!pvNode || (alpha < ttHit.value && ttHit.value < beta)) {
+      if (!pvNode || ttHit.type == TT_EntryType.EXACT) {
         return ttHit.value;
       }
-      // we could not use value but the last best move will be used for move sorting
+      // we could not use value but the last best move will be used
+      // for move sorting
     }
     // End TT Lookup
     // ###############################################
@@ -777,9 +778,9 @@ public class Search implements Runnable {
       // Do not return unproven mate values
       if (checkMateValue(nullValue)) {
         if (nullValue > 0) {
-          nullValue = Evaluation.CHECKMATE_THRESHOLD-1;
+          nullValue = Evaluation.CHECKMATE_THRESHOLD - 1;
         } else {
-          nullValue = -Evaluation.CHECKMATE_THRESHOLD+1;
+          nullValue = -Evaluation.CHECKMATE_THRESHOLD + 1;
         }
       }
 
@@ -822,7 +823,7 @@ public class Search implements Runnable {
     int bestNodeMove = Move.NOMOVE;
 
     // Prepare hash type
-    TT_EntryType ttType = TT_EntryType.ALPHA;
+    byte ttType = TT_EntryType.ALPHA;
 
     // prepare move generator
     // set position, killers and TT move
@@ -986,11 +987,11 @@ public class Search implements Runnable {
       if (position.hasCheck()) {
         // We have a check mate. Return a -CHECKMATE.
         int value = -Evaluation.CHECKMATE + ply;
-        storeTT(position, depthLeft, TT_EntryType.EXACT, value, Move.NOMOVE);
+        //storeTT(position, depthLeft, TT_EntryType.EXACT, value, Move.NOMOVE);
         return value;
       } else {
         // We have a stale mate. Return the draw value.
-        storeTT(position, depthLeft, TT_EntryType.EXACT, Evaluation.DRAW, Move.NOMOVE);
+        //storeTT(position, depthLeft, TT_EntryType.EXACT, Evaluation.DRAW, Move.NOMOVE);
         return Evaluation.DRAW;
       }
     }
@@ -1086,7 +1087,7 @@ public class Search implements Runnable {
     int bestNodeMove = Move.NOMOVE;
 
     // Prepare hash type
-    TT_EntryType ttType = TT_EntryType.ALPHA;
+    byte ttType = TT_EntryType.ALPHA;
 
     // Generate all PseudoLegalMoves for QSearch
     // Usually only capture moves and check evasions
@@ -1170,11 +1171,11 @@ public class Search implements Runnable {
       if (position.hasCheck()) {
         // We have a check mate. Return a -CHECKMATE.
         int mateValue = -Evaluation.CHECKMATE + ply;
-        storeTT(position, MAX_SEARCH_DEPTH, TT_EntryType.EXACT, mateValue, Move.NOMOVE);
+        //storeTT(position, MAX_SEARCH_DEPTH, TT_EntryType.EXACT, mateValue, Move.NOMOVE);
         return mateValue;
       } else {
         // We have a stale mate. Return the draw value.
-        storeTT(position, MAX_SEARCH_DEPTH, TT_EntryType.EXACT, Evaluation.DRAW, Move.NOMOVE);
+        //storeTT(position, MAX_SEARCH_DEPTH, TT_EntryType.EXACT, Evaluation.DRAW, Move.NOMOVE);
         return Evaluation.DRAW;
       }
     }
@@ -1231,20 +1232,24 @@ public class Search implements Runnable {
                                                                  .ordinal()]);
   }
 
-  private void storeTT(final Position position, final int depthLeft, final TT_EntryType ttType,
+  private void storeTT(final Position position, final int depthLeft, final byte ttType,
                        final int value, int bestMove) {
 
+    assert depthLeft <= Byte.MAX_VALUE;
+    assert Math.abs(value) < Short.MAX_VALUE;
+
     if (config.USE_TRANSPOSITION_TABLE && !isPerftSearch() && !stopSearch) {
-      transpositionTable.put(position, value, ttType, depthLeft, bestMove);
+      transpositionTable.put(position, (byte) value, ttType, (byte) depthLeft, bestMove);
     }
   }
 
   // struct for multi return value for TTHit
   class TTHit {
-    int value    = Evaluation.NOVALUE;
-
-    int bestMove = Move.NOMOVE;
+    int  value    = Evaluation.NOVALUE;
+    byte type     = TT_EntryType.NONE;
+    int  bestMove = Move.NOMOVE;
   }
+
   private TTHit probeTT(final Position position, final int ply, final int depthLeft,
                         final int alpha, final int beta) {
 
@@ -1262,21 +1267,25 @@ public class Search implements Runnable {
           hit.bestMove = ttEntry.bestMove;
         }
 
-        if (ttEntry.depth >= depthLeft) { // only if tt depth was equal or deeper
+        // only if tt depth was equal or deeper
+        if (ttEntry.depth >= depthLeft) {
           int value = ttEntry.value;
 
           // check the retrieved hash table entry
           if (ttEntry.type == TT_EntryType.EXACT) {
             hit.value = value;
+            hit.type = TT_EntryType.EXACT;
 
           } else if (ttEntry.type == TT_EntryType.ALPHA) {
             if (value <= alpha) {
               hit.value = alpha;
+              hit.type = TT_EntryType.ALPHA;
             }
 
           } else if (ttEntry.type == TT_EntryType.BETA) {
             if (value >= beta) {
               hit.value = alpha;
+              hit.type = TT_EntryType.BETA;
             }
           }
           return hit;
