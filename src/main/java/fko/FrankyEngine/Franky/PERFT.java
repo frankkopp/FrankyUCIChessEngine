@@ -119,8 +119,8 @@ public class PERFT {
 
         // moves to search recursively
         // some convenience fields
-        Color _activePlayer = board.getNextPlayer();
-        Color _passivePlayer = board.getNextPlayer().getInverseColor();
+        final Color _activePlayer = board.getNextPlayer();
+        final Color _passivePlayer = board.getNextPlayer().getInverseColor();
         mg[ply].setPosition(board);
         MoveList moves = mg[ply].getPseudoLegalMoves();
         for(int i = 0; i < moves.size(); i++) {
