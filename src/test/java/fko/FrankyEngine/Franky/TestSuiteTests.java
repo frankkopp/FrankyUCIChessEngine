@@ -125,4 +125,16 @@ public class TestSuiteTests {
                       10000, 16));
   }
 
+  @Test
+  @Disabled
+  public void manualTest() {
+
+    // difficult for LMR because of Queen sacrifice
+    assertTrue(
+      testSuite
+        .startOneTest("rnbq3r/pppp4/3b1pkp/5p2/2BP4/4P3/PPP2PPP/RN1QK2R w KQ - bm Qh5+;",
+                      5000, 8));
+
+  }
+
 }
