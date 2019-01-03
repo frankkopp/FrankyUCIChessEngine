@@ -28,12 +28,18 @@ package fko.FrankyEngine.Franky;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.stream.IntStream;
+
 /**
  * A cache for node results during AlphaBeta search.
- * Implementation uses a simple array of an Entry class. The array indexes
+ *
+ * Implementation uses a simple array of an TT_Entry class. The array indexes
  * are calculated by using the modulo of the max number of entries from the key.
  * <code>entries[key%maxNumberOfEntries]</code>. As long as key is randomly distributed
  * this works just fine.
+ *
+ * The TT_Entry elements are tailored for small memory footprint and use primitive data types
+ * for value (short), depth (byte), type (byte), age (byte).
  */
 public class TranspositionTable {
 
@@ -87,24 +93,26 @@ public class TranspositionTable {
 
   /**
    * Stores the node value and the depth it has been calculated at.
-   *  @param position
+   *
+   * @param position
    * @param value
    * @param type
    * @param depth
    */
-  public void put(Position position, int value, TT_EntryType type, int depth) {
+  public void put(Position position, short value, byte type, byte depth) {
     put(position, value, type, depth, Move.NOMOVE);
   }
 
   /**
    * Stores the node value and the depth it has been calculated at.
-   *  @param position
+   *
+   * @param position
    * @param value
    * @param type
    * @param depth
    * @param bestMove
    */
-  public void put(Position position, int value, TT_EntryType type, int depth, int bestMove) {
+  public void put(Position position, short value, byte type, byte depth, int bestMove) {
 
     final int hash = getHash(position.getZobristKey());
 
@@ -117,10 +125,13 @@ public class TranspositionTable {
       entries[hash].type = type;
       entries[hash].depth = depth;
       entries[hash].bestMove = bestMove;
+      entries[hash].age = 1;
     }
     // different position - overwrite
-    // TODO: better replacement strategy
-    else if (position.getZobristKey() != entries[hash].key) {
+    else if (position.getZobristKey() != entries[hash].key
+             && depth > entries[hash].depth
+             && entries[hash].age > 0
+    ) {
       numberOfCollisions++;
       entries[hash].key = position.getZobristKey();
       //entries[hash].fen = position.toFENString();
@@ -128,6 +139,7 @@ public class TranspositionTable {
       entries[hash].type = type;
       entries[hash].depth = depth;
       entries[hash].bestMove = bestMove;
+      entries[hash].age = 1;
     }
     // Update
     else if (position.getZobristKey() == entries[hash].key  // same position
@@ -139,6 +151,7 @@ public class TranspositionTable {
       entries[hash].type = type;
       entries[hash].depth = depth;
       entries[hash].bestMove = bestMove;
+      entries[hash].age = 1;
     }
     // ignore new values for cache
   }
@@ -154,6 +167,7 @@ public class TranspositionTable {
   public TT_Entry get(Position position) {
     final int hash = getHash(position.getZobristKey());
     if (entries[hash].key == position.getZobristKey()) { // hash hit
+      entries[hash].age = (byte) Math.max(entries[hash].age - 1, 0);
       return entries[hash];
     }
     // cache miss or collision
@@ -162,6 +176,7 @@ public class TranspositionTable {
 
   /**
    * TODO: better hash function?
+   *
    * @param key
    * @return returns a hash key
    */
@@ -178,9 +193,11 @@ public class TranspositionTable {
     for (int i = 0; i < maxNumberOfEntries; i++) {
       entries[i].key = 0L;
       //entries[i].fen = "";
-      entries[i].value = Integer.MIN_VALUE;
+      entries[i].value = Byte.MIN_VALUE;
       entries[i].depth = 0;
       entries[i].type = TT_EntryType.ALPHA;
+      entries[i].bestMove = Move.NOMOVE;
+      entries[i].age = 0;
     }
     numberOfEntries = 0;
     numberOfCollisions = 0;
@@ -188,9 +205,19 @@ public class TranspositionTable {
   }
 
   /**
-   * @return the numberOfEntries
+   * Mark all entries unused and clear for overwriting
    */
-  public int getNumberOfEntries() {
+  public void ageEntries() {
+    IntStream.range(0, entries.length)
+             .parallel()
+             .filter(i -> entries[i].key != 0)
+             .forEach(i -> entries[i].age
+               = (byte) Math.min(entries[i].age + 1, Byte.MAX_VALUE-1));
+  }
+
+  /**
+   * @return the numberOfEntries
+   */ public int getNumberOfEntries() {
     return this.numberOfEntries;
   }
 
@@ -223,39 +250,45 @@ public class TranspositionTable {
     return numberOfUpdates;
   }
 
+  // @formatter:off
   /**
    * Entry for transposition table.
-   * Contains a key, value and an entry type.
+   * <pre>
+   * fko.FrankyEngine.Franky.TranspositionTable$TT_Entry object internals:
+   * OFFSET  SIZE      TYPE DESCRIPTION                               VALUE
+   *      0    12           (object header)                           N/A
+   *     12     4       int TT_Entry.bestMove                         N/A
+   *     16     8      long TT_Entry.key                              N/A
+   *     24     2     short TT_Entry.value                            N/A
+   *     26     1      byte TT_Entry.depth                            N/A
+   *     27     1      byte TT_Entry.type                             N/A
+   *     28     1   boolean TT_Entry.usedFlag                         N/A
+   *     29     3           (loss due to the next object alignment)
+   * Instance size: 32 bytes
+   * </pre>
    */
+  // @formatter:on
   public static final class TT_Entry {
 
-    // @formatter:off
-    /**
-     * fko.FrankyEngine.Franky.TranspositionTable$TT_Entry object internals:
-     *
-     *  OFFSET  SIZE TYPE DESCRIPTION
-     *       0    12                (object header)
-     *      12     4            int TT_Entry.value
-     *      16     8           long TT_Entry.key
-     *      24     4            int TT_Entry.depth
-     *      28     4   TT_EntryType TT_Entry.type
-     * Instance size: 32 bytes
-     *
-     */
-    // @formatter:on
-    static final int SIZE = 40;
+    static final int SIZE = 32;
 
-    long         key      = 0L;
-    int          value    = Evaluation.NOVALUE;
-    int          depth    = 0;
-    TT_EntryType type     = TT_EntryType.ALPHA;
-    int          bestMove = Move.NOMOVE;
+    long  key      = 0L;
+    short value    = Evaluation.NOVALUE;
+    byte  depth    = 0;
+    byte  type     = TT_EntryType.NONE;
+    int   bestMove = Move.NOMOVE;
+    byte  age      = 0;
   }
 
   /**
    * Defines the type of transposition table entry for alpha beta search.
    */
-  public enum TT_EntryType {EXACT, ALPHA, BETA}
+  public static class TT_EntryType {
+    public static final byte NONE  = 0;
+    public static final byte EXACT = 1;
+    public static final byte ALPHA = 2;
+    public static final byte BETA  = 3;
+  }
 
 
 }
