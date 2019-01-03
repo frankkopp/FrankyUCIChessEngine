@@ -606,6 +606,8 @@ public class Search implements Runnable {
       currentVariation.removeLast();
       // #### END - Commit move and go deeper into recursion
 
+      if (stopSearch) break;
+
       // write the value back to the root moves list
       rootMoves.set(i, move, value);
 
@@ -624,7 +626,6 @@ public class Search implements Runnable {
         searchCounter.currentBestRootValue = alpha;
       }
 
-      if (stopSearch) break;
     } // end for root moves loop
     // ##### Iterate through all available moves
     // #########################################################
@@ -934,6 +935,8 @@ public class Search implements Runnable {
       currentVariation.removeLast();
       position.undoMove();
 
+      if (stopSearch) break;
+
       // Did we find a better move for this node?
       // For the PV move this is always the case.
       if (value > bestNodeValue && !isPerftSearch()) {
@@ -972,7 +975,6 @@ public class Search implements Runnable {
         }
       }
 
-      if (stopSearch) break;
     } // iteration over all moves
 
     // TODO: what happens when we never find a move higher then alpha in this ply??
@@ -1136,6 +1138,8 @@ public class Search implements Runnable {
       currentVariation.removeLast();
       position.undoMove();
 
+      if (stopSearch) break;
+
       // Did we find a better move for this node?
       // For the PV move this is always the case.
       if (value > bestNodeValue) { // to find first PV
@@ -1161,7 +1165,6 @@ public class Search implements Runnable {
       }
       // PRUNING END
 
-      if (stopSearch) break;
     } // iteration over all qmoves
 
     // if we did not have a legal move then we have a mate
@@ -1239,7 +1242,7 @@ public class Search implements Runnable {
     assert Math.abs(value) < Short.MAX_VALUE;
 
     if (config.USE_TRANSPOSITION_TABLE && !isPerftSearch() && !stopSearch) {
-      transpositionTable.put(position, (byte) value, ttType, (byte) depthLeft, bestMove);
+      transpositionTable.put(position, (short) value, ttType, (byte) depthLeft, bestMove);
     }
   }
 
