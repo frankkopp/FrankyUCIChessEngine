@@ -25,7 +25,7 @@
 
 package fko.FrankyEngine.Franky;
 
-import fko.FrankyEngine.Franky.openingbook.*;
+import fko.FrankyEngine.Franky.openingbook.OpeningBookImpl;
 
 /**
  * This is the engines configuration. All fields are package visible
@@ -95,6 +95,11 @@ public class Configuration {
    * Sort root moves after iterations.
    */
   public boolean USE_ROOT_MOVES_SORT = true;
+
+  /**
+   * Uses TT to determine best move of previous searches and also start depth
+   */
+  public boolean USE_TT_ROOT = true;
 
   /**
    * Push last PV move to search first position for iterations.

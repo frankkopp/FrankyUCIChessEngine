@@ -405,9 +405,41 @@ public class Search implements Runnable {
       }
     }
 
+    // max window search - preparation for aspiration window search
+    final int alpha = Evaluation.MIN;
+    final int beta = Evaluation.MAX;
+
     // temporary best move - take the first move available
     searchCounter.currentBestRootMove = rootMoves.getMove(0);
     searchCounter.currentBestRootValue = Evaluation.NOVALUE;
+
+    // for fixed depth searches we start at the final depth directly
+    // no iterative deepening
+    int depth = searchMode.getStartDepth();
+
+    // ###############################################
+    // TT Lookup
+    if (config.USE_TT_ROOT && config.USE_TRANSPOSITION_TABLE) {
+      TTHit ttHit = probeTT(position, depth, alpha, beta);
+      if (ttHit != null) {
+        // determine pv moves from TT
+        if (ttHit.bestMove != Move.NOMOVE) {
+          // sort found TT move as first root move
+          rootMoves.pushToHead(ttHit.bestMove);
+          searchCounter.currentBestRootMove = ttHit.bestMove;
+          // try to get PV line from TT
+          getPVLine(position, ttHit.depth, principalVariation[0]);
+        }
+        // update depth as we already searched these depths
+        if (ttHit.value != Evaluation.NOVALUE && ttHit.type == TT_EntryType.EXACT) {
+          searchCounter.currentBestRootValue = ttHit.value;
+          searchCounter.currentIterationDepth = depth;
+          depth = ttHit.depth;
+        }
+      }
+    }
+    // End TT Lookup
+    // ###############################################
 
     // prepare search result
     SearchResult searchResult = new SearchResult();
@@ -416,10 +448,6 @@ public class Search implements Runnable {
     if (searchMode.isTimeControl()) {
       configureTimeLimits();
     }
-
-    // for fixed depth searches we start at the final depth directly
-    // no iterative deepening
-    int depth = searchMode.getStartDepth();
 
     // print search setup for debugging
     if (LOG.isDebugEnabled()) {
@@ -433,10 +461,6 @@ public class Search implements Runnable {
       LOG.debug("Max Depth: {}", searchMode.getMaxDepth());
       LOG.debug("Start iterative deepening now");
     }
-
-    // max window search - preparation for aspiration window search
-    final int alpha = Evaluation.MIN;
-    final int beta = Evaluation.MAX;
 
     // #############################
     // ### BEGIN Iterative Deepening
@@ -481,13 +505,19 @@ public class Search implements Runnable {
     searchResult.extraDepth = searchCounter.currentExtraSearchDepth;
     // retrieved ponder move from pv
     searchResult.ponderMove = Move.NOMOVE;
-    if (principalVariation[0].size() > 1 && (principalVariation[0].get(1)) != Move.NOMOVE) {
+    if (principalVariation[0].
+
+                               size() > 1 && (principalVariation[0].
+
+                                                                     get(1)) != Move.NOMOVE) {
       searchResult.ponderMove = principalVariation[0].get(1);
     }
 
     // search is finished - stop timer
     stopTime = System.currentTimeMillis();
-    searchCounter.lastSearchTime = elapsedTime(stopTime);
+    searchCounter.lastSearchTime =
+
+      elapsedTime(stopTime);
 
     // print result of the search
     if (LOG.isInfoEnabled()) {
@@ -505,6 +535,17 @@ public class Search implements Runnable {
     }
 
     return searchResult;
+  }
+
+  private void getPVLine(final Position position, final byte depth,
+                         final MoveList pv) {
+    TT_Entry ttEntry = transpositionTable.get(position);
+    if (ttEntry != null && ttEntry.bestMove != Move.NOMOVE) {
+      pv.add(ttEntry.bestMove);
+      position.makeMove(ttEntry.bestMove);
+      getPVLine(position, (byte) (depth - 1), pv);
+      position.undoMove();
+    }
   }
 
   /**
@@ -713,7 +754,7 @@ public class Search implements Runnable {
 
     // ###############################################
     // TT Lookup
-    TTHit ttHit = probeTT(position, ply, depthLeft, alpha, beta);
+    TTHit ttHit = probeTT(position, depthLeft, alpha, beta);
     if (ttHit != null) {
       // in PV node only return ttHit if it was an exact hit
       if (!pvNode || ttHit.type == TT_EntryType.EXACT) {
@@ -1076,7 +1117,7 @@ public class Search implements Runnable {
     // ###############################################
     // TT Lookup
     // For now only for the best move in qsearch
-    TTHit ttHit = probeTT(position, ply, 0, alpha, beta);
+    TTHit ttHit = probeTT(position, 0, alpha, beta);
     // End TT Lookup
     // ###############################################
 
@@ -1185,7 +1226,7 @@ public class Search implements Runnable {
       }
     }
 
-    storeTT(position, 0, ttType, alpha, bestNodeMove);
+    storeTT(position, 1, ttType, alpha, bestNodeMove);
     return alpha;
   }
 
@@ -1218,7 +1259,7 @@ public class Search implements Runnable {
     final int value = evaluator.evaluate(position);
     searchCounter.leafPositionsEvaluated++;
 
-    storeTT(position, 0, TT_EntryType.EXACT, value, Move.NOMOVE);
+    storeTT(position, 1, TT_EntryType.EXACT, value, Move.NOMOVE);
     return value;
   }
 
@@ -1233,8 +1274,8 @@ public class Search implements Runnable {
     }
   }
 
-  private TTHit probeTT(final Position position, final int ply, final int depthLeft,
-                        final int alpha, final int beta) {
+  private TTHit probeTT(final Position position, final int depthLeft, final int alpha,
+                        final int beta) {
 
     if (config.USE_TRANSPOSITION_TABLE && !isPerftSearch()) {
       TT_Entry ttEntry = transpositionTable.get(position);
@@ -1245,10 +1286,11 @@ public class Search implements Runnable {
         // hit
         searchCounter.nodeCache_Hits++;
 
+        // return the depth as well
+        hit.depth = ttEntry.depth;
+
         // get best move form last search of this node
-        if (ttEntry.bestMove != Move.NOMOVE) {
-          hit.bestMove = ttEntry.bestMove;
-        }
+        hit.bestMove = ttEntry.bestMove;
 
         // only if tt depth was equal or deeper
         if (ttEntry.depth >= depthLeft) {
@@ -1520,6 +1562,7 @@ public class Search implements Runnable {
   class TTHit {
     int  value    = Evaluation.NOVALUE;
     byte type     = TT_EntryType.NONE;
+    byte depth    = 0;
     int  bestMove = Move.NOMOVE;
   }
 

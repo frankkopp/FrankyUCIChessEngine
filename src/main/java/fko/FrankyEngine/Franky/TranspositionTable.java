@@ -32,12 +32,12 @@ import java.util.stream.IntStream;
 
 /**
  * A cache for node results during AlphaBeta search.
- *
+ * <p>
  * Implementation uses a simple array of an TT_Entry class. The array indexes
  * are calculated by using the modulo of the max number of entries from the key.
  * <code>entries[key%maxNumberOfEntries]</code>. As long as key is randomly distributed
  * this works just fine.
- *
+ * <p>
  * The TT_Entry elements are tailored for small memory footprint and use primitive data types
  * for value (short), depth (byte), type (byte), age (byte).
  */
@@ -114,6 +114,10 @@ public class TranspositionTable {
    */
   public void put(Position position, short value, byte type, byte depth, int bestMove) {
 
+    assert depth > 0;
+    assert type > 0;
+    assert value > Evaluation.NOVALUE;
+
     final int hash = getHash(position.getZobristKey());
 
     // new value
@@ -128,10 +132,8 @@ public class TranspositionTable {
       entries[hash].age = 1;
     }
     // different position - overwrite
-    else if (position.getZobristKey() != entries[hash].key
-             && depth > entries[hash].depth
-             && entries[hash].age > 0
-    ) {
+    else if (position.getZobristKey() != entries[hash].key && depth > entries[hash].depth &&
+             entries[hash].age > 0) {
       numberOfCollisions++;
       entries[hash].key = position.getZobristKey();
       //entries[hash].fen = position.toFENString();
@@ -147,21 +149,25 @@ public class TranspositionTable {
       numberOfUpdates++;
 
       // FIXME DEBUG
-      if (Math.abs(entries[hash].value) >= Evaluation.CHECKMATE_THRESHOLD
-          && entries[hash].value == TT_EntryType.EXACT) {
+      if (Math.abs(entries[hash].value) >= Evaluation.CHECKMATE_THRESHOLD &&
+          entries[hash].value == TT_EntryType.EXACT) {
         if (Math.abs(value) < Evaluation.CHECKMATE_THRESHOLD) {
           System.err.println("We are erasing a MATE in the TT");
           System.err.println();
         }
       }
 
-      entries[hash].key = position.getZobristKey();
       //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
-      entries[hash].bestMove = bestMove;
       entries[hash].age = 1;
+      // update best move only if not NOMOVE
+      if (bestMove != Move.NOMOVE) {
+        entries[hash].bestMove = bestMove;
+        entries[hash].age = 1;
+      }
+
     }
     // ignore new values for cache
   }
@@ -221,13 +227,14 @@ public class TranspositionTable {
     IntStream.range(0, entries.length)
              .parallel()
              .filter(i -> entries[i].key != 0)
-             .forEach(i -> entries[i].age
-               = (byte) Math.min(entries[i].age + 1, Byte.MAX_VALUE-1));
+             .forEach(
+               i -> entries[i].age = (byte) Math.min(entries[i].age + 1, Byte.MAX_VALUE - 1));
   }
 
   /**
    * @return the numberOfEntries
-   */ public int getNumberOfEntries() {
+   */
+  public int getNumberOfEntries() {
     return this.numberOfEntries;
   }
 

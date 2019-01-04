@@ -457,6 +457,7 @@ public class SearchTest {
 
     search.config.USE_TRANSPOSITION_TABLE = false;
 
+    search.config.USE_TT_ROOT = false;
     search.config.USE_MATE_DISTANCE_PRUNING = false;
     search.config.USE_MINOR_PROMOTION_PRUNING = false;
     search.config.USE_NULL_MOVE_PRUNING = false;
@@ -480,6 +481,10 @@ public class SearchTest {
     search.config.USE_PVS_MOVE_ORDERING = true;
     measureTreeSize(position, searchMode, values, "PVS_ORDER", true);
 
+    search.config.USE_TT_ROOT = true;
+    measureTreeSize(position, searchMode, values, "TT_ROOT", false);
+    search.config.USE_TT_ROOT = false;
+
     search.config.USE_KILLER_MOVES = true;
     measureTreeSize(position, searchMode, values, "KILLER_PUSH", true);
 
@@ -499,6 +504,9 @@ public class SearchTest {
 
     search.config.USE_QUIESCENCE = true;
     measureTreeSize(position, searchMode, values, "QS", true);
+
+    search.config.USE_TT_ROOT = true;
+    measureTreeSize(position, searchMode, values, "TT_ROOT", false);
 
     // REPEAT
     measureTreeSize(position, searchMode, values, "REPEAT+TT", false);
@@ -521,6 +529,24 @@ public class SearchTest {
                              (1e3 * search.getSearchCounter().nodesVisited)
                              / search.getSearchCounter().lastSearchTime,
                              search.getSearchCounter().toString()));
+  }
+
+  @Test
+  void TT_Root_Test() {
+    String fen = Position.STANDARD_BOARD_FEN;
+    Position position = new Position(fen);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, true, false);
+
+    search.startSearch(position, searchMode);
+    search.waitWhileSearching();
+
+    position.makeMove(Move.fromSANNotation(position,"e4"));
+    position.makeMove(Move.fromSANNotation(position,"e5"));
+
+    search.startSearch(position, searchMode);
+    search.waitWhileSearching();
+
+    // What can be asserted here?
   }
 
   /**
