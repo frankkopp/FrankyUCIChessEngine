@@ -523,6 +523,11 @@ public class TestSearch {
                              search.getSearchCounter().toString()));
   }
 
+  /**
+   * Razor and LMR make the search miss this mate at higher depths
+   * Might be a consequence from these "optimizations" might be a bug
+   * TODO: investigate more
+   */
   @Test
   @Disabled
   public void mateSearchIssueTest() {
@@ -545,7 +550,6 @@ public class TestSearch {
 
     // these two make the search miss this mate at higher depths
     // might be a consequence from these "optimizations" might be a bug
-    // TODO: investigate more
     search.config.USE_RAZOR_PRUNING = false;
     search.config.USE_LMR = false;
 
@@ -559,8 +563,7 @@ public class TestSearch {
     // mate in 3
     fen = "4r1b1/1p4B1/pN2pR2/RB2k3/1P2N2p/2p3b1/n2P1p1r/5K1n w - -";
     position = new Position(fen);
-    searchMode =
-      new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
 
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
