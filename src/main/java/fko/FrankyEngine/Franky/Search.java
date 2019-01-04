@@ -49,9 +49,10 @@ import java.util.concurrent.CountDownLatch;
  */
 public class Search implements Runnable {
 
-  public static final  int    MAX_SEARCH_DEPTH    = Byte.MAX_VALUE;
-  public static final  int    UCI_UPDATE_INTERVAL = 500;
-  private static final Logger LOG                 = LoggerFactory.getLogger(Search.class);
+  private static final Logger LOG = LoggerFactory.getLogger(Search.class);
+
+  public static final  int MAX_SEARCH_DEPTH    = Byte.MAX_VALUE;
+  private static final int UCI_UPDATE_INTERVAL = 500;
 
   // Readability constants
   private static final boolean       DO_NULL  = true;
@@ -129,51 +130,6 @@ public class Search implements Runnable {
     // create position evaluator
     evaluator = new Evaluation();
 
-  }
-
-  /**
-   * Called by engine whenever hash size changes.
-   * Initially set in constructor
-   *
-   * @param hashSize
-   */
-  public void setHashSize(int hashSize) {
-    transpositionTable = new TranspositionTable(hashSize);
-  }
-
-  /**
-   * Returns true if at least on non pawn/king piece is on the
-   * board for the moving side.
-   *
-   * @param position
-   * @return
-   */
-  private static boolean bigPiecePresent(Position position) {
-    final int activePlayer = position.getNextPlayer().ordinal();
-    return !(position.getKnightSquares()[activePlayer].isEmpty() &&
-             position.getBishopSquares()[activePlayer].isEmpty() &&
-             position.getRookSquares()[activePlayer].isEmpty() &&
-             position.getQueenSquares()[activePlayer].isEmpty());
-  }
-
-  /**
-   * @param value
-   * @return true if absolute value is a mate value, false otherwise
-   */
-  private static boolean checkMateValue(int value) {
-    return Math.abs(value) > Evaluation.CHECKMATE_THRESHOLD;
-  }
-
-  private static String getScoreString(int value) {
-    String scoreString;
-    if (checkMateValue(value)) {
-      scoreString = "score mate ";
-      scoreString += value < 0 ? "-" : "";
-      scoreString += (Evaluation.CHECKMATE - Math.abs(value) + 1) / 2;
-    } else {
-      scoreString = "score cp " + value;
-    }
-    return scoreString;
   }
 
   /**
@@ -390,48 +346,6 @@ public class Search implements Runnable {
 
     } else {
       LOG.warn("Ponderhit when not pondering!");
-    }
-  }
-
-  /**
-   * @return true if previous search is still running
-   */
-  public boolean isSearching() {
-    return searchThread != null && searchThread.isAlive();
-  }
-
-  /**
-   * Configure time limits<br>
-   * Chooses if search mode is time per move or remaining time
-   * and set time limits accordingly
-   */
-  private void configureTimeLimits() {
-
-    // TODO calculate time inc into the estimation
-
-    if (searchMode.getMoveTime().toMillis() > 0) { // mode time per move
-      hardTimeLimit = searchMode.getMoveTime().toMillis();
-    } else { // remaining time - estimated time per move
-      // reset flags
-      long timeLeft = searchMode.getRemainingTime(myColor).toMillis();
-      // Give some overhead time so that in games with very low available time we do not run out
-      // of time
-      timeLeft -= 1000; // this should do
-      // when we know the move to go (until next time control) use them otherwise assume 40
-      final int movesLeft = searchMode.getMovesToGo() > 0 ? searchMode.getMovesToGo() : 40;
-      // for timed games with remaining time
-      hardTimeLimit = Duration.ofMillis((long) ((timeLeft / movesLeft) * 1.0f)).toMillis();
-    }
-
-    softTimeLimit = (long) (hardTimeLimit * 0.8f);
-    // limits for very short available time
-    if (hardTimeLimit < 100) {
-      hardTimeLimit = (long) (hardTimeLimit * 0.9f);
-      softTimeLimit = (long) (hardTimeLimit * 0.8f);
-    }
-    // limits for higher available time
-    else if (hardTimeLimit > 10000) {
-      softTimeLimit = hardTimeLimit;
     }
   }
 
@@ -1308,21 +1222,6 @@ public class Search implements Runnable {
     return value;
   }
 
-  /**
-   * @param position
-   * @return value depending on game phase to avoid easy draws
-   */
-  private int contempt(Position position) {
-    return -Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR;
-  }
-
-  private boolean wasIllegalMove(final Position position) {
-    return position.isAttacked(position.getNextPlayer(),
-                               position.getKingSquares()[position.getNextPlayer()
-                                                                 .getInverseColor()
-                                                                 .ordinal()]);
-  }
-
   private void storeTT(final Position position, final int depthLeft, final byte ttType,
                        final int value, int bestMove) {
 
@@ -1379,6 +1278,91 @@ public class Search implements Runnable {
       searchCounter.nodeCache_Misses++;
     }
     return null;
+  }
+
+  /**
+   * Configure time limits<br>
+   * Chooses if search mode is time per move or remaining time
+   * and set time limits accordingly
+   */
+  private void configureTimeLimits() {
+
+    // TODO calculate time inc into the estimation
+
+    if (searchMode.getMoveTime().toMillis() > 0) { // mode time per move
+      hardTimeLimit = searchMode.getMoveTime().toMillis();
+    } else { // remaining time - estimated time per move
+      // reset flags
+      long timeLeft = searchMode.getRemainingTime(myColor).toMillis();
+      // Give some overhead time so that in games with very low available time we do not run out
+      // of time
+      timeLeft -= 1000; // this should do
+      // when we know the move to go (until next time control) use them otherwise assume 40
+      final int movesLeft = searchMode.getMovesToGo() > 0 ? searchMode.getMovesToGo() : 40;
+      // for timed games with remaining time
+      hardTimeLimit = Duration.ofMillis((long) ((timeLeft / movesLeft) * 1.0f)).toMillis();
+    }
+
+    softTimeLimit = (long) (hardTimeLimit * 0.8f);
+    // limits for very short available time
+    if (hardTimeLimit < 100) {
+      hardTimeLimit = (long) (hardTimeLimit * 0.9f);
+      softTimeLimit = (long) (hardTimeLimit * 0.8f);
+    }
+    // limits for higher available time
+    else if (hardTimeLimit > 10000) {
+      softTimeLimit = hardTimeLimit;
+    }
+  }
+
+  /**
+   * Returns true if at least on non pawn/king piece is on the
+   * board for the moving side.
+   *
+   * @param position
+   * @return
+   */
+  private static boolean bigPiecePresent(Position position) {
+    final int activePlayer = position.getNextPlayer().ordinal();
+    return !(position.getKnightSquares()[activePlayer].isEmpty() &&
+             position.getBishopSquares()[activePlayer].isEmpty() &&
+             position.getRookSquares()[activePlayer].isEmpty() &&
+             position.getQueenSquares()[activePlayer].isEmpty());
+  }
+
+  /**
+   * @param value
+   * @return true if absolute value is a mate value, false otherwise
+   */
+  private static boolean checkMateValue(int value) {
+    return Math.abs(value) > Evaluation.CHECKMATE_THRESHOLD;
+  }
+
+  private static String getScoreString(int value) {
+    String scoreString;
+    if (checkMateValue(value)) {
+      scoreString = "score mate ";
+      scoreString += value < 0 ? "-" : "";
+      scoreString += (Evaluation.CHECKMATE - Math.abs(value) + 1) / 2;
+    } else {
+      scoreString = "score cp " + value;
+    }
+    return scoreString;
+  }
+
+  /**
+   * @param position
+   * @return value depending on game phase to avoid easy draws
+   */
+  private int contempt(Position position) {
+    return -Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR;
+  }
+
+  private boolean wasIllegalMove(final Position position) {
+    return position.isAttacked(position.getNextPlayer(),
+                               position.getKingSquares()[position.getNextPlayer()
+                                                                 .getInverseColor()
+                                                                 .ordinal()]);
   }
 
   private boolean isPerftSearch() {
@@ -1444,6 +1428,13 @@ public class Search implements Runnable {
   }
 
   /**
+   * @return true if previous search is still running
+   */
+  public boolean isSearching() {
+    return searchThread != null && searchThread.isAlive();
+  }
+
+  /**
    * Called when the state of this search is no longer valid as the last call to startSearch is
    * not from
    * the same game as the next.
@@ -1471,6 +1462,16 @@ public class Search implements Runnable {
    */
   public TranspositionTable getTranspositionTable() {
     return transpositionTable;
+  }
+
+  /**
+   * Called by engine whenever hash size changes.
+   * Initially set in constructor
+   *
+   * @param hashSize
+   */
+  public void setHashSize(int hashSize) {
+    transpositionTable = new TranspositionTable(hashSize);
   }
 
   /**
