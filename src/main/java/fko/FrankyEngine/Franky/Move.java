@@ -155,8 +155,8 @@ public class Move {
    */
   public static Piece getTarget(int move) {
     if (move == NOMOVE) return Piece.NOPIECE;
-    int chessman = (move & TARGET_MASK) >>> TARGET_SHIFT;
-    return Piece.values[chessman];
+    int piece = (move & TARGET_MASK) >>> TARGET_SHIFT;
+    return Piece.values[piece];
   }
 
   /**
@@ -181,6 +181,17 @@ public class Move {
     if (move == NOMOVE) return MoveType.NOMOVETYPE;
     int type = ((move & MOVETYPE_MASK) >>> MOVETYPE_SHIFT);
     return MoveType.values[type];
+  }
+
+  /**
+   * Determines if a move is a capturing move
+   * @param move
+   * @return true if move is capturing
+   */
+  public static boolean isCapturing(final int move) {
+    if (move == NOMOVE) return false;
+    final int piece = (move & TARGET_MASK) >>> TARGET_SHIFT;
+    return !Piece.values[piece].equals(Piece.NOPIECE);
   }
 
   /**
@@ -246,8 +257,8 @@ public class Move {
 
     // to find the move type it is easiest to generate all legal moves and then look
     // for a move with the same from and to
-    MoveGenerator omg = new MoveGenerator();
-    MoveList moves = omg.getLegalMoves(position);
+    MoveGenerator omg = new MoveGenerator(position);
+    MoveList moves = omg.getLegalMoves();
 
     for (int m : moves) {
       Square f = Move.getStart(m);
@@ -279,8 +290,6 @@ public class Move {
   }
 
   public static int fromSANNotation(final Position position, String san) {
-    // debugging
-    boolean trace = false;
 
     // remove unnecessary characters from operand
     String sanMove = san.replaceAll("x", "");
@@ -298,7 +307,7 @@ public class Move {
     if (!matcher.find()) {
       LOG.warn("Could not match a SAN move in this string: {}", sanMove);
       return NOMOVE;
-    };
+    }
     String piece = matcher.group(1);
     String disambFile = matcher.group(2);
     String disambRank = matcher.group(3);
@@ -306,33 +315,25 @@ public class Move {
     String promotion = matcher.group(6);
     String checkSign = matcher.group(7);
 
-    if (trace) {
-      System.out.printf("Piece: %s File: %s Row: %s Target: %s Promotion: %s CheckSign: %s\n",
-                        piece, disambFile, disambRank, targetSquare, promotion, checkSign);
-    }
+    LOG.trace("Piece: {} File: {} Row: {} Target: {} Promotion: {} CheckSign: {}",
+              piece, disambFile, disambRank, targetSquare, promotion, checkSign);
 
     // generate all legal moves from the position
     // and try to find a matching move
-    MoveGenerator mg = new MoveGenerator();
-    MoveList moveList = mg.getLegalMoves(position);
+    MoveGenerator mg = new MoveGenerator(position);
+    MoveList moveList = mg.getLegalMoves();
     int moveFromSAN = Move.NOMOVE;
     int movesFound = 0;
     for (int move : moveList) {
-      if (trace) {
-        System.out.printf("Move %s\n", Move.toString(move));
-      }
+      LOG.trace("Move {}", Move.toString(move));
 
       // castling
       if (Move.getMoveType(move) == MoveType.CASTLING) {
-        if (trace) {
-          System.out.println("Castling");
-        }
+        LOG.trace("Castling");
         if (!targetSquare.equals(Move.toString(move).toUpperCase())) {
           continue;
         }
-        if (trace) {
-          System.out.println("Castling MATCH " + Move.toString(move));
-        }
+        LOG.trace("Castling MATCH " + Move.toString(move));
         moveFromSAN = move;
         movesFound++;
         continue;
@@ -341,42 +342,28 @@ public class Move {
       // same end square
       if (Move.getEnd(move).name().equals(targetSquare)) {
         if (piece != null && Move.getPiece(move).getType().getShortName().equals(piece)) {
-          if (trace) {
-            System.out.println("Piece MATCH " + Move.getPiece(move).getType().toString());
-          }
+          LOG.trace("Piece MATCH " + Move.getPiece(move).getType().toString());
         } else if (piece == null && Move.getPiece(move).getType().equals(PieceType.PAWN)) {
-          if (trace) {
-            System.out.println("Piece MATCH PAWN");
-          }
+          LOG.trace("Piece MATCH PAWN");
         } else {
-          if (trace) {
-            System.out.println("Piece NO MATCH");
-          }
+          LOG.trace("Piece NO MATCH");
           continue;
         }
 
         // Disambiguation
         if (disambFile != null) {
           if (Move.getStart(move).getFile().name().equals(disambFile)) {
-            if (trace) {
-              System.out.println("File MATCH " + Move.getStart(move).getFile().name());
-            }
+            LOG.trace("File MATCH " + Move.getStart(move).getFile().name());
           } else {
-            if (trace) {
-              System.out.println("File NO MATCH " + Move.getStart(move).getFile().name());
-            }
+            LOG.trace("File NO MATCH " + Move.getStart(move).getFile().name());
             continue;
           }
         }
         if (disambRank != null) {
           if (("" + Move.getStart(move).getRank().get()).equals(disambRank)) {
-            if (trace) {
-              System.out.println("Rank MATCH " + Move.getStart(move).getRank().get());
-            }
+            LOG.trace("Rank MATCH " + Move.getStart(move).getRank().get());
           } else {
-            if (trace) {
-              System.out.println("Rank NO MATCH " + Move.getStart(move).getRank().get());
-            }
+            LOG.trace("Rank NO MATCH " + Move.getStart(move).getRank().get());
             continue;
           }
         }
@@ -384,13 +371,9 @@ public class Move {
         // promotion
         if (promotion != null) {
           if (Move.getPromotion(move).getType().getShortName().equals(promotion)) {
-            if (trace) {
-              System.out.println("Promotion MATCH");
-            }
+            LOG.trace("Promotion MATCH");
           } else {
-            if (trace) {
-              System.out.println("Promotion NO MATCH");
-            }
+            LOG.trace("Promotion NO MATCH");
             continue;
           }
         }

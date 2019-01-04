@@ -67,9 +67,8 @@ public enum Color {
                 return BLACK;
             case NOCOLOR:
                 throw new UnsupportedOperationException("Color.NONE has no inverse color");
-            default:
-                throw new RuntimeException("Invalid Color");
         }
+        return null;
     }
 
     /**
@@ -122,39 +121,6 @@ public enum Color {
         return this==NOCOLOR;
     }
 
-    /**
-     * Convert from GameColor
-     * @param c
-     * @return matching Color
-     */
-//    public static Color convertFromGameColor(GameColor c) {
-//        switch (c) {
-//            case WHITE:
-//                return Color.WHITE;
-//            case BLACK:
-//                return Color.BLACK;
-//            case NONE:
-//                return Color.NOCOLOR;
-//            default:
-//                throw new RuntimeException("Invalid Color");
-//        }
-//    }
-
-    /**
-     * Convert to GameColor
-     * @return matching GameColor
-     */
-//    public GameColor convertToGameColor() {
-//        switch (this) {
-//            case WHITE:
-//                return GameColor.WHITE;
-//            case BLACK:
-//                return GameColor.BLACK;
-//            case NOCOLOR:
-//                return GameColor.NONE;
-//            default:
-//                throw new RuntimeException("Invalid Color");
-//        }
 //    }
 
 }

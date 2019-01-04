@@ -35,12 +35,12 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * A class running chess test using EPD positions and test operations
@@ -227,7 +227,7 @@ public class TestSuite {
     System.out.printf("Best Moves: %s\n", testCase.bestMoves);
 
     SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, searchDepth, 0, 0, searchTime, null, false, false, false);
+      new SearchMode(0, 0, 0, 0, 0, searchTime, 0, searchDepth, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching(search);
 
@@ -271,7 +271,7 @@ public class TestSuite {
     Position position = new Position(testCase.fen);
 
     SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, searchDepth, 0, mateDepth, searchTime, null, false, false, false);
+      new SearchMode(0, 0, 0, 0, 0, searchTime, 0, searchDepth, mateDepth, null, false, false, false);
     search.startSearch(position, searchMode);
     waitWhileSearching(search);
 
@@ -339,8 +339,8 @@ public class TestSuite {
 
       // generate all legal moves from the position
       // and try to find a matching move
-      MoveGenerator mg = new MoveGenerator();
-      MoveList moveList = mg.getLegalMoves(position);
+      MoveGenerator mg = new MoveGenerator(position);
+      MoveList moveList = mg.getLegalMoves();
       int moveFromSAN = Move.NOMOVE;
       int movesFound = 0;
       for (int move : moveList) {

@@ -67,22 +67,21 @@ public class SearchMode {
 
   /**
    * Keeps the search mode state
-   *
-   * @param whiteTime remaining time in msec
+   *  @param whiteTime remaining time in msec
    * @param blackTime remaining in msec
    * @param whiteInc time inc per move in msec
    * @param blackInc time inc in msec
    * @param movesToGo until next time control
-   * @param depth max depth of search
-   * @param nodes max number of nodes to search
-   * @param mate mate in x search
    * @param moveTime time per move in msec
+   * @param nodes max number of nodes to search
+   * @param depth max depth of search
+   * @param mate mate in x search
    * @param moves list of moves to search
    * @param ponder true or false
    * @param infinite true or false
    */
   public SearchMode(int whiteTime, int blackTime, int whiteInc, int blackInc, int movesToGo,
-                    int depth, long nodes, int mate, int moveTime, List<String> moves,
+                    int moveTime, long nodes, int depth, int mate, List<String> moves,
                     boolean ponder, boolean infinite, boolean perft) {
 
     this.whiteTime = Duration.ofMillis(whiteTime);
