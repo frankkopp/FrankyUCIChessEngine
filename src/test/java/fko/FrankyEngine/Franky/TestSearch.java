@@ -525,6 +525,59 @@ public class TestSearch {
 
   @Test
   @Disabled
+  public void mateSearchIssueTest() {
+    String fen;
+    SearchMode searchMode;
+    Position position;
+
+    search.config.USE_ALPHABETA_PRUNING = true;
+    search.config.USE_ROOT_MOVES_SORT = true;
+    search.config.USE_PVS = true;
+    search.config.USE_PVS_MOVE_ORDERING = true;
+    search.config.USE_KILLER_MOVES = true;
+
+    search.config.USE_TRANSPOSITION_TABLE = true;
+
+    search.config.USE_MATE_DISTANCE_PRUNING = true;
+    search.config.USE_MINOR_PROMOTION_PRUNING = true;
+    search.config.USE_NULL_MOVE_PRUNING = true;
+    search.config.USE_STATIC_NULL_PRUNING = true;
+
+    // these two make the search miss this mate at higher depths
+    // might be a consequence from these "optimizations" might be a bug
+    // TODO: investigate more
+    search.config.USE_RAZOR_PRUNING = false;
+    search.config.USE_LMR = false;
+
+    search.config.USE_QUIESCENCE = false;
+
+    int maxDepth = 6;
+    int moveTime = 0;
+    int mateIn = 0;
+    boolean infinite = true;
+
+    // mate in 3
+    fen = "4r1b1/1p4B1/pN2pR2/RB2k3/1P2N2p/2p3b1/n2P1p1r/5K1n w - -";
+    position = new Position(fen);
+    searchMode =
+      new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
+
+    search.startSearch(position, searchMode);
+    search.waitWhileSearching();
+
+    LOG.warn("Best Move: {} Value: {} Ponder {}",
+             Move.toSimpleString(search.getLastSearchResult().bestMove),
+             search.getLastSearchResult().resultValue / 100f,
+             Move.toSimpleString(search.getLastSearchResult().ponderMove));
+
+    LOG.warn(search.getSearchCounter().toString());
+
+    assertEquals(Evaluation.CHECKMATE - 5, search.getLastSearchResult().resultValue);
+
+  }
+
+  @Test
+  @Disabled
   public void evaluationTest() {
     String fen;
     SearchMode searchMode;
@@ -542,7 +595,7 @@ public class TestSearch {
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
     search.config.USE_NULL_MOVE_PRUNING = true;
     search.config.USE_STATIC_NULL_PRUNING = true;
-    search.config.USE_RAZOR_PRUNING = true;
+    search.config.USE_RAZOR_PRUNING = false;
     search.config.USE_LMR = false;
 
     search.config.USE_QUIESCENCE = false;

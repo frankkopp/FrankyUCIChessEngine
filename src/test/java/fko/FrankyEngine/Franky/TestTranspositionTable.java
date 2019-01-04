@@ -162,8 +162,8 @@ public class TestTranspositionTable {
   }
 
   /**
-   *  different randoms influence tt collisions greatly
-   *  tried to find a good seed here
+   * different randoms influence tt collisions greatly
+   * tried to find a good seed here
    */
   @Test
   @Disabled

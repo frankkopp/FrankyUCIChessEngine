@@ -290,8 +290,6 @@ public class Move {
   }
 
   public static int fromSANNotation(final Position position, String san) {
-    // debugging
-    boolean trace = false;
 
     // remove unnecessary characters from operand
     String sanMove = san.replaceAll("x", "");
@@ -317,10 +315,8 @@ public class Move {
     String promotion = matcher.group(6);
     String checkSign = matcher.group(7);
 
-    if (trace) {
-      System.out.printf("Piece: %s File: %s Row: %s Target: %s Promotion: %s CheckSign: %s\n",
-                        piece, disambFile, disambRank, targetSquare, promotion, checkSign);
-    }
+    LOG.trace("Piece: {} File: {} Row: {} Target: {} Promotion: {} CheckSign: {}",
+              piece, disambFile, disambRank, targetSquare, promotion, checkSign);
 
     // generate all legal moves from the position
     // and try to find a matching move
@@ -329,21 +325,15 @@ public class Move {
     int moveFromSAN = Move.NOMOVE;
     int movesFound = 0;
     for (int move : moveList) {
-      if (trace) {
-        System.out.printf("Move %s\n", Move.toString(move));
-      }
+      LOG.trace("Move {}", Move.toString(move));
 
       // castling
       if (Move.getMoveType(move) == MoveType.CASTLING) {
-        if (trace) {
-          System.out.println("Castling");
-        }
+        LOG.trace("Castling");
         if (!targetSquare.equals(Move.toString(move).toUpperCase())) {
           continue;
         }
-        if (trace) {
-          System.out.println("Castling MATCH " + Move.toString(move));
-        }
+        LOG.trace("Castling MATCH " + Move.toString(move));
         moveFromSAN = move;
         movesFound++;
         continue;
@@ -352,42 +342,28 @@ public class Move {
       // same end square
       if (Move.getEnd(move).name().equals(targetSquare)) {
         if (piece != null && Move.getPiece(move).getType().getShortName().equals(piece)) {
-          if (trace) {
-            System.out.println("Piece MATCH " + Move.getPiece(move).getType().toString());
-          }
+          LOG.trace("Piece MATCH " + Move.getPiece(move).getType().toString());
         } else if (piece == null && Move.getPiece(move).getType().equals(PieceType.PAWN)) {
-          if (trace) {
-            System.out.println("Piece MATCH PAWN");
-          }
+          LOG.trace("Piece MATCH PAWN");
         } else {
-          if (trace) {
-            System.out.println("Piece NO MATCH");
-          }
+          LOG.trace("Piece NO MATCH");
           continue;
         }
 
         // Disambiguation
         if (disambFile != null) {
           if (Move.getStart(move).getFile().name().equals(disambFile)) {
-            if (trace) {
-              System.out.println("File MATCH " + Move.getStart(move).getFile().name());
-            }
+            LOG.trace("File MATCH " + Move.getStart(move).getFile().name());
           } else {
-            if (trace) {
-              System.out.println("File NO MATCH " + Move.getStart(move).getFile().name());
-            }
+            LOG.trace("File NO MATCH " + Move.getStart(move).getFile().name());
             continue;
           }
         }
         if (disambRank != null) {
           if (("" + Move.getStart(move).getRank().get()).equals(disambRank)) {
-            if (trace) {
-              System.out.println("Rank MATCH " + Move.getStart(move).getRank().get());
-            }
+            LOG.trace("Rank MATCH " + Move.getStart(move).getRank().get());
           } else {
-            if (trace) {
-              System.out.println("Rank NO MATCH " + Move.getStart(move).getRank().get());
-            }
+            LOG.trace("Rank NO MATCH " + Move.getStart(move).getRank().get());
             continue;
           }
         }
@@ -395,13 +371,9 @@ public class Move {
         // promotion
         if (promotion != null) {
           if (Move.getPromotion(move).getType().getShortName().equals(promotion)) {
-            if (trace) {
-              System.out.println("Promotion MATCH");
-            }
+            LOG.trace("Promotion MATCH");
           } else {
-            if (trace) {
-              System.out.println("Promotion NO MATCH");
-            }
+            LOG.trace("Promotion NO MATCH");
             continue;
           }
         }

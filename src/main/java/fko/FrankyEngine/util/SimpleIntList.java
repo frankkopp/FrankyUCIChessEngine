@@ -451,10 +451,7 @@ public class SimpleIntList implements Iterable<Integer> {
       return false;
     }
     SimpleIntList other = (SimpleIntList) obj;
-    if (!Arrays.equals(this.toArray(), other.toArray())) {
-      return false;
-    }
-    return true;
+    return Arrays.equals(this.toArray(), other.toArray());
   }
 
   /**
@@ -481,7 +478,7 @@ public class SimpleIntList implements Iterable<Integer> {
     // is too expensive.
     // TODO: 5000 are arbitrarily chosen - needs timing tests
     if (tail - head < 5000 && comparator!=null) {
-      insertionsort(head, tail, comparator);
+      insertionSort(head, tail, comparator);
     } else {
       final Integer[] tmp = Arrays.stream(_list).boxed().toArray(Integer[]::new);
       Arrays.sort(tmp, _head, _tail, comparator);
@@ -496,7 +493,7 @@ public class SimpleIntList implements Iterable<Integer> {
    * @param tail
    * @param comparator
    */
-  private void insertionsort(int head, int tail, Comparator<Integer> comparator) {
+  private void insertionSort(int head, int tail, Comparator<Integer> comparator) {
     int temp;
     for (int i = head + 1; i < tail; i++) {
       for (int j = i; j > head; j--) {
