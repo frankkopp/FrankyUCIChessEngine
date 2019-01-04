@@ -607,4 +607,38 @@ public class SimpleIntListTest {
     return true;
   }
 
+  @Test
+  void contains() {
+    SimpleIntList list = new SimpleIntList();
+    IntStream.rangeClosed(0, 100).forEach((int a) -> list.add(1000+a));
+    int test = 333;
+    assertFalse(list.contains(test));
+    list.add(test);
+    assertTrue(list.contains(test));
+    assertEquals(101,list.indexOf(test));
+  }
+
+  @Test
+  void addFront() {
+    int test = 333;
+
+    SimpleIntList list = new SimpleIntList();
+
+    // empty list
+    assertFalse(list.contains(test));
+    list.addFront(test);
+    assertTrue(list.contains(test));
+    assertEquals(1, list.size());
+    list.removeLast();
+    assertFalse(list.contains(test));
+
+    IntStream.rangeClosed(0, 100).forEach((int a) -> list.add(1000+a));
+
+    // on empty list
+    assertFalse(list.contains(test));
+    list.addFront(test);
+    assertTrue(list.contains(test));
+    assertEquals(0,list.indexOf(test));
+
+  }
 }

@@ -86,6 +86,41 @@ public class MoveList extends SimpleIntList {
     }
 
     @Override
+    public void addFront(final int move) {
+        if (!Move.isValid(move))
+            throw new IllegalArgumentException("not a valid move: "+move);
+        super.addFront(move);
+    }
+
+    @Override
+    public boolean contains(final int move) {
+        if (!Move.isValid(move))
+            throw new IllegalArgumentException("not a valid move: "+move);
+        return super.contains(move);
+    }
+
+    @Override
+    public int indexOf(final int move) {
+        if (!Move.isValid(move))
+            throw new IllegalArgumentException("not a valid move: "+move);
+        return super.indexOf(move);
+    }
+
+    @Override
+    public boolean pushToHead(final int move) {
+        if (!Move.isValid(move))
+            throw new IllegalArgumentException("not a valid move: "+move);
+        return super.pushToHead(move);
+    }
+
+    @Override
+    public boolean pushToHeadStable(final int move) {
+        if (!Move.isValid(move))
+            throw new IllegalArgumentException("not a valid move: "+move);
+        return super.pushToHeadStable(move);
+    }
+
+    @Override
     public void sort(Comparator<Integer> comparator) {
         super.sort(comparator);
     }

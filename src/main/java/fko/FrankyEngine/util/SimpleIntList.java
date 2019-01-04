@@ -89,6 +89,80 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
+   * Gets entry at a specific index
+   *
+   * @param index
+   * @return element at index
+   */
+  public int get(int index) {
+    if (index < 0) {
+      throw new ArrayIndexOutOfBoundsException("Index < 0");
+    }
+    if (_tail <= _head) {
+      throw new ArrayIndexOutOfBoundsException("List is empty");
+    }
+    if (_head + index >= _tail) {
+      throw new ArrayIndexOutOfBoundsException("Index too high");
+    }
+    return _list[_head + index];
+  }
+
+  /**
+   * Gets entry at a first index
+   *
+   * @return first element
+   */
+  public int getFirst() {
+    if (_tail <= _head) {
+      throw new ArrayIndexOutOfBoundsException("List is empty");
+    }
+    return _list[_head];
+  }
+
+  /**
+   * Gets entry at a last index
+   *
+   * @return last element
+   */
+  public int getLast() {
+    if (_tail <= _head) {
+      throw new ArrayIndexOutOfBoundsException("List is empty");
+    }
+    return _list[_tail - 1];
+  }
+
+  /**
+   * Returns {@code true} if this list contains the specified element.
+   * More formally, returns {@code true} if and only if this list contains
+   * at least one element {@code e} such that
+   * {@code s == e)}.
+   *
+   * @param s element whose presence in this list is to be tested
+   * @return {@code true} if this list contains the specified element
+   */
+  public boolean contains(int s) {
+    return indexOf(s) >= 0;
+  }
+
+  /**
+   * Returns the index of the first occurrence of the specified element
+   * in this list, or -1 if this list does not contain the element.
+   * More formally, returns the lowest index {@code i} such that
+   * {@code s == get(i)},
+   * or -1 if there is no such index.
+   */
+  public int indexOf(final int s) {
+    if (empty()) return -1;
+    // look for number in list
+    for (int i = _head; i < _tail; i++) {
+      if (_list[i] == s) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /**
    * Adds an element to the end of the list.
    *
    * @param integer
@@ -114,6 +188,20 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
+   * Adds an element to the front of the list.
+   *
+   * @param integer
+   */
+  public void addFront(final int integer) {
+    if (_tail >= _list.length) {
+      grow(1);
+    }
+    System.arraycopy(_list, _head, _list, _head+1,_tail-_head);
+    _list[0] = integer;
+    _tail++;
+  }
+
+  /**
    * Adds an list to the front of the list.
    *
    * @param newList
@@ -130,26 +218,25 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
-   * @param extra_size
-   */
-  private void grow(int extra_size) {
-    _arraySize = _arraySize + extra_size + DEFAULT_GROWTH_MARGIN;
-    _list = Arrays.copyOfRange(_list, _head, _arraySize);
-    this._tail = _tail - _head;
-    this._head = 0;
-  }
-
-  /**
-   * Removes the last entry and returns the value.
-   * If the list is empty it throws ArrayIndexOutOfBoundsException
+   * Sets entry at a specific index
    *
-   * @return removed element
+   * @param index
+   * @param value
+   * @return old value at index
    */
-  public int removeLast() {
+  public int set(int index, int value) {
     if (_tail <= _head) {
       throw new ArrayIndexOutOfBoundsException("List is empty");
     }
-    return _list[--_tail];
+    if (index < 0) {
+      throw new ArrayIndexOutOfBoundsException("Index < 0");
+    }
+    if (_head + index >= _tail) {
+      throw new ArrayIndexOutOfBoundsException("Index too high");
+    }
+    int old = _list[_head + index];
+    _list[_head + index] = value;
+    return old;
   }
 
   /**
@@ -166,8 +253,20 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
+   * Removes the last entry and returns the value.
+   * If the list is empty it throws ArrayIndexOutOfBoundsException
+   *
+   * @return removed element
+   */
+  public int removeLast() {
+    if (_tail <= _head) {
+      throw new ArrayIndexOutOfBoundsException("List is empty");
+    }
+    return _list[--_tail];
+  }
+
+  /**
    * Removes an entry.
-   * If the list is empty it throws a ArrayIndexOutOfBoundsException
    *
    * @return boolean true of element has been found and removed
    */
@@ -205,25 +304,6 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
-   * Gets entry at a specific index
-   *
-   * @param index
-   * @return element at index
-   */
-  public int get(int index) {
-    if (index < 0) {
-      throw new ArrayIndexOutOfBoundsException("Index < 0");
-    }
-    if (_tail <= _head) {
-      throw new ArrayIndexOutOfBoundsException("List is empty");
-    }
-    if (_head + index >= _tail) {
-      throw new ArrayIndexOutOfBoundsException("Index too high");
-    }
-    return _list[_head + index];
-  }
-
-  /**
    * Exchanges/swaps two entries
    *
    * @param i
@@ -246,52 +326,6 @@ public class SimpleIntList implements Iterable<Integer> {
       throw new ArrayIndexOutOfBoundsException("Index j too high");
     }
     exchange(_head + i, _head + j);
-  }
-
-  /**
-   * Sets entry at a specific index
-   *
-   * @param index
-   * @param value
-   * @return old value at index
-   */
-  public int set(int index, int value) {
-    if (_tail <= _head) {
-      throw new ArrayIndexOutOfBoundsException("List is empty");
-    }
-    if (index < 0) {
-      throw new ArrayIndexOutOfBoundsException("Index < 0");
-    }
-    if (_head + index >= _tail) {
-      throw new ArrayIndexOutOfBoundsException("Index too high");
-    }
-    int old = _list[_head + index];
-    _list[_head + index] = value;
-    return old;
-  }
-
-  /**
-   * Gets entry at a last index
-   *
-   * @return last element
-   */
-  public int getLast() {
-    if (_tail <= _head) {
-      throw new ArrayIndexOutOfBoundsException("List is empty");
-    }
-    return _list[_tail - 1];
-  }
-
-  /**
-   * Gets entry at a first index
-   *
-   * @return first element
-   */
-  public int getFirst() {
-    if (_tail <= _head) {
-      throw new ArrayIndexOutOfBoundsException("List is empty");
-    }
-    return _list[_head];
   }
 
   /**
@@ -366,6 +400,15 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
+   * Returns true is size==0
+   *
+   * @return true if empty
+   */
+  public boolean empty() {
+    return _tail - _head == 0;
+  }
+
+  /**
    * Returns a number of how many elements can be added to this list before it is full.
    *
    * @return number of available slots for elements to add
@@ -375,12 +418,13 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
-   * Returns true is size==0
+   * fast sort of list
    *
-   * @return true if empty
+   * @param comparator
    */
-  public boolean empty() {
-    return _tail - _head == 0;
+  public void sort(Comparator<Integer> comparator) {
+    if (this.empty()) return;
+    sort(_head, _tail, comparator);
   }
 
   /**
@@ -408,7 +452,6 @@ public class SimpleIntList implements Iterable<Integer> {
   public SimpleIntList clone() {
     return new SimpleIntList(this);
   }
-
   @Override
   public String toString() {
     String s = "List size=" + size() + " available capacity=" + getAvailableCapacity() + " [";
@@ -421,6 +464,7 @@ public class SimpleIntList implements Iterable<Integer> {
     s += "]";
     return s;
   }
+
   /* (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
@@ -455,13 +499,13 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
-   * fast sort of list
-   *
-   * @param comparator
+   * @param extra_size
    */
-  public void sort(Comparator<Integer> comparator) {
-    if (this.empty()) return;
-    sort(_head, _tail, comparator);
+  private void grow(int extra_size) {
+    _arraySize = _arraySize + extra_size + DEFAULT_GROWTH_MARGIN;
+    _list = Arrays.copyOfRange(_list, _head, _arraySize);
+    this._tail = _tail - _head;
+    this._head = 0;
   }
 
   /**
@@ -536,8 +580,8 @@ public class SimpleIntList implements Iterable<Integer> {
   public Iterator<Integer> iterator() {
     return new SimpleIntListIterator();
   }
-
   private class SimpleIntListIterator implements Iterator<Integer> {
+
 
     // detect modifications
     final int initialHead = _head;
