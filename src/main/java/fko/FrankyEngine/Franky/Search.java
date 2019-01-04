@@ -108,8 +108,8 @@ public class Search implements Runnable {
   private SearchResult lastSearchResult;
   private long         uciUpdateTicker;
 
-  // killer move lists killerMoves[ply][killerMoveNumber]
-  private int[][] killerMoves;
+  // killer move lists
+  private MoveList[] killerMoves;
 
   /**
    * Creates a search object and stores a back reference to the engine object.<br>
@@ -129,6 +129,12 @@ public class Search implements Runnable {
 
     // create position evaluator
     evaluator = new Evaluation();
+
+    // init killer moves
+    killerMoves = new MoveList[MAX_SEARCH_DEPTH];
+    for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
+      killerMoves[i] = new MoveList(config.NO_KILLER_MOVES + 1);
+    }
 
   }
 
@@ -241,9 +247,6 @@ public class Search implements Runnable {
       // prepare principal variation lists
       principalVariation[i] = new MoveList(MAX_SEARCH_DEPTH);
     }
-
-    // init killer moves
-    killerMoves = new int[MAX_SEARCH_DEPTH][config.NO_KILLER_MOVES];
 
     // age TT
     transpositionTable.ageEntries();
@@ -365,6 +368,9 @@ public class Search implements Runnable {
 
     // generate all root moves
     moveGenerators[0].setPosition(position);
+    if (config.USE_KILLER_MOVES && !killerMoves[2].empty()) {
+      moveGenerators[0].setKillerMoves(killerMoves[2]);
+    }
     MoveList legalMoves = moveGenerators[0].getLegalMoves(true);
 
     // no legal root moves - game already ended!
@@ -384,14 +390,6 @@ public class Search implements Runnable {
       principalVariation[i].clear();
     }
 
-    // clear killer moves
-    for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
-      for (int j = 0; j < config.NO_KILLER_MOVES; j++) {
-        killerMoves[i][j] = Move.NOMOVE;
-        killerMoves[i][j] = Move.NOMOVE;
-      }
-    }
-
     // create rootMoves list
     rootMoves.clear();
     for (int i = 0; i < legalMoves.size(); i++) {
@@ -408,10 +406,6 @@ public class Search implements Runnable {
     // max window search - preparation for aspiration window search
     final int alpha = Evaluation.MIN;
     final int beta = Evaluation.MAX;
-
-    // temporary best move - take the first move available
-    searchCounter.currentBestRootMove = rootMoves.getMove(0);
-    searchCounter.currentBestRootValue = Evaluation.NOVALUE;
 
     // for fixed depth searches we start at the final depth directly
     // no iterative deepening
@@ -440,6 +434,12 @@ public class Search implements Runnable {
     }
     // End TT Lookup
     // ###############################################
+
+    // temporary best move - take the first move available
+    if (searchCounter.currentBestRootMove == Move.NOMOVE) {
+      searchCounter.currentBestRootMove = rootMoves.getMove(0);
+      principalVariation[0].add(rootMoves.getMove(0));
+    }
 
     // prepare search result
     SearchResult searchResult = new SearchResult();
@@ -473,7 +473,6 @@ public class Search implements Runnable {
       // *******************************************
 
       assert searchCounter.currentBestRootMove != Move.NOMOVE;
-      assert searchCounter.currentBestRootValue != Evaluation.NOVALUE;
       assert !principalVariation[0].empty();
       assert principalVariation[0].getFirst() == searchCounter.currentBestRootMove;
 
@@ -505,11 +504,8 @@ public class Search implements Runnable {
     searchResult.extraDepth = searchCounter.currentExtraSearchDepth;
     // retrieved ponder move from pv
     searchResult.ponderMove = Move.NOMOVE;
-    if (principalVariation[0].
-
-                               size() > 1 && (principalVariation[0].
-
-                                                                     get(1)) != Move.NOMOVE) {
+    if (principalVariation[0].size() > 1
+        && (principalVariation[0].get(1)) != Move.NOMOVE) {
       searchResult.ponderMove = principalVariation[0].get(1);
     }
 
@@ -537,8 +533,7 @@ public class Search implements Runnable {
     return searchResult;
   }
 
-  private void getPVLine(final Position position, final byte depth,
-                         final MoveList pv) {
+  private void getPVLine(final Position position, final byte depth, final MoveList pv) {
     TT_Entry ttEntry = transpositionTable.get(position);
     if (ttEntry != null && ttEntry.bestMove != Move.NOMOVE) {
       pv.add(ttEntry.bestMove);
@@ -870,7 +865,7 @@ public class Search implements Runnable {
     // prepare move generator
     // set position, killers and TT move
     moveGenerators[ply].setPosition(position);
-    if (config.USE_KILLER_MOVES) {
+    if (config.USE_KILLER_MOVES && !killerMoves[ply].empty()) {
       moveGenerators[ply].setKillerMoves(killerMoves[ply]);
     }
     if (config.USE_PVS_MOVE_ORDERING && ttHit != null && ttHit.bestMove != Move.NOMOVE) {
@@ -924,8 +919,7 @@ public class Search implements Runnable {
           && !position.hasCheck()
           && Move.getTarget(move).equals(Piece.NOPIECE)
           && !Move.getMoveType(move).equals(MoveType.PROMOTION)
-          && move != killerMoves[ply][0]
-          && move != killerMoves[ply][1]
+          && killerMoves[ply].contains(move)
       ) { // @formatter:on
         lmrReduce = config.LMR_REDUCTION;
         searchCounter.lmrReductions++;
@@ -993,10 +987,10 @@ public class Search implements Runnable {
           if (config.USE_ALPHABETA_PRUNING) {
             // save killer moves so they will be search earlier on following nodes
             if (config.USE_KILLER_MOVES && Move.getTarget(move).equals(Piece.NOPIECE)) {
-              for (int k = 0; k < config.NO_KILLER_MOVES; k++) {
-                if (killerMoves[ply][k] == Move.NOMOVE || killerMoves[ply][k] == move) {
-                  killerMoves[ply][k] = move;
-                  break;
+              if (!killerMoves[ply].pushToHeadStable(move)) {
+                killerMoves[ply].addFront(move);
+                while (killerMoves[ply].size() > config.NO_KILLER_MOVES) {
+                  killerMoves[ply].removeLast(); // keep size stable
                 }
               }
             }

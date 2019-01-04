@@ -246,7 +246,7 @@ public class SearchTest {
     for (int i = 0; i < 10; i++) {
       SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 0, null, true, false, false);
       search.startSearch(position, searchMode);
-      Thread.sleep(new Random().nextInt(100));
+      Thread.sleep(new Random().nextInt(100) + 100);
       search.stopSearch();
       assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
       assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);

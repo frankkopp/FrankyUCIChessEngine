@@ -70,7 +70,7 @@ public class MoveGenerator {
 
   // These fields control the on demand generation of moves.
   private OnDemandState generationCycleState = OnDemandState.NEW;
-  private int[]         killerMoves          = null;
+  private MoveList      killerMoves          = new MoveList(0);
   private int           pvMove               = Move.NOMOVE;
 
   private enum OnDemandState {
@@ -86,9 +86,8 @@ public class MoveGenerator {
 
   // Comparator for move value victim least value attacker
   private static final Comparator<Integer> mvvlvaComparator = Comparator.comparingInt(
-    (Integer move) -> (Move.getPiece(move).getType().getValue() - Move.getTarget(move)
-                                                                      .getType()
-                                                                      .getValue()));
+    (Integer move) -> (Move.getPiece(move).getType().getValue() -
+                       Move.getTarget(move).getType().getValue()));
 
   /**
    * Creates a new {@link MoveGenerator}
@@ -116,11 +115,9 @@ public class MoveGenerator {
     this.position = position;
     this.activePlayer = position.getNextPlayer();
     this.generationCycleState = OnDemandState.NEW;
-    this.killerMoves = null;
+    this.killerMoves = new MoveList(0);
     this.pvMove = Move.NOMOVE;
     this.genMode = GEN_ALL;
-    this.killerMoves = null;
-    this.pvMove = Move.NOMOVE;
     clearLists();
   }
 
@@ -143,7 +140,7 @@ public class MoveGenerator {
    *
    * @param killerMoves
    */
-  public void setKillerMoves(int[] killerMoves) {
+  public void setKillerMoves(MoveList killerMoves) {
     assert killerMoves != null : "parameter null not allowed";
     this.killerMoves = killerMoves.clone();
   }
@@ -434,8 +431,8 @@ public class MoveGenerator {
         qSearchMoves.add(move);
       }
       // Lower value piece captures higher value piece (with a margin)
-      else if (Move.getPiece(move).getType().getValue() + 200
-               < Move.getTarget(move).getType().getValue()) {
+      else if (Move.getPiece(move).getType().getValue() + 200 <
+               Move.getTarget(move).getType().getValue()) {
         qSearchMoves.add(move);
       }
       // undefended pieces captures are good
@@ -511,7 +508,7 @@ public class MoveGenerator {
     }
   }
 
-  private void generateAllgMoves() {
+  private void generateAllMoves() {
     int oldMode = genMode;
     genMode = GEN_ALL;
     capturingMoves.clear();
@@ -565,12 +562,9 @@ public class MoveGenerator {
     // non capturing
     else {
       // killer moves
-      if (killerMoves != null) {
-        for (int i = killerMoves.length - 1; i >= 0; i--) {
-          if (killerMoves[i] == move) {
-            return 8000 + i;
-          }
-        }
+      final int idx = killerMoves.indexOf(move);
+      if (idx >= 0) {
+        return 8000 + idx;
       }
       // promotions
       final PieceType pieceType = Move.getPromotion(move).getType();
@@ -629,15 +623,13 @@ public class MoveGenerator {
    * @param moveList
    */
   private void pushKillerMoves(final MoveList moveList) {
-    if (killerMoves != null && nonCapturingMoves.size() > 0) {
-      for (int i = killerMoves.length - 1; i >= 0; i--) {
-        if (killerMoves[i] != Move.NOMOVE && killerMoves[i] != nonCapturingMoves.get(0)) {
-          moveList.pushToHeadStable(killerMoves[i]);
-        }
+    if (nonCapturingMoves.size() > 0) {
+      for (int i = killerMoves.size() - 1; i >= 0; i--) {
+        assert killerMoves.get(i) != Move.NOMOVE;
+        moveList.pushToHeadStable(killerMoves.get(i));
       }
     }
   }
-
 
   private void generatePawnMoves() {
     // reverse direction of pawns for black
@@ -756,16 +748,16 @@ public class MoveGenerator {
                                   Piece.BLACK_BISHOP));
               } else {
                 // pawndouble
-                if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow()
-                    && (position.getX88Board()[fromSquare.ordinal() + (2 * Square.N)])
-                       == Piece.NOPIECE) {
+                if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow() &&
+                    (position.getX88Board()[fromSquare.ordinal() + (2 * Square.N)]) ==
+                    Piece.NOPIECE) {
                   // on rank 2 && rank 4 is free(rank 3 already checked via target)
                   nonCapturingMoves.add(
                     Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getNorth(), piece,
                                     target, promotion));
-                } else if (activePlayer.isBlack() && fromSquare.isBlackPawnBaseRow()
-                           && position.getX88Board()[fromSquare.ordinal() + (2 * Square.S)]
-                              == Piece.NOPIECE) {
+                } else if (activePlayer.isBlack() && fromSquare.isBlackPawnBaseRow() &&
+                           position.getX88Board()[fromSquare.ordinal() + (2 * Square.S)] ==
+                           Piece.NOPIECE) {
                   // on rank 7 && rank 5 is free(rank 6 already checked via target)
                   nonCapturingMoves.add(
                     Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getSouth(), piece,
@@ -993,8 +985,8 @@ public class MoveGenerator {
     /*
      * Find a move by finding at least one moves for a piece type
      */
-    return findKingMove() || findPawnMove() || findKnightMove() || findQueenMove() || findRookMove()
-           || findBishopMove();
+    return findKingMove() || findPawnMove() || findKnightMove() || findQueenMove() ||
+           findRookMove() || findBishopMove();
   }
 
   /**

@@ -242,12 +242,17 @@ public class MoveGeneratorTest {
     String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq - 0 113";
     Position board = new Position(testFen);
 
-    int killer1 = 67178790; // 67178790 (NORMAL Rg3-c3)
-    int killer2 = 67178534; // 67178534 (NORMAL Rg3-a3)
-    int killer3 = 67130005; // already at first position
+    final int killer1 = 67178790; // 67178790 (NORMAL Rg3-c3)
+    final int killer2 = 67178534; // 67178534 (NORMAL Rg3-a3)
+    final int killer3 = 67130005; // already at first position
+
+    final MoveList killerList = new MoveList();
+    killerList.add(killer1);
+    killerList.add(killer2);
+    killerList.add(killer3);
 
     MoveGenerator moveGenerator = new MoveGenerator(board);
-    moveGenerator.setKillerMoves(new int[]{killer1, killer2, killer3});
+    moveGenerator.setKillerMoves(killerList);
     MoveList moves = moveGenerator.getLegalMoves();
 
     int lastCapture = 0;
@@ -276,8 +281,13 @@ public class MoveGeneratorTest {
     int killer2 = 67178534; // 67178534 (NORMAL Rg3-a3)
     int killer3 = 67130005; // already at first position
 
+    final MoveList killerList = new MoveList();
+    killerList.add(killer1);
+    killerList.add(killer2);
+    killerList.add(killer3);
+
     MoveGenerator moveGenerator = new MoveGenerator(board);
-    moveGenerator.setKillerMoves(new int[]{killer1, killer2, killer3});
+    moveGenerator.setKillerMoves(killerList);
 
     int lastCapture = 0;
     int i = 0;
@@ -307,15 +317,22 @@ public class MoveGeneratorTest {
     MoveGenerator moveGenerator = new MoveGenerator();
     moveGenerator.SORT_MOVES = true;
 
+    final int killer1 = 67320564;
+    final int killer2 = 67318516;
+
+    final MoveList killerList = new MoveList();
+    killerList.add(killer1);
+    killerList.add(killer2);
+
     // direct list
     moveGenerator.setPosition(position);
-    moveGenerator.setKillerMoves(new int[]{67320564, 67318516});
+    moveGenerator.setKillerMoves(killerList);
     moveGenerator.setPVMove(67248483);
     MoveList movesDirect = moveGenerator.getPseudoLegalMoves().clone();
 
     // OD list
     moveGenerator.setPosition(position);
-    moveGenerator.setKillerMoves(new int[]{67320564, 67318516});
+    moveGenerator.setKillerMoves(killerList);
     moveGenerator.setPVMove(67248483);
     MoveList movesOD = new MoveList();
     int tmp;
@@ -360,19 +377,18 @@ public class MoveGeneratorTest {
       // get some example killer and pv moves
       moveGenerator.setPosition(position);
       MoveList tmp = moveGenerator.getPseudoLegalMoves().clone();
-      int killer1 = Move.NOMOVE;
-      int killer2 = Move.NOMOVE;
       int pvMove = Move.NOMOVE;
+      final MoveList killerList = new MoveList();
       if (tmp.size() > 10) {
-        killer1 = tmp.get(9);
-        killer2 = tmp.get(10);
         pvMove = tmp.get(4);
+        killerList.add(tmp.get(9));
+        killerList.add(tmp.get(10));
       }
 
       // direct list
       moveGenerator.setPosition(position);
       if (tmp.size() > 10) {
-        moveGenerator.setKillerMoves(new int[]{killer1, killer2});
+        moveGenerator.setKillerMoves(killerList);
         moveGenerator.setPVMove(pvMove);
       }
       MoveList movesDirect = moveGenerator.getPseudoLegalMoves().clone();
@@ -380,7 +396,7 @@ public class MoveGeneratorTest {
       // OD list
       moveGenerator.setPosition(position);
       if (tmp.size() > 10) {
-        moveGenerator.setKillerMoves(new int[]{killer1, killer2});
+        moveGenerator.setKillerMoves(killerList);
         moveGenerator.setPVMove(pvMove);
       }
       MoveList movesOD = new MoveList();
@@ -391,8 +407,10 @@ public class MoveGeneratorTest {
 
       System.out.printf("POSITION: %d. %s %n", i + 1, position.toFENString());
       System.out.printf("Bulk: %,d OnDemand: %,d %n", movesDirect.size(), movesOD.size());
-      System.out.printf("Killer 1: %-20s Killer 2: %-20s PV: %-20s%n", Move.toString(killer1),
-                        Move.toString(killer2), Move.toString(pvMove));
+      System.out.printf("Killer 1: %-20s Killer 2: %-20s PV: %-20s%n",
+                        killerList.size()>0 ? Move.toString(killerList.get(0)) : "none",
+                        killerList.size()>1 ? Move.toString(killerList.get(1)) : "none",
+                        Move.toString(pvMove));
       System.out.printf("%3s  %-20s %-20s %n", "No.", "Direct", "OnDemand");
       System.out.printf("---------------------------------------------%n");
 
@@ -464,10 +482,14 @@ public class MoveGeneratorTest {
     int killer2 = 67318516;
     int pvMove = 67248483;
 
+    final MoveList killerList = new MoveList();
+    killerList.add(killer1);
+    killerList.add(killer2);
+
     // OD list
     MoveList movesOD = new MoveList();
     moveGenerator.setPosition(position);
-    moveGenerator.setKillerMoves(new int[]{killer1, killer2});
+    moveGenerator.setKillerMoves(killerList);
     moveGenerator.setPVMove(pvMove);
     int m;
     while ((m = moveGenerator.getNextPseudoLegalMove(false)) != Move.NOMOVE) {
@@ -476,7 +498,7 @@ public class MoveGeneratorTest {
 
     // direct list
     moveGenerator.setPosition(position);
-    moveGenerator.setKillerMoves(new int[]{killer1, killer2});
+    moveGenerator.setKillerMoves(killerList);
     moveGenerator.setPVMove(pvMove);
     MoveList moves = moveGenerator.getPseudoLegalMoves().clone();
 
@@ -646,9 +668,10 @@ public class MoveGeneratorTest {
     mG.SORT_MOVES = false;
     mG.SORT_CAPTURING_MOVES = true;
 
-    final int killer1 = 67320564;
-    final int killer2 = 67318516;
-    mG.setKillerMoves(new int[]{killer1, killer2});
+    final MoveList killerList = new MoveList();
+    killerList.add(67320564);
+    killerList.add(67318516);
+    mG.setKillerMoves(killerList);
 
     return mG.getPseudoLegalMoves();
 
@@ -660,9 +683,10 @@ public class MoveGeneratorTest {
     mG.SORT_MOVES = true;
     mG.SORT_CAPTURING_MOVES = true;
 
-    final int killer1 = 67320564;
-    final int killer2 = 67318516;
-    mG.setKillerMoves(new int[]{killer1, killer2});
+    final MoveList killerList = new MoveList();
+    killerList.add(67320564);
+    killerList.add(67318516);
+    mG.setKillerMoves(killerList);
 
     return mG.getPseudoLegalMoves();
   }
