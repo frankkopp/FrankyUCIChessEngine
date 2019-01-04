@@ -49,53 +49,63 @@ import java.util.concurrent.CountDownLatch;
  */
 public class Search implements Runnable {
 
-  public static final  int                MAX_SEARCH_DEPTH           = Byte.MAX_VALUE;
-  public static final  int                UCI_UPDATE_INTERVAL        = 500;
-  private static final Logger             LOG                        =
-    LoggerFactory.getLogger(Search.class);
+  public static final  int    MAX_SEARCH_DEPTH    = Byte.MAX_VALUE;
+  public static final  int    UCI_UPDATE_INTERVAL = 500;
+  private static final Logger LOG                 = LoggerFactory.getLogger(Search.class);
+
   // Readability constants
-  private static final boolean            DO_NULL                    = true;
-  private static final boolean            NO_NULL                    = false;
-  private static final boolean            PV_NODE                    = true;
-  private static final boolean            CUT_NODE                   = false;
-  final                Configuration      config;
+  private static final boolean       DO_NULL  = true;
+  private static final boolean       NO_NULL  = false;
+  private static final boolean       PV_NODE  = true;
+  private static final boolean       CUT_NODE = false;
+  final                Configuration config;
+
   // search counters
-  private final        SearchCounter      searchCounter              = new SearchCounter();
+  private final SearchCounter searchCounter = new SearchCounter();
+
   // back reference to the engine
-  private final        IUCIEngine         engine;
+  private final IUCIEngine engine;
+
   // opening book
-  private final        OpeningBook        book;
+  private final OpeningBook book;
+
   // Move Generators - each depth in search gets it own to avoid object creation during search
-  private final        MoveGenerator[]    moveGenerators             =
-    new MoveGenerator[MAX_SEARCH_DEPTH];
+  private final MoveGenerator[] moveGenerators = new MoveGenerator[MAX_SEARCH_DEPTH];
+
   // Position Evaluator
-  private final        Evaluation         evaluator;
+  private final Evaluation evaluator;
+
   // running search global variables
-  private final        RootMoveList       rootMoves                  = new RootMoveList();
+  private final RootMoveList rootMoves = new RootMoveList();
+
   // current variation of the search
-  private final        MoveList           currentVariation           =
-    new MoveList(MAX_SEARCH_DEPTH);
-  private final        MoveList[]         principalVariation         =
-    new MoveList[MAX_SEARCH_DEPTH];
+  private final MoveList   currentVariation   = new MoveList(MAX_SEARCH_DEPTH);
+  private final MoveList[] principalVariation = new MoveList[MAX_SEARCH_DEPTH];
+
   // the thread in which we will do the actual search
-  private              Thread             searchThread               = null;
+  private Thread searchThread = null;
+
   // flag to indicate to stop the search - can be called externally or via the timer clock.
-  private              boolean            stopSearch                 = true;
+  private boolean stopSearch = true;
+
   // hash tables
-  private              TranspositionTable transpositionTable;
+  private TranspositionTable transpositionTable;
+
   // used to wait for move from search
-  private              CountDownLatch     waitForInitializationLatch = new CountDownLatch(1);
+  private CountDownLatch waitForInitializationLatch = new CountDownLatch(1);
+
   // time variables
-  private              long               startTime;
-  private              long               stopTime;
-  private              long               hardTimeLimit;
+  private long startTime;
+  private long stopTime;
+  private long hardTimeLimit;
   private long softTimeLimit;
+
   // search state - valid for one call to startSearch
   private Position     currentPosition;
   private Color        myColor;
   private SearchMode   searchMode;
   private SearchResult lastSearchResult;
-  private       long         uciUpdateTicker;
+  private long         uciUpdateTicker;
 
   // killer move lists killerMoves[ply][killerMoveNumber]
   private int[][] killerMoves;
