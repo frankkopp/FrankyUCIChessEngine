@@ -40,9 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Frank
  */
-public class TestTranspositionTable {
+public class TranspositionTableTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TestTranspositionTable.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TranspositionTableTest.class);
 
   private IUCIEngine engine;
   private Search     search;

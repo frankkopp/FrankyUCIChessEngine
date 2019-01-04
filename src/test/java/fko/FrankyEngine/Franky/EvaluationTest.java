@@ -40,9 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Attempt at a proper Unit Test for Evaluation
  */
-public class TestEvaluation {
+public class EvaluationTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TestEvaluation.class);
+  private static final Logger LOG = LoggerFactory.getLogger(EvaluationTest.class);
 
   private String fenStandard;
 

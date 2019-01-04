@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * TestSuiteTests
+ * SuiteTestsTest
  * <p>
  * https://www.chessprogramming.org/Test-Positions#Test_Suites
  * http://www.bergbomconsulting.se/chess/testsuites.html
@@ -44,9 +44,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * TODO: Implement reading test sets from file - Extended Position Description (EPD)
  * https://www.chessprogramming.org/Extended_Position_Description
  */
-public class TestSuiteTests {
+public class SuiteTestsTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TestSuiteTests.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SuiteTestsTest.class);
 
   TestSuite testSuite;
 

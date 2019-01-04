@@ -35,7 +35,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** @author fkopp */
-public class TestPosition {
+public class PositionTest {
 
   private static final int ITERATIONS = 999;
 

@@ -26,8 +26,10 @@
 package fko.FrankyEngine.Franky;
 
 
+import fko.FrankyEngine.Franky.Square.File;
+import fko.FrankyEngine.Franky.Square.Rank;
 import org.junit.jupiter.api.Test;
-import fko.FrankyEngine.Franky.Square.*;
+
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Frank
  *
  */
-public class TestSquare {
+public class SquareTest {
 
     /**
      * Tests basic Square operations

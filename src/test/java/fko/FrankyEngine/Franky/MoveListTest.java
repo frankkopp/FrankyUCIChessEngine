@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Frank
  */
-public class TestMoveList {
+public class MoveListTest {
 
   @Test
   public void testListWithInts() {

@@ -22,23 +22,18 @@
  * SOFTWARE.
  *
  */
-
 package fko.FrankyEngine.Franky;
 
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.EnumSet;
+import java.util.Arrays;
 
-/**
- * @author Frank
- */
-public class testTimings_EnumSetIteratorVsArray {
+/** @author Frank */
+public class TimingTests {
 
-  final EnumSet<Square> _squareSet  = EnumSet.noneOf(Square.class);
-  final SquareList      _squareList = new SquareList();
-
+  private int[] _list_1;
 
   @Test
   public void testTiming() {
@@ -60,7 +55,7 @@ public class testTimings_EnumSetIteratorVsArray {
 
       start = Instant.now();
       ITERATIONS = 0;
-      while (true) {
+      for (; ; ) {
         ITERATIONS++;
         test1();
         if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) break;
@@ -69,73 +64,34 @@ public class testTimings_EnumSetIteratorVsArray {
 
       start = Instant.now();
       ITERATIONS = 0;
-      while (true) {
+      for (; ; ) {
         ITERATIONS++;
         test2();
         if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) break;
       }
       System.out.println(String.format("Test 2: %,7d runs/s", ITERATIONS / DURATION));
-
     }
-
   }
 
-  /**
-   *
-   */
+  /** */
   private void prepare() {
+
+    _list_1 = new int[512];
+    // add many entries
+    for (int i = 0; i < 512; i++) {
+      _list_1[i] = (int) (Math.random() * Integer.MAX_VALUE);
+    }
   }
 
   @SuppressWarnings("unused")
   private void test1() {
 
-    for (Square s : Square.values) {
-      if (s.isValidSquare()) {
-        _squareSet.add(s);
-      }
-    }
-
-    Square tempa, tempb;
-    for (Square s : _squareSet) {
-      for (Square b : _squareSet) {
-        tempa = s;
-        tempb = b;
-      }
-    }
-
-    for (Square s : Square.values) {
-      if (s.isValidSquare()) {
-        _squareSet.remove(s);
-      }
-    }
-
+    int[] list = Arrays.copyOf(_list_1, _list_1.length);
   }
 
   @SuppressWarnings("unused")
   private void test2() {
 
-    for (Square s : Square.values) {
-      if (s.isValidSquare()) {
-        _squareList.add(s);
-      }
-    }
-
-    Square tempa, tempb;
-    for (int i = 0; i < _squareList.size(); i++) {
-      for (int j = 0; j < _squareList.size(); j++) {
-        tempa = _squareList.get(i);
-        tempb = _squareList.get(j);
-      }
-    }
-
-    for (Square s : Square.values) {
-      if (s.isValidSquare()) {
-        _squareList.remove(s);
-      }
-    }
-
-
+    int[] list = _list_1.clone();
   }
-
-
 }

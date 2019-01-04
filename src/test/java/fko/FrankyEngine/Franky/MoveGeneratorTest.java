@@ -41,9 +41,9 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Frank
  */
-public class TestMoveGenerator {
+public class MoveGeneratorTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TestMoveGenerator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MoveGeneratorTest.class);
 
   @Test
   public void testFromStandardBoard() {

@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author fkopp
  *
  */
-public class TestPiece {
+public class PieceTest {
 
     /**
      *

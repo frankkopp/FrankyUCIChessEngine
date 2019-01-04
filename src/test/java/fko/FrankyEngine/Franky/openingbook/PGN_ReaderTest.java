@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /** @author fkopp */
-public class PGN_Reader_Test {
+public class PGN_ReaderTest {
 
   @Test
   public void testPGN_Reader() {

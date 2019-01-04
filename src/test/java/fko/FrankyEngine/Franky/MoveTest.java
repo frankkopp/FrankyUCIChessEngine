@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Frank
  *
  */
-public class TestMove {
+public class MoveTest {
 
     @Test
     public void testValidMove() {

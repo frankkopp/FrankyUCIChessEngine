@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  * @author Frank
  *
  */
-public class TestSquareList {
+public class SquareListTest {
 
     static SquareList list;
 

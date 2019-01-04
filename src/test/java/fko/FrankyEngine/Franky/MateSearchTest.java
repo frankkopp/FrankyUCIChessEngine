@@ -39,9 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Frank
  */
-class TestMateSearch {
+class MateSearchTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TestMateSearch.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MateSearchTest.class);
 
   private IUCIEngine engine;
   private Search     search;

@@ -45,9 +45,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Frank
  */
-public class TestSearch {
+public class SearchTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TestSearch.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SearchTest.class);
 
   private IUCIEngine engine;
   private Search     search;

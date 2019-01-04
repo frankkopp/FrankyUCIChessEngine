@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Frank
  *
  */
-public class TestPERFT {
+public class PERFTTest {
 
   /**
    * Perft Test https://chessprogramming.wikispaces.com/Perft+Results
