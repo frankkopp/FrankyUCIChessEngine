@@ -157,7 +157,7 @@ public class TranspositionTableTest {
       long hashAllocation = (usedMemoryAfter - usedMemoryBefore) / (1024 * 1024);
       System.out.format("TT Size (config): %dMB = %dMB real size - Nodes: %d%n", i, hashAllocation,
                         tt.getMaxEntries());
-      tt = null;
+      tt=null; // GC help
     }
   }
 

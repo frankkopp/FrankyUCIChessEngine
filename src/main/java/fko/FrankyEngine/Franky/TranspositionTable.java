@@ -120,7 +120,7 @@ public class TranspositionTable {
     if (entries[hash].key == 0) {
       numberOfEntries++;
       entries[hash].key = position.getZobristKey();
-      entries[hash].fen = position.toFENString();
+      //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
@@ -134,7 +134,7 @@ public class TranspositionTable {
     ) {
       numberOfCollisions++;
       entries[hash].key = position.getZobristKey();
-      entries[hash].fen = position.toFENString();
+      //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
@@ -156,7 +156,7 @@ public class TranspositionTable {
       }
 
       entries[hash].key = position.getZobristKey();
-      entries[hash].fen = position.toFENString();
+      //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
@@ -288,7 +288,7 @@ public class TranspositionTable {
     byte  type     = TT_EntryType.NONE;
     int   bestMove = Move.NOMOVE;
     byte  age      = 0;
-    String fen = "";
+    //String fen = "";
   }
 
   /**
