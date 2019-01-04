@@ -73,10 +73,10 @@ public class SearchTest {
     search.waitWhileSearching();
     final long endTime = System.currentTimeMillis() - startTime;
     System.out.printf("MoveTime was %,d and Duration was %,d %n", moveTime, endTime);
-    assertTrue(endTime < moveTime+100);
+    assertTrue(endTime < moveTime + 100);
   }
 
-    @Test
+  @Test
   public void testBookSearch() {
     search.config.USE_BOOK = true;
     String fen = Position.STANDARD_BOARD_FEN;
@@ -220,7 +220,7 @@ public class SearchTest {
   }
 
   @Test
-  public void testMultipleStartAndStopSearch() {
+  public void testMultipleStartAndStopSearch() throws InterruptedException {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
     // Test start and stop search
@@ -228,13 +228,18 @@ public class SearchTest {
       SearchMode searchMode =
         new SearchMode(0, 0, 0, 0, 0, 10000, 0, 0, 0, null, false, false, false);
       search.startSearch(position, searchMode);
-      try {
-        Thread.sleep(new Random().nextInt(1000));
-      } catch (InterruptedException ignored) {
-      }
+
+      Thread.sleep(new Random().nextInt(1000) + 100);
+
       search.stopSearch();
+
       assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
-      assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+      if (search.getLastSearchResult().bestMove == Move.NOMOVE) {
+        System.out.println(search.getLastSearchResult());
+        System.out.println();
+      }
+      assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE ||
+                 search.getLastSearchResult().resultValue == -Evaluation.CHECKMATE);
     }
   }
 
@@ -526,8 +531,8 @@ public class SearchTest {
                              search.getSearchCounter().leafPositionsEvaluated,
                              Move.toString(search.getLastSearchResult().bestMove),
                              search.getLastSearchResult().resultValue,
-                             (1e3 * search.getSearchCounter().nodesVisited)
-                             / search.getSearchCounter().lastSearchTime,
+                             (1e3 * search.getSearchCounter().nodesVisited) /
+                             search.getSearchCounter().lastSearchTime,
                              search.getSearchCounter().toString()));
   }
 
@@ -540,8 +545,8 @@ public class SearchTest {
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
 
-    position.makeMove(Move.fromSANNotation(position,"e4"));
-    position.makeMove(Move.fromSANNotation(position,"e5"));
+    position.makeMove(Move.fromSANNotation(position, "e4"));
+    position.makeMove(Move.fromSANNotation(position, "e5"));
 
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
@@ -589,7 +594,8 @@ public class SearchTest {
     // mate in 3
     fen = "4r1b1/1p4B1/pN2pR2/RB2k3/1P2N2p/2p3b1/n2P1p1r/5K1n w - -";
     position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
+    searchMode =
+      new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
 
     search.startSearch(position, searchMode);
     search.waitWhileSearching();

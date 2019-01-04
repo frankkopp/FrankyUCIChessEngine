@@ -178,7 +178,10 @@ public class Search implements Runnable {
     }
     searchThread = new Thread(this, threadName);
     searchThread.setDaemon(true);
-    //searchThread.setUncaughtExceptionHandler((t, e) -> LOG.error("Uncaught exception", e));
+//    searchThread.setUncaughtExceptionHandler((t, e) -> {
+//      LOG.error("Uncaught exception", e);
+//      System.exit(1);
+//    });
     searchThread.start();
 
     // Wait for initialization in run() before returning from call
@@ -378,7 +381,7 @@ public class Search implements Runnable {
       final SearchResult searchResult = new SearchResult();
       searchResult.bestMove = Move.NOMOVE;
       if (position.hasCheck()) {
-        searchResult.resultValue = Evaluation.CHECKMATE;
+        searchResult.resultValue = -Evaluation.CHECKMATE;
       } else {
         searchResult.resultValue = Evaluation.DRAW;
       }
@@ -440,6 +443,9 @@ public class Search implements Runnable {
       searchCounter.currentBestRootMove = rootMoves.getMove(0);
       principalVariation[0].add(rootMoves.getMove(0));
     }
+
+    assert searchCounter.currentBestRootMove != Move.NOMOVE;
+    assert !principalVariation[0].empty();
 
     // prepare search result
     SearchResult searchResult = new SearchResult();
@@ -553,6 +559,10 @@ public class Search implements Runnable {
    */
   private void rootMovesSearch(Position position, int depth, int alpha, int beta) {
     LOG.trace("Search root moves for depth {}", depth);
+
+    assert !principalVariation[0].empty();
+    assert depth > 0 && depth < MAX_SEARCH_DEPTH;
+    assert alpha >= Evaluation.MIN && beta <= Evaluation.MAX;
 
     // root node is always first searched node
     searchCounter.nodesVisited++;
@@ -1602,6 +1612,8 @@ public class Search implements Runnable {
     int  lmrReductions          = 0;
 
     private void resetCounter() {
+      currentBestRootMove     = Move.NOMOVE;
+      currentBestRootValue    = Evaluation.NOVALUE;
       currentIterationDepth = 0;
       currentSearchDepth = 0;
       currentExtraSearchDepth = 0;
