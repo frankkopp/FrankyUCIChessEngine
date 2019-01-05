@@ -486,7 +486,7 @@ public class SearchTest {
   @Disabled
   public void sizeOfSearchTreeTest() {
 
-    int depth = 6;
+    int depth = 5;
     List<String> resultStrings = new ArrayList<>();
     List<String> fens = new ArrayList<>();
 

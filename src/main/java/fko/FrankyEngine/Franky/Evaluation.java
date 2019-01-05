@@ -30,9 +30,10 @@ import org.slf4j.LoggerFactory;
 
 import static fko.FrankyEngine.Franky.EvaluationConfig.*;
 import static fko.FrankyEngine.Franky.Piece.*;
-import static fko.FrankyEngine.Franky.PieceType.*;
+import static fko.FrankyEngine.Franky.PieceType.PAWN;
 import static fko.FrankyEngine.Franky.Square.File.*;
-import static fko.FrankyEngine.Franky.Square.Rank.*;
+import static fko.FrankyEngine.Franky.Square.Rank.r1;
+import static fko.FrankyEngine.Franky.Square.Rank.r8;
 import static fko.FrankyEngine.Franky.Square.*;
 
 /**
@@ -147,7 +148,7 @@ public class Evaluation {
    */
   public int evaluate(Position position) {
     setPosition(position);
-    return _evaluate();
+    return evaluate();
   }
 
   /**
@@ -156,7 +157,7 @@ public class Evaluation {
    * @return value of the position from active player's view.
    */
 
-  private int _evaluate() {
+  private int evaluate() {
 
     // protect against null position
     if (position == null) {
@@ -164,6 +165,9 @@ public class Evaluation {
       LOG.error("No position to evaluate. Set position before calling this", e);
       throw e;
     }
+
+    // if not enough material on the board for a win then it is a draw
+    if (position.checkInsufficientMaterial()) return Evaluation.DRAW;
 
     // Clear all evaluation values
     clearValues();
