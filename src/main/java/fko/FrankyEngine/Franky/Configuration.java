@@ -134,10 +134,10 @@ public class Configuration {
   /**
    * Null Move Pruning
    */
-  public boolean USE_NULL_MOVE_PRUNING = true;
-  public int     NULL_MOVE_DEPTH       = 2;
-  //boolean USE_VERIFY_NMP                   = false;
-  //int     NULL_MOVE_REDUCTION_VERIFICATION = 3;
+  public boolean USE_NULL_MOVE_PRUNING            = true;
+  public int     NULL_MOVE_DEPTH                  = 2;
+  public boolean USE_VERIFY_NMP                   = true;
+  public int     NULL_MOVE_REDUCTION_VERIFICATION = 3;
 
   /**
    * Eval Pruning - early cut for low static evals
@@ -194,23 +194,23 @@ public class Configuration {
 
   @Override
   public String toString() {
-    return "Configuration{" + "PERFT=" + PERFT + "\nHASH_SIZE=" + HASH_SIZE + "\nPONDER=" + PONDER
-           + "\nDEBUG=" + DEBUG + "\nUCI_ShowCurrLine=" + UCI_ShowCurrLine + "\nUSE_BOOK="
-           + USE_BOOK + "\nOB_FolderPath='" + OB_FolderPath + '\'' + "\nOB_fileNamePlain='"
-           + OB_fileNamePlain + '\'' + "\nOB_Mode=" + OB_Mode + "\nUSE_QUIESCENCE=" + USE_QUIESCENCE
-           + "\nUSE_ROOT_MOVES_SORT=" + USE_ROOT_MOVES_SORT + "\nUSE_PVS_MOVE_ORDERING="
-           + USE_PVS_MOVE_ORDERING + "\nUSE_ALPHABETA_PRUNING=" + USE_ALPHABETA_PRUNING
-           + "\nUSE_PVS=" + USE_PVS + "\nUSE_TRANSPOSITION_TABLE=" + USE_TRANSPOSITION_TABLE
-           + "\nUSE_MATE_DISTANCE_PRUNING=" + USE_MATE_DISTANCE_PRUNING
-           + "\nUSE_MINOR_PROMOTION_PRUNING=" + USE_MINOR_PROMOTION_PRUNING
-           + "\nUSE_NULL_MOVE_PRUNING=" + USE_NULL_MOVE_PRUNING + "\nNULL_MOVE_DEPTH="
-           + NULL_MOVE_DEPTH + "\nUSE_STATIC_NULL_PRUNING=" + USE_STATIC_NULL_PRUNING
-           + "\nSTATIC_NULL_PRUNING_DEPTH=" + STATIC_NULL_PRUNING_DEPTH
-           + "\nSTATIC_NULL_PRUNING_MARGIN=" + STATIC_NULL_PRUNING_MARGIN + "\nUSE_RAZOR_PRUNING="
-           + USE_RAZOR_PRUNING + "\nRAZOR_PRUNING_DEPTH=" + RAZOR_PRUNING_DEPTH
-           + "\nRAZOR_PRUNING_MARGIN=" + RAZOR_PRUNING_MARGIN + "\nUSE_KILLER_MOVES="
-           + USE_KILLER_MOVES + "\nUSE_SORT_ALL_MOVES=" + USE_SORT_ALL_MOVES + "\nUSE_LMR="
-           + USE_LMR + "\nLMR_MIN_DEPTH=" + LMR_MIN_DEPTH + "\nLMR_REDUCTION=" + LMR_REDUCTION
-           + "\nUSE_ASPIRATION_WINDOW=" + USE_ASPIRATION_WINDOW + '}';
+    return "Configuration{" + "PERFT=" + PERFT + "\nHASH_SIZE=" + HASH_SIZE + "\nPONDER=" + PONDER +
+           "\nDEBUG=" + DEBUG + "\nUCI_ShowCurrLine=" + UCI_ShowCurrLine + "\nUSE_BOOK=" +
+           USE_BOOK + "\nOB_FolderPath='" + OB_FolderPath + '\'' + "\nOB_fileNamePlain='" +
+           OB_fileNamePlain + '\'' + "\nOB_Mode=" + OB_Mode + "\nUSE_QUIESCENCE=" + USE_QUIESCENCE +
+           "\nUSE_ROOT_MOVES_SORT=" + USE_ROOT_MOVES_SORT + "\nUSE_PVS_MOVE_ORDERING=" +
+           USE_PVS_MOVE_ORDERING + "\nUSE_ALPHABETA_PRUNING=" + USE_ALPHABETA_PRUNING +
+           "\nUSE_PVS=" + USE_PVS + "\nUSE_TRANSPOSITION_TABLE=" + USE_TRANSPOSITION_TABLE +
+           "\nUSE_MATE_DISTANCE_PRUNING=" + USE_MATE_DISTANCE_PRUNING +
+           "\nUSE_MINOR_PROMOTION_PRUNING=" + USE_MINOR_PROMOTION_PRUNING +
+           "\nUSE_NULL_MOVE_PRUNING=" + USE_NULL_MOVE_PRUNING + "\nNULL_MOVE_DEPTH=" +
+           NULL_MOVE_DEPTH + "\nUSE_STATIC_NULL_PRUNING=" + USE_STATIC_NULL_PRUNING +
+           "\nSTATIC_NULL_PRUNING_DEPTH=" + STATIC_NULL_PRUNING_DEPTH +
+           "\nSTATIC_NULL_PRUNING_MARGIN=" + STATIC_NULL_PRUNING_MARGIN + "\nUSE_RAZOR_PRUNING=" +
+           USE_RAZOR_PRUNING + "\nRAZOR_PRUNING_DEPTH=" + RAZOR_PRUNING_DEPTH +
+           "\nRAZOR_PRUNING_MARGIN=" + RAZOR_PRUNING_MARGIN + "\nUSE_KILLER_MOVES=" +
+           USE_KILLER_MOVES + "\nUSE_SORT_ALL_MOVES=" + USE_SORT_ALL_MOVES + "\nUSE_LMR=" +
+           USE_LMR + "\nLMR_MIN_DEPTH=" + LMR_MIN_DEPTH + "\nLMR_REDUCTION=" + LMR_REDUCTION +
+           "\nUSE_ASPIRATION_WINDOW=" + USE_ASPIRATION_WINDOW + '}';
   }
 }
