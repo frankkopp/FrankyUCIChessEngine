@@ -50,21 +50,20 @@ public class FrankyEngine implements IUCIEngine {
   // back reference to the uci protocol handler for sending messages to the UCI UI
   private IUCIProtocolHandler uciProtocolHandler = null;
 
-  // configuration parameters
-
+  // engine/search configuration
   private final Configuration config = new Configuration();
+
   // the current search instance
+  private final Search search;
 
-  private Search search;
   // ID of engine
+  private final String iDName;
+  private final String iDAuthor;
 
-  private String iDName   = "Franky";
-  private String iDAuthor = "Frank Kopp";
   // options of engine
-
   private List<IUCIEngine.IUCIOption> iUciOptions;
-  // engine state
 
+  // engine state
   private Position   position;
   private SearchMode searchMode;
 
@@ -84,6 +83,7 @@ public class FrankyEngine implements IUCIEngine {
       System.exit(1);
     }
     iDName = properties.getProperty("artifactId") + " v" + properties.getProperty("version");
+    iDAuthor = properties.getProperty("author");
 
     initOptions();
 
