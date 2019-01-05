@@ -57,7 +57,7 @@ public class Search implements Runnable {
   /**
    * Maximum depth this search can go.
    */
-  public static final  int MAX_SEARCH_DEPTH    = Byte.MAX_VALUE;
+  public static final int MAX_SEARCH_DEPTH = Byte.MAX_VALUE;
 
   // Readability constants
   private static final boolean DO_NULL    = true;
@@ -241,6 +241,11 @@ public class Search implements Runnable {
     LOG.info("Search thread has been stopped");
   }
 
+  /**
+   * Called when the new search thread is started.
+   * Initializes the search and checks the opening book if required.
+   * Calls <code>iterativeDeepening()</code> when search is initialized.
+   */
   @Override
   public void run() {
 
@@ -365,7 +370,10 @@ public class Search implements Runnable {
   }
 
   /**
-   * This starts the actual iterative search.
+   * Generates root moves and starts the actual iterative search by calling the
+   * root moves search <code>rootMovesSearch()</code>.
+   * <p>
+   * Detects mate if started on a mate position.
    *
    * @param position
    * @return search result
@@ -533,23 +541,25 @@ public class Search implements Runnable {
     // print result of the search
     if (LOG.isInfoEnabled()) {
       LOG.info("{}", String.format(
-        "Search complete. " + "Nodes visited: %,d " + "Boards Evaluated: %,d (+%,d) " +
-        "Captures: %,d " + "EP: %,d " + "Checks: %,d " + "Mates: %,d ", searchCounter.nodesVisited,
-        searchCounter.leafPositionsEvaluated, searchCounter.nonLeafPositionsEvaluated,
-        searchCounter.captureCounter, searchCounter.enPassantCounter, searchCounter.checkCounter,
+        "Search complete. " + "Nodes visited: %,d " + "Boards Evaluated: %,d (+%,d) "
+        + "Captures: %,d " + "EP: %,d " + "Checks: %,d " + "Mates: %,d ",
+        searchCounter.nodesVisited, searchCounter.leafPositionsEvaluated,
+        searchCounter.nonLeafPositionsEvaluated, searchCounter.captureCounter,
+        searchCounter.enPassantCounter, searchCounter.checkCounter,
         searchCounter.checkMateCounter));
       LOG.info("Search Depth was {} ({})", searchCounter.currentSearchDepth,
                searchCounter.currentExtraSearchDepth);
       LOG.info("Search took {}", DurationFormatUtils.formatDurationHMS(elapsedTime(stopTime)));
-      LOG.info("Speed: {}", String.format("%,d", (int) (searchCounter.leafPositionsEvaluated /
-                                                        (elapsedTime() / 1e3))) + " nps");
+      LOG.info("Speed: {}", String.format("%,d", (int) (searchCounter.leafPositionsEvaluated / (
+        elapsedTime() / 1e3))) + " nps");
     }
 
     return searchResult;
   }
 
   /**
-   * Performs the search on the root moves and calls the recursive search for each move
+   * Performs the search on the root moves and calls the recursive search for each move.
+   * This is basically a special version of the normal search.
    *
    * @param position
    * @param depth
@@ -612,16 +622,12 @@ public class Search implements Runnable {
       // ########################################
       // ### START PVS ROOT SEARCH            ###
       if (!config.USE_PVS || isPerftSearch() || numberOfSearchedMoves == 0) {
-
         // In root the first move determines the new PV until we have found a better one.
         // As we sort the root moves and put the best moves in front after each iteration
         // we always choose the last best move as our first PV. Only if a proven better
         // one (in the the new deeper search) has been found do we exchange the best move.
-
         value = -search(position, depth - 1, ply + 1, -beta, -alpha, PV_NODE, DO_NULL);
-
       } else {
-
         // As we have a PV (best) move here we try to prove that all other moves are
         // worse or at least not not better (<= alpha) with a null window search. A
         // null window search does not give an exact value but a lower bound for alpha.
@@ -629,18 +635,14 @@ public class Search implements Runnable {
         // not look at it further and continue with the next move. If the lower bound
         // is > alpha we found a better move and need to re-search the move to find
         // the correct value (and not just a bound).
-
         value =
           -search(position, depth - 1 - lmrReduce, ply + 1, -alpha - 1, -alpha, CUT_NODE, DO_NULL);
-
         if (value > alpha && !stopSearch) {
           searchCounter.pvs_root_researches++;
           value = -search(position, depth - 1, ply + 1, -beta, -alpha, PV_NODE, DO_NULL);
-
         } else {
           searchCounter.pvs_root_cutoffs++;
         }
-
       }
       // ### END PVS ROOT SEARCH              ###
       // ########################################
@@ -693,7 +695,7 @@ public class Search implements Runnable {
   }
 
   /**
-   * Search - recursive search
+   * Search - recursive AlphaBeta search with several optimizations.
    *
    * @param position
    * @param depth
@@ -715,8 +717,9 @@ public class Search implements Runnable {
       return qsearch(position, depth, ply, alpha, beta, pvNode);
     }
 
-    assert (isPerftSearch() || !config.USE_ALPHABETA_PRUNING ||
-            (alpha >= Evaluation.MIN && alpha < beta && beta <= Evaluation.MAX));
+    assert
+      (isPerftSearch() || !config.USE_ALPHABETA_PRUNING || (alpha >= Evaluation.MIN && alpha < beta
+                                                            && beta <= Evaluation.MAX));
     assert (pvNode || (alpha == beta - 1));
     assert ply >= 1;
     assert depth <= MAX_SEARCH_DEPTH;
@@ -884,7 +887,7 @@ public class Search implements Runnable {
       moveGenerators[ply].setPVMove(ttHit.bestMove);
     }
 
-    // Search all generated moves
+    // Search all generated moves using the onDemand move generator.
     int move;
     while ((move = moveGenerators[ply].getNextPseudoLegalMove(false)) != Move.NOMOVE) {
       searchCounter.movesGenerated++;
@@ -946,7 +949,6 @@ public class Search implements Runnable {
       // ### START PVS ###
       int value;
       if (!config.USE_PVS || isPerftSearch() || (numberOfSearchedMoves == 0)) {
-
         // In a non root node we need to establish a best move for this ply
         // by using the first move (b/o good move sorting).
         // We will then try to prove that all other moves are worse or at best equal
@@ -954,39 +956,32 @@ public class Search implements Runnable {
         // sibling node. If we do not find a better move we can go to the next move.
         // If we found a better move we need to re-search the move to get the exact
         // value.
-
         value = -search(position, depth - 1, ply + 1, -beta, -alpha, PV_NODE, DO_NULL);
-
       } else {
-
         // Try null window search to prove the move is worse or at best equal the
         // known alpha (best value so far in his ply)
-
         value =
           -search(position, depth - 1 - lmrReduce, ply + 1, -alpha - 1, -alpha, CUT_NODE, DO_NULL);
-
         if (value > alpha && !stopSearch) {
           searchCounter.pvs_researches++;
-
           // We found a better move a need to get the exact value be doing a full
           // window search.
-
           value = -search(position, depth - 1, ply + 1, -beta, -alpha, PV_NODE, DO_NULL);
-
         } else {
           searchCounter.pvs_cutoffs++;
-
         }
         // ### END PVS ###
         // ########################################
-
       }
 
       // needed to remember if we even had a legal move
       numberOfSearchedMoves++;
       currentVariation.removeLast();
+
       position.undoMove();
 
+      // if stopped we ignore the last result and end the loop
+      // which will the return the last alpha value we have
       if (stopSearch) break;
 
       // Did we find a better move for this node?
@@ -1051,10 +1046,27 @@ public class Search implements Runnable {
     return alpha;
   }
 
+  /**
+   * After the normal search has reached its intended depth the search is extended for certain
+   * moves. Typically this are moves which are capturing or checking. All other moves are called
+   * "quiet" moves and therefore the term quiescence search (qsearch).
+   *
+   * A quiescence search is a special und usually simpler version of the normal search where only
+   * certain moves are generated and searched deeper.
+   *
+   * @param position
+   * @param depth
+   * @param ply
+   * @param alpha
+   * @param beta
+   * @param pvNode
+   * @return evaluation
+   */
   private int qsearch(Position position, int depth, int ply, int alpha, int beta, boolean pvNode) {
 
-    assert (isPerftSearch() || !config.USE_ALPHABETA_PRUNING ||
-            (alpha >= Evaluation.MIN && alpha < beta && beta <= Evaluation.MAX));
+    assert
+      (isPerftSearch() || !config.USE_ALPHABETA_PRUNING || (alpha >= Evaluation.MIN && alpha < beta
+                                                            && beta <= Evaluation.MAX));
     assert (pvNode || (alpha == beta - 1));
     assert (depth <= 0);
     assert ply >= 1;
@@ -1361,7 +1373,7 @@ public class Search implements Runnable {
 
   /**
    * Configure time limits-
-   *
+   * <p>
    * Chooses if search mode is time per move or remaining time
    * and set time limits accordingly
    */
@@ -1404,10 +1416,10 @@ public class Search implements Runnable {
    */
   private static boolean bigPiecePresent(Position position) {
     final int activePlayer = position.getNextPlayer().ordinal();
-    return !(position.getKnightSquares()[activePlayer].isEmpty() &&
-             position.getBishopSquares()[activePlayer].isEmpty() &&
-             position.getRookSquares()[activePlayer].isEmpty() &&
-             position.getQueenSquares()[activePlayer].isEmpty());
+    return !(position.getKnightSquares()[activePlayer].isEmpty()
+             && position.getBishopSquares()[activePlayer].isEmpty()
+             && position.getRookSquares()[activePlayer].isEmpty()
+             && position.getQueenSquares()[activePlayer].isEmpty());
   }
 
   /**
@@ -1628,8 +1640,8 @@ public class Search implements Runnable {
 
     @Override
     public String toString() {
-      return "Best Move: " + Move.toString(bestMove) + " (" + getScoreString(resultValue) + ") " +
-             " Ponder Move: " + Move.toString(ponderMove) + " Depth: " + depth + "/" + extraDepth;
+      return "Best Move: " + Move.toString(bestMove) + " (" + getScoreString(resultValue) + ") "
+             + " Ponder Move: " + Move.toString(ponderMove) + " Depth: " + depth + "/" + extraDepth;
     }
   }
 
