@@ -114,9 +114,10 @@ public class TranspositionTable {
    */
   public void put(Position position, short value, byte type, byte depth, int bestMove) {
 
-    assert depth > 0;
+    assert depth >= 0;
     assert type > 0;
     assert value > Evaluation.NOVALUE;
+    assert (value >= Evaluation.MIN && value <= Evaluation.MAX);
 
     final int hash = getHash(position.getZobristKey());
 
@@ -132,8 +133,12 @@ public class TranspositionTable {
       entries[hash].age = 1;
     }
     // different position - overwrite
-    else if (position.getZobristKey() != entries[hash].key && depth > entries[hash].depth &&
-             entries[hash].age > 0) {
+    // @formatter:off
+    else if (position.getZobristKey() != entries[hash].key
+             && depth > entries[hash].depth
+             && entries[hash].age > 0) {
+      // @formatter:on
+      assert entries[hash].value != Evaluation.NOVALUE;
       numberOfCollisions++;
       entries[hash].key = position.getZobristKey();
       //entries[hash].fen = position.toFENString();
@@ -145,7 +150,8 @@ public class TranspositionTable {
     }
     // Update
     else if (position.getZobristKey() == entries[hash].key  // same position
-             && depth > entries[hash].depth) { // Overwrite only when new value from deeper search
+             // Overwrite only when new value from same or deeper search
+             && depth >= entries[hash].depth) {
       numberOfUpdates++;
 
       // FIXME DEBUG
@@ -154,6 +160,7 @@ public class TranspositionTable {
         if (Math.abs(value) < Evaluation.CHECKMATE_THRESHOLD) {
           System.err.println("We are erasing a MATE in the TT");
           System.err.println();
+          assert false;
         }
       }
 
@@ -306,7 +313,18 @@ public class TranspositionTable {
     public static final byte EXACT = 1;
     public static final byte ALPHA = 2;
     public static final byte BETA  = 3;
+
+    public static String toString(int type) {
+      switch (type) {
+        case EXACT:
+          return "EXACT";
+        case ALPHA:
+          return "ALPHA";
+        case BETA:
+          return "BETA";
+        default:
+          return "NONE";
+      }
+    }
   }
-
-
 }
