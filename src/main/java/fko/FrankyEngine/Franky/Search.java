@@ -46,20 +46,28 @@ import java.util.concurrent.CountDownLatch;
  * <p>
  * TODO: ASPIRATION WINDOWS
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
+ * TODO: More extensions and reductions
  */
 public class Search implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Search.class);
 
-  public static final  int MAX_SEARCH_DEPTH    = Byte.MAX_VALUE;
   private static final int UCI_UPDATE_INTERVAL = 500;
 
+  /**
+   * Maximum depth this search can go.
+   */
+  public static final  int MAX_SEARCH_DEPTH    = Byte.MAX_VALUE;
+
   // Readability constants
-  private static final boolean       DO_NULL  = true;
-  private static final boolean       NO_NULL  = false;
-  private static final boolean       PV_NODE  = true;
-  private static final boolean       CUT_NODE = false;
-  final                Configuration config;
+  private static final boolean DO_NULL    = true;
+  private static final boolean NO_NULL    = false;
+  private static final boolean PV_NODE    = true;
+  private static final boolean CUT_NODE   = false;
+  private static final int     DEPTH_NONE = 0;
+
+  // configuration object
+  public final Configuration config;
 
   // search counters
   private final SearchCounter searchCounter = new SearchCounter();
@@ -138,6 +146,7 @@ public class Search implements Runnable {
 
   }
 
+
   /**
    * Start the search in a separate thread.<br>
    * Calls <code>Engine.sendResult(searchResult);</code> to
@@ -178,10 +187,10 @@ public class Search implements Runnable {
     }
     searchThread = new Thread(this, threadName);
     searchThread.setDaemon(true);
-//    searchThread.setUncaughtExceptionHandler((t, e) -> {
-//      LOG.error("Uncaught exception", e);
-//      System.exit(1);
-//    });
+    //    searchThread.setUncaughtExceptionHandler((t, e) -> {
+    //      LOG.error("Uncaught exception", e);
+    //      System.exit(1);
+    //    });
     searchThread.start();
 
     // Wait for initialization in run() before returning from call
@@ -229,7 +238,7 @@ public class Search implements Runnable {
     // clear thread
     searchThread = null;
 
-    LOG.info("Search has been stopped");
+    LOG.info("Search thread has been stopped");
   }
 
   @Override
@@ -417,7 +426,7 @@ public class Search implements Runnable {
     // ###############################################
     // TT Lookup
     if (config.USE_TT_ROOT && config.USE_TRANSPOSITION_TABLE) {
-      TTHit ttHit = probeTT(position, depth, alpha, beta);
+      TTHit ttHit = probeTT(position, depth, alpha, beta, 0);
       if (ttHit != null) {
         // determine pv moves from TT
         if (ttHit.bestMove != Move.NOMOVE) {
@@ -432,6 +441,9 @@ public class Search implements Runnable {
           searchCounter.currentBestRootValue = ttHit.value;
           searchCounter.currentIterationDepth = depth;
           depth = ttHit.depth;
+          if (isCheckMateValue(ttHit.value)) {
+            System.out.println();
+          }
         }
       }
     }
@@ -510,16 +522,13 @@ public class Search implements Runnable {
     searchResult.extraDepth = searchCounter.currentExtraSearchDepth;
     // retrieved ponder move from pv
     searchResult.ponderMove = Move.NOMOVE;
-    if (principalVariation[0].size() > 1
-        && (principalVariation[0].get(1)) != Move.NOMOVE) {
+    if (principalVariation[0].size() > 1 && (principalVariation[0].get(1)) != Move.NOMOVE) {
       searchResult.ponderMove = principalVariation[0].get(1);
     }
 
     // search is finished - stop timer
     stopTime = System.currentTimeMillis();
-    searchCounter.lastSearchTime =
-
-      elapsedTime(stopTime);
+    searchCounter.lastSearchTime = elapsedTime(stopTime);
 
     // print result of the search
     if (LOG.isInfoEnabled()) {
@@ -537,16 +546,6 @@ public class Search implements Runnable {
     }
 
     return searchResult;
-  }
-
-  private void getPVLine(final Position position, final byte depth, final MoveList pv) {
-    TT_Entry ttEntry = transpositionTable.get(position);
-    if (ttEntry != null && ttEntry.bestMove != Move.NOMOVE) {
-      pv.add(ttEntry.bestMove);
-      position.makeMove(ttEntry.bestMove);
-      getPVLine(position, (byte) (depth - 1), pv);
-      position.undoMove();
-    }
   }
 
   /**
@@ -601,6 +600,7 @@ public class Search implements Runnable {
           && !position.hasCheck()
           && Move.getTarget(move).equals(Piece.NOPIECE)
           && !Move.getMoveType(move).equals(MoveType.PROMOTION)
+          && !killerMoves[ply].contains(move)
       ) { // @formatter:on
         lmrReduce = config.LMR_REDUCTION;
         searchCounter.lmrReductions++;
@@ -666,7 +666,6 @@ public class Search implements Runnable {
       if (value > alpha) {
         alpha = value;
         MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
-        storeTT(position, depth, TT_EntryType.EXACT, alpha, Move.NOMOVE);
         searchCounter.currentBestRootMove = move;
         searchCounter.currentBestRootValue = alpha;
       }
@@ -674,6 +673,9 @@ public class Search implements Runnable {
     } // end for root moves loop
     // ##### Iterate through all available moves
     // #########################################################
+
+    // store the best alpha
+    storeTT(position, alpha, TT_EntryType.EXACT, depth, Move.NOMOVE);
 
     // we use a new
     if (config.USE_ROOT_MOVES_SORT) {
@@ -694,39 +696,36 @@ public class Search implements Runnable {
    * Search - recursive search
    *
    * @param position
-   * @param depthLeft
+   * @param depth
    * @param ply
    * @param pvNode
    * @param doNullMove
    * @return value of the search
    */
-  private int search(Position position, int depthLeft, int ply, int alpha, int beta, boolean pvNode,
+  private int search(Position position, int depth, int ply, int alpha, int beta, boolean pvNode,
                      final boolean doNullMove) {
 
     // update current search depth stats
-    if (searchCounter.currentSearchDepth < ply) {
-      searchCounter.currentSearchDepth = ply;
-    }
-    if (searchCounter.currentExtraSearchDepth < ply) {
-      searchCounter.currentExtraSearchDepth = ply;
-    }
-
-    // on leaf node call qsearch
-    if (depthLeft < 1 || ply >= MAX_SEARCH_DEPTH - 1) { // will be checked again in qsearch
-      return qsearch(position, ply, alpha, beta);
-    }
-
+    searchCounter.currentSearchDepth = Math.max(searchCounter.currentSearchDepth, ply);
+    searchCounter.currentExtraSearchDepth = Math.max(searchCounter.currentExtraSearchDepth, ply);
     searchCounter.nodesVisited++;
 
-    // check draw through 50-moves-rule, 3-fold-repetition, insufficient material
+    // on leaf node call qsearch
+    if (depth < 1 || ply >= MAX_SEARCH_DEPTH - 1) { // will be checked again in qsearch
+      return qsearch(position, depth, ply, alpha, beta, pvNode);
+    }
+
+    assert (isPerftSearch() || !config.USE_ALPHABETA_PRUNING ||
+            (alpha >= Evaluation.MIN && alpha < beta && beta <= Evaluation.MAX));
+    assert (pvNode || (alpha == beta - 1));
+    assert ply >= 1;
+    assert depth <= MAX_SEARCH_DEPTH;
+
+    // check draw through 50-moves-rule, 3-fold-repetition
     if (!isPerftSearch()) {
-      // @formatter:off
-      if (   position.check50Moves()
-          || position.check3Repetitions()
-          || position.checkInsufficientMaterial()) {
+      if (position.check50Moves() || position.check3Repetitions()) {
         return contempt(position);
       }
-      // @formatter:on
     }
 
     // Check if we need to stop search - could be external or time or
@@ -749,7 +748,7 @@ public class Search implements Runnable {
       alpha = Math.max(-Evaluation.CHECKMATE + ply, alpha);
       beta = Math.min(Evaluation.CHECKMATE - ply, beta);
       if (alpha >= beta) {
-        assert checkMateValue(alpha);
+        assert isCheckMateValue(alpha);
         searchCounter.mateDistancePrunings++;
         return alpha;
       }
@@ -759,23 +758,19 @@ public class Search implements Runnable {
 
     // ###############################################
     // TT Lookup
-    TTHit ttHit = probeTT(position, depthLeft, alpha, beta);
-    if (ttHit != null) {
+    TTHit ttHit = probeTT(position, depth, alpha, beta, ply);
+    if (ttHit != null && ttHit.type != TT_EntryType.NONE) {
+      assert (ttHit.value >= Evaluation.MIN && ttHit.value <= Evaluation.MAX);
       // in PV node only return ttHit if it was an exact hit
       if (!pvNode || ttHit.type == TT_EntryType.EXACT) {
         return ttHit.value;
       }
-      // we could not use value but the last best move will be used
-      // for move sorting
     }
     // End TT Lookup
     // ###############################################
 
     // Static Eval
-    int staticEval = 0;
-    if (!isPerftSearch()) {
-      staticEval = evaluate(position, ply, alpha, beta);
-    }
+    int staticEval = isPerftSearch() ? 0 : evaluate(position, ply, alpha, beta);
 
     // ###############################################
     // STATIC NULL MOVE PRUNING
@@ -785,12 +780,12 @@ public class Search implements Runnable {
     if (config.USE_STATIC_NULL_PRUNING
         && !isPerftSearch()
         && !pvNode
-        && depthLeft < config.STATIC_NULL_PRUNING_DEPTH
+        && depth < config.STATIC_NULL_PRUNING_DEPTH
         && doNullMove
         && !position.hasCheck()
-        && !checkMateValue(beta)
+        && !isCheckMateValue(beta)
     ) {
-      final int evalMargin = config.STATIC_NULL_PRUNING_MARGIN * depthLeft;
+      final int evalMargin = config.STATIC_NULL_PRUNING_MARGIN * depth;
       if (staticEval - evalMargin >= beta ){
         return beta; // fail-hard / fail-soft: staticEval - evalMargin;
       }
@@ -800,35 +795,61 @@ public class Search implements Runnable {
     // ###############################################
 
     // ###############################################
+    // RAZORING
+    // @formatter:off
+    if (config.USE_RAZOR_PRUNING
+        && !isPerftSearch()
+        && !pvNode
+        && depth <= config.RAZOR_PRUNING_DEPTH
+        && !position.hasCheck()
+    ) {
+      final int threshold = alpha - config.RAZOR_PRUNING_MARGIN;
+      if (staticEval <= threshold ){
+        return qsearch(position, DEPTH_NONE, ply, alpha, beta, CUT_NODE);
+      }
+    }
+    // @formatter:on
+    // RAZORING
+    // ###############################################
+
+    // ###############################################
     // NULL MOVE PRUNING
+    boolean mateThreat = false;
     // @formatter:off
     if (config.USE_NULL_MOVE_PRUNING
         && !isPerftSearch()
         && !pvNode
-        && depthLeft > config.NULL_MOVE_DEPTH
+        && depth > config.NULL_MOVE_DEPTH
         && doNullMove
         && !position.hasCheck()
         && bigPiecePresent(position)
     ) {
       // @formatter:on
 
+      // reduce more on higher depths
+      int r = depth > 6 ? 3 : 2;
+      if (config.USE_VERIFY_NMP) r++;
+
       position.makeNullMove();
-      // null move search
-      int reduction = depthLeft > 6 ? 3 : 2;
-      int nullValue =
-        -search(position, depthLeft - reduction, ply + 1, -beta, -beta + 1, CUT_NODE, NO_NULL);
+      int nullValue = -search(position, depth - r, ply + 1, -beta, -beta + 1, CUT_NODE, NO_NULL);
       position.undoNullMove();
 
-      // TODO: NULL Verification
-
-      // Do not return unproven mate values
-      if (checkMateValue(nullValue)) {
-        if (nullValue > 0) {
-          nullValue = Evaluation.CHECKMATE_THRESHOLD - 1;
-        } else {
-          nullValue = -Evaluation.CHECKMATE_THRESHOLD + 1;
+      // Verify on beta exceeding
+      if (config.USE_VERIFY_NMP) {
+        if (depth > config.NULL_MOVE_REDUCTION_VERIFICATION) {
+          if (nullValue >= beta) {
+            searchCounter.nullMoveVerifications++;
+            nullValue = search(position, depth - r, ply, alpha, beta, PV_NODE, NO_NULL);
+            if (nullValue >= beta) {
+              searchCounter.nullMovePrunings++;
+              return beta;
+            }
+          }
         }
       }
+
+      // Check for mate threat
+      if (isCheckMateValue(nullValue)) mateThreat = true;
 
       // pruning
       if (nullValue >= beta) {
@@ -837,26 +858,6 @@ public class Search implements Runnable {
       }
     }
     // NULL MOVE PRUNING
-    // ###############################################
-
-    // ###############################################
-    // RAZORING
-    // @formatter:off
-    if (config.USE_RAZOR_PRUNING
-        && !isPerftSearch()
-        && !pvNode
-        && depthLeft <= config.RAZOR_PRUNING_DEPTH
-        && !position.hasCheck()
-    ) {
-      final int threshold = alpha - config.RAZOR_PRUNING_MARGIN;
-      if (staticEval < threshold ){
-        final int qsearchVal = qsearch(position, ply, alpha, beta);
-        if (qsearchVal < threshold)
-          return alpha;
-      }
-    }
-    // @formatter:on
-    // RAZORING
     // ###############################################
 
     // needed to remember if we even had a legal move
@@ -875,6 +876,7 @@ public class Search implements Runnable {
     // prepare move generator
     // set position, killers and TT move
     moveGenerators[ply].setPosition(position);
+
     if (config.USE_KILLER_MOVES && !killerMoves[ply].empty()) {
       moveGenerators[ply].setKillerMoves(killerMoves[ply]);
     }
@@ -917,19 +919,22 @@ public class Search implements Runnable {
       // update UCI
       sendUCIUpdate(position);
 
+      // TODO: EXTENSIONS check, castlings, queen promotions,
+
       // ###############################################
       // Late Move Reduction
       int lmrReduce = 0;
       // @formatter:off
       if (config.USE_LMR
           && numberOfSearchedMoves >= 1
-          && depthLeft >= config.LMR_MIN_DEPTH
+          && depth >= config.LMR_MIN_DEPTH
           && !isPerftSearch()
           && !pvNode
           && !position.hasCheck()
+          && !mateThreat
           && Move.getTarget(move).equals(Piece.NOPIECE)
           && !Move.getMoveType(move).equals(MoveType.PROMOTION)
-          && killerMoves[ply].contains(move)
+          && !killerMoves[ply].contains(move)
       ) { // @formatter:on
         lmrReduce = config.LMR_REDUCTION;
         searchCounter.lmrReductions++;
@@ -950,15 +955,15 @@ public class Search implements Runnable {
         // If we found a better move we need to re-search the move to get the exact
         // value.
 
-        value = -search(position, depthLeft - 1, ply + 1, -beta, -alpha, PV_NODE, DO_NULL);
+        value = -search(position, depth - 1, ply + 1, -beta, -alpha, PV_NODE, DO_NULL);
 
       } else {
 
         // Try null window search to prove the move is worse or at best equal the
         // known alpha (best value so far in his ply)
 
-        value = -search(position, depthLeft - 1 - lmrReduce, ply + 1, -alpha - 1, -alpha, CUT_NODE,
-                        DO_NULL);
+        value =
+          -search(position, depth - 1 - lmrReduce, ply + 1, -alpha - 1, -alpha, CUT_NODE, DO_NULL);
 
         if (value > alpha && !stopSearch) {
           searchCounter.pvs_researches++;
@@ -966,7 +971,7 @@ public class Search implements Runnable {
           // We found a better move a need to get the exact value be doing a full
           // window search.
 
-          value = -search(position, depthLeft - 1, ply + 1, -beta, -alpha, PV_NODE, DO_NULL);
+          value = -search(position, depth - 1, ply + 1, -beta, -alpha, PV_NODE, DO_NULL);
 
         } else {
           searchCounter.pvs_cutoffs++;
@@ -1005,7 +1010,7 @@ public class Search implements Runnable {
               }
             }
             searchCounter.prunings++;
-            storeTT(position, depthLeft, TT_EntryType.BETA, beta, Move.NOMOVE);
+            storeTT(position, beta, TT_EntryType.BETA, depth, Move.NOMOVE);
             return beta; // return beta in a fail-hard / value in fail-soft
           }
         }
@@ -1031,63 +1036,42 @@ public class Search implements Runnable {
 
     // if we did not have a legal move then we have a mate
     if (numberOfSearchedMoves == 0 && !stopSearch) {
-      // as we will not enter evaluation we count it here
       searchCounter.nonLeafPositionsEvaluated++;
       if (position.hasCheck()) {
         // We have a check mate. Return a -CHECKMATE.
-        int value = -Evaluation.CHECKMATE + ply;
-        //storeTT(position, depthLeft, TT_EntryType.EXACT, value, Move.NOMOVE);
-        return value;
+        alpha = -Evaluation.CHECKMATE + ply;
       } else {
         // We have a stale mate. Return the draw value.
-        //storeTT(position, depthLeft, TT_EntryType.EXACT, Evaluation.DRAW, Move.NOMOVE);
-        return Evaluation.DRAW;
+        alpha = Evaluation.DRAW;
       }
+      assert ttType == TT_EntryType.ALPHA;
     }
 
-    storeTT(position, depthLeft, ttType, alpha, bestNodeMove);
+    storeTT(position, alpha, ttType, depth, bestNodeMove);
     return alpha;
   }
 
-  private int qsearch(Position position, int ply, int alpha, int beta) {
+  private int qsearch(Position position, int depth, int ply, int alpha, int beta, boolean pvNode) {
+
+    assert (isPerftSearch() || !config.USE_ALPHABETA_PRUNING ||
+            (alpha >= Evaluation.MIN && alpha < beta && beta <= Evaluation.MAX));
+    assert (pvNode || (alpha == beta - 1));
+    assert (depth <= 0);
+    assert ply >= 1;
 
     // update current search depth stats
-    if (searchCounter.currentExtraSearchDepth < ply) {
-      searchCounter.currentExtraSearchDepth = ply;
-    }
+    searchCounter.currentExtraSearchDepth = Math.max(searchCounter.currentExtraSearchDepth, ply);
 
-    searchCounter.nodesVisited++;
+    // if PERFT return with eval to count all captures etc.
+    if (isPerftSearch()) return evaluate(position, ply, alpha, beta);
 
     // check draw through 50-moves-rule, 3-fold-repetition, insufficient material
-    if (!isPerftSearch()) {
-      // @formatter:off
-      if (   position.check50Moves()
-          || position.check3Repetitions()
-          || position.checkInsufficientMaterial()) {
-        return contempt(position);
-      }
-      // @formatter:on
-    } else {
-      // if PERFT return with eval
-      return evaluate(position, ply, alpha, beta); //count captures et al
+    if (position.check50Moves() || position.check3Repetitions()) {
+      return contempt(position);
     }
 
-    // If quiescence is turned off check for mate/stalemate here
-    // and return evaluation
+    // If quiescence is turned off return evaluation
     if (!config.USE_QUIESCENCE || ply >= MAX_SEARCH_DEPTH - 1) {
-      // if we do not have a legal move then we have a mate
-      if (!moveGenerators[ply].hasLegalMove(position)) {
-        if (position.hasCheck()) {
-          // We have a check mate. Return a -CHECKMATE.
-          int mateValue = -Evaluation.CHECKMATE + ply;
-          storeTT(position, MAX_SEARCH_DEPTH, TT_EntryType.EXACT, mateValue, Move.NOMOVE);
-          return mateValue;
-        } else {
-          // We have a stale mate. Return the draw value.
-          storeTT(position, MAX_SEARCH_DEPTH, TT_EntryType.EXACT, Evaluation.DRAW, Move.NOMOVE);
-          return Evaluation.DRAW;
-        }
-      }
       return evaluate(position, ply, alpha, beta);
     }
 
@@ -1102,28 +1086,42 @@ public class Search implements Runnable {
       stopSearch = true;
       return evaluate(position, ply, alpha, beta);
     }
-
     // @formatter:on
 
-    // use evaluation as a standing pat (lower bound)
-    // evaluate position
-    int value = evaluate(position, ply, alpha, beta);
-    if (!position.hasCheck()) {
-      // Standing Pat
-      if (value > alpha) {
-        if (value >= beta) {
-          return beta; // fail-hard, fail-soft: value
-        }
-        alpha = value;
-      }
-    }
+    // Prepare hash type
+    byte ttType = TT_EntryType.ALPHA;
+
+    // Initialize best values
+    int bestNodeValue = -Evaluation.INFINITE;
+    int bestNodeMove = Move.NOMOVE;
 
     // ###############################################
     // TT Lookup
-    // For now only for the best move in qsearch
-    TTHit ttHit = probeTT(position, 0, alpha, beta);
+    TTHit ttHit = probeTT(position, 0, alpha, beta, ply);
+    if (ttHit != null && ttHit.type != TT_EntryType.NONE) {
+      assert (ttHit.value >= Evaluation.MIN && ttHit.value <= Evaluation.MAX);
+      // in PV node only return ttHit if it was an exact hit
+      if (!pvNode || ttHit.type == TT_EntryType.EXACT) {
+        return ttHit.value;
+      }
+    }
     // End TT Lookup
     // ###############################################
+
+    // use evaluation as a standing pat (lower bound)
+    // evaluate position
+    if (!position.hasCheck()) {
+      int statEval = evaluate(position, ply, alpha, beta);
+      // Standing Pat
+      if (statEval >= beta) {
+        storeTT(position, beta, TT_EntryType.BETA, DEPTH_NONE, Move.NOMOVE);
+        assert beta != Evaluation.NOVALUE;
+        return beta; // fail-hard, fail-soft: value
+      }
+      if (statEval > alpha) {
+        alpha = statEval;
+      }
+    }
 
     // needed to remember if we even had a legal move
     int numberOfSearchedMoves = 0;
@@ -1131,19 +1129,10 @@ public class Search implements Runnable {
     // clear principal Variation for this depth
     principalVariation[ply].clear();
 
-    // Initialize best values
-    int bestNodeValue = -Evaluation.INFINITE;
-    int bestNodeMove = Move.NOMOVE;
-
-    // Prepare hash type
-    byte ttType = TT_EntryType.ALPHA;
-
     // Generate all PseudoLegalMoves for QSearch
     // Usually only capture moves and check evasions
     // will be determined in move generator
-    moveGenerators[ply].setPosition(position);
-    // prepare move generator
-    // set position, killers and TT move
+    // Prepare move generator - set position, killers and TT move
     moveGenerators[ply].setPosition(position);
     if (config.USE_PVS_MOVE_ORDERING && ttHit != null && ttHit.bestMove != Move.NOMOVE) {
       moveGenerators[ply].setPVMove(ttHit.bestMove);
@@ -1152,12 +1141,9 @@ public class Search implements Runnable {
     searchCounter.movesGenerated += moves.size();
 
     // moves to search recursively
+    int value;
     for (int i = 0; i < moves.size(); i++) {
       int move = moves.get(i);
-
-      // TODO: Delta Cutoff
-      //  https://www.chessprogramming.org/Delta_Pruning
-      // TODO: Bad Capture or SEE
 
       position.makeMove(move);
 
@@ -1170,7 +1156,8 @@ public class Search implements Runnable {
       // needed to remember if we even had a legal move
       numberOfSearchedMoves++;
 
-      // count as non quiet board
+      // update nodes visited and count as non quiet board
+      searchCounter.nodesVisited++;
       searchCounter.positionsNonQuiet++;
 
       // needed to remember if we even had a legal move
@@ -1180,12 +1167,11 @@ public class Search implements Runnable {
       sendUCIUpdate(position);
 
       // go one ply deeper into the search tree
-      value = -qsearch(position, ply + 1, -beta, -alpha);
+      value = -qsearch(position, depth, ply + 1, -beta, -alpha, pvNode);
+      assert value > Evaluation.MIN && value < Evaluation.MAX;
 
       currentVariation.removeLast();
       position.undoMove();
-
-      if (stopSearch) break;
 
       // Did we find a better move for this node?
       // For the PV move this is always the case.
@@ -1198,6 +1184,8 @@ public class Search implements Runnable {
         if (value >= beta) { // fail-high
           if (config.USE_ALPHABETA_PRUNING && !isPerftSearch()) {
             searchCounter.prunings++;
+            storeTT(position, value, TT_EntryType.BETA, DEPTH_NONE, bestNodeMove);
+            assert beta != Evaluation.NOVALUE;
             return beta; // return beta in a fail-hard / value in fail-soft
           }
         }
@@ -1205,6 +1193,7 @@ public class Search implements Runnable {
         // Did we find a better move than in previous nodes then this is our new
         // PV and best move for this ply.
         if (value > alpha) {
+          assert value != Evaluation.NOVALUE;
           alpha = value;
           MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
           ttType = TT_EntryType.EXACT;
@@ -1218,70 +1207,89 @@ public class Search implements Runnable {
     if (numberOfSearchedMoves == 0 && position.hasCheck() && !stopSearch) {
       // as we will not enter evaluation we count it here
       searchCounter.nonLeafPositionsEvaluated++;
-      if (position.hasCheck()) {
-        // We have a check mate. Return a -CHECKMATE.
-        int mateValue = -Evaluation.CHECKMATE + ply;
-        //storeTT(position, MAX_SEARCH_DEPTH, TT_EntryType.EXACT, mateValue, Move.NOMOVE);
-        return mateValue;
-      } else {
-        // We have a stale mate. Return the draw value.
-        //storeTT(position, MAX_SEARCH_DEPTH, TT_EntryType.EXACT, Evaluation.DRAW, Move.NOMOVE);
-        return Evaluation.DRAW;
-      }
+      // We have a check mate. Return a -CHECKMATE.
+      alpha = -Evaluation.CHECKMATE + ply;
+      assert ttType == TT_EntryType.ALPHA;
     }
 
-    storeTT(position, 1, ttType, alpha, bestNodeMove);
+    assert alpha != Evaluation.NOVALUE;
+    assert alpha > Evaluation.MIN;
+    storeTT(position, alpha, ttType, 0, bestNodeMove);
     return alpha;
   }
 
+  /**
+   * Call the Evaluator evaluation and updates some statistics
+   *
+   * @param position
+   * @param ply
+   * @param alpha
+   * @param beta
+   * @return the evaluation value of the position
+   */
   private int evaluate(Position position, int ply, int alpha, int beta) {
 
+    // count all leaf nodes evaluated
+    searchCounter.leafPositionsEvaluated++;
+
     // update some perft stats - no real performance hit here
-    int lastMove = position.getLastMove();
-    if (Move.getTarget(lastMove) != Piece.NOPIECE) {
-      searchCounter.captureCounter++;
-    }
-    if (Move.getMoveType(lastMove) == MoveType.ENPASSANT) {
-      searchCounter.enPassantCounter++;
-    }
+    final int lastMove = position.getLastMove();
+    if (Move.getTarget(lastMove) != Piece.NOPIECE) searchCounter.captureCounter++;
+    if (Move.getMoveType(lastMove) == MoveType.ENPASSANT) searchCounter.enPassantCounter++;
+    if (position.hasCheck()) searchCounter.checkCounter++;
 
     // special cases for PERFT testing as hasCheck is expensive
     // that is on normal searches we do not count checks and mates
     if (isPerftSearch()) {
-      if (position.hasCheck()) {
-        searchCounter.checkCounter++;
-        if (position.hasCheckMate()) {
-          searchCounter.checkMateCounter++;
-        }
-      }
-      searchCounter.leafPositionsEvaluated++;
+      if (position.hasCheckMate()) searchCounter.checkMateCounter++;
       return 1;
     }
 
-    // call the evaluation
-    // count all leaf nodes evaluated
-    final int value = evaluator.evaluate(position);
-    searchCounter.leafPositionsEvaluated++;
-
-    storeTT(position, 1, TT_EntryType.EXACT, value, Move.NOMOVE);
-    return value;
+    // do evaluation
+    return evaluator.evaluate(position);
   }
 
-  private void storeTT(final Position position, final int depthLeft, final byte ttType,
-                       final int value, int bestMove) {
-
-    assert depthLeft <= Byte.MAX_VALUE;
-    assert Math.abs(value) < Short.MAX_VALUE;
-
+  /**
+   * Stores position values and node best moves into the transposition table.
+   *
+   * @param position
+   * @param value
+   * @param ttType
+   * @param depthLeft
+   * @param bestMove
+   */
+  private void storeTT(final Position position, final int value, final byte ttType,
+                       final int depthLeft, int bestMove) {
     if (config.USE_TRANSPOSITION_TABLE && !isPerftSearch() && !stopSearch) {
+      assert depthLeft >= 0 && depthLeft <= MAX_SEARCH_DEPTH;
+      assert (value >= Evaluation.MIN && value <= Evaluation.MAX);
       transpositionTable.put(position, (short) value, ttType, (byte) depthLeft, bestMove);
     }
   }
 
+  /**
+   * Probes the transposition table. Translates and checks the parameters and also
+   * encapsulates the check for the type of entry/value (exact/alpha/beta). It also translates
+   * mate values to the correct ply.
+   * <p>
+   * Uses a small data structure TTHit as a return type.
+   *
+   * @param position
+   * @param depthLeft
+   * @param alpha
+   * @param beta
+   * @param ply
+   * @return
+   */
   private TTHit probeTT(final Position position, final int depthLeft, final int alpha,
-                        final int beta) {
+                        final int beta, final int ply) {
 
     if (config.USE_TRANSPOSITION_TABLE && !isPerftSearch()) {
+      assert alpha != Evaluation.NOVALUE;
+      assert beta != Evaluation.NOVALUE;
+      assert depthLeft >= 0 && depthLeft <= MAX_SEARCH_DEPTH;
+      assert ply >= 0 && ply <= Byte.MAX_VALUE;
+
       TT_Entry ttEntry = transpositionTable.get(position);
 
       if (ttEntry != null) {
@@ -1289,16 +1297,24 @@ public class Search implements Runnable {
 
         // hit
         searchCounter.nodeCache_Hits++;
-
         // return the depth as well
         hit.depth = ttEntry.depth;
-
         // get best move form last search of this node
         hit.bestMove = ttEntry.bestMove;
 
+        assert hit.type == TT_EntryType.NONE;
+
         // only if tt depth was equal or deeper
         if (ttEntry.depth >= depthLeft) {
+
           int value = ttEntry.value;
+          assert value != Evaluation.NOVALUE;
+
+          // correct the mate value as this has been recorded
+          // relative to a different ply
+          if (isCheckMateValue(value)) {
+            value = value > 0 ? value - ply : value + ply;
+          }
 
           // check the retrieved hash table entry
           if (ttEntry.type == TT_EntryType.EXACT) {
@@ -1327,7 +1343,25 @@ public class Search implements Runnable {
   }
 
   /**
-   * Configure time limits<br>
+   * Retrieves the PV line from the transposition table in root search.
+   *
+   * @param position
+   * @param depth
+   * @param pv
+   */
+  private void getPVLine(final Position position, final byte depth, final MoveList pv) {
+    TT_Entry ttEntry = transpositionTable.get(position);
+    if (ttEntry != null && ttEntry.bestMove != Move.NOMOVE) {
+      pv.add(ttEntry.bestMove);
+      position.makeMove(ttEntry.bestMove);
+      getPVLine(position, (byte) (depth - 1), pv);
+      position.undoMove();
+    }
+  }
+
+  /**
+   * Configure time limits-
+   *
    * Chooses if search mode is time per move or remaining time
    * and set time limits accordingly
    */
@@ -1366,7 +1400,7 @@ public class Search implements Runnable {
    * board for the moving side.
    *
    * @param position
-   * @return
+   * @return true if at least one officer is on the board, false otherwise.
    */
   private static boolean bigPiecePresent(Position position) {
     final int activePlayer = position.getNextPlayer().ordinal();
@@ -1380,13 +1414,18 @@ public class Search implements Runnable {
    * @param value
    * @return true if absolute value is a mate value, false otherwise
    */
-  private static boolean checkMateValue(int value) {
-    return Math.abs(value) > Evaluation.CHECKMATE_THRESHOLD;
+  private static boolean isCheckMateValue(int value) {
+    final int abs = Math.abs(value);
+    return abs >= Evaluation.CHECKMATE_THRESHOLD && abs <= Evaluation.CHECKMATE;
   }
 
+  /**
+   * @param value
+   * @return a UCI compatible string for th score in cp or in mate in ply
+   */
   private static String getScoreString(int value) {
     String scoreString;
-    if (checkMateValue(value)) {
+    if (isCheckMateValue(value)) {
       scoreString = "score mate ";
       scoreString += value < 0 ? "-" : "";
       scoreString += (Evaluation.CHECKMATE - Math.abs(value) + 1) / 2;
@@ -1404,6 +1443,10 @@ public class Search implements Runnable {
     return -Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR;
   }
 
+  /**
+   * @param position
+   * @return true it last move made on poistion was illegal (left the king in check)
+   */
   private boolean wasIllegalMove(final Position position) {
     return position.isAttacked(position.getNextPlayer(),
                                position.getKingSquares()[position.getNextPlayer()
@@ -1411,10 +1454,18 @@ public class Search implements Runnable {
                                                                  .ordinal()]);
   }
 
+  /**
+   * @return if configuration of search mode are in PERFT mode
+   */
   private boolean isPerftSearch() {
-    return config.PERFT || searchMode.isPerft();
+    return config.PERFT || (searchMode != null && searchMode.isPerft());
   }
 
+  /**
+   * Soft time limit is used in iterative deepening to decide if an new depth should even be started.
+   *
+   * @return true if soft time limit is reached, false otherwise
+   */
   private boolean softTimeLimitReached() {
     if (!searchMode.isTimeControl()) {
       return false;
@@ -1423,6 +1474,12 @@ public class Search implements Runnable {
     return stopSearch;
   }
 
+  /**
+   * Hard time limit is used to check time regularily in the search to stop the search when
+   * time is out
+   *
+   * @return true if hard time limit is reached, false otherwise
+   */
   private boolean hardTimeLimitReached() {
     if (!searchMode.isTimeControl()) {
       return false;
@@ -1431,14 +1488,28 @@ public class Search implements Runnable {
     return stopSearch;
   }
 
+  /**
+   * @return the elapsed time in ms since the start of the search
+   */
   private long elapsedTime() {
     return System.currentTimeMillis() - startTime;
   }
 
-  private long elapsedTime(final long stopTime) {
-    return stopTime - startTime;
+  /**
+   * @param t
+   * @returnthe elapsed time from the start of the search to the given t
+   */
+  private long elapsedTime(final long t) {
+    return t - startTime;
   }
 
+  /**
+   * Send the UCI info command line to the UI. Uses a ticker interval to avoid
+   * flooding the protocol. <code>UCI_UPDATE_INTERVAL</code> is used as a time
+   * interval in ms
+   *
+   * @param position
+   */
   private void sendUCIUpdate(final Position position) {
     // send current root move info to UCI every x milli seconds
     if (System.currentTimeMillis() - uciUpdateTicker >= UCI_UPDATE_INTERVAL) {
@@ -1562,7 +1633,9 @@ public class Search implements Runnable {
     }
   }
 
-  // struct for multi return value for TTHit
+  /**
+   * Simple data structure for return value when probing the transposition table.
+   */
   class TTHit {
     int  value    = Evaluation.NOVALUE;
     byte type     = TT_EntryType.NONE;
@@ -1571,7 +1644,7 @@ public class Search implements Runnable {
   }
 
   /**
-   * Convenience Wrapper class for all counters
+   * Convenience Wrapper class for all search data and counters
    */
   public class SearchCounter {
 
@@ -1609,11 +1682,12 @@ public class Search implements Runnable {
     int  minorPromotionPrunings = 0;
     int  mateDistancePrunings   = 0;
     int  nullMovePrunings       = 0;
+    int  nullMoveVerifications  = 0;
     int  lmrReductions          = 0;
 
     private void resetCounter() {
-      currentBestRootMove     = Move.NOMOVE;
-      currentBestRootValue    = Evaluation.NOVALUE;
+      currentBestRootMove = Move.NOMOVE;
+      currentBestRootValue = Evaluation.NOVALUE;
       currentIterationDepth = 0;
       currentSearchDepth = 0;
       currentExtraSearchDepth = 0;
@@ -1638,6 +1712,7 @@ public class Search implements Runnable {
       mateDistancePrunings = 0;
       minorPromotionPrunings = 0;
       nullMovePrunings = 0;
+      nullMoveVerifications = 0;
       lmrReductions = 0;
     }
 
@@ -1671,6 +1746,7 @@ public class Search implements Runnable {
              ", mateDistancePrunings=" + mateDistancePrunings +
              ", minorPromotionPrunings=" + minorPromotionPrunings +
              ", nullMovePrunings=" + nullMovePrunings +
+             ", nullMoveVerifications=" + nullMoveVerifications +
              ", lmrReductions=" + lmrReductions +
              '}';
       // @formatter:on
