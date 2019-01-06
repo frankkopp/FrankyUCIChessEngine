@@ -172,22 +172,35 @@
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
-                                <phase>deploy</phase>
                                 <configuration>
                                     <executable>"C:\Program Files (x86)\Jar2Exe Wizard\j2ewiz.exe"</executable>
-                                    <commandlineArgs>/jar
-                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\target\${project.artifactId}-${project.version}.jar
+                                    <commandlineArgs>
+                                        /jar
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\${project.artifactId}-${project.version}.jar
                                         /o
-                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\target\${project.artifactId}-${project.version}.exe
-                                        /m fko.FrankyEngine.Main /type console /minjre 1.8 /platform windows /checksum
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\${project.artifactId}-${project.version}.exe
+                                        /m
+                                        fko.FrankyEngine.Main
+                                        /type
+                                        console
+                                        /minjre
+                                        1.8
+                                        /platform
+                                        windows
+                                        /checksum
                                         /amd64
-                                        /pv ${project.version} /ve "ProductVersion=${project.version}" /ve
-                                        "ProductName=${project.artifactId} Chess Engine" /ve "LegalCopyright=Copyright
-                                        (c) 2018 by Frank
-                                        Kopp" /ve "FileDescription=Franky UCI Chess Engine"
+                                        /pv
+                                        ${project.version}
+                                        /ve
+                                        "ProductVersion=${project.version}"
+                                        /ve
+                                        "ProductName=${project.artifactId} Chess Engine"
+                                        /ve
+                                        "LegalCopyright=Copyright (c) 2018 by Frank Kopp"
+                                        /ve
+                                        "FileDescription=Franky UCI Chess Engine"
                                     </commandlineArgs>
-                                    <workingDirectory>C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework
-                                    </workingDirectory>
+                                    <workingDirectory>C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target</workingDirectory>
                                 </configuration>
                             </execution>
                             <execution>
@@ -195,17 +208,15 @@
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
-                                <phase>deploy</phase>
                                 <configuration>
                                     <executable>cmd.exe</executable>
                                     <commandlineArgs>
                                         /C
                                         COPY
-                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\target\*
-                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework\Releases
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\*
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\Releases
                                     </commandlineArgs>
-                                    <workingDirectory>C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\JavaUCIEngineFramework
-                                    </workingDirectory>
+                                    <workingDirectory>C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine</workingDirectory>
                                 </configuration>
                             </execution>
                         </executions>

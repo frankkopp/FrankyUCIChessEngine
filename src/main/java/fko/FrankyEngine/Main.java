@@ -61,7 +61,7 @@ public class Main {
    *
    * @param args command line options
    */
-  public static void main(final String[] args) throws JoranException {
+  public static void main(final String[] args) {
 
     Logger LOG = LoggerFactory.getLogger(Main.class);
 
