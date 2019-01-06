@@ -433,42 +433,6 @@ public class Search implements Runnable {
     // no iterative deepening
     int depth = searchMode.getStartDepth();
 
-    // ###############################################
-    // TT Lookup
-    if (config.USE_TT_ROOT && config.USE_TRANSPOSITION_TABLE) {
-      TTHit ttHit = probeTT(position, depth, alpha, beta, 0);
-      if (ttHit != null) {
-        // determine pv moves from TT
-        if (ttHit.bestMove != Move.NOMOVE) {
-          // sort found TT move as first root move
-          rootMoves.pushToHead(ttHit.bestMove);
-          searchCounter.currentBestRootMove = ttHit.bestMove;
-          // try to get PV line from TT
-          getPVLine(position, ttHit.depth, principalVariation[0]);
-        }
-        // update depth as we already searched these depths
-        if (ttHit.value != Evaluation.NOVALUE && ttHit.type == TT_EntryType.EXACT) {
-          searchCounter.currentBestRootValue = ttHit.value;
-          searchCounter.currentIterationDepth = depth;
-          depth = ttHit.depth;
-          if (isCheckMateValue(ttHit.value)) {
-            System.out.println();
-          }
-        }
-      }
-    }
-    // End TT Lookup
-    // ###############################################
-
-    // temporary best move - take the first move available
-    if (searchCounter.currentBestRootMove == Move.NOMOVE) {
-      searchCounter.currentBestRootMove = rootMoves.getMove(0);
-      principalVariation[0].add(rootMoves.getMove(0));
-    }
-
-    assert searchCounter.currentBestRootMove != Move.NOMOVE;
-    assert !principalVariation[0].empty();
-
     // prepare search result
     SearchResult searchResult = new SearchResult();
 
@@ -505,6 +469,42 @@ public class Search implements Runnable {
     // #############################
     // ### BEGIN Iterative Deepening
     do {
+
+      // ###############################################
+      // TT Lookup
+      if (config.USE_TT_ROOT && config.USE_TRANSPOSITION_TABLE) {
+        TTHit ttHit = probeTT(position, depth, alpha, beta, 0);
+        if (ttHit != null) {
+          // determine pv moves from TT
+          if (ttHit.bestMove != Move.NOMOVE) {
+            // sort found TT move as first root move
+            rootMoves.pushToHead(ttHit.bestMove);
+            searchCounter.currentBestRootMove = ttHit.bestMove;
+            // try to get PV line from TT
+            getPVLine(position, ttHit.depth, principalVariation[0]);
+          }
+          // update depth as we already searched these depths
+          if (ttHit.value != Evaluation.NOVALUE && ttHit.type == TT_EntryType.EXACT) {
+            searchCounter.currentBestRootValue = ttHit.value;
+            searchCounter.currentIterationDepth = depth;
+            depth = ttHit.depth + 1;
+            if (isCheckMateValue(ttHit.value)) {
+              System.out.println();
+            }
+          }
+        }
+      }
+      // End TT Lookup
+      // ###############################################
+
+      // temporary best move - take the first move available
+      if (searchCounter.currentBestRootMove == Move.NOMOVE) {
+        searchCounter.currentBestRootMove = rootMoves.getMove(0);
+        principalVariation[0].add(rootMoves.getMove(0));
+      }
+      assert searchCounter.currentBestRootMove != Move.NOMOVE;
+      assert !principalVariation[0].empty();
+
       searchCounter.currentIterationDepth = depth;
 
       // *******************************************
@@ -1052,7 +1052,7 @@ public class Search implements Runnable {
     // if we never had a beta cut off (cut-node) or found a better alpha (pv-node)
     // we have a all-node
     if (principalVariation[ply].empty()) {
-      boolean ALL_NODE  = true; // just to set a breakpoint while debugging
+      boolean ALL_NODE = true; // just to set a breakpoint while debugging
     }
 
     // if we did not have a legal move then we have a mate
@@ -1076,7 +1076,7 @@ public class Search implements Runnable {
    * After the normal search has reached its intended depth the search is extended for certain
    * moves. Typically this are moves which are capturing or checking. All other moves are called
    * "quiet" moves and therefore the term quiescence search (qsearch).
-   *
+   * <p>
    * A quiescence search is a special und usually simpler version of the normal search where only
    * certain moves are generated and searched deeper.
    *
@@ -1371,8 +1371,8 @@ public class Search implements Runnable {
               hit.type = TT_EntryType.BETA;
             }
           }
-          return hit;
         }
+        return hit;
       }
       // miss
       searchCounter.nodeCache_Misses++;

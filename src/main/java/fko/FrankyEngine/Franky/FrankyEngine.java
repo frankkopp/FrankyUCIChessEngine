@@ -42,20 +42,20 @@ import java.util.Properties;
  * Franky Engine for UCI GUIs
  * <p>
  * TODO:
- * Testing / Bug fixing
- * --------------------------------
- * Arena shows Illegal Moves
- * Arena shows forfeit for time
- * Mates found in lower depths lost in higher depths
+ *  Testing / Bug fixing
+ *  --------------------------------
+ *  Arena shows Illegal Moves (probably not 0.8 - better logging implemented)
+ *  Arena shows forfeit for time (needs more analysis
+ *  Mates found in lower depths lost in higher depths
  * <p>
  * <p>
  * TODO
- * Performance
- * --------------------------------
+ *  Performance
+ *  --------------------------------
  * <p>
  * TODO
- * Features
- * --------------------------------
+ *  Features
+ *  --------------------------------
  */
 public class FrankyEngine implements IUCIEngine {
 

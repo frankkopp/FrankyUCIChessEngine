@@ -726,27 +726,25 @@ public class SearchTest {
     // some of these make the search miss this mate at higher depths
     // might be a consequence from these "optimizations" might be a bug
     search.config.USE_NULL_MOVE_PRUNING = true;
-    search.config.NULL_MOVE_DEPTH = 3;
-    search.config.USE_VERIFY_NMP = true;
-    search.config.NULL_MOVE_REDUCTION_VERIFICATION = 4;
+    //    search.config.NULL_MOVE_DEPTH = 3;
+    //    search.config.USE_VERIFY_NMP = true;
+    //    search.config.NULL_MOVE_REDUCTION_VERIFICATION = 4;
 
-    search.config.USE_STATIC_NULL_PRUNING = true;
     search.config.USE_RAZOR_PRUNING = true;
-    search.config.USE_LMR = false;
+    search.config.USE_LMR = true;
+    search.config.USE_QUIESCENCE = true;
 
-    search.config.USE_QUIESCENCE = false;
-
-    int maxDepth = 10;
+    int maxDepth = 7;
     int moveTime = 0;
-    int mateIn = 0;
+    int mateIn = 3;
     boolean infinite = true;
 
     // mate in 3
     //    final int pliesToMate = 5;
     //    fen = "4r1b1/1p4B1/pN2pR2/RB2k3/1P2N2p/2p3b1/n2P1p1r/5K1n w - -";
     // mate in 5
-    final int pliesToMate = 9;
-    fen = "8/8/8/8/4K3/8/R7/4k3 w - -";
+    final int pliesToMate = 5;
+    fen = "6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - -";
     position = new Position(fen);
     searchMode =
       new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
