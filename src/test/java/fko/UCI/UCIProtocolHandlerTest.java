@@ -29,6 +29,7 @@ import fko.FrankyEngine.Franky.FrankyEngine;
 import fko.FrankyEngine.Franky.Move;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -413,6 +414,25 @@ class UCIProtocolHandlerTest {
     assertFalse(engine.isSearching());
 
     commandToEngine("quit");
+  }
+
+  @Test
+  @Disabled
+  void debuggingTest() throws InterruptedException, IOException {
+    commandToEngine("ucinewgame");
+    commandToEngine("position startpos moves g1f3 c7c5 e2e3 g8f6 c2c4 g7g6 b1c3 f8g7 d2d4 c5d4 e3d4 e8g8 d4d5 e7e5 f1e2 d7d6 e1g1 c8g4 c1e3 b8d7 h2h3 g4f3 g2f3 d8e7 d1c2 a7a5 a2a4 d7c5 g1h2 f6h5 f1g1 f7f5 e3g5 e7d7 e2d3 g8f7 d3f1 g7f6 g5h6 f8g8 h6e3 h5f4 f1e2 h7h5 e2f1 g8h8 e3d2 f6h4 d2f4 e5f4 a1b1 h4f6 b1e1 f6c3 b2c3 h8g8 c2d2 b7b6 d2f4 a8d8 f4h6 d8b8 g1g2 b8b7 h6h7 g8g7 h7h6 d7a4 h6e3 g7g8 h3h4 b6b5 e3f4 a4c2 e1e3 c2b1 g2g1 b1a2 h2g3 b5c4 f1c4 a2a4 g1e1 g8a8 f4d4 a8b8 g3f4 a4d7 e1h1 d7d8 e3e1 a5a4 e1f1 b7b2 f1g1 d8h8 d4h8 b8h8 f4g3 a4a3 g1a1 h8a8 a1b1 c5a4 b1a1 a8c8 c4a6 c8c3 h1c1 a3a2 c1e1 c3c5 e1e6 a4c3 a1e1 c5c7 e1a1 b2b1 a1a2 c3a2 e6d6 a2c3 d6d8 b1d1 d5d6 c7c6 a6c8 c3e2 g3h2 c6c4 c8e6 f7e6 d8e8 e6f6 f3f4 e2f4 e8f8 f6e5 f8b8 d1d3 b8e8 f4e6 h2g2 c4h4 g2g1 h4a4 e8g8 a4a1 g1h2 g6g5 g8c8 g5g4 c8e8 e5d6 e8e6 d6e6 f2f3 h5h4 f3g4 f5g4");
+    commandToEngine("go ponder wtime 87653 btime 57944");
+    waitUntilSearching();
+    while (engine.isSearching()) {
+      while (fromHandlerReader.ready()) {
+        final String line = getResponseFromEngine();
+        assertTrue(line.startsWith("info ") || line.startsWith("bestmove "));
+        if (line.startsWith("info depth 10 ")) {
+          commandToEngine("ponderhit");
+          break;
+        }
+      }
+    }
   }
 
   private void commandToEngine(String s) throws InterruptedException {
