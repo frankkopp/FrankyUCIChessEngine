@@ -1019,7 +1019,7 @@ public class Search implements Runnable {
               }
             }
             searchCounter.prunings++;
-            storeTT(position, beta, TT_EntryType.BETA, depth, Move.NOMOVE);
+            storeTT(position, beta, TT_EntryType.BETA, depth, bestNodeMove);
             return beta; // return beta in a fail-hard / value in fail-soft
           }
         }
