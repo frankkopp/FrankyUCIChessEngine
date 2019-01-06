@@ -63,7 +63,7 @@ public class Search implements Runnable {
   private static final boolean DO_NULL    = true;
   private static final boolean NO_NULL    = false;
   private static final boolean PV_NODE    = true;
-  private static final boolean CUT_NODE   = false;
+  private static final boolean NPV_NODE   = false;
   private static final int     DEPTH_NONE = 0;
 
   // configuration object
@@ -490,6 +490,18 @@ public class Search implements Runnable {
       LOG.debug("Start iterative deepening now");
     }
 
+    // send info to UCI
+    // @formatter:off
+      engine.sendInfoToUCI("depth " + depth
+                           + " seldepth " + searchCounter.currentExtraSearchDepth
+                           + " multipv 1"
+                           + " " + getScoreString(searchCounter.currentBestRootValue)
+                           + " nodes " + searchCounter.nodesVisited
+                           + " nps " + 1000 * (searchCounter.nodesVisited / (elapsedTime()+2L))
+                           + " time " + elapsedTime()
+                           + " pv " + principalVariation[0].toNotationString());
+      // @formatter:on
+
     // #############################
     // ### BEGIN Iterative Deepening
     do {
@@ -638,7 +650,7 @@ public class Search implements Runnable {
         // is > alpha we found a better move and need to re-search the move to find
         // the correct value (and not just a bound).
         value =
-          -search(position, depth - 1 - lmrReduce, ply + 1, -alpha - 1, -alpha, CUT_NODE, DO_NULL);
+          -search(position, depth - 1 - lmrReduce, ply + 1, -alpha - 1, -alpha, NPV_NODE, DO_NULL);
         if (value > alpha && !stopSearch) {
           searchCounter.pvs_root_researches++;
           value = -search(position, depth - 1, ply + 1, -beta, -alpha, PV_NODE, DO_NULL);
@@ -679,7 +691,7 @@ public class Search implements Runnable {
     // #########################################################
 
     // store the best alpha
-    storeTT(position, alpha, TT_EntryType.EXACT, depth, Move.NOMOVE);
+    storeTT(position, alpha, TT_EntryType.EXACT, depth, searchCounter.currentBestRootMove);
 
     // we use a new
     if (config.USE_ROOT_MOVES_SORT) {
@@ -810,7 +822,7 @@ public class Search implements Runnable {
     ) {
       final int threshold = alpha - config.RAZOR_PRUNING_MARGIN;
       if (staticEval <= threshold ){
-        return qsearch(position, DEPTH_NONE, ply, alpha, beta, CUT_NODE);
+        return qsearch(position, DEPTH_NONE, ply, alpha, beta, NPV_NODE);
       }
     }
     // @formatter:on
@@ -836,7 +848,7 @@ public class Search implements Runnable {
       if (config.USE_VERIFY_NMP) r++;
 
       position.makeNullMove();
-      int nullValue = -search(position, depth - r, ply + 1, -beta, -beta + 1, CUT_NODE, NO_NULL);
+      int nullValue = -search(position, depth - r, ply + 1, -beta, -beta + 1, NPV_NODE, NO_NULL);
       position.undoNullMove();
 
       // Verify on beta exceeding
@@ -963,7 +975,7 @@ public class Search implements Runnable {
         // Try null window search to prove the move is worse or at best equal the
         // known alpha (best value so far in his ply)
         value =
-          -search(position, depth - 1 - lmrReduce, ply + 1, -alpha - 1, -alpha, CUT_NODE, DO_NULL);
+          -search(position, depth - 1 - lmrReduce, ply + 1, -alpha - 1, -alpha, NPV_NODE, DO_NULL);
         if (value > alpha && !stopSearch) {
           searchCounter.pvs_researches++;
           // We found a better move a need to get the exact value be doing a full
