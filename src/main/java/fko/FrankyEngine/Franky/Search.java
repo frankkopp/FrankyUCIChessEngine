@@ -675,11 +675,15 @@ public class Search implements Runnable {
       // Evaluate the calculated value and compare to current best move
       if (value >= beta) {
         // we ignore beta in root as it will always be +INF
+        // Root node is always a PV_NODE
+        // this could change when we start using aspiration windows
         LOG.warn("value >= beta at Root Search");
       }
       // if we indeed found a better move (value > alpha) then we need to update
       // the PV (best move) and also store the the new exact value in the TT:
       if (value > alpha) {
+        // PV_NODE
+        // we have a new PV - we overwrite the old one but could also keep it
         alpha = value;
         MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
         searchCounter.currentBestRootMove = move;
@@ -689,6 +693,11 @@ public class Search implements Runnable {
     } // end for root moves loop
     // ##### Iterate through all available moves
     // #########################################################
+
+    // as the root node is always a PV_NODE we must have a move here that raised
+    // our minimum alpha
+    assert searchCounter.currentBestRootMove != Move.NOMOVE;
+    assert searchCounter.currentBestRootValue >= Evaluation.MIN;
 
     // store the best alpha
     storeTT(position, alpha, TT_EntryType.EXACT, depth, searchCounter.currentBestRootMove);
@@ -1008,6 +1017,7 @@ public class Search implements Runnable {
         // opponent can/will avoid this position altogether so we can stop search
         // this node
         if (value >= beta) { // fail-high
+          boolean CUT_NODE = true; // just to set breakpooints
           if (config.USE_ALPHABETA_PRUNING) {
             // save killer moves so they will be search earlier on following nodes
             if (config.USE_KILLER_MOVES && Move.getTarget(move).equals(Piece.NOPIECE)) {
@@ -1030,6 +1040,7 @@ public class Search implements Runnable {
         // but not for the ply. We will return alpha and store a alpha node in
         // TT.
         if (value > alpha) {
+          boolean PV_NODE = true; // just to set breakpoint
           alpha = value;
           MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
           ttType = TT_EntryType.EXACT;
@@ -1038,9 +1049,10 @@ public class Search implements Runnable {
 
     } // iteration over all moves
 
-    // TODO: what happens when we never find a move higher then alpha in this ply??
+    // if we never had a beta cut off (cut-node) or found a better alpha (pv-node)
+    // we have a all-node
     if (principalVariation[ply].empty()) {
-      int stop = 1; // just to set a breakpoint while debugging
+      boolean ALL_NODE  = true; // just to set a breakpoint while debugging
     }
 
     // if we did not have a legal move then we have a mate
