@@ -40,6 +40,22 @@ import java.util.Properties;
 
 /**
  * Franky Engine for UCI GUIs
+ * <p>
+ * TODO:
+ * Testing / Bug fixing
+ * --------------------------------
+ * Arena shows Illegal Moves
+ * Arena shows forfeit for time
+ * Mates found in lower depths lost in higher depths
+ * <p>
+ * <p>
+ * TODO
+ * Performance
+ * --------------------------------
+ * <p>
+ * TODO
+ * Features
+ * --------------------------------
  */
 public class FrankyEngine implements IUCIEngine {
 
@@ -88,7 +104,9 @@ public class FrankyEngine implements IUCIEngine {
     initOptions();
 
     search = new Search(this, config);
-    position = new Position(); // default is standard start board
+    position = new Position();
+
+    // TODO: Welcome message
   }
 
   /**
@@ -395,7 +413,7 @@ public class FrankyEngine implements IUCIEngine {
         break;
       case "Number_Killer_Moves":
         config.NO_KILLER_MOVES = Integer.valueOf(value);
-        msg = "Number of Killer Moves set to " + config.NO_KILLER_MOVES ;
+        msg = "Number of Killer Moves set to " + config.NO_KILLER_MOVES;
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
@@ -417,13 +435,13 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-//      case "Use_Aspiration_Window_Search":
-//        config.USE_ASPIRATION_WINDOW = Boolean.valueOf(value);
-//        msg =
-//          "Use Aspiration Window Search set to " + (config.USE_ASPIRATION_WINDOW ? "On" : "Off");
-//        LOG.info(msg);
-//        uciProtocolHandler.sendInfoStringToUCI(msg);
-//        break;
+      //      case "Use_Aspiration_Window_Search":
+      //        config.USE_ASPIRATION_WINDOW = Boolean.valueOf(value);
+      //        msg =
+      //          "Use Aspiration Window Search set to " + (config.USE_ASPIRATION_WINDOW ? "On" : "Off");
+      //        LOG.info(msg);
+      //        uciProtocolHandler.sendInfoStringToUCI(msg);
+      //        break;
       default:
         LOG.error("Unknown option: {}", name);
         break;
@@ -522,6 +540,12 @@ public class FrankyEngine implements IUCIEngine {
 
   @Override
   public void sendResult(int bestMove, int ponderMove) {
+    if (!Move.isValid(bestMove)) {
+      LOG.error("Engine Best Move is invalid move!" + Move.toString(bestMove));
+      LOG.error("Position: " + position.toFENString());
+      LOG.error("Last Move: " + position.getLastMove());
+    }
+
     LOG.info(
       "Engine got Best Move: " + Move.toSimpleString(bestMove) + " [Ponder " + Move.toSimpleString(
         ponderMove) + "]");

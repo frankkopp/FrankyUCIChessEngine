@@ -215,7 +215,7 @@ public class Search implements Runnable {
           "Pondering has been stopped after ponder search has finished. " + "Send obsolete result");
         LOG.info("Search result was: {} PV {}", lastSearchResult.toString(),
                  principalVariation[0].toNotationString());
-        engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
+        sendUCIBestMove();
       } else {
         LOG.info("Pondering has been stopped. Ponder Miss!");
       }
@@ -311,7 +311,8 @@ public class Search implements Runnable {
         if (bookMove != Move.NOMOVE && Move.isValid(bookMove)) {
           LOG.info("Book move found: {}", Move.toString(bookMove));
           lastSearchResult.bestMove = bookMove;
-          engine.sendResult(lastSearchResult.bestMove, Move.NOMOVE);
+          lastSearchResult.ponderMove = Move.NOMOVE;
+          sendUCIBestMove();
           return;
         } else {
           LOG.info("No Book move found");
@@ -336,7 +337,7 @@ public class Search implements Runnable {
              principalVariation[0].toNotationString());
 
     // send result to engine
-    engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
+    sendUCIBestMove();
   }
 
   /**
@@ -361,7 +362,8 @@ public class Search implements Runnable {
         LOG.info("Ponderhit when ponder search already ended. Sending result.");
         LOG.info("Search result was: {} PV {}", lastSearchResult.toString(),
                  principalVariation[0].toNotationString());
-        engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
+
+        sendUCIBestMove();
       }
 
     } else {
@@ -1554,6 +1556,19 @@ public class Search implements Runnable {
       // @formatter:on
       uciUpdateTicker = System.currentTimeMillis();
     }
+  }
+
+  /**
+   * Sends the lastSearchResult to the UCI UI via the engine
+   */
+  private void sendUCIBestMove() {
+    if (!Move.isValid(lastSearchResult.bestMove)) {
+      LOG.error("Engine Best Move is invalid move!" + Move.toString(lastSearchResult.bestMove));
+      LOG.error("Position: " + currentPosition.toFENString());
+      LOG.error("Last Move: " + currentPosition.getLastMove());
+    }
+    assert Move.isValid(lastSearchResult.bestMove);
+    engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
   }
 
   /**
