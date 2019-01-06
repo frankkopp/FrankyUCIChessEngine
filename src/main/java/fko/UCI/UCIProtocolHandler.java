@@ -120,6 +120,9 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   @Override
   public void run() {
 
+    // start with uci command directly
+    commandUCI(null);
+
     final BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
 
     while (running) {

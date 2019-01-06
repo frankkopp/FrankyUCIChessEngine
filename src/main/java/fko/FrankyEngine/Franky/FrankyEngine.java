@@ -106,7 +106,18 @@ public class FrankyEngine implements IUCIEngine {
     search = new Search(this, config);
     position = new Position();
 
-    // TODO: Welcome message
+    // @formatter:off
+    System.out.printf("%n===================================================%n"
+                      + "%s%n"
+                      + "Java UCI Chess Engine%n"
+                      + "MIT License%n"
+                      + "Copyright (c) 2018 by %s %n"
+                      + "===================================================%n%n",
+                      iDName,
+                      iDAuthor
+                     );
+   // @formatter:on
+
   }
 
   /**
