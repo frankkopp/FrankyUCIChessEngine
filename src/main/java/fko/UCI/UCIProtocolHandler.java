@@ -133,6 +133,13 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
 
         // wait until a line is ready to be read
         final String readLine = in.readLine();
+
+        // Input is gone - probably application quit
+        if (readLine == null) {
+          COMLOG.info(">> {}", "EOF");
+          break;
+        }
+
         COMLOG.info(">> {}", readLine);
 
         // Scanner parses the line to tokenize it
