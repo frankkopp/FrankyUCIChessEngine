@@ -271,8 +271,8 @@ public class Search implements Runnable {
     if (isPerftSearch()) {
       LOG.info("****** PERFT SEARCH (" + searchMode.getMaxDepth() + ") *******");
     }
-    if (searchMode.isTimeControl() && searchMode.getMate() <= 0) {
-      LOG.info("****** TIMED SEARCH *******");
+    if (searchMode.isTimeControl() && searchMode.getMate() > 0) {
+      LOG.info("****** TIMED MATE SEARCH *******");
     }
     if (searchMode.isTimeControl()) {
       LOG.info("****** TIMED SEARCH *******");
@@ -454,17 +454,9 @@ public class Search implements Runnable {
       LOG.debug("Start iterative deepening now");
     }
 
-    // send info to UCI
-    // @formatter:off
-      engine.sendInfoToUCI("depth " + depth
-                           + " seldepth " + searchCounter.currentExtraSearchDepth
-                           + " multipv 1"
-                           + " " + getScoreString(searchCounter.currentBestRootValue)
-                           + " nodes " + searchCounter.nodesVisited
-                           + " nps " + 1000 * (searchCounter.nodesVisited / (elapsedTime()+2L))
-                           + " time " + elapsedTime()
-                           + " pv " + principalVariation[0].toNotationString());
-      // @formatter:on
+    // current search depth
+    searchCounter.currentSearchDepth = 0;
+    searchCounter.currentExtraSearchDepth = 0;
 
     // #############################
     // ### BEGIN Iterative Deepening
@@ -486,16 +478,18 @@ public class Search implements Runnable {
           // update depth as we already searched these depths
           if (ttHit.value != Evaluation.NOVALUE && ttHit.type == TT_EntryType.EXACT) {
             searchCounter.currentBestRootValue = ttHit.value;
-            searchCounter.currentIterationDepth = depth;
-            depth = ttHit.depth + 1;
-            if (isCheckMateValue(ttHit.value)) {
-              System.out.println();
+            if (ttHit.depth >= depth) {
+              depth = ttHit.depth + 1;
+              searchCounter.currentIterationDepth = depth;
+              LOG.debug("TT cached result of depth {}. Start depth is now {}", ttHit.depth, depth);
             }
           }
         }
       }
       // End TT Lookup
       // ###############################################
+
+      searchCounter.currentIterationDepth = depth;
 
       // temporary best move - take the first move available
       if (searchCounter.currentBestRootMove == Move.NOMOVE) {
@@ -504,8 +498,6 @@ public class Search implements Runnable {
       }
       assert searchCounter.currentBestRootMove != Move.NOMOVE;
       assert !principalVariation[0].empty();
-
-      searchCounter.currentIterationDepth = depth;
 
       // *******************************************
       // do search
@@ -592,10 +584,6 @@ public class Search implements Runnable {
 
     // root ply = 0
     final int ply = 0;
-
-    // current search depth
-    searchCounter.currentSearchDepth = 0;
-    searchCounter.currentExtraSearchDepth = 0;
 
     int numberOfSearchedMoves = 0;
 
@@ -690,14 +678,17 @@ public class Search implements Runnable {
         searchCounter.currentBestRootValue = alpha;
       }
 
+
     } // end for root moves loop
     // ##### Iterate through all available moves
     // #########################################################
 
     // as the root node is always a PV_NODE we must have a move here that raised
     // our minimum alpha
-    assert searchCounter.currentBestRootMove != Move.NOMOVE;
-    assert searchCounter.currentBestRootValue >= Evaluation.MIN;
+    if (!stopSearch) {
+      assert searchCounter.currentBestRootMove != Move.NOMOVE;
+      assert searchCounter.currentBestRootValue >= Evaluation.MIN;
+    }
 
     // store the best alpha
     storeTT(position, alpha, TT_EntryType.EXACT, depth, searchCounter.currentBestRootMove);
@@ -1388,6 +1379,7 @@ public class Search implements Runnable {
    * @param pv
    */
   private void getPVLine(final Position position, final byte depth, final MoveList pv) {
+    if (depth < 0) return;
     TT_Entry ttEntry = transpositionTable.get(position);
     if (ttEntry != null && ttEntry.bestMove != Move.NOMOVE) {
       pv.add(ttEntry.bestMove);
@@ -1567,16 +1559,16 @@ public class Search implements Runnable {
       if (config.UCI_ShowCurrLine) {
         engine.sendInfoToUCI("currline " + currentVariation.toNotationString());
       }
-      LOG.debug(searchCounter.toString());
-      LOG.debug(String.format("TT Entries %,d/%,d TT Updates %,d TT Collisions %,d "
-                              + "TT Hits %,d TT Misses %,d"
-                              , transpositionTable.getNumberOfEntries()
-                              , transpositionTable.getMaxEntries()
-                              , transpositionTable.getNumberOfUpdates()
-                              , transpositionTable.getNumberOfCollisions()
-                              , searchCounter.nodeCache_Hits
-                              , searchCounter.nodeCache_Misses
-                              ));
+//      LOG.debug(searchCounter.toString());
+//      LOG.debug(String.format("TT Entries %,d/%,d TT Updates %,d TT Collisions %,d "
+//                              + "TT Hits %,d TT Misses %,d"
+//                              , transpositionTable.getNumberOfEntries()
+//                              , transpositionTable.getMaxEntries()
+//                              , transpositionTable.getNumberOfUpdates()
+//                              , transpositionTable.getNumberOfCollisions()
+//                              , searchCounter.nodeCache_Hits
+//                              , searchCounter.nodeCache_Misses
+//                              ));
       // @formatter:on
       uciUpdateTicker = System.currentTimeMillis();
     }
@@ -1591,7 +1583,6 @@ public class Search implements Runnable {
       LOG.error("Position: " + currentPosition.toFENString());
       LOG.error("Last Move: " + currentPosition.getLastMove());
     }
-    assert Move.isValid(lastSearchResult.bestMove);
     engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
   }
 
