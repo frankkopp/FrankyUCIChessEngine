@@ -335,6 +335,12 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
+      case "UCI_ShowCurrLine":
+        config.UCI_ShowCurrLine = Boolean.valueOf(value);
+        msg = "Engine UCI_ShowCurrLine set to " + (config.UCI_ShowCurrLine ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
       case "Ponder":
         config.PONDER = Boolean.valueOf(value);
         msg = "Engine Ponder set to " + (config.PONDER ? "On" : "Off");
