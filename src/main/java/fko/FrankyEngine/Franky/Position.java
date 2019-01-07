@@ -27,6 +27,7 @@ package fko.FrankyEngine.Franky;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * This class represents the chess board and its position.<br>
@@ -165,7 +166,7 @@ public class Position {
   }
 
   public static void setZobristRandoms(final int seed) {
-    SecureRandom random = new SecureRandom();
+    Random random = new Random(1234567890);
 
     // all pieces on all squares
     for (Piece p : Piece.values) {

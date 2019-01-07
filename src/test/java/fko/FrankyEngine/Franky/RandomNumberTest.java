@@ -41,7 +41,7 @@ class RandomNumberTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(RandomNumberTest.class);
 
-  private       Random              random64       = new Random();
+  private       Random              random64       = new Random(1234567890);
   private final SecureRandom        random64Secure = new SecureRandom();
   private final RandomDataGenerator random64Apache = new RandomDataGenerator();
 
