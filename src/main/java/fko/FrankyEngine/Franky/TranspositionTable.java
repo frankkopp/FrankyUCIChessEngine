@@ -77,7 +77,7 @@ public class TranspositionTable {
     LOG.debug("{}", String.format("Current used memory: %,d MB", usedMemory / KB));
     LOG.debug("{}", String.format("Current free memory: %,d MB", freeMemory / KB));
     LOG.debug("{}", String.format("Current free memory: %,d MB", freeMemory / KB));
-    LOG.debug("{}", String.format("Current memory claim for TT: %,d MB", ttMemory / KB));
+    LOG.debug("{}", String.format("Memory available for TT: %,d MB", ttMemory / KB));
 
     if (ttMemory < sizeInByte) {
       LOG.warn(

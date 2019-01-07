@@ -199,6 +199,10 @@
                                         "LegalCopyright=Copyright (c) 2018 by Frank Kopp"
                                         /ve
                                         "FileDescription=Franky UCI Chess Engine"
+                                        /config
+                                        "option -Xms1024m"
+                                        /config
+                                        "option -Xmx8192m"
                                     </commandlineArgs>
                                     <workingDirectory>C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target</workingDirectory>
                                 </configuration>

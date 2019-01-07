@@ -32,6 +32,7 @@ import fko.UCI.UCIOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +118,6 @@ public class FrankyEngine implements IUCIEngine {
                       iDAuthor
                      );
    // @formatter:on
-
   }
 
   /**
@@ -148,7 +148,7 @@ public class FrankyEngine implements IUCIEngine {
                 UCIOptionType.spin,
                 "" + config.HASH_SIZE,
                 "1",
-                "512",
+                "4096",
                 ""));
     iUciOptions.add(
         new UCIOption("Clear Hash",

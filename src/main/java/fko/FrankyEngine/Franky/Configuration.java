@@ -42,7 +42,7 @@ public class Configuration {
   /**
    * Hash Size
    */
-  public int HASH_SIZE = 256;
+  public int HASH_SIZE = 1024;
 
   /**
    * Ponder

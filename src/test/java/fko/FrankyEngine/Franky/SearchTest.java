@@ -618,77 +618,6 @@ public class SearchTest {
 
     // problematic positions:
 
-    // 8/2P1P1P1/3PkP2/8/4K3/8/8/8 w - - 0 1
-    // result PV shows too moves from same player
-    // does not find mate 3
-
-    // Franky-0.8:
-    // 1/5	00:00	 73	24k	+12,51	Na6-b4+ Kc6-c7 Nd6xb5+ Kc7-c8 Nb4xa2
-    // 2/5	00:00	 228	76k	+12,51	Na6-b4+ Kc6-c7
-    // 3/12	00:00	 3k	430k	+12,51	Na6-b4+ Kc6-c7 Nd6xb5+
-    // 4/12	00:00	 5k	497k	+12,51	Na6-b4+ Kc6-c7 Nd6xb5+ Kc7-c8
-    // 5/15	00:00	 99k	800k	+12,51	Na6-b4+ Kc6-c7 Nd6xb5+ Kc7-c8 Nb4xa2
-    // 6/15	00:00	 123k	778k	+12,51	Na6-b4+ Kc6-c7 Nb4-a6+ Kc7-c6 Qd4-h4 g6-g5 Qh4xg5 f7-f6 Qg5xf6
-    // 7/20	00:01	 894k	873k	+13,01	Na6-b4+ Kc6-c7 Qd4-c3+ Ba2-c4 Nd6xb5+ Kc7-d8 Qc3xc4
-    // 8/20	00:01	 1.154k	877k	+13,83	Na6-b4+ Kc6-c7 Nb4xa2 g6-g5 Qd4-c3+ Kc7-d8 Qc3-c8+ Kd8-e7 Qc8xa8
-    // 9/22	00:04	 4.487k	1.049k	+M5	Na6-b4+ Kc6-c7 Nb4xa2 g6-g5 Qd4-c3+ Kc7-d8 Qc3-c8+ Kd8-e7 Qc8-e8+ <<<<<<<<<<<<<<<<<<
-    // 10/22	00:06	 6.965k	1.023k	+M6	Na6-b4+ Kc6-c7 Nb4xa2 Kc7-d8 Qd4-e4 Na8-c7 Bg3-h4+ g6-g5 Bh4xg5+ f7-f6 Bg5xf6+ <<<<<<<<<<<<<<<<<<
-    // 11/25	00:11	 11.892k	1.033k	+M5	Na6-b4+ Kc6-c7 Qd4-h4 f7-f6 Qh4-h8 f6xe5 Bg3xe5 g6-g5 Qh8-c8+ <<<<<<<<<<<<<<<<<<
-
-    // - finds mate in
-    // "6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - -"
-    //    Franky-0.8:
-    //        1/6	00:00	 81	40k	-2,66	Nxh6+ Kg5
-    //        2/10	00:00	 510	255k	-2,66	Nxh6+ Kg5
-    //        3/13	00:00	 6k	167k	-2,16	Nxh6+ Kg5 Nf7+ Kg4
-    //        4/11	00:00	 9k	98k	-1,88	Nxh6+ Kg5 Nf7+ Kf5 Bxh3+ Bg4
-    //        5/23	00:00	 224k	318k	+M3	Rb6 cxd4 Rf6 dxe3 Nxe3+ <<<<<<<<<<<<<<<<<<
-    //        6/22	00:01	 402k	338k	-1,88	Nxh6+ Kg5 Nf7+ Kf5 Bxh3+ Bg4 <<<<<<<<<<<<<<<<<<
-    //        7/26	00:03	 1.415k	398k	+2,02	f4 Kf5 Bxh3+ Bg4 Nxh6+ Ke6 Bxg4+
-    //        8/26	00:08	 3.463k	432k	+2,02	f4 Kf5 Bxh3+ Bg4 Nxh6+ Ke6 Bxg4+ Kd6
-    //        9/29	00:32	 15.919k	495k	+M4	Rf3 Bxc7 Bf6 e3 Nxh6+ Kxf3 Rxe3+
-    //        10/25	00:38	 19.435k	501k	+M3	Rb6 cxd4 Rf6 dxe3 Nxe3+
-
-    // can't find mate after 10 plies / very slow search
-    // r3r3/p1p2p1k/3p2pp/2p5/2P2n2/2N2B2/PPR1PP1q/3RQK2 b - - 0 1
-    //    Franky-0.8:
-    //        6/15	00:00	 300k	434k	-1,25	Qh3+ Kg1 Rab8 Nd5 Nxd5 cxd5
-    //        7/19	00:04	 2.369k	563k	+0,43	Rac8 Rdc1 Re3 Ne4 Rxf3 Ng5+ hxg5 exf3
-    //        8/24	00:20	 10.987k	548k	-1,41	Re5 Ne4 Qh3+ Kg1 Rb8 b3 Qe6 Qc3
-    //        9/28	02:15	 56.966k	421k	-0,71	Qh3+ Kg1 Rac8 Qd2 Qh4 e4 Nh3+ Kh2 Nxf2+ Kg1
-    //        10/26	03:40	 85.856k	388k	-0,54	Re5 Ne4 Qh3+ Kg1 Qf5 Nf6+ Kg7 Qc3 Nxe2+ Rxe2 Qxf6
-
-    // found M4 then went to M5 again
-    // n7/3p1p2/NpkNp1p1/1p2P3/3Q4/6B1/b7/4K3 w - - 0 1
-    // Franky-0.8:
-    // 1/5	00:00	 73	36k	+12,51	Nb4+ Kc7 Nxb5+ Kc8 Nxa2
-    // 2/5	00:00	 229	114k	+12,51	Nb4+ Kc7
-    // 3/11	00:00	 3k	168k	+12,51	Nb4+ Kc7 Nxb5+
-    // 4/9	00:00	 5k	283k	+12,51	Nb4+ Kc7 Nxb5+ Kd8 Nxa2
-    // 5/15	00:00	 92k	529k	+12,51	Nb4+ Kc7 Nxb5+ Kc8 Nxa2
-    // 6/14	00:00	 140k	493k	+12,91	Nb4+ Kc7 Nxa2 f5 Nb4 g5 Nxb5+ Kc8
-    // 7/19	00:01	 1.060k	599k	+13,15	Nb4+ Kc7 Nxa2 f5 exf6 g5 Nxb5+ Kc6
-    // 8/18	00:02	 1.618k	562k	+13,93	Nb4+ Kc7 Nxa2 f6 Qc3+ Kd8 Qf3 fxe5 Qxa8+ Ke7 Bxe5
-    // 9/22	00:12	 8.081k	653k	+M5	Qa1 Bd5 Nb4+ Kc7 Nxd5+ exd5 Qxa8 d4 Nxb5+
-    // 10/24	00:19	 12.505k	648k	+M5	Nb4+ Kc7 Qh4 f6 Qh8 fxe5 Bxe5 g5 Qc8+
-    // 11/24	00:30	 19.145k	622k	+M4	Qg1 g5 Bf2 Kd5 Bxb6 Nxb6 Qc5+ <<<<<<<<<<<<<<<<<<
-    // 12/26	00:57	 33.514k	580k	+M5	Qg1 Bc4 Qh1+ Bd5 Qh8 Nc7 Qc8 b4 Qxc7+ <<<<<<<<<<<<<<<<<<
-
-    // finds M§ which is wrong!!
-    // K6Q/1p6/pPq4P/P2p2P1/4pP1N/7k/n5R1/1n2BB2 w - - 0 1
-    // Franky-0.8:
-    // 1/6	00:00	 80	40k	+14,05	Rc2+ Kg4 Rxc6 bxc6
-    // 2/11	00:00	 685	38k	+14,05	Rc2+ Kg4
-    // 3/14	00:00	 9k	250k	+14,05	Rc2+ Kg4 Rxc6
-    // 4/13	00:00	 19k	284k	+14,05	Rc2+ Kg4 Rxc6 bxc6
-    // 5/18	00:00	 284k	393k	+19,70	Ng6 Nbc3 Ne5 Qe8+ Qxe8
-    // 6/16	00:01	 491k	401k	+15,01	Qf8 Qe6 Rxa2+ Kg4 Rb2 Nc3 Bxc3 Kxh4 Kxb7
-    // 7/20	00:02	 1.111k	444k	+M3	Rg1+ Kh2 Qb2+ Kxg1 Qg2+  <<<<<<<<<<<<<<<<<<
-    // 8/22	00:04	 2.409k	505k	+M4	Rg1+ Kh2 Qb2+ Nd2 Qxd2+ Kxg1 Qg2+
-    // 9/21	00:06	 3.814k	548k	+M4	Rg1+ Kh2 Qb2+ Nd2 Qxd2+ Kxg1 Qg2+
-    // 10/23	00:23	 12.141k	512k	+M5	Rg1+ Kh2 Bg3+ Kxg1 Qd4+ e3 Qxe3+ Kxf1 Qf2+
-    // 11/23	00:58	 27.067k	461k	+M4	Bxa6 bxa6+ b7 Qxh6 gxh6 Nd2 Qc8+
-
     // Found M5 in M4 which is wrong!!!
     // r2r4/1p1R3p/5pk1/b1B1Pp2/p4P2/P7/1P5P/1K1R4 w - - 0 1
     // Franky-0.8:
@@ -725,17 +654,15 @@ public class SearchTest {
     // 14/21	01:24	 52.191k	614k	+7,35	Rc2 a4 Re1 a3 Ree2 Bd4 Re1+
     // 15/24	04:33	 174.777k	638k	+7,35	Rc2 a4 Rf3 Bd4 Rf1+ Bg1
 
-    //depth 9  seldepth 22 multipv 1 score mate 5 pv a6b4 c6c7 b4a2 g6g5 d4c3 c7d8 c3c8 d8e7 c8e8
-    //depth 10 seldepth 22 multipv 1 score mate 6 pv a6b4 c6c7 b4a2 c7d8 d4e4 a8c7 g3h4 g6g5 h4g5 f7f6 g5f6
-    //depth 11 seldepth 24 multipv 1 score mate 5 pv a6b4 c6c7 d4h4 f7f6 h4h8 f6e5 g3e5 g6g5 h8c8
 
-    int maxDepth = 10;
+    int maxDepth = 8;
     int moveTime = 0;
     int mateIn = 4;
     boolean infinite = false;
     int pliesToMate = 7;
-    String fen = "n7/3p1p2/NpkNp1p1/1p2P3/3Q4/6B1/b7/4K3 w - -";
+    String fen = "r2r4/1p1R3p/5p1k/b1B1Pp2/p4P2/P7/1P5P/1K4R1 w - - 0 2";
 
+    // these should not change result
     search.config.USE_ALPHABETA_PRUNING = true;
     search.config.USE_ROOT_MOVES_SORT = true;
     search.config.USE_PVS = true;
@@ -745,6 +672,7 @@ public class SearchTest {
     search.config.USE_MATE_DISTANCE_PRUNING = true;
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
 
+    // these can change result
     // some of these make the search miss this mate at higher depths
     // might be a consequence from these "optimizations" might be a bug
     search.config.USE_NULL_MOVE_PRUNING = true;

@@ -816,24 +816,6 @@ public class Search implements Runnable {
     // ###############################################
 
     // ###############################################
-    // RAZORING
-    // @formatter:off
-    if (config.USE_RAZOR_PRUNING
-        && !isPerftSearch()
-        && !pvNode
-        && depth <= config.RAZOR_PRUNING_DEPTH
-        && !position.hasCheck()
-    ) {
-      final int threshold = alpha - config.RAZOR_PRUNING_MARGIN;
-      if (staticEval <= threshold ){
-        return qsearch(position, DEPTH_NONE, ply, alpha, beta, NPV_NODE);
-      }
-    }
-    // @formatter:on
-    // RAZORING
-    // ###############################################
-
-    // ###############################################
     // NULL MOVE PRUNING
     //mateThreat[ply] = false;
     // @formatter:off
@@ -875,6 +857,26 @@ public class Search implements Runnable {
       }
     }
     // NULL MOVE PRUNING
+    // ###############################################
+
+    // ###############################################
+    // RAZORING
+    // @formatter:off
+    if (config.USE_RAZOR_PRUNING
+        && !isPerftSearch()
+        && !pvNode
+        && depth <= config.RAZOR_PRUNING_DEPTH
+        && !position.hasCheck()
+        && !mateThreat[ply]
+        && !isCheckMateValue(beta)
+    ) {
+      final int threshold = alpha - config.RAZOR_PRUNING_MARGIN;
+      if (staticEval <= threshold ){
+        return qsearch(position, DEPTH_NONE, ply, alpha, beta, NPV_NODE);
+      }
+    }
+    // @formatter:on
+    // RAZORING
     // ###############################################
 
     // needed to remember if we even had a legal move
@@ -949,6 +951,7 @@ public class Search implements Runnable {
           && !pvNode
           && !position.hasCheck()
           && !mateThreat[ply]
+          && !isCheckMateValue(beta)
           && Move.getTarget(move).equals(Piece.NOPIECE)
           && !Move.getMoveType(move).equals(MoveType.PROMOTION)
           && !killerMoves[ply].contains(move)
@@ -1020,6 +1023,8 @@ public class Search implements Runnable {
               }
             }
             searchCounter.prunings++;
+            // store the bestNodeMove any way as this is the a refutation and
+            // should be checked in other nodes very early
             storeTT(position, beta, TT_EntryType.BETA, depth, bestNodeMove);
             return beta; // return beta in a fail-hard / value in fail-soft
           }
