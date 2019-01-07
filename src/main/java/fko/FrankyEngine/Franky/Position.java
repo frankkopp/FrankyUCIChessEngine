@@ -62,7 +62,7 @@ public class Position {
   private static final int BOARDSIZE = 128;
 
   /* Max History */
-  private static final int MAX_HISTORY = 255;
+  private static final int MAX_HISTORY = 512;
 
   /*
    * The zobrist key to use as a hash key in transposition tables
