@@ -128,7 +128,7 @@ public class TranspositionTable {
     assert value > Evaluation.NOVALUE;
     assert (value >= Evaluation.MIN && value <= Evaluation.MAX);
 
-    final int hash = Long.hashCode(position.getZobristKey());
+    final int hash = getHash(position.getZobristKey());
 
     // new value
     if (entries[hash].key == 0) {
@@ -186,7 +186,7 @@ public class TranspositionTable {
    * @return value for key or <tt>Integer.MIN_VALUE</tt> if not found
    */
   public TT_Entry get(Position position) {
-    final int hash = Long.hashCode(position.getZobristKey());
+    final int hash = getHash(position.getZobristKey());
     if (entries[hash].key == position.getZobristKey()) { // hash hit
       entries[hash].age = (byte) Math.max(entries[hash].age - 1, 0);
       return entries[hash];
@@ -224,6 +224,16 @@ public class TranspositionTable {
              .filter(i -> entries[i].key != 0)
              .forEach(
                i -> entries[i].age = (byte) Math.min(entries[i].age + 1, Byte.MAX_VALUE - 1));
+  }
+
+  /**
+   * TODO: better hash function?
+   *
+   * @param key
+   * @return returns a hash key
+   */
+  private int getHash(long key) {
+    return (int) (key % maxNumberOfEntries);
   }
 
   /**
