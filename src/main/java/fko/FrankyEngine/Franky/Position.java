@@ -27,6 +27,7 @@ package fko.FrankyEngine.Franky;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 
+import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
@@ -64,12 +65,6 @@ public class Position {
 
   /* Max History */
   private static final int MAX_HISTORY = 255;
-
-  // Random generator for use with zobrist hash keys
-  // Uses build in Random() before but assume better results with this one.
-  // For the transposition table is imperative to have good random
-  // values to calculate a well spread zobrist key.
-  private static RandomDataGenerator random = new RandomDataGenerator();
 
   /*
    * The zobrist key to use as a hash key in transposition tables
@@ -168,32 +163,29 @@ public class Position {
   }
 
   public static void setZobristRandoms(final int seed) {
-    random = new RandomDataGenerator();
-    random.getRandomGenerator().setSeed(seed);
-    final long lowerRandom = 0;
-    final long higherRandom = Long.MAX_VALUE;
+    SecureRandom random = new SecureRandom();
 
     // all pieces on all squares
     for (Piece p : Piece.values) {
       for (Square s : Square.values) {
-        pieceZobrist[p.ordinal()][s.ordinal()] = random.nextLong(lowerRandom, higherRandom);
+        pieceZobrist[p.ordinal()][s.ordinal()] = Math.abs(random.nextLong());
       }
     }
 
     // all castling combinations
-    castlingWK_Zobrist = random.nextLong(lowerRandom, higherRandom);
-    castlingWQ_Zobrist = random.nextLong(lowerRandom, higherRandom);
-    castlingBK_Zobrist = random.nextLong(lowerRandom, higherRandom);
-    castlingBQ_Zobrist = random.nextLong(lowerRandom, higherRandom);
+    castlingWK_Zobrist = Math.abs(random.nextLong());
+    castlingWQ_Zobrist = Math.abs(random.nextLong());
+    castlingBK_Zobrist = Math.abs(random.nextLong());
+    castlingBQ_Zobrist = Math.abs(random.nextLong());
 
     // all possible positions of the en passant square (easiest to use all fields and not just the
     // ones where en passant is indeed possible)
     for (Square s : Square.values) {
-      enPassantSquare_Zobrist[s.ordinal()] = random.nextLong(lowerRandom, higherRandom);
+      enPassantSquare_Zobrist[s.ordinal()] = Math.abs(random.nextLong());
     }
 
     // set or unset this for the two color options
-    nextPlayer_Zobrist = random.nextLong(lowerRandom, higherRandom);
+    nextPlayer_Zobrist = Math.abs(random.nextLong());
   }
   // **********************************************************
 

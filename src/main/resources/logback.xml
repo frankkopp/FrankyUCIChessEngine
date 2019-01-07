@@ -59,7 +59,7 @@
     <logger name="ComLog" level="INFO" additivity="true">
         <appender-ref ref="COMLOG"/>
     </logger>
-    <logger name="fko.UCI" level="DEBUG" additivity="true">
+    <logger name="fko.UCI" level="WARN" additivity="true">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </logger>

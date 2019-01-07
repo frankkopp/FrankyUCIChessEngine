@@ -274,7 +274,7 @@ public class Search implements Runnable {
     if (searchMode.isTimeControl() && searchMode.getMate() > 0) {
       LOG.info("****** TIMED MATE SEARCH *******");
     }
-    if (searchMode.isTimeControl()) {
+    if (searchMode.isTimeControl() && searchMode.getMate() <= 0) {
       LOG.info("****** TIMED SEARCH *******");
     }
     if (searchMode.isPonder()) {

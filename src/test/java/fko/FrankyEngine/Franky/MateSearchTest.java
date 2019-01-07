@@ -84,7 +84,7 @@ class MateSearchTest {
     assertEquals(0, search.getSearchCounter().leafPositionsEvaluated);
     assertEquals(0, search.getSearchCounter().currentIterationDepth);
     assertEquals(search.getLastSearchResult().bestMove, Move.NOMOVE);
-    assertEquals(Evaluation.CHECKMATE, search.getLastSearchResult().resultValue);
+    assertEquals(-Evaluation.CHECKMATE, search.getLastSearchResult().resultValue);
   }
 
   @Test
@@ -167,15 +167,6 @@ class MateSearchTest {
   @Test
   @Disabled
   public void testMate5Search() {
-
-//    search.config.USE_ALPHABETA_PRUNING = true;
-//    search.config.USE_NULL_MOVE_PRUNING = true;
-//    search.config.USE_MINOR_PROMOTION_PRUNING = true;
-//    search.config.USE_PVS_MOVE_ORDERING = true;
-//    search.config.USE_MATE_DISTANCE_PRUNING = true;
-//    search.config.USE_QUIESCENCE = true;
-//    search.config.USE_PVS = true;
-//    search.config.USE_TRANSPOSITION_TABLE = true;
 
     String fen;
     Position position;
