@@ -166,7 +166,7 @@ public class Position {
   }
 
   public static void setZobristRandoms(final int seed) {
-    Random random = new Random(1234567890);
+    Random random = new Random(0);
 
     // all pieces on all squares
     for (Piece p : Piece.values) {

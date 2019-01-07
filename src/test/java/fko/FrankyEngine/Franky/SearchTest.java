@@ -725,45 +725,39 @@ public class SearchTest {
     // 14/21	01:24	 52.191k	614k	+7,35	Rc2 a4 Re1 a3 Ree2 Bd4 Re1+
     // 15/24	04:33	 174.777k	638k	+7,35	Rc2 a4 Rf3 Bd4 Rf1+ Bg1
 
-    String fen;
-    SearchMode searchMode;
-    Position position;
+    //depth 9  seldepth 22 multipv 1 score mate 5 pv a6b4 c6c7 b4a2 g6g5 d4c3 c7d8 c3c8 d8e7 c8e8
+    //depth 10 seldepth 22 multipv 1 score mate 6 pv a6b4 c6c7 b4a2 c7d8 d4e4 a8c7 g3h4 g6g5 h4g5 f7f6 g5f6
+    //depth 11 seldepth 24 multipv 1 score mate 5 pv a6b4 c6c7 d4h4 f7f6 h4h8 f6e5 g3e5 g6g5 h8c8
+
+    int maxDepth = 10;
+    int moveTime = 0;
+    int mateIn = 4;
+    boolean infinite = false;
+    int pliesToMate = 7;
+    String fen = "n7/3p1p2/NpkNp1p1/1p2P3/3Q4/6B1/b7/4K3 w - -";
 
     search.config.USE_ALPHABETA_PRUNING = true;
     search.config.USE_ROOT_MOVES_SORT = true;
     search.config.USE_PVS = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
     search.config.USE_KILLER_MOVES = true;
-
     search.config.USE_TRANSPOSITION_TABLE = true;
-
     search.config.USE_MATE_DISTANCE_PRUNING = true;
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
 
     // some of these make the search miss this mate at higher depths
     // might be a consequence from these "optimizations" might be a bug
     search.config.USE_NULL_MOVE_PRUNING = true;
-    //    search.config.NULL_MOVE_DEPTH = 3;
-    //    search.config.USE_VERIFY_NMP = true;
-    //    search.config.NULL_MOVE_REDUCTION_VERIFICATION = 4;
+    search.config.NULL_MOVE_DEPTH = 2;
+    search.config.USE_VERIFY_NMP = true;
+    search.config.NULL_MOVE_REDUCTION_VERIFICATION = 3;
 
     search.config.USE_RAZOR_PRUNING = true;
     search.config.USE_LMR = true;
     search.config.USE_QUIESCENCE = true;
 
-    int maxDepth = 7;
-    int moveTime = 0;
-    int mateIn = 3;
-    boolean infinite = true;
-
-    // mate in 3
-    //    final int pliesToMate = 5;
-    //    fen = "4r1b1/1p4B1/pN2pR2/RB2k3/1P2N2p/2p3b1/n2P1p1r/5K1n w - -";
-    // mate in 5
-    final int pliesToMate = 5;
-    fen = "6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - -";
-    position = new Position(fen);
-    searchMode =
+    Position position = new Position(fen);
+    SearchMode searchMode =
       new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
 
     search.startSearch(position, searchMode);

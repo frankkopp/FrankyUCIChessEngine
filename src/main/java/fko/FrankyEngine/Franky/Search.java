@@ -119,6 +119,9 @@ public class Search implements Runnable {
   // killer move lists
   private MoveList[] killerMoves;
 
+  // remember if there have been mate threads in a ply
+  private boolean[] mateThreat = new boolean[MAX_SEARCH_DEPTH];
+
   /**
    * Creates a search object and stores a back reference to the engine object.<br>
    *
@@ -143,7 +146,6 @@ public class Search implements Runnable {
     for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
       killerMoves[i] = new MoveList(config.NO_KILLER_MOVES + 1);
     }
-
   }
 
 
@@ -263,6 +265,8 @@ public class Search implements Runnable {
       moveGenerators[i].SORT_MOVES = config.USE_SORT_ALL_MOVES;
       // prepare principal variation lists
       principalVariation[i] = new MoveList(MAX_SEARCH_DEPTH);
+      // mateThreads
+      mateThreat[i] = false;
     }
 
     // age TT
@@ -831,7 +835,7 @@ public class Search implements Runnable {
 
     // ###############################################
     // NULL MOVE PRUNING
-    boolean mateThreat = false;
+    //mateThreat[ply] = false;
     // @formatter:off
     if (config.USE_NULL_MOVE_PRUNING
         && !isPerftSearch()
@@ -857,19 +861,15 @@ public class Search implements Runnable {
           if (nullValue >= beta) {
             searchCounter.nullMoveVerifications++;
             nullValue = search(position, depth - r, ply, alpha, beta, PV_NODE, NO_NULL);
-            if (nullValue >= beta) {
-              searchCounter.nullMovePrunings++;
-              return beta;
-            }
           }
         }
       }
 
       // Check for mate threat
-      if (isCheckMateValue(nullValue)) mateThreat = true;
+      if (isCheckMateValue(nullValue)) mateThreat[ply] = true;
 
       // pruning
-      if (nullValue >= beta) {
+      if (nullValue >= beta && !mateThreat[ply]) {
         searchCounter.nullMovePrunings++;
         return beta; // fail-hard, fail-soft: nullValue;
       }
@@ -948,7 +948,7 @@ public class Search implements Runnable {
           && !isPerftSearch()
           && !pvNode
           && !position.hasCheck()
-          && !mateThreat
+          && !mateThreat[ply]
           && Move.getTarget(move).equals(Piece.NOPIECE)
           && !Move.getMoveType(move).equals(MoveType.PROMOTION)
           && !killerMoves[ply].contains(move)
