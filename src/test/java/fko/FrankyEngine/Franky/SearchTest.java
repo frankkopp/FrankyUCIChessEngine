@@ -616,51 +616,12 @@ public class SearchTest {
   @Disabled
   public void mateSearchIssueTest() {
 
-    // problematic positions:
-
-    // Found M5 in M4 which is wrong!!!
-    // r2r4/1p1R3p/5pk1/b1B1Pp2/p4P2/P7/1P5P/1K1R4 w - - 0 1
-    // Franky-0.8:
-    // 1/5	00:00	 64	32k	+6,30	Rxd8
-    // 2/5	00:00	 295	147k	+1,70	Rg1+ Kh6 Rxb7 fxe5 fxe5
-    // 3/9	00:00	 2k	91k	+1,70	Rg1+ Kh6 Rxb7
-    // 4/10	00:00	 6k	184k	+1,70	Rg1+ Kh6 Rxb7 fxe5 c3 fxe5
-    // 5/13	00:00	 19k	299k	+1,58	Rg1+ Kh6 Rxb7 Bd2 Rb6
-    // 6/13	00:00	 97k	361k	+1,68	Rg1+ Kh6 Rf7 fxe5 Rf6+ Kh5
-    // 7/16	00:00	 233k	424k	+M4	Rg1+ Kh6 Bf8+ Rxf8 Rd3 fxe5 Rh3+
-    // 8/16	00:01	 857k	553k	+1,68	Rg1+ Kh6 Rf7 fxe5 Rf6+ Kh5 Rxf5+ Kh4 fxe5
-    // 9/20	00:03	 1.946k	610k	+M4	Rg1+ Kh6 Bf8+ Rxf8 Rd3 fxe5 Rh3+
-    // 10/19	00:08	 5.514k	647k	+M5	Rg1+ Kh6 Bf8+ Rxf8 Rd3 Be1 Rh3+ Bh4 Rxh4+
-    // 11/23	00:23	 14.678k	632k	+M5	Rg1+ Kh6 Bf8+ Rxf8 Rd3 Be1 Rh3+ Bh4 Rxh4+
-
-    // Zugzwang Mate - not found
-    // 8/8/8/p7/8/8/R6p/2K2Rbk w - - 0 1
-    // Stockfish_10_x64:
-    //  66/22	00:12	 21.952k	1.741k	+M5	Raf2 a4 Kd2 a3 Ra1 a2 Ke1 Bxf2+ Kxf2+
-    // Franky-0.8:
-    // 1/3	00:00	 38	19k	+6,37	Rxa5
-    // 2/2	00:00	 68	34k	+6,07	Rxa5 Kg2
-    // 3/5	00:00	 543	271k	+6,41	Kb1 a4 Rxa4
-    // 4/6	00:00	 2k	956k	+6,41	Kb1 a4 Re1 a3 Rxa3
-    // 5/8	00:00	 6k	339k	+6,89	Kc2 a4 Kd3 a3 Rxa3
-    // 6/10	00:00	 19k	397k	+6,45	Re1 a4 Rd1 a3 Kc2 Kg2 Rxa3
-    // 7/11	00:00	 32k	398k	+9,97	Re1 a4 Re5 Bc5 Rxc5 a3 Rxa3
-    // 8/14	00:00	 144k	536k	+6,89	Rc2 a4 Kb2 a3+ Kb3 a2 Kc4 a1Q Rxa1
-    // 9/14	00:00	 302k	601k	+6,95	Rc2 a4 Rd2 a3 Kc2 a2 Kc3 a1Q+ Rxa1
-    // 10/16	00:02	 1.916k	665k	+6,45	Rc2 a4 Rf3 a3 Kb1 Bd4 Rf1+
-    // 11/19	00:11	 9.299k	805k	+6,68	Rc2 a4 Kb2 a3+ Kb3 a2 Rc8 a1Q Rxa1 Kg2 Kc4
-    // 12/20	00:20	 14.711k	729k	+6,87	Rc2 a4 Ra2 a3 Rf3 Bd4 Rf1+ Bg1 Raf2 a2 Kc2 a1Q Rxa1
-    // 13/20	00:38	 27.806k	724k	+7,35	Rc2 a4 Re1 a3 Ree2 Bd4 Rxh2+ Kg1 Rh3 Kf1 Kd1 Kg1 Rxa3
-    // 14/21	01:24	 52.191k	614k	+7,35	Rc2 a4 Re1 a3 Ree2 Bd4 Re1+
-    // 15/24	04:33	 174.777k	638k	+7,35	Rc2 a4 Rf3 Bd4 Rf1+ Bg1
-
-
-    int maxDepth = 8;
-    int moveTime = 0;
-    int mateIn = 4;
     boolean infinite = false;
-    int pliesToMate = 7;
-    String fen = "r2r4/1p1R3p/5p1k/b1B1Pp2/p4P2/P7/1P5P/1K4R1 w - - 0 2";
+    int maxDepth = 16;
+    int moveTime = 0;
+    int mateIn = 5;
+    int pliesToMate = 9;
+    String fen = "8/8/8/p7/8/8/R6p/2K2Rbk w - -"; // Zugzwang Mate - not found
 
     // these should not change result
     search.config.USE_ALPHABETA_PRUNING = true;

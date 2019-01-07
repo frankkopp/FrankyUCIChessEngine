@@ -38,11 +38,6 @@ public class TimingTests {
 
     ArrayList<String> result = new ArrayList<>();
 
-    MoveList m1 = new MoveList();
-    MoveList m2 = new MoveList();
-    final Position position =
-      new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
-
     int ROUNDS = 5;
     int ITERATIONS = 50;
     int REPETITIONS = 2000000;
@@ -78,12 +73,6 @@ public class TimingTests {
 
       result.add(String.format("Round %d Test 1 avg: %,.3f sec", round, avg1));
       result.add(String.format("Round %d Test 2 avg: %,.3f sec", round, avg2));
-    }
-
-    System.out.println();
-    System.out.printf("%-20s %-20s %n", "Test 1", "Test 2");
-    for (int i = 0; i < m1.size(); i++) {
-      System.out.printf("%-20s %-20s %n", Move.toString(m1.get(i)), Move.toString(m2.get(i)));
     }
 
     System.out.println();
