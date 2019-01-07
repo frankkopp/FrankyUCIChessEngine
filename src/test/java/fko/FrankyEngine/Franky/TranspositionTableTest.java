@@ -220,6 +220,7 @@ public class TranspositionTableTest {
   }
 
   @Test
+  @Disabled
   public void showSize() {
     //System.out.println(VM.current().details());
     TranspositionTable.TT_Entry test = new TranspositionTable.TT_Entry();

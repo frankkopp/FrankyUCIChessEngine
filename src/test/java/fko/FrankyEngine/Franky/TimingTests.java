@@ -24,74 +24,84 @@
  */
 package fko.FrankyEngine.Franky;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Arrays;
+import java.util.ArrayList;
 
 /** @author Frank */
 public class TimingTests {
 
-  private int[] _list_1;
-
   @Test
+  @Disabled
   public void testTiming() {
 
-    prepare();
+    ArrayList<String> result = new ArrayList<>();
+
+    MoveList m1 = new MoveList();
+    MoveList m2 = new MoveList();
+    final Position position =
+      new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
 
     int ROUNDS = 5;
-    int DURATION = 5;
+    int ITERATIONS = 50;
+    int REPETITIONS = 2000000;
 
-    int ITERATIONS = 0;
+    for (int round = 0; round < ROUNDS; round++) {
+      long start = 0, end = 0, sum = 0;
 
-    Instant start;
-
-    System.out.println("Running Timing Test Test 1 vs. Test 2");
-
-    for (int j = 0; j < ROUNDS; j++) {
-
+      System.out.printf("Running round %d of Timing Test Test 1 vs. Test 2%n", round);
       System.gc();
 
-      start = Instant.now();
-      ITERATIONS = 0;
-      for (; ; ) {
-        ITERATIONS++;
-        test1();
-        if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) break;
+      int i = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          test1();
+        }
+        end = System.nanoTime();
+        sum += end - start;
       }
-      System.out.println(String.format("Test 1: %,7d runs/s", ITERATIONS / DURATION));
+      float avg1 = ((float) sum / ITERATIONS) / 1e9f;
 
-      start = Instant.now();
-      ITERATIONS = 0;
-      for (; ; ) {
-        ITERATIONS++;
-        test2();
-        if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) break;
+      i = 0;
+      sum = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          test2();
+        }
+        end = System.nanoTime();
+        sum += end - start;
       }
-      System.out.println(String.format("Test 2: %,7d runs/s", ITERATIONS / DURATION));
+      float avg2 = ((float) sum / ITERATIONS) / 1e9f;
+
+      result.add(String.format("Round %d Test 1 avg: %,.3f sec", round, avg1));
+      result.add(String.format("Round %d Test 2 avg: %,.3f sec", round, avg2));
     }
+
+    System.out.println();
+    System.out.printf("%-20s %-20s %n", "Test 1", "Test 2");
+    for (int i = 0; i < m1.size(); i++) {
+      System.out.printf("%-20s %-20s %n", Move.toString(m1.get(i)), Move.toString(m2.get(i)));
+    }
+
+    System.out.println();
+    for (String s : result) {
+      System.out.println(s);
+    }
+
   }
 
-  /** */
-  private void prepare() {
-
-    _list_1 = new int[512];
-    // add many entries
-    for (int i = 0; i < 512; i++) {
-      _list_1[i] = (int) (Math.random() * Integer.MAX_VALUE);
-    }
-  }
-
-  @SuppressWarnings("unused")
   private void test1() {
-
-    int[] list = Arrays.copyOf(_list_1, _list_1.length);
+    final long longValue = (long) Math.abs(Math.random() * Long.MAX_VALUE);
+    int test = (int) (longValue % Integer.MAX_VALUE);
+//    System.out.println("Test1: "+test);
   }
 
-  @SuppressWarnings("unused")
   private void test2() {
-
-    int[] list = _list_1.clone();
+    final long longValue = (long) Math.abs(Math.random() * Long.MAX_VALUE);
+    int test = (int) (longValue ^ (longValue >>> 32));
+//    System.out.println("Test2: "+test);
   }
 }
