@@ -70,12 +70,20 @@ public class TranspositionTable {
     System.gc();
     long usedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
     long freeMemory = (Runtime.getRuntime().maxMemory() - usedMemory);
-    int percentage = 10;
-    if (freeMemory * percentage / 100 < sizeInByte) {
+    long ttMemory = (long) (freeMemory * 0.9);
+
+    LOG.debug("{}", String.format("Max JVM memory: %,d MB", Runtime.getRuntime().maxMemory() / KB));
+    LOG.debug("{}", String.format("Current total memory: %,d MB", Runtime.getRuntime().totalMemory() / KB));
+    LOG.debug("{}", String.format("Current used memory: %,d MB", usedMemory / KB));
+    LOG.debug("{}", String.format("Current free memory: %,d MB", freeMemory / KB));
+    LOG.debug("{}", String.format("Current free memory: %,d MB", freeMemory / KB));
+    LOG.debug("{}", String.format("Current memory claim for TT: %,d MB", ttMemory / KB));
+
+    if (ttMemory < sizeInByte) {
       LOG.warn(
         String.format("Not enough memory for a %,dMB transposition cache - reducing to %,dMB",
-                      sizeInByte / (KB * KB), (freeMemory * percentage / 100) / (KB * KB)));
-      sizeInByte = (int) (freeMemory * percentage / 100); // % of memory
+                      sizeInByte / (KB * KB), (ttMemory) / (KB * KB)));
+      sizeInByte = (int) (ttMemory); // % of memory
     }
 
     // size in byte divided by entry size plus size for array bucket
