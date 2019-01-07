@@ -46,6 +46,7 @@ public class TranspositionTable {
   private static final Logger LOG = LoggerFactory.getLogger(TranspositionTable.class);
 
   private static final int KB = 1024;
+  private static final int MB = KB*KB;
 
   private long sizeInByte;
   private int  maxNumberOfEntries;
@@ -64,7 +65,7 @@ public class TranspositionTable {
    * @param size in MB (1024B^2)
    */
   public TranspositionTable(int size) {
-    sizeInByte = (long) size * KB * KB;
+    sizeInByte = (long) size * MB;
 
     // check available mem - add some head room
     System.gc();
@@ -72,18 +73,17 @@ public class TranspositionTable {
     long freeMemory = (Runtime.getRuntime().maxMemory() - usedMemory);
     long ttMemory = (long) (freeMemory * 0.9);
 
-    LOG.debug("{}", String.format("Max JVM memory: %,d MB", Runtime.getRuntime().maxMemory() / KB));
-    LOG.debug("{}", String.format("Current total memory: %,d MB",
-                                  Runtime.getRuntime().totalMemory() / KB));
-    LOG.debug("{}", String.format("Current used memory: %,d MB", usedMemory / KB));
-    LOG.debug("{}", String.format("Current free memory: %,d MB", freeMemory / KB));
-    LOG.debug("{}", String.format("Current free memory: %,d MB", freeMemory / KB));
-    LOG.debug("{}", String.format("Memory available for TT: %,d MB", ttMemory / KB));
+    LOG.debug("{}", String.format("Max JVM memory:           %,5d MB", Runtime.getRuntime().maxMemory() / MB));
+    LOG.debug("{}", String.format("Current total memory:     %,5d MB",
+                                  Runtime.getRuntime().totalMemory() / MB));
+    LOG.debug("{}", String.format("Current used memory:      %,5d MB", usedMemory / MB));
+    LOG.debug("{}", String.format("Current free memory:      %,5d MB", freeMemory / MB));
+    LOG.debug("{}", String.format("Memory available for TT:  %,5d MB", ttMemory / MB));
 
     if (ttMemory < sizeInByte) {
       LOG.warn("{}", String.format(
         "Not enough memory for a %,dMB transposition cache - reducing to %,dMB",
-        sizeInByte / (KB * KB), (ttMemory) / (KB * KB)));
+        sizeInByte / MB, (ttMemory) / MB));
       sizeInByte = (int) (ttMemory); // % of memory
     }
 
@@ -97,7 +97,7 @@ public class TranspositionTable {
       entries[i] = new TT_Entry();
     }
 
-    LOG.info("Transposition Table Size: {}MB", String.format("%,d", sizeInByte / (KB * KB)));
+    LOG.info("{}", String.format("Transposition Table Size: %,5d MB", sizeInByte / (KB * KB)));
   }
 
   /**
