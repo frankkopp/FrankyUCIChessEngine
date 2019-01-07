@@ -53,7 +53,7 @@ class UCIProtocolHandlerTest {
   private Semaphore    semaphore;
 
   @BeforeEach
-  void setUp() throws IOException {
+  void setUp() throws IOException, InterruptedException {
 
     final PipedOutputStream toHandler = new PipedOutputStream();
     final InputStream handlerInput = new PipedInputStream(toHandler);
@@ -71,6 +71,10 @@ class UCIProtocolHandlerTest {
     handler.setSemaphoreForSynchronization(semaphore);
 
     handler.startHandler();
+
+    Thread.sleep(1000);
+
+    clearBuffer();
 
   }
 
@@ -271,14 +275,15 @@ class UCIProtocolHandlerTest {
   @Test
   void test3FoldRepetition() throws InterruptedException, IOException {
 
-    commandToEngine("position startpos moves b2b3 b7b6 c1b2 c8b7 e2e3 g8f6 " +
-                    "f2f4 g7g6 g1f3 f8g7 f1e2 e8g8 e1g1 c7c5 a2a4 b8c6 b1c3 " +
-                    "d7d5 d2d4 f6g4 b2c1 c5d4 e3d4 g4f6 f3e5 f6e4 c3e4 d5e4 " +
-                    "c1e3 d8d6 d1d2 a8d8 f1d1 f7f6 e5c4 d6c7 d2c3 h7h5 g1f2 " +
-                    "e7e5 d4e5 f6e5 d1d8 c7d8 f4f5 f8f5 f2g3 c6d4 c3d2 d4e2 " +
-                    "d2e2 h5h4 g3h3 b7c8 g2g4 f5f3 h3g2 c8g4 a1d1 d8f8 e3g5 " +
-                    "h4h3 g2g1 f3f4 e2e3 g4d1 g5f4 e5f4 e3e4 f8f5 e4e8 g8h7 " +
-                    "e8e7 d1c2 e7h4 h7g8 h4d8 g8h7 d8h4 h7g8 h4d8 g8h7");
+    commandToEngine("position startpos moves b2b3 b7b6 c1b2 c8b7 e2e3 g8f6 "
+                    + "f2f4 g7g6 g1f3 f8g7 f1e2 e8g8 e1g1 c7c5 a2a4 b8c6 b1c3 "
+                    + "d7d5 d2d4 f6g4 b2c1 c5d4 e3d4 g4f6 f3e5 f6e4 c3e4 d5e4 "
+                    + "c1e3 d8d6 d1d2 a8d8 f1d1 f7f6 e5c4 d6c7 d2c3 h7h5 g1f2 "
+                    + "e7e5 d4e5 f6e5 d1d8 c7d8 f4f5 f8f5 f2g3 c6d4 c3d2 d4e2 "
+                    + "d2e2 h5h4 g3h3 b7c8 g2g4 f5f3 h3g2 c8g4 a1d1 d8f8 e3g5 "
+                    + "h4h3 g2g1 f3f4 e2e3 g4d1 g5f4 e5f4 e3e4 f8f5 e4e8 g8h7 "
+                    + "e8e7 d1c2 e7h4 h7g8 h4d8 g8h7 d8h4 h7g8 h4d8 g8h7");
+
     assertEquals("3Q4/p5bk/1p4p1/5q2/P1N2p2/1P5p/2b4P/6K1 w - - 8 42",
                  engine.getPosition().toFENString());
 
@@ -292,21 +297,22 @@ class UCIProtocolHandlerTest {
           System.out.println(line);
           assertEquals("d8h4",
                        Move.toSimpleString(engine.getSearch().getLastSearchResult().bestMove));
-          assertEquals(0, engine.getSearch().getLastSearchResult().resultValue);
+          // because of contempt this is not 0 but 22
+          assertEquals(22, engine.getSearch().getLastSearchResult().resultValue);
           break;
         }
       }
     }
 
     // black should avoid 3-fold repetition
-    commandToEngine("position startpos moves b2b3 b7b6 c1b2 c8b7 e2e3 g8f6 " +
-                    "f2f4 g7g6 g1f3 f8g7 f1e2 e8g8 e1g1 c7c5 a2a4 b8c6 b1c3 " +
-                    "d7d5 d2d4 f6g4 b2c1 c5d4 e3d4 g4f6 f3e5 f6e4 c3e4 d5e4 " +
-                    "c1e3 d8d6 d1d2 a8d8 f1d1 f7f6 e5c4 d6c7 d2c3 h7h5 g1f2 " +
-                    "e7e5 d4e5 f6e5 d1d8 c7d8 f4f5 f8f5 f2g3 c6d4 c3d2 d4e2 " +
-                    "d2e2 h5h4 g3h3 b7c8 g2g4 f5f3 h3g2 c8g4 a1d1 d8f8 e3g5 " +
-                    "h4h3 g2g1 f3f4 e2e3 g4d1 g5f4 e5f4 e3e4 f8f5 e4e8 g8h7 " +
-                    "e8e7 d1c2 e7h4 h7g8 h4d8 g8h7 d8h4 h7g8 h4d8");
+    commandToEngine("position startpos moves b2b3 b7b6 c1b2 c8b7 e2e3 g8f6 "
+                    + "f2f4 g7g6 g1f3 f8g7 f1e2 e8g8 e1g1 c7c5 a2a4 b8c6 b1c3 "
+                    + "d7d5 d2d4 f6g4 b2c1 c5d4 e3d4 g4f6 f3e5 f6e4 c3e4 d5e4 "
+                    + "c1e3 d8d6 d1d2 a8d8 f1d1 f7f6 e5c4 d6c7 d2c3 h7h5 g1f2 "
+                    + "e7e5 d4e5 f6e5 d1d8 c7d8 f4f5 f8f5 f2g3 c6d4 c3d2 d4e2 "
+                    + "d2e2 h5h4 g3h3 b7c8 g2g4 f5f3 h3g2 c8g4 a1d1 d8f8 e3g5 "
+                    + "h4h3 g2g1 f3f4 e2e3 g4d1 g5f4 e5f4 e3e4 f8f5 e4e8 g8h7 "
+                    + "e8e7 d1c2 e7h4 h7g8 h4d8 g8h7 d8h4 h7g8 h4d8");
     assertEquals("3Q2k1/p5b1/1p4p1/5q2/P1N2p2/1P5p/2b4P/6K1 b - - 7 41",
                  engine.getPosition().toFENString());
 
@@ -380,7 +386,7 @@ class UCIProtocolHandlerTest {
   @Test
   void sendInfoToUCI() throws IOException, InterruptedException {
 
-    engine.getConfig().USE_BOOK=false;
+    engine.getConfig().USE_BOOK = false;
 
     commandToEngine("go movetime 5000");
     while (engine.isSearching()) {
@@ -420,7 +426,8 @@ class UCIProtocolHandlerTest {
   @Disabled
   void debuggingTest() throws InterruptedException, IOException {
     commandToEngine("ucinewgame");
-    commandToEngine("position startpos moves g1f3 c7c5 e2e3 g8f6 c2c4 g7g6 b1c3 f8g7 d2d4 c5d4 e3d4 e8g8 d4d5 e7e5 f1e2 d7d6 e1g1 c8g4 c1e3 b8d7 h2h3 g4f3 g2f3 d8e7 d1c2 a7a5 a2a4 d7c5 g1h2 f6h5 f1g1 f7f5 e3g5 e7d7 e2d3 g8f7 d3f1 g7f6 g5h6 f8g8 h6e3 h5f4 f1e2 h7h5 e2f1 g8h8 e3d2 f6h4 d2f4 e5f4 a1b1 h4f6 b1e1 f6c3 b2c3 h8g8 c2d2 b7b6 d2f4 a8d8 f4h6 d8b8 g1g2 b8b7 h6h7 g8g7 h7h6 d7a4 h6e3 g7g8 h3h4 b6b5 e3f4 a4c2 e1e3 c2b1 g2g1 b1a2 h2g3 b5c4 f1c4 a2a4 g1e1 g8a8 f4d4 a8b8 g3f4 a4d7 e1h1 d7d8 e3e1 a5a4 e1f1 b7b2 f1g1 d8h8 d4h8 b8h8 f4g3 a4a3 g1a1 h8a8 a1b1 c5a4 b1a1 a8c8 c4a6 c8c3 h1c1 a3a2 c1e1 c3c5 e1e6 a4c3 a1e1 c5c7 e1a1 b2b1 a1a2 c3a2 e6d6 a2c3 d6d8 b1d1 d5d6 c7c6 a6c8 c3e2 g3h2 c6c4 c8e6 f7e6 d8e8 e6f6 f3f4 e2f4 e8f8 f6e5 f8b8 d1d3 b8e8 f4e6 h2g2 c4h4 g2g1 h4a4 e8g8 a4a1 g1h2 g6g5 g8c8 g5g4 c8e8 e5d6 e8e6 d6e6 f2f3 h5h4 f3g4 f5g4");
+    commandToEngine(
+      "position startpos moves g1f3 c7c5 e2e3 g8f6 c2c4 g7g6 b1c3 f8g7 d2d4 c5d4 e3d4 e8g8 d4d5 e7e5 f1e2 d7d6 e1g1 c8g4 c1e3 b8d7 h2h3 g4f3 g2f3 d8e7 d1c2 a7a5 a2a4 d7c5 g1h2 f6h5 f1g1 f7f5 e3g5 e7d7 e2d3 g8f7 d3f1 g7f6 g5h6 f8g8 h6e3 h5f4 f1e2 h7h5 e2f1 g8h8 e3d2 f6h4 d2f4 e5f4 a1b1 h4f6 b1e1 f6c3 b2c3 h8g8 c2d2 b7b6 d2f4 a8d8 f4h6 d8b8 g1g2 b8b7 h6h7 g8g7 h7h6 d7a4 h6e3 g7g8 h3h4 b6b5 e3f4 a4c2 e1e3 c2b1 g2g1 b1a2 h2g3 b5c4 f1c4 a2a4 g1e1 g8a8 f4d4 a8b8 g3f4 a4d7 e1h1 d7d8 e3e1 a5a4 e1f1 b7b2 f1g1 d8h8 d4h8 b8h8 f4g3 a4a3 g1a1 h8a8 a1b1 c5a4 b1a1 a8c8 c4a6 c8c3 h1c1 a3a2 c1e1 c3c5 e1e6 a4c3 a1e1 c5c7 e1a1 b2b1 a1a2 c3a2 e6d6 a2c3 d6d8 b1d1 d5d6 c7c6 a6c8 c3e2 g3h2 c6c4 c8e6 f7e6 d8e8 e6f6 f3f4 e2f4 e8f8 f6e5 f8b8 d1d3 b8e8 f4e6 h2g2 c4h4 g2g1 h4a4 e8g8 a4a1 g1h2 g6g5 g8c8 g5g4 c8e8 e5d6 e8e6 d6e6 f2f3 h5h4 f3g4 f5g4");
     commandToEngine("go ponder wtime 87653 btime 57944");
     waitUntilSearching();
     while (engine.isSearching()) {
@@ -438,7 +445,7 @@ class UCIProtocolHandlerTest {
   private void commandToEngine(String s) throws InterruptedException {
     System.out.println("COMMAND  >> " + s);
     toHandlerPrinter.println(s);
-    semaphore.tryAcquire(2000, TimeUnit.MILLISECONDS);
+    semaphore.tryAcquire(10000, TimeUnit.MILLISECONDS);
   }
 
   private void waitWhileSearching() throws InterruptedException, IOException {

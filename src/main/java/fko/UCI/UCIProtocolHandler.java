@@ -55,8 +55,9 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
 
   // -- the handler runs in a separate thread --
   private Thread myThread = null;
+  private Semaphore startUpGate = new Semaphore(0, true);
 
-  private Semaphore   semaphore;
+  private Semaphore   externalSynchWaiter;
   private boolean     running = false;
   private PrintStream outputStreamPrinter;
 
@@ -119,9 +120,6 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
    */
   @Override
   public void run() {
-
-    // start with uci command directly
-    commandUCI(null);
 
     final BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
 
@@ -378,13 +376,13 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   }
 
   private void waiterResume() {
-    if (semaphore != null) {
-      semaphore.release();
+    if (externalSynchWaiter != null) {
+      externalSynchWaiter.release();
     }
   }
 
   void setSemaphoreForSynchronization(Semaphore waiter) {
-    this.semaphore = waiter;
+    this.externalSynchWaiter = waiter;
   }
 
   /**

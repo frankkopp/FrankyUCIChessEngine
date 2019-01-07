@@ -25,7 +25,6 @@
 
 package fko.FrankyEngine;
 
-import ch.qos.logback.core.joran.spi.JoranException;
 import fko.FrankyEngine.Franky.FrankyEngine;
 import fko.UCI.IUCIEngine;
 import fko.UCI.UCIProtocolHandler;
