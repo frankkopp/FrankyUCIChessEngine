@@ -257,6 +257,7 @@ public class Search implements Runnable {
       LOG.error(s, e);
     }
 
+    // initialize ply based data
     for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
       // Move Generators - each depth in search gets it own to avoid object creation
       // during search. This is in preparation for move generators which keep a state
