@@ -187,10 +187,10 @@ public class Search implements Runnable {
     }
     searchThread = new Thread(this, threadName);
     searchThread.setDaemon(true);
-    //    searchThread.setUncaughtExceptionHandler((t, e) -> {
-    //      LOG.error("Uncaught exception", e);
-    //      System.exit(1);
-    //    });
+    searchThread.setUncaughtExceptionHandler((t, e) -> {
+      LOG.error("Caught uncaught exception", e);
+      System.exit(1);
+    });
     searchThread.start();
 
     // Wait for initialization in run() before returning from call

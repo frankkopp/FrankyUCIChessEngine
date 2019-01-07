@@ -273,7 +273,48 @@ class UCIProtocolHandlerTest {
   }
 
   @Test
-  void test3FoldRepetition() throws InterruptedException, IOException {
+  void test3FoldRepetitionTest1() throws InterruptedException, IOException {
+    // position startpos moves b2b4 c7c6 e2e3 g8f6 c1b2 a7a5 b4b5 a5a4 g1f3 d7d6 f1e2 e7e5 c2c4 f8e7 e1g1 e8g8 d2d4 d8c7 d4e5 d6e5 b2e5 c7a5 e5c3 e7b4 c3b4 a5b4 a2a3 b4b2 b1d2 c6b5 c4b5 c8e6 d1c1 b2c1 a1c1 b8d7 f3d4 f8c8 f2f4 d7c5 e2f3 e6a2 d4f5 c8d8 c1c5 d8d2 f3b7 a8b8 f1c1 a2e6 f5d4 d2d3 d4e6 f7e6 c5c8 b8c8 c1c8 g8f7 c8c7 f7g6 g1f2 d3a3 f2f3 a3a1 c7e7 a4a3 b7e4 g6h6 g2g4 a3a2 g4g5 h6h5 e7a7 a1f1 f3g2 a2a1r a7a1 f1a1 g5f6 g7f6 e4h7 a1a2 g2f3 a2h2 h7g8 e6e5 g8f7 h5h6 f3e4 e5f4 e3f4 h2b2 e4f5 h6g7 f7c4 b2b4 c4e2 g7f7 e2f1 f7e7 f1d3 e7d6 d3e4 b4b5 f5f6 b5b8 f6g5 d6e6 g5g4 b8b3 e4h7 e6f7 h7f5 f7f6 f5h7 f6f7 h7f5 f7f6 f5h7 b3c3 h7g8 c3c7 g8d5 c7c3 d5a2 c3d3 a2g8 d3e3 g8d5 e3d3 d5c4 d3e3 c4d5 e3d3 d5c4 d3a3 c4d5 a3c3 d5a2 c3d3 a2g8 d3c3
+    // go infinite
+
+    commandToEngine("setoption name OwnBook value false");
+
+    // Ba2 and Bd5 are r3-fold repetition
+    commandToEngine(
+      "position startpos moves b2b4 c7c6 e2e3 g8f6 c1b2 a7a5 b4b5 a5a4 g1f3 d7d6 "
+      + "f1e2 e7e5 c2c4 f8e7 e1g1 e8g8 d2d4 d8c7 d4e5 d6e5 b2e5 c7a5 e5c3 e7b4 c3b4 "
+      + "a5b4 a2a3 b4b2 b1d2 c6b5 c4b5 c8e6 d1c1 b2c1 a1c1 b8d7 f3d4 f8c8 f2f4 d7c5 "
+      + "e2f3 e6a2 d4f5 c8d8 c1c5 d8d2 f3b7 a8b8 f1c1 a2e6 f5d4 d2d3 d4e6 f7e6 c5c8 "
+      + "b8c8 c1c8 g8f7 c8c7 f7g6 g1f2 d3a3 f2f3 a3a1 c7e7 a4a3 b7e4 g6h6 g2g4 a3a2 "
+      + "g4g5 h6h5 e7a7 a1f1 f3g2 a2a1r a7a1 f1a1 g5f6 g7f6 e4h7 a1a2 g2f3 a2h2 h7g8 "
+      + "e6e5 g8f7 h5h6 f3e4 e5f4 e3f4 h2b2 e4f5 h6g7 f7c4 b2b4 c4e2 g7f7 e2f1 f7e7 "
+      + "f1d3 e7d6 d3e4 b4b5 f5f6 b5b8 f6g5 d6e6 g5g4 b8b3 e4h7 e6f7 h7f5 f7f6 f5h7 "
+      + "f6f7 h7f5 f7f6 f5h7 b3c3 h7g8 c3c7 g8d5 c7c3 d5a2 c3d3 a2g8 d3e3 g8d5 e3d3 "
+      + "d5c4 d3e3 c4d5 e3d3 d5c4 d3a3 c4d5 a3c3 d5a2 c3d3 a2g8 d3c3 g8d5");
+
+    assertEquals("8/8/5k2/3B4/5PK1/2r5/8/8 b - - 38 72", engine.getPosition().toFENString());
+
+    // white can draw with d8h4 b/c 3-fold-repetition with Ba2 and Bd5
+    commandToEngine("go depth 6 searchmoves c3d3");
+    while (engine.isSearching()) {
+      while (fromHandlerReader.ready()) {
+        final String line = getResponseFromEngine();
+        assertTrue(line.startsWith("info ") || line.startsWith("bestmove "));
+        if (line.startsWith("bestmove ")) {
+          System.out.println(line);
+          assertEquals("c3d3",
+                       Move.toSimpleString(engine.getSearch().getLastSearchResult().bestMove));
+          // because of contempt this is not 0 but 6
+          assertEquals(6, engine.getSearch().getLastSearchResult().resultValue);
+          break;
+        }
+      }
+    }
+  }
+
+  @Test
+  void test3FoldRepetitionTest2() throws InterruptedException, IOException {
+
 
     commandToEngine("position startpos moves b2b3 b7b6 c1b2 c8b7 e2e3 g8f6 "
                     + "f2f4 g7g6 g1f3 f8g7 f1e2 e8g8 e1g1 c7c5 a2a4 b8c6 b1c3 "
@@ -462,15 +503,15 @@ class UCIProtocolHandlerTest {
     }
   }
 
-  private String getResponseFromEngine() throws IOException {
-    final String readLine = fromHandlerReader.readLine();
-    System.out.println("RESPONSE << " + readLine);
-    return readLine;
-  }
-
   private void clearBuffer() throws IOException {
     while (fromHandlerReader.ready()) {
       getResponseFromEngine();
     }
+  }
+
+  private String getResponseFromEngine() throws IOException {
+    final String readLine = fromHandlerReader.readLine();
+    System.out.println("RESPONSE << " + readLine);
+    return readLine;
   }
 }

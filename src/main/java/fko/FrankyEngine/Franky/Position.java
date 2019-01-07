@@ -987,11 +987,11 @@ public class Position {
      */
     if (historyCounter < 8) return false;
     int counter = 0;
-    int i = historyCounter - 4;
+    int i = historyCounter - 2;
     while (i >= 0) {
       if (this.zobristKey == zobristKeyHistory[i]) counter++;
       if (counter >= 2) return true;
-      i -= 4;
+      i -= 2;
     }
     return false;
   }

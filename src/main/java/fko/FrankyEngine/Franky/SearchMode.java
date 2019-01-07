@@ -183,7 +183,7 @@ public class SearchMode {
 
   public Duration getRemainingTime(Color color) {
     if (color == Color.NOCOLOR) {
-      String msg = "Color ust be either WHITE or BLACK";
+      String msg = "Color must be either WHITE or BLACK";
       IllegalArgumentException e = new IllegalArgumentException(msg);
       LOG.error(msg, e);
       throw e;
@@ -201,7 +201,7 @@ public class SearchMode {
 
   public Duration getTimeInc(Color color) {
     if (color == Color.NOCOLOR) {
-      String msg = "Color ust be either WHITE or BLACK";
+      String msg = "Color must be either WHITE or BLACK";
       IllegalArgumentException e = new IllegalArgumentException(msg);
       LOG.error(msg, e);
       throw e;

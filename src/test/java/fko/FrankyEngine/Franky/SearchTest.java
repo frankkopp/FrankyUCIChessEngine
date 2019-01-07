@@ -618,6 +618,23 @@ public class SearchTest {
 
     // problematic positions:
 
+    // 8/2P1P1P1/3PkP2/8/4K3/8/8/8 w - - 0 1
+    // result PV shows too moves from same player
+    // does not find mate 3
+
+    // Franky-0.8:
+    // 1/5	00:00	 73	24k	+12,51	Na6-b4+ Kc6-c7 Nd6xb5+ Kc7-c8 Nb4xa2
+    // 2/5	00:00	 228	76k	+12,51	Na6-b4+ Kc6-c7
+    // 3/12	00:00	 3k	430k	+12,51	Na6-b4+ Kc6-c7 Nd6xb5+
+    // 4/12	00:00	 5k	497k	+12,51	Na6-b4+ Kc6-c7 Nd6xb5+ Kc7-c8
+    // 5/15	00:00	 99k	800k	+12,51	Na6-b4+ Kc6-c7 Nd6xb5+ Kc7-c8 Nb4xa2
+    // 6/15	00:00	 123k	778k	+12,51	Na6-b4+ Kc6-c7 Nb4-a6+ Kc7-c6 Qd4-h4 g6-g5 Qh4xg5 f7-f6 Qg5xf6
+    // 7/20	00:01	 894k	873k	+13,01	Na6-b4+ Kc6-c7 Qd4-c3+ Ba2-c4 Nd6xb5+ Kc7-d8 Qc3xc4
+    // 8/20	00:01	 1.154k	877k	+13,83	Na6-b4+ Kc6-c7 Nb4xa2 g6-g5 Qd4-c3+ Kc7-d8 Qc3-c8+ Kd8-e7 Qc8xa8
+    // 9/22	00:04	 4.487k	1.049k	+M5	Na6-b4+ Kc6-c7 Nb4xa2 g6-g5 Qd4-c3+ Kc7-d8 Qc3-c8+ Kd8-e7 Qc8-e8+ <<<<<<<<<<<<<<<<<<
+    // 10/22	00:06	 6.965k	1.023k	+M6	Na6-b4+ Kc6-c7 Nb4xa2 Kc7-d8 Qd4-e4 Na8-c7 Bg3-h4+ g6-g5 Bh4xg5+ f7-f6 Bg5xf6+ <<<<<<<<<<<<<<<<<<
+    // 11/25	00:11	 11.892k	1.033k	+M5	Na6-b4+ Kc6-c7 Qd4-h4 f7-f6 Qh4-h8 f6xe5 Bg3xe5 g6-g5 Qh8-c8+ <<<<<<<<<<<<<<<<<<
+
     // - finds mate in
     // "6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - -"
     //    Franky-0.8:
