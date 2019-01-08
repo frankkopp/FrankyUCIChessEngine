@@ -236,8 +236,6 @@ public enum Square {
 
   /**
    * Returns a list of all valid squares in the correct order. [0]=a1, [63]=h8
-   *
-   * @author fkopp
    */
   public static List<Square> getValueList() {
     return validSquares;
