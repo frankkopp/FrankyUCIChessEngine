@@ -558,7 +558,7 @@ public class FrankyEngine implements IUCIEngine {
   @Override
   public void sendResult(int bestMove, int ponderMove) {
     if (!Move.isValid(bestMove)) {
-      LOG.error("Engine Best Move is invalid move!" + Move.toString(bestMove));
+      LOG.error("Engine Best Move is invalid move: " + Move.toString(bestMove));
       LOG.error("Position: " + position.toFENString());
       LOG.error("Last Move: " + position.getLastMove());
     }
