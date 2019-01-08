@@ -32,6 +32,7 @@ import fko.UCI.UCIOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,22 @@ import java.util.Properties;
 
 /**
  * Franky Engine for UCI GUIs
+ * <p>
+ * TODO:
+ *  Testing / Bug fixing
+ *  --------------------------------
+ *  Arena shows Illegal Moves (probably not 0.8 - better logging implemented)
+ *  Arena shows forfeit for time (needs more analysis
+ *  Mates found in lower depths lost in higher depths
+ * <p>
+ * <p>
+ * TODO
+ *  Performance
+ *  --------------------------------
+ * <p>
+ * TODO
+ *  Features
+ *  --------------------------------
  */
 public class FrankyEngine implements IUCIEngine {
 
@@ -50,21 +67,20 @@ public class FrankyEngine implements IUCIEngine {
   // back reference to the uci protocol handler for sending messages to the UCI UI
   private IUCIProtocolHandler uciProtocolHandler = null;
 
-  // configuration parameters
-
+  // engine/search configuration
   private final Configuration config = new Configuration();
+
   // the current search instance
+  private final Search search;
 
-  private Search search;
   // ID of engine
+  private final String iDName;
+  private final String iDAuthor;
 
-  private String iDName   = "Franky";
-  private String iDAuthor = "Frank Kopp";
   // options of engine
-
   private List<IUCIEngine.IUCIOption> iUciOptions;
-  // engine state
 
+  // engine state
   private Position   position;
   private SearchMode searchMode;
 
@@ -84,11 +100,24 @@ public class FrankyEngine implements IUCIEngine {
       System.exit(1);
     }
     iDName = properties.getProperty("artifactId") + " v" + properties.getProperty("version");
+    iDAuthor = properties.getProperty("author");
 
     initOptions();
 
     search = new Search(this, config);
-    position = new Position(); // default is standard start board
+    position = new Position();
+
+    // @formatter:off
+    System.out.printf("%n===================================================%n"
+                      + "%s%n"
+                      + "Java UCI Chess Engine%n"
+                      + "MIT License%n"
+                      + "Copyright (c) 2018 by %s %n"
+                      + "===================================================%n%n",
+                      iDName,
+                      iDAuthor
+                     );
+   // @formatter:on
   }
 
   /**
@@ -119,7 +148,7 @@ public class FrankyEngine implements IUCIEngine {
                 UCIOptionType.spin,
                 "" + config.HASH_SIZE,
                 "1",
-                "512",
+                "4096",
                 ""));
     iUciOptions.add(
         new UCIOption("Clear Hash",
@@ -306,6 +335,12 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
+      case "UCI_ShowCurrLine":
+        config.UCI_ShowCurrLine = Boolean.valueOf(value);
+        msg = "Engine UCI_ShowCurrLine set to " + (config.UCI_ShowCurrLine ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
       case "Ponder":
         config.PONDER = Boolean.valueOf(value);
         msg = "Engine Ponder set to " + (config.PONDER ? "On" : "Off");
@@ -395,7 +430,7 @@ public class FrankyEngine implements IUCIEngine {
         break;
       case "Number_Killer_Moves":
         config.NO_KILLER_MOVES = Integer.valueOf(value);
-        msg = "Number of Killer Moves set to " + config.NO_KILLER_MOVES ;
+        msg = "Number of Killer Moves set to " + config.NO_KILLER_MOVES;
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
@@ -417,13 +452,13 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-//      case "Use_Aspiration_Window_Search":
-//        config.USE_ASPIRATION_WINDOW = Boolean.valueOf(value);
-//        msg =
-//          "Use Aspiration Window Search set to " + (config.USE_ASPIRATION_WINDOW ? "On" : "Off");
-//        LOG.info(msg);
-//        uciProtocolHandler.sendInfoStringToUCI(msg);
-//        break;
+      //      case "Use_Aspiration_Window_Search":
+      //        config.USE_ASPIRATION_WINDOW = Boolean.valueOf(value);
+      //        msg =
+      //          "Use Aspiration Window Search set to " + (config.USE_ASPIRATION_WINDOW ? "On" : "Off");
+      //        LOG.info(msg);
+      //        uciProtocolHandler.sendInfoStringToUCI(msg);
+      //        break;
       default:
         LOG.error("Unknown option: {}", name);
         break;
@@ -522,6 +557,12 @@ public class FrankyEngine implements IUCIEngine {
 
   @Override
   public void sendResult(int bestMove, int ponderMove) {
+    if (!Move.isValid(bestMove)) {
+      LOG.error("Engine Best Move is invalid move: " + Move.toString(bestMove));
+      LOG.error("Position: " + position.toFENString());
+      LOG.error("Last Move: " + position.getLastMove());
+    }
+
     LOG.info(
       "Engine got Best Move: " + Move.toSimpleString(bestMove) + " [Ponder " + Move.toSimpleString(
         ponderMove) + "]");

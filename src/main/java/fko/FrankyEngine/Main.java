@@ -31,14 +31,29 @@ import fko.UCI.UCIProtocolHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.time.Instant;
+import java.util.Objects;
+import java.util.Properties;
 
 /**
  * Main
  */
 public class Main {
 
-  private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+  static {
+    String PROJECT_PROPERTIES = "project.properties";
+    final Properties properties = new Properties();
+    try {
+      properties.load(Objects.requireNonNull(
+        Main.class.getClassLoader().getResourceAsStream(PROJECT_PROPERTIES)));
+    } catch (IOException e) {
+      e.printStackTrace();
+      System.exit(1);
+    }
+    String name = properties.getProperty("artifactId") + "_v" + properties.getProperty("version");
+    System.setProperty("application-name", name);
+  }
 
   /**
    * The main() method parses the command line arguments<br>
@@ -46,6 +61,9 @@ public class Main {
    * @param args command line options
    */
   public static void main(final String[] args) {
+
+    Logger LOG = LoggerFactory.getLogger(Main.class);
+
     LOG.debug("Start UCI Engine Framework " + Instant.now());
 
     final IUCIEngine uciEngine = new FrankyEngine();

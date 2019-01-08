@@ -32,12 +32,12 @@ import java.util.stream.IntStream;
 
 /**
  * A cache for node results during AlphaBeta search.
- *
+ * <p>
  * Implementation uses a simple array of an TT_Entry class. The array indexes
  * are calculated by using the modulo of the max number of entries from the key.
  * <code>entries[key%maxNumberOfEntries]</code>. As long as key is randomly distributed
  * this works just fine.
- *
+ * <p>
  * The TT_Entry elements are tailored for small memory footprint and use primitive data types
  * for value (short), depth (byte), type (byte), age (byte).
  */
@@ -46,6 +46,7 @@ public class TranspositionTable {
   private static final Logger LOG = LoggerFactory.getLogger(TranspositionTable.class);
 
   private static final int KB = 1024;
+  private static final int MB = KB*KB;
 
   private long sizeInByte;
   private int  maxNumberOfEntries;
@@ -64,18 +65,26 @@ public class TranspositionTable {
    * @param size in MB (1024B^2)
    */
   public TranspositionTable(int size) {
-    sizeInByte = (long) size * KB * KB;
+    sizeInByte = (long) size * MB;
 
     // check available mem - add some head room
     System.gc();
     long usedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
     long freeMemory = (Runtime.getRuntime().maxMemory() - usedMemory);
-    int percentage = 10;
-    if (freeMemory * percentage / 100 < sizeInByte) {
-      LOG.warn(
-        String.format("Not enough memory for a %,dMB transposition cache - reducing to %,dMB",
-                      sizeInByte / (KB * KB), (freeMemory * percentage / 100) / (KB * KB)));
-      sizeInByte = (int) (freeMemory * percentage / 100); // % of memory
+    long ttMemory = (long) (freeMemory * 0.9);
+
+    LOG.debug("{}", String.format("Max JVM memory:           %,5d MB", Runtime.getRuntime().maxMemory() / MB));
+    LOG.debug("{}", String.format("Current total memory:     %,5d MB",
+                                  Runtime.getRuntime().totalMemory() / MB));
+    LOG.debug("{}", String.format("Current used memory:      %,5d MB", usedMemory / MB));
+    LOG.debug("{}", String.format("Current free memory:      %,5d MB", freeMemory / MB));
+    LOG.debug("{}", String.format("Memory available for TT:  %,5d MB", ttMemory / MB));
+
+    if (ttMemory < sizeInByte) {
+      LOG.warn("{}", String.format(
+        "Not enough memory for a %,dMB transposition cache - reducing to %,dMB",
+        sizeInByte / MB, (ttMemory) / MB));
+      sizeInByte = (int) (ttMemory); // % of memory
     }
 
     // size in byte divided by entry size plus size for array bucket
@@ -88,7 +97,7 @@ public class TranspositionTable {
       entries[i] = new TT_Entry();
     }
 
-    LOG.info("Transposition Table Size: {}MB", String.format("%,d", sizeInByte / (KB * KB)));
+    LOG.info("{}", String.format("Transposition Table Size: %,5d MB", sizeInByte / (KB * KB)));
   }
 
   /**
@@ -114,13 +123,18 @@ public class TranspositionTable {
    */
   public void put(Position position, short value, byte type, byte depth, int bestMove) {
 
+    assert depth >= 0;
+    assert type > 0;
+    assert value > Evaluation.NOVALUE;
+    assert (value >= Evaluation.MIN && value <= Evaluation.MAX);
+
     final int hash = getHash(position.getZobristKey());
 
     // new value
     if (entries[hash].key == 0) {
       numberOfEntries++;
       entries[hash].key = position.getZobristKey();
-      entries[hash].fen = position.toFENString();
+      //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
@@ -128,40 +142,37 @@ public class TranspositionTable {
       entries[hash].age = 1;
     }
     // different position - overwrite
+    // @formatter:off
     else if (position.getZobristKey() != entries[hash].key
              && depth > entries[hash].depth
-             && entries[hash].age > 0
-    ) {
+             && entries[hash].age > 0) {
+      // @formatter:on
+      assert entries[hash].value != Evaluation.NOVALUE;
       numberOfCollisions++;
       entries[hash].key = position.getZobristKey();
-      entries[hash].fen = position.toFENString();
+      //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
       entries[hash].bestMove = bestMove;
       entries[hash].age = 1;
     }
-    // Update
-    else if (position.getZobristKey() == entries[hash].key  // same position
-             && depth > entries[hash].depth) { // Overwrite only when new value from deeper search
+    // Update same position
+    else if (position.getZobristKey() == entries[hash].key
+             // Overwrite only when new value from same or deeper search
+             && depth >= entries[hash].depth) {
       numberOfUpdates++;
-
-      // FIXME DEBUG
-      if (Math.abs(entries[hash].value) >= Evaluation.CHECKMATE_THRESHOLD
-          && entries[hash].value == TT_EntryType.EXACT) {
-        if (Math.abs(value) < Evaluation.CHECKMATE_THRESHOLD) {
-          System.err.println("We are erasing a MATE in the TT");
-          System.err.println();
-        }
-      }
-
-      entries[hash].key = position.getZobristKey();
-      entries[hash].fen = position.toFENString();
+      //entries[hash].fen = position.toFENString();
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
-      entries[hash].bestMove = bestMove;
       entries[hash].age = 1;
+      // update best move only if not NOMOVE
+      if (bestMove != Move.NOMOVE) {
+        entries[hash].bestMove = bestMove;
+        entries[hash].age = 1;
+      }
+
     }
     // ignore new values for cache
   }
@@ -182,16 +193,6 @@ public class TranspositionTable {
     }
     // cache miss or collision
     return null;
-  }
-
-  /**
-   * TODO: better hash function?
-   *
-   * @param key
-   * @return returns a hash key
-   */
-  private int getHash(long key) {
-    return (int) (key % maxNumberOfEntries);
   }
 
   /**
@@ -221,13 +222,24 @@ public class TranspositionTable {
     IntStream.range(0, entries.length)
              .parallel()
              .filter(i -> entries[i].key != 0)
-             .forEach(i -> entries[i].age
-               = (byte) Math.min(entries[i].age + 1, Byte.MAX_VALUE-1));
+             .forEach(
+               i -> entries[i].age = (byte) Math.min(entries[i].age + 1, Byte.MAX_VALUE - 1));
+  }
+
+  /**
+   * TODO: better hash function?
+   *
+   * @param key
+   * @return returns a hash key
+   */
+  private int getHash(long key) {
+    return (int) (key % maxNumberOfEntries);
   }
 
   /**
    * @return the numberOfEntries
-   */ public int getNumberOfEntries() {
+   */
+  public int getNumberOfEntries() {
     return this.numberOfEntries;
   }
 
@@ -272,7 +284,7 @@ public class TranspositionTable {
    *     24     2     short TT_Entry.value                            N/A
    *     26     1      byte TT_Entry.depth                            N/A
    *     27     1      byte TT_Entry.type                             N/A
-   *     28     1   boolean TT_Entry.usedFlag                         N/A
+   *     28     1   boolean TT_Entry.age                              N/A
    *     29     3           (loss due to the next object alignment)
    * Instance size: 32 bytes
    * </pre>
@@ -288,7 +300,7 @@ public class TranspositionTable {
     byte  type     = TT_EntryType.NONE;
     int   bestMove = Move.NOMOVE;
     byte  age      = 0;
-    String fen = "";
+    //String fen = "";
   }
 
   /**
@@ -299,7 +311,18 @@ public class TranspositionTable {
     public static final byte EXACT = 1;
     public static final byte ALPHA = 2;
     public static final byte BETA  = 3;
+
+    public static String toString(int type) {
+      switch (type) {
+        case EXACT:
+          return "EXACT";
+        case ALPHA:
+          return "ALPHA";
+        case BETA:
+          return "BETA";
+        default:
+          return "NONE";
+      }
+    }
   }
-
-
 }

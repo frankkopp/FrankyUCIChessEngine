@@ -55,8 +55,9 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
 
   // -- the handler runs in a separate thread --
   private Thread myThread = null;
+  private Semaphore startUpGate = new Semaphore(0, true);
 
-  private Semaphore   semaphore;
+  private Semaphore   externalSynchWaiter;
   private boolean     running = false;
   private PrintStream outputStreamPrinter;
 
@@ -130,6 +131,13 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
 
         // wait until a line is ready to be read
         final String readLine = in.readLine();
+
+        // Input is gone - probably application quit
+        if (readLine == null) {
+          COMLOG.info(">> {}", "EOF");
+          break;
+        }
+
         COMLOG.info(">> {}", readLine);
 
         // Scanner parses the line to tokenize it
@@ -368,13 +376,13 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
   }
 
   private void waiterResume() {
-    if (semaphore != null) {
-      semaphore.release();
+    if (externalSynchWaiter != null) {
+      externalSynchWaiter.release();
     }
   }
 
   void setSemaphoreForSynchronization(Semaphore waiter) {
-    this.semaphore = waiter;
+    this.externalSynchWaiter = waiter;
   }
 
   /**

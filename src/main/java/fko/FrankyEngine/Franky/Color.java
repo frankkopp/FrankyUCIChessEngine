@@ -68,7 +68,7 @@ public enum Color {
             case NOCOLOR:
                 throw new UnsupportedOperationException("Color.NONE has no inverse color");
         }
-        return null;
+        return NOCOLOR;
     }
 
     /**
