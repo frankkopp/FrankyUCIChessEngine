@@ -463,6 +463,10 @@ public class Search implements Runnable {
     searchCounter.currentSearchDepth = 0;
     searchCounter.currentExtraSearchDepth = 0;
 
+    // current best values
+    assert searchCounter.currentBestRootValue == Evaluation.NOVALUE;
+    assert searchCounter.currentBestRootMove == Move.NOMOVE;
+
     // #############################
     // ### BEGIN Iterative Deepening
     do {
@@ -504,9 +508,20 @@ public class Search implements Runnable {
       assert searchCounter.currentBestRootMove != Move.NOMOVE;
       assert !principalVariation[0].empty();
 
+      // determine initial value for aspiration search
+      // either from TT or through a 1 ply search
+      if (searchCounter.currentBestRootValue == Evaluation.NOVALUE) {
+        rootMovesSearch(position, 1, alpha, beta);
+      }
+      assert searchCounter.currentBestRootValue != Evaluation.NOVALUE;
+
       // *******************************************
       // do search
-      rootMovesSearch(position, depth, alpha, beta);
+      if (config.USE_ASPIRATION_WINDOW) {
+        aspiration_search(position, depth);
+      } else {
+        rootMovesSearch(position, depth, Evaluation.MIN, Evaluation.MAX);
+      }
       // *******************************************
 
       assert searchCounter.currentBestRootMove != Move.NOMOVE;
@@ -569,6 +584,42 @@ public class Search implements Runnable {
   }
 
   /**
+   * Aspiration search works with the assumption that the value from previous searches will not
+   * change too much and therefore the search can be tried with a narrow window around the previous
+   * value to cause more cut offs. If the the result is at the edge our outside (not possible
+   * in fail-hard) of our window, we try another search with a wider window. If this also fails we
+   * fall back to a full window search.
+   *
+   * @param position
+   * @param depth
+   */
+  public void aspiration_search(Position position, int depth) {
+
+    final int bestValue = searchCounter.currentBestRootValue;
+
+    // 1st aspiration
+    int alpha = Math.max(Evaluation.MIN, bestValue - 30);
+    int beta = Math.min(Evaluation.MAX, bestValue + 30);
+    rootMovesSearch(position, depth, alpha, beta);
+
+    // 2nd aspiration
+    if (searchCounter.currentBestRootValue <= alpha || searchCounter.currentBestRootValue >= beta) {
+      searchCounter.aspirationResearches++;
+      alpha = Math.max(Evaluation.MIN, bestValue - 200);
+      beta = Math.min(Evaluation.MAX, bestValue + 200);
+      rootMovesSearch(position, depth, alpha, beta);
+    }
+
+    // full window search
+    if (searchCounter.currentBestRootValue <= alpha || searchCounter.currentBestRootValue >= beta) {
+      searchCounter.aspirationResearches++;
+      alpha = Evaluation.MIN;
+      beta = Evaluation.MAX;
+      rootMovesSearch(position, depth, alpha, beta);
+    }
+  }
+
+  /**
    * Performs the search on the root moves and calls the recursive search for each move.
    * This is basically a special version of the normal search.
    *
@@ -589,6 +640,7 @@ public class Search implements Runnable {
 
     // root ply = 0
     final int ply = 0;
+    byte ttType = TT_EntryType.ALPHA;
 
     int numberOfSearchedMoves = 0;
 
@@ -667,10 +719,10 @@ public class Search implements Runnable {
 
       // Evaluate the calculated value and compare to current best move
       if (value >= beta) {
-        // we ignore beta in root as it will always be +INF
-        // Root node is always a PV_NODE
-        // this could change when we start using aspiration windows
-        LOG.warn("value >= beta at Root Search");
+        searchCounter.currentBestRootMove = move;
+        searchCounter.currentBestRootValue=beta;
+//        storeTT(position, alpha, TT_EntryType.BETA, depth, searchCounter.currentBestRootMove);
+        break;
       }
       // if we indeed found a better move (value > alpha) then we need to update
       // the PV (best move) and also store the the new exact value in the TT:
@@ -681,6 +733,7 @@ public class Search implements Runnable {
         MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
         searchCounter.currentBestRootMove = move;
         searchCounter.currentBestRootValue = alpha;
+        ttType=TT_EntryType.EXACT;
       }
 
 
@@ -696,7 +749,8 @@ public class Search implements Runnable {
     }
 
     // store the best alpha
-    storeTT(position, alpha, TT_EntryType.EXACT, depth, searchCounter.currentBestRootMove);
+
+//    storeTT(position, alpha, ttType, depth, searchCounter.currentBestRootMove);
 
     // we use a new
     if (config.USE_ROOT_MOVES_SORT) {
@@ -737,8 +791,11 @@ public class Search implements Runnable {
     }
 
     assert
-      (isPerftSearch() || !config.USE_ALPHABETA_PRUNING || (alpha >= Evaluation.MIN && alpha < beta
-                                                            && beta <= Evaluation.MAX));
+      (isPerftSearch()
+       || !config.USE_ALPHABETA_PRUNING
+       || (alpha >= Evaluation.MIN
+           && alpha < beta
+           && beta <= Evaluation.MAX));
     assert (pvNode || (alpha == beta - 1));
     assert ply >= 1;
     assert depth <= MAX_SEARCH_DEPTH;
@@ -1732,6 +1789,7 @@ public class Search implements Runnable {
     int  nullMovePrunings       = 0;
     int  nullMoveVerifications  = 0;
     int  lmrReductions          = 0;
+    int aspirationResearches = 0;
 
     private void resetCounter() {
       currentBestRootMove = Move.NOMOVE;
@@ -1762,6 +1820,7 @@ public class Search implements Runnable {
       nullMovePrunings = 0;
       nullMoveVerifications = 0;
       lmrReductions = 0;
+      aspirationResearches = 0;
     }
 
     @Override
@@ -1796,6 +1855,7 @@ public class Search implements Runnable {
              ", nullMovePrunings=" + nullMovePrunings +
              ", nullMoveVerifications=" + nullMoveVerifications +
              ", lmrReductions=" + lmrReductions +
+             ", aspirationResearches=" + aspirationResearches +
              '}';
       // @formatter:on
     }

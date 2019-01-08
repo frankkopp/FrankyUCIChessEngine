@@ -486,7 +486,7 @@ public class SearchTest {
   @Disabled
   public void sizeOfSearchTreeTest() {
 
-    int depth = 5;
+    int depth = 6;
     List<String> resultStrings = new ArrayList<>();
     List<String> fens = new ArrayList<>();
 
@@ -494,15 +494,17 @@ public class SearchTest {
 
     LOG.info("Start SIZE Test for depth {}", depth);
 
-    //fens.add(Position.STANDARD_BOARD_FEN);
-    //fens.add("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    //fens.add("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -");
-    //fens.add("r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -");
+    fens.add(Position.STANDARD_BOARD_FEN);
+    fens.add("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    fens.add("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -");
+    fens.add("r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -");
     fens.add("1r1r2k1/2p1qp1p/6p1/ppQB1b2/5Pn1/2R1P1P1/PP5P/R1B3K1 b - -");
 
     measureTreeSize(new Position(),
                     new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false),
                     resultStrings, "WARM UP", true);
+
+    search.clearHashTables();
 
     for (String fen : fens) {
       resultStrings.add("");
@@ -527,12 +529,14 @@ public class SearchTest {
     search.config.USE_ROOT_MOVES_SORT = false;
     search.config.USE_PVS = false;
     search.config.USE_PVS_MOVE_ORDERING = false;
+    search.config.USE_ASPIRATION_WINDOW = false;
 
     search.config.USE_TRANSPOSITION_TABLE = false;
 
     search.config.USE_TT_ROOT = false;
     search.config.USE_MATE_DISTANCE_PRUNING = false;
     search.config.USE_MINOR_PROMOTION_PRUNING = false;
+
     search.config.USE_NULL_MOVE_PRUNING = false;
     search.config.USE_KILLER_MOVES = false;
     search.config.USE_STATIC_NULL_PRUNING = false;
@@ -541,51 +545,54 @@ public class SearchTest {
 
     search.config.USE_QUIESCENCE = false;
 
-    measureTreeSize(position, searchMode, values, "REFERENCE", true);
+//    measureTreeSize(position, searchMode, values, "REFERENCE", true);
 
     search.config.USE_ALPHABETA_PRUNING = true;
-    measureTreeSize(position, searchMode, values, "BASE", true);
+//    measureTreeSize(position, searchMode, values, "BASE", true);
 
     search.config.USE_TRANSPOSITION_TABLE = true;
-    measureTreeSize(position, searchMode, values, "TT", true);
+//    measureTreeSize(position, searchMode, values, "TT", true);
 
     search.config.USE_ROOT_MOVES_SORT = true;
     search.config.USE_PVS = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
-    measureTreeSize(position, searchMode, values, "PVS_ORDER", true);
+//    measureTreeSize(position, searchMode, values, "PVS_ORDER", true);
 
     search.config.USE_TT_ROOT = true;
-    measureTreeSize(position, searchMode, values, "TT_ROOT", false);
-    search.config.USE_TT_ROOT = false;
+//    measureTreeSize(position, searchMode, values, "TT_ROOT", false);
+//    search.config.USE_TT_ROOT = false;
 
     search.config.USE_KILLER_MOVES = true;
-    measureTreeSize(position, searchMode, values, "KILLER_PUSH", true);
+//    measureTreeSize(position, searchMode, values, "KILLER_PUSH", true);
 
     search.config.USE_MATE_DISTANCE_PRUNING = true;
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
-    measureTreeSize(position, searchMode, values, "MDP/MPP", true);
+//    measureTreeSize(position, searchMode, values, "MDP/MPP", true);
 
     search.config.USE_STATIC_NULL_PRUNING = true;
     search.config.USE_RAZOR_PRUNING = true;
-    measureTreeSize(position, searchMode, values, "STATIC/RAZOR", true);
+//    measureTreeSize(position, searchMode, values, "STATIC/RAZOR", true);
 
     search.config.USE_LMR = true;
-    measureTreeSize(position, searchMode, values, "LMR", true);
+//    measureTreeSize(position, searchMode, values, "LMR", true);
 
     search.config.USE_NULL_MOVE_PRUNING = true;
-    search.config.NULL_MOVE_DEPTH = 3;
-    search.config.USE_VERIFY_NMP = true;
-    search.config.NULL_MOVE_REDUCTION_VERIFICATION = 4;
-    measureTreeSize(position, searchMode, values, "NMP", true);
+//    search.config.NULL_MOVE_DEPTH = 3;
+//    search.config.USE_VERIFY_NMP = true;
+//    search.config.NULL_MOVE_REDUCTION_VERIFICATION = 4;
+//    measureTreeSize(position, searchMode, values, "NMP", true);
 
     search.config.USE_QUIESCENCE = true;
-    measureTreeSize(position, searchMode, values, "QS", true);
+//    measureTreeSize(position, searchMode, values, "QS", true);
 
-    search.config.USE_TT_ROOT = true;
-    measureTreeSize(position, searchMode, values, "TT_ROOT", false);
+//    search.config.USE_TT_ROOT = true;
+    measureTreeSize(position, searchMode, values, "ALL", true);
+
+    search.config.USE_ASPIRATION_WINDOW = true;
+    measureTreeSize(position, searchMode, values, "ASPIRATION", true);
 
     // REPEAT
-    measureTreeSize(position, searchMode, values, "REPEAT+TT", false);
+//    measureTreeSize(position, searchMode, values, "REPEAT+TT", false);
   }
 
   private void measureTreeSize(final Position position, final SearchMode searchMode,
@@ -675,6 +682,7 @@ public class SearchTest {
     search.config.USE_PVS = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
     search.config.USE_KILLER_MOVES = true;
+    search.config.USE_ASPIRATION_WINDOW = true;
 
     search.config.USE_TRANSPOSITION_TABLE = true;
 
@@ -682,17 +690,19 @@ public class SearchTest {
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
     search.config.USE_NULL_MOVE_PRUNING = true;
     search.config.USE_STATIC_NULL_PRUNING = true;
-    search.config.USE_RAZOR_PRUNING = false;
-    search.config.USE_LMR = false;
+    search.config.USE_RAZOR_PRUNING = true;
+    search.config.USE_LMR = true;
 
-    search.config.USE_QUIESCENCE = false;
+    search.config.USE_QUIESCENCE = true;
 
     int maxDepth = 6;
     int moveTime = 0;
     int mateIn = 0;
     boolean infinite = true;
 
-    fen = "4r1b1/1p4B1/pN2pR2/RB2k3/1P2N2p/2p3b1/n2P1p1r/5K1n w - -";
+    String result = "";
+
+    fen = "r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -";
     //    fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
     //    fen = "r2q1rk1/1p1nbppp/3p1n2/1Pp2b2/p1P5/2N1Pp1P/PBNPB1P1/R2Q1RK1 w - -";
     //    fen = "4k3/4p3/8/8/8/8/8/3KQ3 w - -";
@@ -700,18 +710,35 @@ public class SearchTest {
     searchMode =
       new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
 
+    // FIXME: results should be the same with or without aspiration windows
+
+    search.config.USE_ASPIRATION_WINDOW = false;
+
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
 
-    LOG.warn("Best Move: {} Value: {} Ponder {}",
-             Move.toSimpleString(search.getLastSearchResult().bestMove),
-             search.getLastSearchResult().resultValue / 100f,
-             Move.toSimpleString(search.getLastSearchResult().ponderMove));
+    result += String.format("%nSIZE: %,14d >> %-18s (%4d) >> nps %,.0f >> %s %n ",
+                  search.getSearchCounter().leafPositionsEvaluated,
+                  Move.toString(search.getLastSearchResult().bestMove),
+                  search.getLastSearchResult().resultValue,
+                  (1e3 * search.getSearchCounter().nodesVisited) /
+                  search.getSearchCounter().lastSearchTime,
+                  search.getSearchCounter().toString());
 
-    LOG.warn(search.getSearchCounter().toString());
+    search.config.USE_ASPIRATION_WINDOW = true;
 
-    assertEquals(Evaluation.CHECKMATE - 5, search.getLastSearchResult().resultValue);
+    search.startSearch(position, searchMode);
+    search.waitWhileSearching();
 
+    result += String.format("%nSIZE: %,14d >> %-18s (%4d) >> nps %,.0f >> %s %n ",
+                      search.getSearchCounter().leafPositionsEvaluated,
+                      Move.toString(search.getLastSearchResult().bestMove),
+                      search.getLastSearchResult().resultValue,
+                      (1e3 * search.getSearchCounter().nodesVisited) /
+                      search.getSearchCounter().lastSearchTime,
+                      search.getSearchCounter().toString());
+
+    System.out.println(result);
   }
 
   @Test

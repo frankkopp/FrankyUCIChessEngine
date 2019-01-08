@@ -61,7 +61,8 @@ public class MoveGenerator {
   private Color activePlayer;
 
   // these are are working lists as fields to avoid to have to
-  // create them every time. Instead of creating the need to be cleared before use.
+  // create them during each move generation. Instead of creating the need
+  // to be cleared before use.
   private final MoveList legalMoves        = new MoveList();
   // these are all pseudo legal
   private final MoveList pseudoLegalMoves  = new MoveList(); // all moves
@@ -70,19 +71,16 @@ public class MoveGenerator {
 
   // These fields control the on demand generation of moves.
   private OnDemandState generationCycleState = OnDemandState.NEW;
-  private MoveList      killerMoves          = new MoveList(0);
-  private int           pvMove               = Move.NOMOVE;
-
-  private enum OnDemandState {
-    NEW, CAPTURING, NON_CAPTURING, ALL
-  }
-
   private static final int GEN_CAPTURES    = 1;
   private static final int GEN_NONCAPTURES = 2;
   private static final int GEN_ALL         = 3;
   private              int genMode         = GEN_ALL;
-
+  private enum OnDemandState { NEW, CAPTURING, NON_CAPTURING, ALL }
   private MoveList onDemandMoveList = new MoveList();
+
+  // these field influence the move sorting as pv and killer moves are typically searched early
+  private MoveList      killerMoves          = new MoveList(0);
+  private int           pvMove               = Move.NOMOVE;
 
   // Comparator for move value victim least value attacker
   private static final Comparator<Integer> mvvlvaComparator = Comparator.comparingInt(
@@ -153,7 +151,7 @@ public class MoveGenerator {
    * <p>
    * The generation cycle starts new with each new call to <code>setPosition</code>.
    *
-   * @return int representing the next legal Move. Return Move.NOMOVE if none available
+   * @return int representing the next legal Move. Returns Move.NOMOVE if none available
    */
   public int getNextPseudoLegalMove(boolean capturingOnly) {
     // protect against null position
@@ -169,8 +167,10 @@ public class MoveGenerator {
     while (onDemandMoveList.empty() && !(generationCycleState == OnDemandState.ALL)) {
 
       switch (generationCycleState) {
-        case NEW: // fall through
+        case NEW:
           generationCycleState = OnDemandState.CAPTURING;
+          // fall through
+
         case CAPTURING:
 
           genMode = GEN_CAPTURES;
