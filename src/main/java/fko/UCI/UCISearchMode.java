@@ -37,6 +37,7 @@ import java.util.List;
  * <p>start calculating on the current position set up with the "position" command.<br>
  * There are a number of commands that can follow this command, all will be sent in the same string.<br>
  * If one command is not sent its value should be interpreted as it would not influence the search.<br>
+ *  <pre>
  * * searchmoves <move1> .... <movei><br>
  * restrict search to this moves only<br>
  * Example: After "position startpos" and "go infinite searchmoves e2e4 d2d4"<br>
@@ -72,7 +73,8 @@ import java.util.List;
  * * moveTime <x><br>
  * search exactly x mseconds<br>
  * * infinite<br>
- * search until the "stop" command. Do not exit the search without being told so in this mode!</p>
+ * search until the "stop" command. Do not exit the search without being told so in this mode!
+ * </pre>
  */
 public class UCISearchMode implements IUCISearchMode {
 

@@ -45,8 +45,6 @@ public interface IUCIEngine {
    * "setoption name Style value Risky\n"
    * "setoption name Clear Hash\n"
    * "setoption name NalimovPath value c:\chess\tb\4;c:\chess\tb\5\n"
-   *
-   * @return
    */
   void setOption(String name, String value);
 
@@ -251,7 +249,7 @@ public interface IUCIEngine {
    * any string str which will be displayed be the engine,<br>
    * if there is a string command the rest of the line will be interpreted as <str>.<br>
    * * refutation <move1> <move2> ... <movei><br>
-   * move <move1> is refuted by the line <move2> ... <movei>, i can be any number >= 1.<br>
+   * move <move1> is refuted by the line <move2> ... <movei>, i can be any number &gt;= 1.<br>
    * Example: after move d1h5 is searched, the engine can send<br>
    * "info refutation d1h5 g6h5"<br>
    * if g6h5 is the best answer after d1h5 or if g6h5 refutes the move d1h5.<br>
