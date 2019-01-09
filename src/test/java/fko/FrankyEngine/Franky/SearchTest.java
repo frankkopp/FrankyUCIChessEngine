@@ -681,21 +681,21 @@ public class SearchTest {
     search.config.USE_ROOT_MOVES_SORT = true;
     search.config.USE_PVS = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
-    search.config.USE_KILLER_MOVES = true;
+    search.config.USE_KILLER_MOVES = false;
     search.config.USE_ASPIRATION_WINDOW = true;
+    search.config.USE_MATE_DISTANCE_PRUNING = false;
+    search.config.USE_MINOR_PROMOTION_PRUNING = false;
 
     search.config.USE_TRANSPOSITION_TABLE = true;
 
-    search.config.USE_MATE_DISTANCE_PRUNING = true;
-    search.config.USE_MINOR_PROMOTION_PRUNING = true;
-    search.config.USE_NULL_MOVE_PRUNING = true;
-    search.config.USE_STATIC_NULL_PRUNING = true;
-    search.config.USE_RAZOR_PRUNING = true;
-    search.config.USE_LMR = true;
+    search.config.USE_NULL_MOVE_PRUNING = false;
+    search.config.USE_STATIC_NULL_PRUNING = false;
+    search.config.USE_RAZOR_PRUNING = false;
+    search.config.USE_LMR = false;
 
-    search.config.USE_QUIESCENCE = true;
+    search.config.USE_QUIESCENCE = false;
 
-    int maxDepth = 6;
+    int maxDepth = 2;
     int moveTime = 0;
     int mateIn = 0;
     boolean infinite = true;

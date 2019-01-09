@@ -481,6 +481,8 @@ public class Search implements Runnable {
             // sort found TT move as first root move
             rootMoves.pushToHead(ttHit.bestMove);
             searchCounter.currentBestRootMove = ttHit.bestMove;
+            principalVariation[0].clear();
+            principalVariation[0].add(rootMoves.getMove(0));
             // try to get PV line from TT
             getPVLine(position, ttHit.depth, principalVariation[0]);
           }
@@ -503,6 +505,7 @@ public class Search implements Runnable {
       // temporary best move - take the first move available
       if (searchCounter.currentBestRootMove == Move.NOMOVE) {
         searchCounter.currentBestRootMove = rootMoves.getMove(0);
+        principalVariation[0].clear();
         principalVariation[0].add(rootMoves.getMove(0));
       }
       assert searchCounter.currentBestRootMove != Move.NOMOVE;
@@ -514,6 +517,9 @@ public class Search implements Runnable {
         rootMovesSearch(position, 1, alpha, beta);
       }
       assert searchCounter.currentBestRootValue != Evaluation.NOVALUE;
+      assert searchCounter.currentBestRootMove != Move.NOMOVE;
+      assert !principalVariation[0].empty();
+      assert principalVariation[0].getFirst() == searchCounter.currentBestRootMove;
 
       // *******************************************
       // do search
@@ -523,7 +529,6 @@ public class Search implements Runnable {
         rootMovesSearch(position, depth, Evaluation.MIN, Evaluation.MAX);
       }
       // *******************************************
-
       assert searchCounter.currentBestRootMove != Move.NOMOVE;
       assert !principalVariation[0].empty();
       assert principalVariation[0].getFirst() == searchCounter.currentBestRootMove;
@@ -644,6 +649,8 @@ public class Search implements Runnable {
 
     int numberOfSearchedMoves = 0;
 
+    String nodeType = "ALL_NODE";
+
     // #########################################################
     // ##### ROOT MOVES
     // ##### Iterate through all available root moves
@@ -651,8 +658,8 @@ public class Search implements Runnable {
       final int move = rootMoves.getMove(i);
 
       // store the current move
-      searchCounter.currentRootMove = move;
       searchCounter.currentRootMoveNumber = i + 1;
+      searchCounter.currentRootMove = move;
 
       // #### START - Commit move and go deeper into recursion
       position.makeMove(move);
@@ -719,21 +726,26 @@ public class Search implements Runnable {
 
       // Evaluate the calculated value and compare to current best move
       if (value >= beta) {
+        nodeType = "CUT_NODE";
         searchCounter.currentBestRootMove = move;
-        searchCounter.currentBestRootValue=beta;
-//        storeTT(position, alpha, TT_EntryType.BETA, depth, searchCounter.currentBestRootMove);
+        searchCounter.currentBestRootValue = beta;
+        // in root move we can use this as pv as there might not be another
+        // increase of pv due to aspiration windows cut off
+        MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
+        // storeTT(position, alpha, TT_EntryType.BETA, depth, searchCounter.currentBestRootMove);
         break;
       }
       // if we indeed found a better move (value > alpha) then we need to update
       // the PV (best move) and also store the the new exact value in the TT:
       if (value > alpha) {
         // PV_NODE
+      nodeType = "PV_NODE";
         // we have a new PV - we overwrite the old one but could also keep it
         alpha = value;
-        MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
         searchCounter.currentBestRootMove = move;
         searchCounter.currentBestRootValue = alpha;
-        ttType=TT_EntryType.EXACT;
+        MoveList.savePV(move, principalVariation[ply + 1], principalVariation[ply]);
+        ttType = TT_EntryType.EXACT;
       }
 
 
@@ -748,11 +760,7 @@ public class Search implements Runnable {
       assert searchCounter.currentBestRootValue >= Evaluation.MIN;
     }
 
-    // store the best alpha
-
-//    storeTT(position, alpha, ttType, depth, searchCounter.currentBestRootMove);
-
-    // we use a new
+    // sort the root move list for the next iteration
     if (config.USE_ROOT_MOVES_SORT) {
       // sort root moves - higher values first
       // best move is not necessarily at index 0
@@ -764,6 +772,10 @@ public class Search implements Runnable {
       }
     }
 
+    // store the best alpha
+    // storeTT(position, alpha, ttType, depth, searchCounter.currentBestRootMove);
+
+    LOG.debug("Node Type {} for depth {} ", nodeType, depth);
     LOG.trace("Root moves for depth {} searched.", depth);
   }
 
@@ -791,11 +803,8 @@ public class Search implements Runnable {
     }
 
     assert
-      (isPerftSearch()
-       || !config.USE_ALPHABETA_PRUNING
-       || (alpha >= Evaluation.MIN
-           && alpha < beta
-           && beta <= Evaluation.MAX));
+      (isPerftSearch() || !config.USE_ALPHABETA_PRUNING || (alpha >= Evaluation.MIN && alpha < beta
+                                                            && beta <= Evaluation.MAX));
     assert (pvNode || (alpha == beta - 1));
     assert ply >= 1;
     assert depth <= MAX_SEARCH_DEPTH;
@@ -1789,7 +1798,7 @@ public class Search implements Runnable {
     int  nullMovePrunings       = 0;
     int  nullMoveVerifications  = 0;
     int  lmrReductions          = 0;
-    int aspirationResearches = 0;
+    int  aspirationResearches   = 0;
 
     private void resetCounter() {
       currentBestRootMove = Move.NOMOVE;
