@@ -26,13 +26,23 @@
 package fko.FrankyEngine.Franky;
 
 /**
- * A simple and fast list for OmegaSquares for use as piece lists.<br>
+ * A simple and fast list for Squares for use as piece lists.<br>
  */
 public class SquareList {
 
     private static final int MAX_SIZE = 65;
 
     private final Square[] elements = new Square[MAX_SIZE];
+
+    private int size = 0;
+
+    /**
+     * @return the size
+     */
+    public int size() {
+        return size;
+    }
+
     /**
      * @param i
      * @return the element at index i
@@ -40,14 +50,6 @@ public class SquareList {
     public Square get(int i) {
         if (i>=size) throw new ArrayIndexOutOfBoundsException();
         return this.elements[i];
-    }
-
-    private int size = 0;
-    /**
-     * @return the size
-     */
-    public int size() {
-        return size;
     }
 
     /**
@@ -112,16 +114,16 @@ public class SquareList {
      * @return true if size == 0
      */
     public boolean isEmpty() {
-        return size()==0;
+        return size == 0;
     }
 
     @Override
     public String toString() {
-        String s = "["+size()+"] ";
-        for (int i=0; i<size(); i++) {
-            s += elements[i] + " ";
+        StringBuilder s = new StringBuilder("[" + size + "] ");
+        for (int i = 0; i < size; i++) {
+            s.append(elements[i]).append(" ");
         }
-        return s;
+        return s.toString();
     }
 
     /**
