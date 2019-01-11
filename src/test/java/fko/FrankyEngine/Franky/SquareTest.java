@@ -92,7 +92,7 @@ public class SquareTest {
 
         // iteration
         int counter = 0;
-        for ( Square sq : Square.values ) {
+        for (Square sq : Square.values) {
             if (!sq.isValidSquare()) continue;
             counter++;
         }
@@ -107,17 +107,19 @@ public class SquareTest {
         // check order by creating string
         StringBuilder sb = new StringBuilder();
         list.forEach(c -> sb.append(c));
-        assertEquals("a1b1c1d1e1f1g1h1a2b2c2d2e2f2g2h2a3b3c3d3e3f3g3h3a4b4c4d4e4f4g4h4a5b5c5d5e5f5g5h5a6b6c6d6e6f6g6h6a7b7c7d7e7f7g7h7a8b8c8d8e8f8g8h8", sb.toString());
+        assertEquals(
+          "a1b1c1d1e1f1g1h1a2b2c2d2e2f2g2h2a3b3c3d3e3f3g3h3a4b4c4d4e4f4g4h4a5b5c5d5e5f5g5h5a6b6c6d6e6f6g6h6a7b7c7d7e7f7g7h7a8b8c8d8e8f8g8h8",
+          sb.toString());
 
         counter = 0;
-        for ( Square.File f : Square.File.values() ) {
+        for (Square.File f : Square.File.values()) {
             if (f == File.NOFILE) continue;
             counter++;
         }
         assertEquals(8, counter);
 
         counter = 0;
-        for ( Square.Rank r : Square.Rank.values() ) {
+        for (Square.Rank r : Square.Rank.values()) {
             if (r == Rank.NORANK) continue;
             counter++;
         }
@@ -125,9 +127,6 @@ public class SquareTest {
 
     }
 
-    /**
-     *
-     */
     @Test
     public void testDirections() {
         Square e4 = Square.e4;
@@ -136,4 +135,16 @@ public class SquareTest {
         assertSame(e4.getEast(), Square.f4);
         assertSame(e4.getWest(), Square.d4);
     }
+
+    @Test
+    public void index64Test() {
+        assertEquals(0, Square.a1.index64);
+        assertEquals(7, Square.h1.index64);
+        assertEquals(8, Square.a2.index64);
+        assertEquals(56, Square.a8.index64);
+        assertEquals(63, Square.h8.index64);
+        assertEquals(-1, Square.i1.index64);
+        assertEquals(-1, Square.p8.index64);
+    }
+
 }
