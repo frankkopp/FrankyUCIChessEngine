@@ -136,8 +136,8 @@ public class TranspositionTableTest {
     LOG.info(search.getSearchCounter().toString());
 
     assertTrue(search.getTranspositionTable().getNumberOfEntries() > 0);
-    assertTrue(search.getTranspositionTable().getNumberOfCollisions() > 0);
     assertTrue(search.getTranspositionTable().getNumberOfUpdates() > 0);
+    assertEquals(0, search.getTranspositionTable().getNumberOfCollisions());
     assertTrue(search.getSearchCounter().nodeCache_Hits > 0);
     assertTrue(search.getSearchCounter().nodeCache_Misses > 0);
   }
