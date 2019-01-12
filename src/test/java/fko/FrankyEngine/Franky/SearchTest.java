@@ -159,8 +159,6 @@ public class SearchTest {
       new SearchMode(100000, 100000, 2000, 2000, 0, 0, 0, 0, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
-    // TODO: Inc not implemented in search time estimations yet - so this is similar to non inc
-    //  time control
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
     assertTrue(search.getSearchCounter().currentIterationDepth > 1);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
@@ -257,15 +255,6 @@ public class SearchTest {
     assertTrue(search.getSearchCounter().currentIterationDepth > 0);
     assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
     assertEquals(-Evaluation.CHECKMATE + 6, search.getLastSearchResult().resultValue);
-  }
-
-  @Test
-  @Disabled
-  public void testInfiniteSearch() {
-    Position position = new Position();
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 0, null, false, true, false);
-    search.startSearch(position, searchMode);
-    search.waitWhileSearching();
   }
 
   @Test
@@ -545,6 +534,38 @@ public class SearchTest {
 
     LOG.info("BOARDS: {}", String.format("%,d", search.getSearchCounter().leafPositionsEvaluated));
     LOG.info("PERFT Test for depth 5 successful.");
+  }
+
+  @Test
+  public void testAdvTimeControl() {
+    search.config.USE_BOOK = true;
+    String fen = Position.STANDARD_BOARD_FEN;
+    Position position = new Position(fen);
+
+    // timed search - should use book
+    SearchMode searchMode =
+      new SearchMode(300000, 300000, 0, 0, 0, 0, 0, 0, 0, null, false, false, false);
+    search.startSearch(position, searchMode);
+    search.waitWhileSearching();
+    assertEquals(0, search.getSearchCounter().leafPositionsEvaluated);
+    assertEquals(0, search.getSearchCounter().currentIterationDepth);
+    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+
+    // non timed search - should not use book
+    //    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
+    //    search.startSearch(position, searchMode);
+    //    search.waitWhileSearching();
+    //    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+    //    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+  }
+
+  @Test
+  @Disabled
+  public void testInfiniteSearch() {
+    Position position = new Position();
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 0, null, false, true, false);
+    search.startSearch(position, searchMode);
+    search.waitWhileSearching();
   }
 
   @Test
