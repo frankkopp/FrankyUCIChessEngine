@@ -92,11 +92,6 @@ public class Configuration {
   public boolean USE_QUIESCENCE = true;
 
   /**
-   * Sort root moves after iterations.
-   */
-  public boolean USE_ROOT_MOVES_SORT = true;
-
-  /**
    * Uses TT to determine best move of previous searches and also start depth
    */
   public boolean USE_TT_ROOT = true;
@@ -161,6 +156,22 @@ public class Configuration {
   public boolean USE_KILLER_MOVES = true;
   public int     NO_KILLER_MOVES  = 2;
 
+
+  /**
+   * Late Move Reduction
+   */
+  public boolean USE_LMR       = true;
+  public int     LMR_MIN_DEPTH = 2;
+  public int     LMR_REDUCTION = 1;
+
+  /**
+   * Use Aspiration Window in root search
+   * TODO: Make evaluation more stable between different depths - otherwise
+   * Aspiration will not be efficient.
+   */
+  public boolean USE_ASPIRATION_WINDOW  = true;
+  public int     ASPIRATION_START_DEPTH = 2;
+
   /**
    * Experimental sorting of moves in move generation.
    * Generating moves already has good ordering - extra sorting is expensive
@@ -177,40 +188,27 @@ public class Configuration {
    */
   public boolean USE_SORT_ALL_MOVES = false;
 
-  /**
-   * Late Move Reduction
-   */
-  public boolean USE_LMR       = true;
-  public int     LMR_MIN_DEPTH = 2;
-  public int     LMR_REDUCTION = 1;
 
   // TODO vvvvvvvv
 
-  /**
-   * Use Aspiration Window in root search
-   */
-  public boolean USE_ASPIRATION_WINDOW = false;
-
-
   @Override
   public String toString() {
-    return "Configuration{" + "PERFT=" + PERFT + "\nHASH_SIZE=" + HASH_SIZE + "\nPONDER=" + PONDER +
-           "\nDEBUG=" + DEBUG + "\nUCI_ShowCurrLine=" + UCI_ShowCurrLine + "\nUSE_BOOK=" +
-           USE_BOOK + "\nOB_FolderPath='" + OB_FolderPath + '\'' + "\nOB_fileNamePlain='" +
-           OB_fileNamePlain + '\'' + "\nOB_Mode=" + OB_Mode + "\nUSE_QUIESCENCE=" + USE_QUIESCENCE +
-           "\nUSE_ROOT_MOVES_SORT=" + USE_ROOT_MOVES_SORT + "\nUSE_PVS_MOVE_ORDERING=" +
-           USE_PVS_MOVE_ORDERING + "\nUSE_ALPHABETA_PRUNING=" + USE_ALPHABETA_PRUNING +
-           "\nUSE_PVS=" + USE_PVS + "\nUSE_TRANSPOSITION_TABLE=" + USE_TRANSPOSITION_TABLE +
-           "\nUSE_MATE_DISTANCE_PRUNING=" + USE_MATE_DISTANCE_PRUNING +
-           "\nUSE_MINOR_PROMOTION_PRUNING=" + USE_MINOR_PROMOTION_PRUNING +
-           "\nUSE_NULL_MOVE_PRUNING=" + USE_NULL_MOVE_PRUNING + "\nNULL_MOVE_DEPTH=" +
-           NULL_MOVE_DEPTH + "\nUSE_STATIC_NULL_PRUNING=" + USE_STATIC_NULL_PRUNING +
-           "\nSTATIC_NULL_PRUNING_DEPTH=" + STATIC_NULL_PRUNING_DEPTH +
-           "\nSTATIC_NULL_PRUNING_MARGIN=" + STATIC_NULL_PRUNING_MARGIN + "\nUSE_RAZOR_PRUNING=" +
-           USE_RAZOR_PRUNING + "\nRAZOR_PRUNING_DEPTH=" + RAZOR_PRUNING_DEPTH +
-           "\nRAZOR_PRUNING_MARGIN=" + RAZOR_PRUNING_MARGIN + "\nUSE_KILLER_MOVES=" +
-           USE_KILLER_MOVES + "\nUSE_SORT_ALL_MOVES=" + USE_SORT_ALL_MOVES + "\nUSE_LMR=" +
-           USE_LMR + "\nLMR_MIN_DEPTH=" + LMR_MIN_DEPTH + "\nLMR_REDUCTION=" + LMR_REDUCTION +
-           "\nUSE_ASPIRATION_WINDOW=" + USE_ASPIRATION_WINDOW + '}';
+    return "Configuration{" + "PERFT=" + PERFT + "\nHASH_SIZE=" + HASH_SIZE + "\nPONDER=" + PONDER
+           + "\nDEBUG=" + DEBUG + "\nUCI_ShowCurrLine=" + UCI_ShowCurrLine + "\nUSE_BOOK="
+           + USE_BOOK + "\nOB_FolderPath='" + OB_FolderPath + '\'' + "\nOB_fileNamePlain='"
+           + OB_fileNamePlain + '\'' + "\nOB_Mode=" + OB_Mode + "\nUSE_QUIESCENCE=" + USE_QUIESCENCE
+           + "\nUSE_PVS_MOVE_ORDERING=" + USE_PVS_MOVE_ORDERING + "\nUSE_ALPHABETA_PRUNING="
+           + USE_ALPHABETA_PRUNING + "\nUSE_PVS=" + USE_PVS + "\nUSE_TRANSPOSITION_TABLE="
+           + USE_TRANSPOSITION_TABLE + "\nUSE_MATE_DISTANCE_PRUNING=" + USE_MATE_DISTANCE_PRUNING
+           + "\nUSE_MINOR_PROMOTION_PRUNING=" + USE_MINOR_PROMOTION_PRUNING
+           + "\nUSE_NULL_MOVE_PRUNING=" + USE_NULL_MOVE_PRUNING + "\nNULL_MOVE_DEPTH="
+           + NULL_MOVE_DEPTH + "\nUSE_STATIC_NULL_PRUNING=" + USE_STATIC_NULL_PRUNING
+           + "\nSTATIC_NULL_PRUNING_DEPTH=" + STATIC_NULL_PRUNING_DEPTH
+           + "\nSTATIC_NULL_PRUNING_MARGIN=" + STATIC_NULL_PRUNING_MARGIN + "\nUSE_RAZOR_PRUNING="
+           + USE_RAZOR_PRUNING + "\nRAZOR_PRUNING_DEPTH=" + RAZOR_PRUNING_DEPTH
+           + "\nRAZOR_PRUNING_MARGIN=" + RAZOR_PRUNING_MARGIN + "\nUSE_KILLER_MOVES="
+           + USE_KILLER_MOVES + "\nUSE_SORT_ALL_MOVES=" + USE_SORT_ALL_MOVES + "\nUSE_LMR="
+           + USE_LMR + "\nLMR_MIN_DEPTH=" + LMR_MIN_DEPTH + "\nLMR_REDUCTION=" + LMR_REDUCTION
+           + "\nUSE_ASPIRATION_WINDOW=" + USE_ASPIRATION_WINDOW + '}';
   }
 }
