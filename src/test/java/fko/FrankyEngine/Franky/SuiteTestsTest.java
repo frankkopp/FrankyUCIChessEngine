@@ -131,9 +131,8 @@ public class SuiteTestsTest {
 
     // difficult for LMR because of Queen sacrifice
     assertTrue(
-      testSuite
-        .startOneTest("rnbq3r/pppp4/3b1pkp/5p2/2BP4/4P3/PPP2PPP/RN1QK2R w KQ - bm Qh5+;",
-                      5000, 8));
+      testSuite.startOneTest("6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - - dm 3;",
+                             15000, 0));
 
   }
 

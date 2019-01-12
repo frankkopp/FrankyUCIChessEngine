@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -106,6 +106,17 @@ public class SearchTest {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
+    search.startSearch(position, searchMode);
+    search.waitWhileSearching();
+    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+  }
+
+  @Test
+  public void testIterativeSearch() {
+    String fen = Position.STANDARD_BOARD_FEN;
+    Position position = new Position(fen);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 10, 0, null, false, true, false);
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -262,7 +273,8 @@ public class SearchTest {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
     SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, 1000, 0, 0, 0, Arrays.asList("h2h4"), false, false, false);
+      new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, Collections.singletonList("h2h4"), false, true,
+                     false);
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -288,8 +300,8 @@ public class SearchTest {
         System.out.println(search.getLastSearchResult());
         System.out.println();
       }
-      assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE ||
-                 search.getLastSearchResult().resultValue == -Evaluation.CHECKMATE);
+      assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE
+                 || search.getLastSearchResult().resultValue == -Evaluation.CHECKMATE);
     }
   }
 
@@ -432,19 +444,72 @@ public class SearchTest {
   @Test
   void TT_Root_Test() {
     String fen = Position.STANDARD_BOARD_FEN;
+    fen = "8/6R1/1rp1k3/6p1/3KPp1p/5P1P/8/8 b - -";
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, true, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 12, 0, null, false, true, false);
 
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
 
-    position.makeMove(Move.fromSANNotation(position, "e4"));
-    position.makeMove(Move.fromSANNotation(position, "e5"));
+    //    position.makeMove(Move.fromSANNotation(position, "e4"));
+    //    position.makeMove(Move.fromSANNotation(position, "e5"));
+
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 14, 0, null, false, true, false);
 
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
 
     // What can be asserted here?
+  }
+
+  @Test
+  void aspiration_search() {
+    String fen;
+    SearchMode searchMode;
+    Position position;
+
+    int maxDepth = 6;
+    int moveTime = 0;
+    int mateIn = 0;
+    boolean infinite = true;
+    searchMode =
+      new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
+
+    String result = "";
+
+    fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+    position = new Position(fen);
+
+    search.config.USE_ASPIRATION_WINDOW = false;
+
+    search.startSearch(position, searchMode);
+    search.waitWhileSearching();
+
+    result += String.format("%nSIZE: %,14d >> %-18s (%4d) >> nps %,.0f >> %s %n",
+                            search.getSearchCounter().leafPositionsEvaluated,
+                            Move.toString(search.getLastSearchResult().bestMove),
+                            search.getLastSearchResult().resultValue,
+                            (1e3 * search.getSearchCounter().nodesVisited)
+                            / search.getSearchCounter().lastSearchTime,
+                            search.getSearchCounter().toString());
+
+    search.config.USE_ASPIRATION_WINDOW = true;
+
+    search.clearHashTables();
+
+    search.startSearch(position, searchMode);
+    search.waitWhileSearching();
+
+    result += String.format("SIZE: %,14d >> %-18s (%4d) >> nps %,.0f >> %s %n",
+                            search.getSearchCounter().leafPositionsEvaluated,
+                            Move.toString(search.getLastSearchResult().bestMove),
+                            search.getLastSearchResult().resultValue,
+                            (1e3 * search.getSearchCounter().nodesVisited)
+                            / search.getSearchCounter().lastSearchTime,
+                            search.getSearchCounter().toString());
+
+    System.out.println(result);
+
   }
 
   @Test
@@ -526,14 +591,13 @@ public class SearchTest {
 
     // turn off all optimizations to get a reference value of the search tree size
     search.config.USE_ALPHABETA_PRUNING = false;
-    search.config.USE_ROOT_MOVES_SORT = false;
     search.config.USE_PVS = false;
     search.config.USE_PVS_MOVE_ORDERING = false;
     search.config.USE_ASPIRATION_WINDOW = false;
 
     search.config.USE_TRANSPOSITION_TABLE = false;
-
     search.config.USE_TT_ROOT = false;
+
     search.config.USE_MATE_DISTANCE_PRUNING = false;
     search.config.USE_MINOR_PROMOTION_PRUNING = false;
 
@@ -545,54 +609,53 @@ public class SearchTest {
 
     search.config.USE_QUIESCENCE = false;
 
-//    measureTreeSize(position, searchMode, values, "REFERENCE", true);
+    //    measureTreeSize(position, searchMode, values, "REFERENCE", true);
 
     search.config.USE_ALPHABETA_PRUNING = true;
-//    measureTreeSize(position, searchMode, values, "BASE", true);
+    //    measureTreeSize(position, searchMode, values, "BASE", true);
 
     search.config.USE_TRANSPOSITION_TABLE = true;
-//    measureTreeSize(position, searchMode, values, "TT", true);
+    //    measureTreeSize(position, searchMode, values, "TT", true);
 
-    search.config.USE_ROOT_MOVES_SORT = true;
     search.config.USE_PVS = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
-//    measureTreeSize(position, searchMode, values, "PVS_ORDER", true);
+    //    measureTreeSize(position, searchMode, values, "PVS_ORDER", true);
 
     search.config.USE_TT_ROOT = true;
-//    measureTreeSize(position, searchMode, values, "TT_ROOT", false);
-//    search.config.USE_TT_ROOT = false;
+    //    measureTreeSize(position, searchMode, values, "TT_ROOT", false);
+    //    search.config.USE_TT_ROOT = false;
 
     search.config.USE_KILLER_MOVES = true;
-//    measureTreeSize(position, searchMode, values, "KILLER_PUSH", true);
+    //    measureTreeSize(position, searchMode, values, "KILLER_PUSH", true);
 
     search.config.USE_MATE_DISTANCE_PRUNING = true;
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
-//    measureTreeSize(position, searchMode, values, "MDP/MPP", true);
+    //    measureTreeSize(position, searchMode, values, "MDP/MPP", true);
 
     search.config.USE_STATIC_NULL_PRUNING = true;
     search.config.USE_RAZOR_PRUNING = true;
-//    measureTreeSize(position, searchMode, values, "STATIC/RAZOR", true);
+    //    measureTreeSize(position, searchMode, values, "STATIC/RAZOR", true);
 
     search.config.USE_LMR = true;
-//    measureTreeSize(position, searchMode, values, "LMR", true);
+    //    measureTreeSize(position, searchMode, values, "LMR", true);
 
     search.config.USE_NULL_MOVE_PRUNING = true;
-//    search.config.NULL_MOVE_DEPTH = 3;
-//    search.config.USE_VERIFY_NMP = true;
-//    search.config.NULL_MOVE_REDUCTION_VERIFICATION = 4;
-//    measureTreeSize(position, searchMode, values, "NMP", true);
+    //    search.config.NULL_MOVE_DEPTH = 3;
+    //    search.config.USE_VERIFY_NMP = true;
+    //    search.config.NULL_MOVE_REDUCTION_VERIFICATION = 4;
+    //    measureTreeSize(position, searchMode, values, "NMP", true);
 
     search.config.USE_QUIESCENCE = true;
-//    measureTreeSize(position, searchMode, values, "QS", true);
+    //    measureTreeSize(position, searchMode, values, "QS", true);
 
-//    search.config.USE_TT_ROOT = true;
+    //    search.config.USE_TT_ROOT = true;
     measureTreeSize(position, searchMode, values, "ALL", true);
 
     search.config.USE_ASPIRATION_WINDOW = true;
     measureTreeSize(position, searchMode, values, "ASPIRATION", true);
 
     // REPEAT
-//    measureTreeSize(position, searchMode, values, "REPEAT+TT", false);
+    //    measureTreeSize(position, searchMode, values, "REPEAT+TT", false);
   }
 
   private void measureTreeSize(final Position position, final SearchMode searchMode,
@@ -609,8 +672,8 @@ public class SearchTest {
                              search.getSearchCounter().leafPositionsEvaluated,
                              Move.toString(search.getLastSearchResult().bestMove),
                              search.getLastSearchResult().resultValue,
-                             (1e3 * search.getSearchCounter().nodesVisited) /
-                             search.getSearchCounter().lastSearchTime,
+                             (1e3 * search.getSearchCounter().nodesVisited)
+                             / search.getSearchCounter().lastSearchTime,
                              search.getSearchCounter().toString()));
   }
 
@@ -624,15 +687,14 @@ public class SearchTest {
   public void mateSearchIssueTest() {
 
     boolean infinite = false;
-    int maxDepth = 16;
-    int moveTime = 0;
+    int maxDepth = 0;
+    int moveTime = 10000;
     int mateIn = 5;
-    int pliesToMate = 9;
-    String fen = "8/8/8/p7/8/8/R6p/2K2Rbk w - -"; // Zugzwang Mate - not found
+    int pliesToMate = 7;
+    String fen = "6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - -";
 
     // these should not change result
     search.config.USE_ALPHABETA_PRUNING = true;
-    search.config.USE_ROOT_MOVES_SORT = true;
     search.config.USE_PVS = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
     search.config.USE_KILLER_MOVES = true;
@@ -677,68 +739,119 @@ public class SearchTest {
     SearchMode searchMode;
     Position position;
 
+    search.config.USE_BOOK = false;
+
     search.config.USE_ALPHABETA_PRUNING = true;
-    search.config.USE_ROOT_MOVES_SORT = true;
     search.config.USE_PVS = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
-    search.config.USE_KILLER_MOVES = false;
+    search.config.USE_KILLER_MOVES = true;
     search.config.USE_ASPIRATION_WINDOW = true;
-    search.config.USE_MATE_DISTANCE_PRUNING = false;
-    search.config.USE_MINOR_PROMOTION_PRUNING = false;
+    search.config.USE_MATE_DISTANCE_PRUNING = true;
+    search.config.USE_MINOR_PROMOTION_PRUNING = true;
 
     search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_TT_ROOT = true;
 
-    search.config.USE_NULL_MOVE_PRUNING = false;
-    search.config.USE_STATIC_NULL_PRUNING = false;
-    search.config.USE_RAZOR_PRUNING = false;
-    search.config.USE_LMR = false;
+    search.config.USE_NULL_MOVE_PRUNING = true;
+    search.config.NULL_MOVE_DEPTH = 2;
+    search.config.USE_VERIFY_NMP = true;
+    search.config.NULL_MOVE_REDUCTION_VERIFICATION = 3;
 
-    search.config.USE_QUIESCENCE = false;
+    search.config.USE_STATIC_NULL_PRUNING = true;
+    search.config.USE_RAZOR_PRUNING = true;
+    search.config.USE_LMR = true;
 
-    int maxDepth = 2;
+    search.config.USE_QUIESCENCE = true;
+
+    int maxDepth = 8;
     int moveTime = 0;
     int mateIn = 0;
     boolean infinite = true;
 
     String result = "";
 
-    fen = "r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -";
-    //    fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
-    //    fen = "r2q1rk1/1p1nbppp/3p1n2/1Pp2b2/p1P5/2N1Pp1P/PBNPB1P1/R2Q1RK1 w - -";
-    //    fen = "4k3/4p3/8/8/8/8/8/3KQ3 w - -";
+    fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+    // fen = "r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -";
+    // fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+    // fen = "r2q1rk1/1p1nbppp/3p1n2/1Pp2b2/p1P5/2N1Pp1P/PBNPB1P1/R2Q1RK1 w - -";
+    // fen = "4k3/4p3/8/8/8/8/8/3KQ3 w - -";
+    //    fen = "7k/8/8/8/6p1/3N3N/P4p2/1K6 w - -";
+
     position = new Position(fen);
     searchMode =
       new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
 
-    // FIXME: results should be the same with or without aspiration windows
+    // results should be the same with or without aspiration windows
+    //SIZE:      1.209.389 >> NORMAL bc8-g4      ( -83) >> nps 92.560 >> SearchCounter{nodesVisited=1209395, lastSearchTime=00:00:13.066, currentBestRootMove=67263346, currentBestRootValue=-83, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=134341478, currentRootMoveNumber=36, leafPositionsEvaluated=1209389, nonLeafPositionsEvaluated=0, checkCounter=49935, checkMateCounter=0, captureCounter=264419, enPassantCounter=140, positionsNonQuiet=0, nodeCache_Hits=0, nodeCache_Misses=0, movesGenerated=1232507, pvs_root_researches=4, pvs_root_cutoffs=206, pvs_researches=5986, pvs_cutoffs=982459, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=0, nullMoveVerifications=0, lmrReductions=0, aspirationResearches=0}
+    //SIZE:      1.438.298 >> NORMAL bc8-g4      ( -83) >> nps 106.906 >> SearchCounter{nodesVisited=1438312, lastSearchTime=00:00:13.454, currentBestRootMove=67263346, currentBestRootValue=-83, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=134341478, currentRootMoveNumber=36, leafPositionsEvaluated=1438298, nonLeafPositionsEvaluated=0, checkCounter=75913, checkMateCounter=0, captureCounter=362170, enPassantCounter=269, positionsNonQuiet=0, nodeCache_Hits=0, nodeCache_Misses=0, movesGenerated=1505868, pvs_root_researches=4, pvs_root_cutoffs=347, pvs_researches=6645, pvs_cutoffs=1118873, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=0, nullMoveVerifications=0, lmrReductions=0, aspirationResearches=8}
+    //
+    //Killer
+    //SIZE:        716.768 >> NORMAL bc8-g4      ( -83) >> nps 77.372 >> SearchCounter{nodesVisited=716774, lastSearchTime=00:00:09.264, currentBestRootMove=67263346, currentBestRootValue=-83, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=134341478, currentRootMoveNumber=36, leafPositionsEvaluated=716768, nonLeafPositionsEvaluated=0, checkCounter=38662, checkMateCounter=0, captureCounter=172954, enPassantCounter=110, positionsNonQuiet=0, nodeCache_Hits=0, nodeCache_Misses=0, movesGenerated=746895, pvs_root_researches=4, pvs_root_cutoffs=206, pvs_researches=2525, pvs_cutoffs=565213, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=0, nullMoveVerifications=0, lmrReductions=0, aspirationResearches=0}
+    //SIZE:        951.743 >> NORMAL bc8-g4      ( -83) >> nps 126.547 >> SearchCounter{nodesVisited=951757, lastSearchTime=00:00:07.521, currentBestRootMove=67263346, currentBestRootValue=-83, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=134341478, currentRootMoveNumber=36, leafPositionsEvaluated=951743, nonLeafPositionsEvaluated=0, checkCounter=56333, checkMateCounter=0, captureCounter=270340, enPassantCounter=238, positionsNonQuiet=0, nodeCache_Hits=0, nodeCache_Misses=0, movesGenerated=1022371, pvs_root_researches=4, pvs_root_cutoffs=347, pvs_researches=3236, pvs_cutoffs=707178, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=0, nullMoveVerifications=0, lmrReductions=0, aspirationResearches=8}
+    //
+    //MP
+    //SIZE:        716.768 >> NORMAL bc8-g4      ( -83) >> nps 77.364 >> SearchCounter{nodesVisited=716774, lastSearchTime=00:00:09.265, currentBestRootMove=67263346, currentBestRootValue=-83, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=134341478, currentRootMoveNumber=36, leafPositionsEvaluated=716768, nonLeafPositionsEvaluated=0, checkCounter=38662, checkMateCounter=0, captureCounter=172954, enPassantCounter=110, positionsNonQuiet=0, nodeCache_Hits=0, nodeCache_Misses=0, movesGenerated=746895, pvs_root_researches=4, pvs_root_cutoffs=206, pvs_researches=2525, pvs_cutoffs=565213, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=0, nullMoveVerifications=0, lmrReductions=0, aspirationResearches=0}
+    //SIZE:        951.743 >> NORMAL bc8-g4      ( -83) >> nps 130.467 >> SearchCounter{nodesVisited=951757, lastSearchTime=00:00:07.295, currentBestRootMove=67263346, currentBestRootValue=-83, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=134341478, currentRootMoveNumber=36, leafPositionsEvaluated=951743, nonLeafPositionsEvaluated=0, checkCounter=56333, checkMateCounter=0, captureCounter=270340, enPassantCounter=238, positionsNonQuiet=0, nodeCache_Hits=0, nodeCache_Misses=0, movesGenerated=1022371, pvs_root_researches=4, pvs_root_cutoffs=347, pvs_researches=3236, pvs_cutoffs=707178, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=0, nullMoveVerifications=0, lmrReductions=0, aspirationResearches=8}
+    //
+    //TT
+    //SIZE:        437.097 >> NORMAL bc8-g4      ( -83) >> nps 59.466 >> SearchCounter{nodesVisited=460626, lastSearchTime=00:00:07.746, currentBestRootMove=67263346, currentBestRootValue=-83, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=134341478, currentRootMoveNumber=36, leafPositionsEvaluated=437097, nonLeafPositionsEvaluated=0, checkCounter=21643, checkMateCounter=0, captureCounter=100515, enPassantCounter=76, positionsNonQuiet=0, nodeCache_Hits=63461, nodeCache_Misses=46505, movesGenerated=453512, pvs_root_researches=4, pvs_root_cutoffs=206, pvs_researches=24533, pvs_cutoffs=324897, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=0, nullMoveVerifications=0, lmrReductions=0, aspirationResearches=0}
+    //SIZE:        186.486 >> NORMAL bc8-g4      ( -83) >> nps 136.962 >> SearchCounter{nodesVisited=273376, lastSearchTime=00:00:01.996, currentBestRootMove=67263346, currentBestRootValue=-83, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=67246290, currentRootMoveNumber=36, leafPositionsEvaluated=186486, nonLeafPositionsEvaluated=0, checkCounter=29482, checkMateCounter=0, captureCounter=97200, enPassantCounter=132, positionsNonQuiet=0, nodeCache_Hits=180146, nodeCache_Misses=1336, movesGenerated=194035, pvs_root_researches=180, pvs_root_cutoffs=69, pvs_researches=86770, pvs_cutoffs=4794, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=0, nullMoveVerifications=0, lmrReductions=0, aspirationResearches=3}
+    //
+    //NULL
+    //SIZE:        271.342 >> NORMAL bc8-g4      ( -51) >> nps 48.362 >> SearchCounter{nodesVisited=289401, lastSearchTime=00:00:05.984, currentBestRootMove=67263346, currentBestRootValue=-51, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=134341478, currentRootMoveNumber=36, leafPositionsEvaluated=271342, nonLeafPositionsEvaluated=0, checkCounter=12191, checkMateCounter=0, captureCounter=60232, enPassantCounter=24, positionsNonQuiet=0, nodeCache_Hits=46334, nodeCache_Misses=24318, movesGenerated=273738, pvs_root_researches=4, pvs_root_cutoffs=206, pvs_researches=18685, pvs_cutoffs=198437, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=931, nullMoveVerifications=99, lmrReductions=0, aspirationResearches=0}
+    //SIZE:         60.903 >> NORMAL bc8-g4      ( -51) >> nps 106.440 >> SearchCounter{nodesVisited=86323, lastSearchTime=00:00:00.811, currentBestRootMove=67263346, currentBestRootValue=-51, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=67246290, currentRootMoveNumber=36, leafPositionsEvaluated=60903, nonLeafPositionsEvaluated=0, checkCounter=8436, checkMateCounter=0, captureCounter=28987, enPassantCounter=20, positionsNonQuiet=0, nodeCache_Hits=54750, nodeCache_Misses=378, movesGenerated=59783, pvs_root_researches=176, pvs_root_cutoffs=73, pvs_researches=25332, pvs_cutoffs=5496, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=1691, nullMoveVerifications=8, lmrReductions=0, aspirationResearches=3}
+    //
+    //STATIC
+    //SIZE:        263.500 >> NORMAL bc8-g4      ( -51) >> nps 51.343 >> SearchCounter{nodesVisited=278435, lastSearchTime=00:00:05.423, currentBestRootMove=67263346, currentBestRootValue=-51, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=134341478, currentRootMoveNumber=36, leafPositionsEvaluated=263500, nonLeafPositionsEvaluated=0, checkCounter=12069, checkMateCounter=0, captureCounter=52412, enPassantCounter=13, positionsNonQuiet=0, nodeCache_Hits=38088, nodeCache_Misses=29440, movesGenerated=265896, pvs_root_researches=4, pvs_root_cutoffs=206, pvs_researches=15561, pvs_cutoffs=201562, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=931, nullMoveVerifications=99, lmrReductions=0, aspirationResearches=0}
+    //SIZE:         55.566 >> NORMAL bc8-g4      ( -51) >> nps 88.103 >> SearchCounter{nodesVisited=75945, lastSearchTime=00:00:00.862, currentBestRootMove=67263346, currentBestRootValue=-51, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=67246290, currentRootMoveNumber=36, leafPositionsEvaluated=55566, nonLeafPositionsEvaluated=0, checkCounter=8183, checkMateCounter=0, captureCounter=23656, enPassantCounter=12, positionsNonQuiet=0, nodeCache_Hits=44639, nodeCache_Misses=5448, movesGenerated=54446, pvs_root_researches=176, pvs_root_cutoffs=73, pvs_researches=20291, pvs_cutoffs=10537, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=1691, nullMoveVerifications=8, lmrReductions=0, aspirationResearches=3}
+    //
+    //RAZOR
+    //SIZE:        261.568 >> NORMAL bc8-g4      ( -51) >> nps 42.784 >> SearchCounter{nodesVisited=276382, lastSearchTime=00:00:06.460, currentBestRootMove=67263346, currentBestRootValue=-51, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=134341478, currentRootMoveNumber=36, leafPositionsEvaluated=261568, nonLeafPositionsEvaluated=0, checkCounter=12064, checkMateCounter=0, captureCounter=52277, enPassantCounter=13, positionsNonQuiet=0, nodeCache_Hits=37967, nodeCache_Misses=29474, movesGenerated=263782, pvs_root_researches=4, pvs_root_cutoffs=206, pvs_researches=15618, pvs_cutoffs=199516, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=931, nullMoveVerifications=99, lmrReductions=0, aspirationResearches=0}
+    //SIZE:         55.566 >> NORMAL bc8-g4      ( -51) >> nps 88.206 >> SearchCounter{nodesVisited=75945, lastSearchTime=00:00:00.861, currentBestRootMove=67263346, currentBestRootValue=-51, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=67246290, currentRootMoveNumber=36, leafPositionsEvaluated=55566, nonLeafPositionsEvaluated=0, checkCounter=8183, checkMateCounter=0, captureCounter=23656, enPassantCounter=12, positionsNonQuiet=0, nodeCache_Hits=44639, nodeCache_Misses=5448, movesGenerated=54446, pvs_root_researches=176, pvs_root_cutoffs=73, pvs_researches=20291, pvs_cutoffs=10537, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=1691, nullMoveVerifications=8, lmrReductions=0, aspirationResearches=3}
+    //
+    //LMR
+    //SIZE:        497.206 >> NORMAL bc8-g4      ( -51) >> nps 46.703 >> SearchCounter{nodesVisited=515135, lastSearchTime=00:00:11.030, currentBestRootMove=67263346, currentBestRootValue=-51, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=134341478, currentRootMoveNumber=36, leafPositionsEvaluated=497206, nonLeafPositionsEvaluated=0, checkCounter=13115, checkMateCounter=0, captureCounter=111286, enPassantCounter=7, positionsNonQuiet=0, nodeCache_Hits=55362, nodeCache_Misses=67804, movesGenerated=501967, pvs_root_researches=148, pvs_root_cutoffs=62, pvs_researches=43124, pvs_cutoffs=331264, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=598, nullMoveVerifications=11, lmrReductions=44611, aspirationResearches=0}
+    //SIZE:        933.240 >> NORMAL bc8-g4      ( -51) >> nps 73.021 >> SearchCounter{nodesVisited=991473, lastSearchTime=00:00:13.578, currentBestRootMove=67263346, currentBestRootValue=-51, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=6, currentRootMove=67246290, currentRootMoveNumber=36, leafPositionsEvaluated=933240, nonLeafPositionsEvaluated=0, checkCounter=28995, checkMateCounter=0, captureCounter=218595, enPassantCounter=42, positionsNonQuiet=0, nodeCache_Hits=172982, nodeCache_Misses=90006, movesGenerated=912637, pvs_root_researches=154, pvs_root_cutoffs=133, pvs_researches=88157, pvs_cutoffs=629134, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=1353, nullMoveVerifications=250, lmrReductions=57569, aspirationResearches=5}
+    //
+    //QS
+    //SIZE:        469.339 >> NORMAL bc8-g4      ( -32) >> nps 77.392 >> SearchCounter{nodesVisited=592205, lastSearchTime=00:00:07.652, currentBestRootMove=67263346, currentBestRootValue=-32, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=14, currentRootMove=67246290, currentRootMoveNumber=36, leafPositionsEvaluated=469339, nonLeafPositionsEvaluated=4, checkCounter=1265, checkMateCounter=0, captureCounter=97807, enPassantCounter=6, positionsNonQuiet=45578, nodeCache_Hits=307742, nodeCache_Misses=284482, movesGenerated=829051, pvs_root_researches=67, pvs_root_cutoffs=143, pvs_researches=124301, pvs_cutoffs=254405, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=737, nullMoveVerifications=57, lmrReductions=13306, aspirationResearches=0}
+    //SIZE:         79.131 >> NORMAL bc8-g4      ( -32) >> nps 124.998 >> SearchCounter{nodesVisited=102623, lastSearchTime=00:00:00.821, currentBestRootMove=67263346, currentBestRootValue=-32, currentIterationDepth=6, currentSearchDepth=6, currentExtraSearchDepth=14, currentRootMove=67299571, currentRootMoveNumber=36, leafPositionsEvaluated=79131, nonLeafPositionsEvaluated=4, checkCounter=133, checkMateCounter=0, captureCounter=22338, enPassantCounter=1, positionsNonQuiet=10813, nodeCache_Hits=77019, nodeCache_Misses=25600, movesGenerated=112266, pvs_root_researches=224, pvs_root_cutoffs=59, pvs_researches=21784, pvs_cutoffs=31314, mateDistancePrunings=0, minorPromotionPrunings=0, nullMovePrunings=1926, nullMoveVerifications=27, lmrReductions=842, aspirationResearches=4}
 
     search.config.USE_ASPIRATION_WINDOW = false;
 
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
 
-    result += String.format("%nSIZE: %,14d >> %-18s (%4d) >> nps %,.0f >> %s %n ",
-                  search.getSearchCounter().leafPositionsEvaluated,
-                  Move.toString(search.getLastSearchResult().bestMove),
-                  search.getLastSearchResult().resultValue,
-                  (1e3 * search.getSearchCounter().nodesVisited) /
-                  search.getSearchCounter().lastSearchTime,
-                  search.getSearchCounter().toString());
+    result += String.format("%nSIZE: %,14d >> %-18s (%4d) >> nps %,.0f >> %s %n",
+                            search.getSearchCounter().leafPositionsEvaluated,
+                            Move.toString(search.getLastSearchResult().bestMove),
+                            search.getLastSearchResult().resultValue,
+                            (1e3 * search.getSearchCounter().nodesVisited)
+                            / search.getSearchCounter().lastSearchTime,
+                            search.getSearchCounter().toString());
+
+    int bestMove1 = search.getLastSearchResult().bestMove;
 
     search.config.USE_ASPIRATION_WINDOW = true;
+
+    search.clearHashTables();
 
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
 
-    result += String.format("%nSIZE: %,14d >> %-18s (%4d) >> nps %,.0f >> %s %n ",
-                      search.getSearchCounter().leafPositionsEvaluated,
-                      Move.toString(search.getLastSearchResult().bestMove),
-                      search.getLastSearchResult().resultValue,
-                      (1e3 * search.getSearchCounter().nodesVisited) /
-                      search.getSearchCounter().lastSearchTime,
-                      search.getSearchCounter().toString());
+    result += String.format("SIZE: %,14d >> %-18s (%4d) >> nps %,.0f >> %s %n",
+                            search.getSearchCounter().leafPositionsEvaluated,
+                            Move.toString(search.getLastSearchResult().bestMove),
+                            search.getLastSearchResult().resultValue,
+                            (1e3 * search.getSearchCounter().nodesVisited)
+                            / search.getSearchCounter().lastSearchTime,
+                            search.getSearchCounter().toString());
+
+    int bestMove2 = search.getLastSearchResult().bestMove;
 
     System.out.println(result);
+
+    assertEquals(bestMove1, bestMove2);
   }
 
   @Test
@@ -748,7 +861,6 @@ public class SearchTest {
     Position position;
     SearchMode searchMode;
 
-    search.config.USE_ROOT_MOVES_SORT = true;
     search.config.USE_ALPHABETA_PRUNING = true;
     search.config.USE_ASPIRATION_WINDOW = true;
     search.config.USE_PVS = true;
