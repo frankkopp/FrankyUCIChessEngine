@@ -44,14 +44,12 @@ import java.util.Properties;
  * TODO:
  *  Testing / Bug fixing
  *  --------------------------------
- *  Arena shows Illegal Moves (probably not 0.8 - better logging implemented)
- *  Arena shows forfeit for time (needs more analysis
- *  Mates found in lower depths lost in higher depths
- * <p>
+ *
  * <p>
  * TODO
  *  Performance
  *  --------------------------------
+ *
  * <p>
  * TODO
  *  Features
