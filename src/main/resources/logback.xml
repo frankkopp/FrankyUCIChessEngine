@@ -31,6 +31,9 @@
     <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%-15.-15thread] %-5.5level %-20.20logger{0} > %msg%n</pattern>
         </encoder>
@@ -41,8 +44,27 @@
         <file>log/app-${application-name}.log</file>
         <append>true</append>
         <immediateFlush>true</immediateFlush>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%-20.-20thread] %-5.5level %-20.20logger{0} > %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="TRACE" class="ch.qos.logback.core.FileAppender">
+        <!-- "application-name" is a variable -->
+        <file>log/trace-${application-name}.log</file>
+        <append>false</append>
+        <immediateFlush>true</immediateFlush>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>TRACE</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -63,9 +85,10 @@
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </logger>
-    <logger name="fko.FrankyEngine" level="DEBUG" additivity="false">
+    <logger name="fko.FrankyEngine" level="TRACE" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="TRACE"/>
     </logger>
 
 </configuration>
