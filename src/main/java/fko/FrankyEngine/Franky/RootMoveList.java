@@ -106,7 +106,7 @@ public class RootMoveList extends ArrayList<RootMoveEntry> {
   @Override
   public String toString() {
     StringBuilder s = new StringBuilder();
-    this.stream().forEach((i) -> {
+    this.forEach((i) -> {
       s.append(Move.toSimpleString(i.move));
       s.append(" (");
       s.append(i.value);
