@@ -223,9 +223,7 @@ public class TranspositionTableTest {
   @Disabled
   public void showSize() {
     //System.out.println(VM.current().details());
-    TranspositionTable.TT_Entry test = new TranspositionTable.TT_Entry();
     System.out.println(ClassLayout.parseClass(TranspositionTable.TT_Entry.class).toPrintable());
-    System.out.println(ClassLayout.parseClass(test.getClass()).toPrintable());
   }
 
 }

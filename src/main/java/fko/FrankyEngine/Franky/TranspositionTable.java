@@ -110,7 +110,7 @@ public class TranspositionTable {
    * @param depth
    */
   public void put(Position position, short value, byte type, byte depth) {
-    put(position, value, type, depth, Move.NOMOVE);
+    put(position, value, type, depth, Move.NOMOVE, false);
   }
 
   /**
@@ -121,8 +121,10 @@ public class TranspositionTable {
    * @param type
    * @param depth
    * @param bestMove
+   * @param mateThreat
    */
-  public void put(Position position, short value, byte type, byte depth, int bestMove) {
+  public void put(Position position, short value, byte type, byte depth, int bestMove,
+                  boolean mateThreat) {
 
     assert depth >= 0;
     assert type > 0;
@@ -134,25 +136,31 @@ public class TranspositionTable {
     // new value
     if (entries[hash].key == 0) {
       numberOfEntries++;
+
       entries[hash].key = position.getZobristKey();
       //entries[hash].fen = position.toFENString();
+      entries[hash].age = 1;
+      entries[hash].mateThreat = mateThreat;
+
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
       entries[hash].bestMove = bestMove;
-      entries[hash].age = 1;
     }
     // different position - overwrite if the previous entry has not been used (is aged)
     else if (position.getZobristKey() != entries[hash].key && depth > entries[hash].depth
              && entries[hash].age > 0) {
       numberOfCollisions++;
+
       entries[hash].key = position.getZobristKey();
       //entries[hash].fen = position.toFENString();
+      entries[hash].age = 1;
+      entries[hash].mateThreat = mateThreat;
+
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
       entries[hash].bestMove = bestMove;
-      entries[hash].age = 1;
     }
     // Update same position
     else if (position.getZobristKey() == entries[hash].key) {
@@ -160,9 +168,12 @@ public class TranspositionTable {
       // if from same depth only update when quality of new entry is better
       // e.g. don't replace EXACT with ALPHA or BETA
       if (depth == entries[hash].depth) {
+
         numberOfUpdates++;
+
         // entries[hash].fen = position.toFENString();
         entries[hash].age = 1;
+        entries[hash].mateThreat = mateThreat;
 
         // old was not EXACT - update
         if (entries[hash].type != TT_EntryType.EXACT) {
@@ -180,9 +191,16 @@ public class TranspositionTable {
       }
       // if depth is greater then we update in any case
       else if (depth > entries[hash].depth) {
+        numberOfUpdates++;
+
+        // entries[hash].fen = position.toFENString();
+        entries[hash].age = 1;
+        entries[hash].mateThreat = mateThreat;
+
         entries[hash].value = value;
         entries[hash].type = type;
         entries[hash].depth = depth;
+
         if (bestMove != Move.NOMOVE) entries[hash].bestMove = bestMove;
       }
 
@@ -222,6 +240,7 @@ public class TranspositionTable {
       entries[i].type = TT_EntryType.NONE;
       entries[i].bestMove = Move.NOMOVE;
       entries[i].age = 0;
+      entries[i].mateThreat = false;
     }
     numberOfEntries = 0;
     numberOfCollisions = 0;
@@ -307,12 +326,13 @@ public class TranspositionTable {
 
     static final int SIZE = 32;
 
-    long  key      = 0L;
-    short value    = Evaluation.NOVALUE;
-    byte  depth    = 0;
-    byte  type     = TT_EntryType.NONE;
-    int   bestMove = Move.NOMOVE;
-    byte  age      = 0;
+    long    key        = 0L;
+    byte    age        = 0;
+    boolean mateThreat = false;
+    short   value      = Evaluation.NOVALUE;
+    byte    depth      = 0;
+    byte    type       = TT_EntryType.NONE;
+    int     bestMove   = Move.NOMOVE;
     //String fen = "";
   }
 
