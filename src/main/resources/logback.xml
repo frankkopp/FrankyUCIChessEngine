@@ -90,5 +90,10 @@
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="TRACE"/>
     </logger>
+    <logger name="fko.FrankyEngine.Franky.Search" level="TRACE" additivity="false">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="TRACE"/>
+    </logger>
 
 </configuration>
