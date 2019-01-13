@@ -40,8 +40,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Frank
@@ -398,7 +397,7 @@ public class SearchTest {
     position.makeMove(Move.fromUCINotation(position, "g8h7"));
     // next white move would be 3-fold draw
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 1000, 0, 0, 0, null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
     assertEquals("d8h4", Move.toSimpleString(search.getLastSearchResult().bestMove));
@@ -422,7 +421,7 @@ public class SearchTest {
 
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
-    assertEquals("g7f8", Move.toSimpleString(search.getLastSearchResult().bestMove));
+    assertNotEquals("g8f7", Move.toSimpleString(search.getLastSearchResult().bestMove));
     LOG.warn("Best Move: {} Value: {} Ponder {}",
              Move.toSimpleString(search.getLastSearchResult().bestMove),
              search.getLastSearchResult().resultValue / 100f,
