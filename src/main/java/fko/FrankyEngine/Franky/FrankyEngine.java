@@ -44,6 +44,7 @@ import java.util.Properties;
  * TODO:
  *  Testing / Bug fixing
  *  --------------------------------
+ *  3-fold repetition too often - pot. bug - more testing
  *
  * <p>
  * TODO
