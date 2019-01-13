@@ -468,53 +468,69 @@ class UCIProtocolHandlerTest {
     commandToEngine("ucinewgame");
     clearBuffer();
 
+
     /*
     Trying to find a 3-fold repetition bug
      */
 
     commandToEngine(
-      "position startpos moves d2d3 g8f6 c2c4 e7e6 g1f3 b7b6 g2g3 c8b7 f1g2 f8b4 b1c3 e8g8 e1g1 b4c3 b2c3 d7d5 a1b1 d8e7 f3e5 b8c6 e5c6 b7c6 c1f4 e6e5 f4e3 e7e6 d1b3 d5c4 b3c4 e6c4 d3c4 c6g2 g1g2 f6e4 g2f3 f7f5 b1b3 e4d6 c4c5 d6e4 c5b6 a7b6 a2a3 e4d6 f1a1 d6c4 h2h4 g8f7 a3a4 c7c5 b3b1 a8a7 h4h5 f8a8 h5h6 g7g6 b1h1 a7a4 a1a4 a8a4 e3g5 f7e6 e2e4 a4a2 g5e3 a2c2 h1a1 f5e4 f3e4 c2c3 a1a8 c4d6 e4f3 c3b3 a8a7 d6f7 f3e2 e5e4 e2d2 b3d3 d2e2 d3b3 e2d2 c5c4 a7a6 e6d5 a6a7 d5e6 a7a6");
+      "position startpos moves a2a3 g8f6 g1f3 d7d5 d2d4 c7c6 c1f4 c8g4 f3e5 g4h5 f2f3 f6d7 b1c3 e7e6 e2e4 d7e5 f4e5 b8d7 e5f4 d5e4 c3e4 f7f5 e4d6 f8d6 f4d6 d7f6 d6e5 d8b6 b2b4 a7a5 b4a5 a8a5 f1c4 a5e5 d4e5 f6e4 d1e2 b6a5 e1f1 e4d2 f1f2 d2e4 f2f1 e4d2 f1f2 a5c5 e2e3 c5e3 f2e3 d2c4 e3d4 b7b5 d4c5 e8e7 c5c6 c4e5 c6b5 e7f6 b5b4 h8c8 b4b3 f5f4 a1c1 c8b8 b3c3 b8a8 c1a1 a8c8 c3b3 c8b8 b3c3 b8c8 c3b3 c8b8 b3c3 b8c8");
     commandToEngine("go infinite");
     waitUntilSearching();
     while (engine.isSearching()) {
       while (fromHandlerReader.ready()) {
         final String line = getResponseFromEngine();
         if (line.startsWith("info depth 15 ")) {
-          commandToEngine("stop");
-          break;
+          //          commandToEngine("stop");
+          //          break;
         }
       }
     }
     clearBuffer();
 
-    commandToEngine(
-      "position startpos moves d2d3 g8f6 c2c4 e7e6 g1f3 b7b6 g2g3 c8b7 f1g2 f8b4 b1c3 e8g8 e1g1 b4c3 b2c3 d7d5 a1b1 d8e7 f3e5 b8c6 e5c6 b7c6 c1f4 e6e5 f4e3 e7e6 d1b3 d5c4 b3c4 e6c4 d3c4 c6g2 g1g2 f6e4 g2f3 f7f5 b1b3 e4d6 c4c5 d6e4 c5b6 a7b6 a2a3 e4d6 f1a1 d6c4 h2h4 g8f7 a3a4 c7c5 b3b1 a8a7 h4h5 f8a8 h5h6 g7g6 b1h1 a7a4 a1a4 a8a4 e3g5 f7e6 e2e4 a4a2 g5e3 a2c2 h1a1 f5e4 f3e4 c2c3 a1a8 c4d6 e4f3 c3b3 a8a7 d6f7 f3e2 e5e4 e2d2 b3d3 d2e2 d3b3 e2d2 c5c4 a7a6 e6d5 a6a7 d5e6 a7a6 e6d5");
-    commandToEngine("go infinite");
-    waitUntilSearching();
-    while (engine.isSearching()) {
-      while (fromHandlerReader.ready()) {
-        final String line = getResponseFromEngine();
-        if (line.startsWith("info depth 15 ")) {
-          commandToEngine("stop");
-          break;
-        }
-      }
-    }
-    clearBuffer();
-
-    commandToEngine(
-      "position startpos moves d2d3 g8f6 c2c4 e7e6 g1f3 b7b6 g2g3 c8b7 f1g2 f8b4 b1c3 e8g8 e1g1 b4c3 b2c3 d7d5 a1b1 d8e7 f3e5 b8c6 e5c6 b7c6 c1f4 e6e5 f4e3 e7e6 d1b3 d5c4 b3c4 e6c4 d3c4 c6g2 g1g2 f6e4 g2f3 f7f5 b1b3 e4d6 c4c5 d6e4 c5b6 a7b6 a2a3 e4d6 f1a1 d6c4 h2h4 g8f7 a3a4 c7c5 b3b1 a8a7 h4h5 f8a8 h5h6 g7g6 b1h1 a7a4 a1a4 a8a4 e3g5 f7e6 e2e4 a4a2 g5e3 a2c2 h1a1 f5e4 f3e4 c2c3 a1a8 c4d6 e4f3 c3b3 a8a7 d6f7 f3e2 e5e4 e2d2 b3d3 d2e2 d3b3 e2d2 c5c4 a7a6 e6d5 a6a7 d5e6 a7a6 e6d5 a6a7");
-    commandToEngine("go infinite");
-    waitUntilSearching();
-    while (engine.isSearching()) {
-      while (fromHandlerReader.ready()) {
-        final String line = getResponseFromEngine();
-        if (line.startsWith("info depth 15 ")) {
-          commandToEngine("stop");
-          break;
-        }
-      }
-    }
+    //    commandToEngine(
+    //      "position startpos moves d2d3 g8f6 c2c4 e7e6 g1f3 b7b6 g2g3 c8b7 f1g2 f8b4 b1c3 e8g8 e1g1 b4c3 b2c3 d7d5 a1b1 d8e7 f3e5 b8c6 e5c6 b7c6 c1f4 e6e5 f4e3 e7e6 d1b3 d5c4 b3c4 e6c4 d3c4 c6g2 g1g2 f6e4 g2f3 f7f5 b1b3 e4d6 c4c5 d6e4 c5b6 a7b6 a2a3 e4d6 f1a1 d6c4 h2h4 g8f7 a3a4 c7c5 b3b1 a8a7 h4h5 f8a8 h5h6 g7g6 b1h1 a7a4 a1a4 a8a4 e3g5 f7e6 e2e4 a4a2 g5e3 a2c2 h1a1 f5e4 f3e4 c2c3 a1a8 c4d6 e4f3 c3b3 a8a7 d6f7 f3e2 e5e4 e2d2 b3d3 d2e2 d3b3 e2d2 c5c4 a7a6 e6d5 a6a7 d5e6 a7a6");
+    //    commandToEngine("go infinite");
+    //    waitUntilSearching();
+    //    while (engine.isSearching()) {
+    //      while (fromHandlerReader.ready()) {
+    //        final String line = getResponseFromEngine();
+    //        if (line.startsWith("info depth 15 ")) {
+    //          commandToEngine("stop");
+    //          break;
+    //        }
+    //      }
+    //    }
+    //    clearBuffer();
+    //
+    //    commandToEngine(
+    //      "position startpos moves d2d3 g8f6 c2c4 e7e6 g1f3 b7b6 g2g3 c8b7 f1g2 f8b4 b1c3 e8g8 e1g1 b4c3 b2c3 d7d5 a1b1 d8e7 f3e5 b8c6 e5c6 b7c6 c1f4 e6e5 f4e3 e7e6 d1b3 d5c4 b3c4 e6c4 d3c4 c6g2 g1g2 f6e4 g2f3 f7f5 b1b3 e4d6 c4c5 d6e4 c5b6 a7b6 a2a3 e4d6 f1a1 d6c4 h2h4 g8f7 a3a4 c7c5 b3b1 a8a7 h4h5 f8a8 h5h6 g7g6 b1h1 a7a4 a1a4 a8a4 e3g5 f7e6 e2e4 a4a2 g5e3 a2c2 h1a1 f5e4 f3e4 c2c3 a1a8 c4d6 e4f3 c3b3 a8a7 d6f7 f3e2 e5e4 e2d2 b3d3 d2e2 d3b3 e2d2 c5c4 a7a6 e6d5 a6a7 d5e6 a7a6 e6d5");
+    //    commandToEngine("go infinite");
+    //    waitUntilSearching();
+    //    while (engine.isSearching()) {
+    //      while (fromHandlerReader.ready()) {
+    //        final String line = getResponseFromEngine();
+    //        if (line.startsWith("info depth 15 ")) {
+    //          commandToEngine("stop");
+    //          break;
+    //        }
+    //      }
+    //    }
+    //    clearBuffer();
+    //
+    //    commandToEngine(
+    //      "position startpos moves d2d3 g8f6 c2c4 e7e6 g1f3 b7b6 g2g3 c8b7 f1g2 f8b4 b1c3 e8g8 e1g1 b4c3 b2c3 d7d5 a1b1 d8e7 f3e5 b8c6 e5c6 b7c6 c1f4 e6e5 f4e3 e7e6 d1b3 d5c4 b3c4 e6c4 d3c4 c6g2 g1g2 f6e4 g2f3 f7f5 b1b3 e4d6 c4c5 d6e4 c5b6 a7b6 a2a3 e4d6 f1a1 d6c4 h2h4 g8f7 a3a4 c7c5 b3b1 a8a7 h4h5 f8a8 h5h6 g7g6 b1h1 a7a4 a1a4 a8a4 e3g5 f7e6 e2e4 a4a2 g5e3 a2c2 h1a1 f5e4 f3e4 c2c3 a1a8 c4d6 e4f3 c3b3 a8a7 d6f7 f3e2 e5e4 e2d2 b3d3 d2e2 d3b3 e2d2 c5c4 a7a6 e6d5 a6a7 d5e6 a7a6 e6d5 a6a7");
+    //    commandToEngine("go infinite");
+    //    waitUntilSearching();
+    //    while (engine.isSearching()) {
+    //      while (fromHandlerReader.ready()) {
+    //        final String line = getResponseFromEngine();
+    //        if (line.startsWith("info depth 15 ")) {
+    //          commandToEngine("stop");
+    //          break;
+    //        }
+    //      }
+    //    }
   }
 
   private void commandToEngine(String s) throws InterruptedException {
