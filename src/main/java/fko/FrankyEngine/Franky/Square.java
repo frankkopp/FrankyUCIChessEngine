@@ -25,9 +25,8 @@
 
 package fko.FrankyEngine.Franky;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -55,13 +54,22 @@ public enum Square {
   NOSQUARE;
 
   // pre-filled list with all squares
-  static final Square[] values;
+  public static final Square[] values;
 
-  // pre-computed if square is valid
-  private final boolean _validSquare;
+  /**
+   * pre-computed if square is valid
+   */
+  public final boolean validSquare;
 
-  // pre-filled list with all valid squares
-  static final List<Square> validSquares;
+  /**
+   * pre-computed index for a 64bit index a1=0, h8=63
+   */
+  public final int index64;
+
+  /**
+   * pre-filled list with all valid squares
+   */
+  public static final List<Square> validSquares;
 
   // Move deltas north, south, east, west and combinations
   static final int N = 16;
@@ -103,12 +111,20 @@ public enum Square {
 
   static {
     values = Square.values();
-    validSquares = Arrays.stream(values()).filter(Square::isValidSquare).collect(
-      Collectors.toList());
+    validSquares = Collections.unmodifiableList(Arrays.stream(values()).filter(Square::isValidSquare).collect(
+      Collectors.toList()));
   }
 
   Square() {
-    _validSquare = (this.ordinal() & 0x88) == 0;
+    if ((this.ordinal() & 0x88) == 0) {
+      validSquare = true;
+      index64 = this.ordinal()/16 * 8 + this.ordinal() % 16;
+    }
+    else {
+      validSquare = false;
+      index64 = -1;
+    }
+
   }
 
   /**
@@ -144,7 +160,7 @@ public enum Square {
    * @return true if Square is a valid chess square
    */
   public boolean isValidSquare() {
-    return _validSquare;
+    return validSquare;
   }
 
   /**
@@ -218,7 +234,7 @@ public enum Square {
    * @return Square.File for this QmegaSquare
    */
   public File getFile() {
-    if (!this._validSquare) {
+    if (!this.validSquare) {
       return File.NOFILE;
     }
     return File.values()[this.ordinal() % 16];
@@ -228,7 +244,7 @@ public enum Square {
    * @return Square.Rank for this QmegaSquare
    */
   public Rank getRank() {
-    if (!this._validSquare) {
+    if (!this.validSquare) {
       return Rank.NORANK;
     }
     return Rank.values()[this.ordinal() >>> 4];

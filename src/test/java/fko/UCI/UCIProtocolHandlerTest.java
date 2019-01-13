@@ -466,16 +466,52 @@ class UCIProtocolHandlerTest {
   @Disabled
   void debuggingTest() throws InterruptedException, IOException {
     commandToEngine("ucinewgame");
+    clearBuffer();
+
+    /*
+    Trying to find a 3-fold repetition bug
+     */
+
     commandToEngine(
-      "position startpos moves b2b3 e7e5 c1b2 d7d6 g2g3 f7f5 f1g2 g8f6 d2d3 g7g6 e2e3 f8g7 g1e2 e8g8 e1g1 b8c6 d3d4 a7a5 b1c3 a8a6 a2a3 e5e4 d1d2 c8d7 h2h3 c6e7 e2f4 g6g5 f4e2 d7e6 f1e1 e7c6 a1c1 d8d7 h3h4 g5h4 g3h4 e6f7 g2h3 c6e7 e2g3 e7g6 h3f5 d7c6 f5e4 f6e4 g3e4 g6h4 d2d1 h7h5 d1e2 f8e8 b3b4 a5b4 a3b4 d6d5 b4b5 c6g6 e4g3 a6f6 e2h5 h4f3 g1h1 g6g3 h5f7 f6f7 f2g3 f3e1 c1e1 g7d4 h1g2 f7f5 c3d1 d4b2 d1b2 d5d4 e3e4 f5c5 e1e2 c5b5 b2d3 c7c5 g2f3 b5a5 e2d2 g8f7 d2d1 b7b6 e4e5 c5c4 d3f4 e8e5 d1d4 a5a3 f3f2 b6b5 f4g2 e5e7 d4f4 f7e6 f4e4 e6d6 e4e7 d6e7 g2f4 e7f6 f4e2 f6e5 c2c3 e5e4 g3g4 a3a2 f2f1 a2a7 f1g2 a7a2 g2f1 a2d2 f1e1 d2b2 e1f1 e4e3 e2d4 b5b4 d4f5 e3f4 c3b4 c4c3 f1e1 b2b1 e1f2 c3c2 f5d4 c2c1n d4e6 f4g4 f2e3 b1b4 e6d4 c1b3 d4b3 b4b3 e3e4 b3b4 e4e5 g4f3 e5d5 f3f4 d5c5 b4b8 c5d4 b8b3 d4d5 b3b4 d5c5 b4e4 c5d5 e4a4 d5c5 f4e5 c5b5 a4a3 b5c4 a3e3 c4c5 e3c3 c5b5 e5d4 b5b6 d4d5 b6b7 d5d6 b7b6 c3b3 b6a5 d6c5 a5a6 b3b1 a6a7 b1b4 a7a6 b4b1 a6a7 b1b4 a7a6 c5c6 a6a7 b4a4 a7b8 a4a5\n");
-    commandToEngine("go wtime 75871 btime 75850 winc 0 binc 0");
+      "position startpos moves d2d3 g8f6 c2c4 e7e6 g1f3 b7b6 g2g3 c8b7 f1g2 f8b4 b1c3 e8g8 e1g1 b4c3 b2c3 d7d5 a1b1 d8e7 f3e5 b8c6 e5c6 b7c6 c1f4 e6e5 f4e3 e7e6 d1b3 d5c4 b3c4 e6c4 d3c4 c6g2 g1g2 f6e4 g2f3 f7f5 b1b3 e4d6 c4c5 d6e4 c5b6 a7b6 a2a3 e4d6 f1a1 d6c4 h2h4 g8f7 a3a4 c7c5 b3b1 a8a7 h4h5 f8a8 h5h6 g7g6 b1h1 a7a4 a1a4 a8a4 e3g5 f7e6 e2e4 a4a2 g5e3 a2c2 h1a1 f5e4 f3e4 c2c3 a1a8 c4d6 e4f3 c3b3 a8a7 d6f7 f3e2 e5e4 e2d2 b3d3 d2e2 d3b3 e2d2 c5c4 a7a6 e6d5 a6a7 d5e6 a7a6");
+    commandToEngine("go infinite");
     waitUntilSearching();
     while (engine.isSearching()) {
       while (fromHandlerReader.ready()) {
         final String line = getResponseFromEngine();
-        assertTrue(line.startsWith("info ") || line.startsWith("bestmove "));
-        if (line.startsWith("info depth 10 ")) {
+        if (line.startsWith("info depth 15 ")) {
+          commandToEngine("stop");
+          break;
+        }
+      }
+    }
+    clearBuffer();
 
+    commandToEngine(
+      "position startpos moves d2d3 g8f6 c2c4 e7e6 g1f3 b7b6 g2g3 c8b7 f1g2 f8b4 b1c3 e8g8 e1g1 b4c3 b2c3 d7d5 a1b1 d8e7 f3e5 b8c6 e5c6 b7c6 c1f4 e6e5 f4e3 e7e6 d1b3 d5c4 b3c4 e6c4 d3c4 c6g2 g1g2 f6e4 g2f3 f7f5 b1b3 e4d6 c4c5 d6e4 c5b6 a7b6 a2a3 e4d6 f1a1 d6c4 h2h4 g8f7 a3a4 c7c5 b3b1 a8a7 h4h5 f8a8 h5h6 g7g6 b1h1 a7a4 a1a4 a8a4 e3g5 f7e6 e2e4 a4a2 g5e3 a2c2 h1a1 f5e4 f3e4 c2c3 a1a8 c4d6 e4f3 c3b3 a8a7 d6f7 f3e2 e5e4 e2d2 b3d3 d2e2 d3b3 e2d2 c5c4 a7a6 e6d5 a6a7 d5e6 a7a6 e6d5");
+    commandToEngine("go infinite");
+    waitUntilSearching();
+    while (engine.isSearching()) {
+      while (fromHandlerReader.ready()) {
+        final String line = getResponseFromEngine();
+        if (line.startsWith("info depth 15 ")) {
+          commandToEngine("stop");
+          break;
+        }
+      }
+    }
+    clearBuffer();
+
+    commandToEngine(
+      "position startpos moves d2d3 g8f6 c2c4 e7e6 g1f3 b7b6 g2g3 c8b7 f1g2 f8b4 b1c3 e8g8 e1g1 b4c3 b2c3 d7d5 a1b1 d8e7 f3e5 b8c6 e5c6 b7c6 c1f4 e6e5 f4e3 e7e6 d1b3 d5c4 b3c4 e6c4 d3c4 c6g2 g1g2 f6e4 g2f3 f7f5 b1b3 e4d6 c4c5 d6e4 c5b6 a7b6 a2a3 e4d6 f1a1 d6c4 h2h4 g8f7 a3a4 c7c5 b3b1 a8a7 h4h5 f8a8 h5h6 g7g6 b1h1 a7a4 a1a4 a8a4 e3g5 f7e6 e2e4 a4a2 g5e3 a2c2 h1a1 f5e4 f3e4 c2c3 a1a8 c4d6 e4f3 c3b3 a8a7 d6f7 f3e2 e5e4 e2d2 b3d3 d2e2 d3b3 e2d2 c5c4 a7a6 e6d5 a6a7 d5e6 a7a6 e6d5 a6a7");
+    commandToEngine("go infinite");
+    waitUntilSearching();
+    while (engine.isSearching()) {
+      while (fromHandlerReader.ready()) {
+        final String line = getResponseFromEngine();
+        if (line.startsWith("info depth 15 ")) {
+          commandToEngine("stop");
+          break;
         }
       }
     }

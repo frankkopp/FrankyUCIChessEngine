@@ -136,8 +136,8 @@ public class TranspositionTableTest {
     LOG.info(search.getSearchCounter().toString());
 
     assertTrue(search.getTranspositionTable().getNumberOfEntries() > 0);
-    assertTrue(search.getTranspositionTable().getNumberOfCollisions() > 0);
     assertTrue(search.getTranspositionTable().getNumberOfUpdates() > 0);
+    assertEquals(0, search.getTranspositionTable().getNumberOfCollisions());
     assertTrue(search.getSearchCounter().nodeCache_Hits > 0);
     assertTrue(search.getSearchCounter().nodeCache_Misses > 0);
   }
@@ -223,9 +223,7 @@ public class TranspositionTableTest {
   @Disabled
   public void showSize() {
     //System.out.println(VM.current().details());
-    TranspositionTable.TT_Entry test = new TranspositionTable.TT_Entry();
     System.out.println(ClassLayout.parseClass(TranspositionTable.TT_Entry.class).toPrintable());
-    System.out.println(ClassLayout.parseClass(test.getClass()).toPrintable());
   }
 
 }

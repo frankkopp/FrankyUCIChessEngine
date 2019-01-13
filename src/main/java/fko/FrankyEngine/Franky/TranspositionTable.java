@@ -46,7 +46,7 @@ public class TranspositionTable {
   private static final Logger LOG = LoggerFactory.getLogger(TranspositionTable.class);
 
   private static final int KB = 1024;
-  private static final int MB = KB*KB;
+  private static final int MB = KB * KB;
 
   private long sizeInByte;
   private int  maxNumberOfEntries;
@@ -73,7 +73,8 @@ public class TranspositionTable {
     long freeMemory = (Runtime.getRuntime().maxMemory() - usedMemory);
     long ttMemory = (long) (freeMemory * 0.9);
 
-    LOG.debug("{}", String.format("Max JVM memory:           %,5d MB", Runtime.getRuntime().maxMemory() / MB));
+    LOG.debug("{}", String.format("Max JVM memory:           %,5d MB",
+                                  Runtime.getRuntime().maxMemory() / MB));
     LOG.debug("{}", String.format("Current total memory:     %,5d MB",
                                   Runtime.getRuntime().totalMemory() / MB));
     LOG.debug("{}", String.format("Current used memory:      %,5d MB", usedMemory / MB));
@@ -82,8 +83,8 @@ public class TranspositionTable {
 
     if (ttMemory < sizeInByte) {
       LOG.warn("{}", String.format(
-        "Not enough memory for a %,dMB transposition cache - reducing to %,dMB",
-        sizeInByte / MB, (ttMemory) / MB));
+        "Not enough memory for a %,dMB transposition cache - reducing to %,dMB", sizeInByte / MB,
+        (ttMemory) / MB));
       sizeInByte = (int) (ttMemory); // % of memory
     }
 
@@ -109,7 +110,7 @@ public class TranspositionTable {
    * @param depth
    */
   public void put(Position position, short value, byte type, byte depth) {
-    put(position, value, type, depth, Move.NOMOVE);
+    put(position, value, type, depth, Move.NOMOVE, false);
   }
 
   /**
@@ -120,8 +121,10 @@ public class TranspositionTable {
    * @param type
    * @param depth
    * @param bestMove
+   * @param mateThreat
    */
-  public void put(Position position, short value, byte type, byte depth, int bestMove) {
+  public void put(Position position, short value, byte type, byte depth, int bestMove,
+                  boolean mateThreat) {
 
     assert depth >= 0;
     assert type > 0;
@@ -133,44 +136,72 @@ public class TranspositionTable {
     // new value
     if (entries[hash].key == 0) {
       numberOfEntries++;
+
       entries[hash].key = position.getZobristKey();
       //entries[hash].fen = position.toFENString();
+      entries[hash].age = 1;
+      entries[hash].mateThreat = mateThreat;
+
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
       entries[hash].bestMove = bestMove;
-      entries[hash].age = 1;
     }
-    // different position - overwrite
-    // @formatter:off
-    else if (position.getZobristKey() != entries[hash].key
-             && depth > entries[hash].depth
+    // different position - overwrite if the previous entry has not been used (is aged)
+    else if (position.getZobristKey() != entries[hash].key && depth > entries[hash].depth
              && entries[hash].age > 0) {
-      // @formatter:on
-      assert entries[hash].value != Evaluation.NOVALUE;
       numberOfCollisions++;
+
       entries[hash].key = position.getZobristKey();
       //entries[hash].fen = position.toFENString();
+      entries[hash].age = 1;
+      entries[hash].mateThreat = mateThreat;
+
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
       entries[hash].bestMove = bestMove;
-      entries[hash].age = 1;
     }
     // Update same position
-    else if (position.getZobristKey() == entries[hash].key
-             // Overwrite only when new value from same or deeper search
-             && depth >= entries[hash].depth) {
-      numberOfUpdates++;
-      //entries[hash].fen = position.toFENString();
-      entries[hash].value = value;
-      entries[hash].type = type;
-      entries[hash].depth = depth;
-      entries[hash].age = 1;
-      // update best move only if not NOMOVE
-      if (bestMove != Move.NOMOVE) {
-        entries[hash].bestMove = bestMove;
+    else if (position.getZobristKey() == entries[hash].key) {
+
+      // if from same depth only update when quality of new entry is better
+      // e.g. don't replace EXACT with ALPHA or BETA
+      if (depth == entries[hash].depth) {
+
+        numberOfUpdates++;
+
+        // entries[hash].fen = position.toFENString();
         entries[hash].age = 1;
+        entries[hash].mateThreat = mateThreat;
+
+        // old was not EXACT - update
+        if (entries[hash].type != TT_EntryType.EXACT) {
+          entries[hash].value = value;
+          entries[hash].type = type;
+          entries[hash].depth = depth;
+        }
+        // old entry was exact, the new entry is also EXACT -> assert that they are identical
+        else if (type == TT_EntryType.EXACT) {
+          assert entries[hash].value == value;
+          assert entries[hash].type == type;
+          assert entries[hash].depth == depth;
+        }
+        if (bestMove != Move.NOMOVE) entries[hash].bestMove = bestMove;
+      }
+      // if depth is greater then we update in any case
+      else if (depth > entries[hash].depth) {
+        numberOfUpdates++;
+
+        // entries[hash].fen = position.toFENString();
+        entries[hash].age = 1;
+        entries[hash].mateThreat = mateThreat;
+
+        entries[hash].value = value;
+        entries[hash].type = type;
+        entries[hash].depth = depth;
+
+        if (bestMove != Move.NOMOVE) entries[hash].bestMove = bestMove;
       }
 
     }
@@ -204,11 +235,12 @@ public class TranspositionTable {
     for (int i = 0; i < maxNumberOfEntries; i++) {
       entries[i].key = 0L;
       //entries[i].fen = "";
-      entries[i].value = Byte.MIN_VALUE;
+      entries[i].value = Evaluation.NOVALUE;
       entries[i].depth = 0;
-      entries[i].type = TT_EntryType.ALPHA;
+      entries[i].type = TT_EntryType.NONE;
       entries[i].bestMove = Move.NOMOVE;
       entries[i].age = 0;
+      entries[i].mateThreat = false;
     }
     numberOfEntries = 0;
     numberOfCollisions = 0;
@@ -294,12 +326,13 @@ public class TranspositionTable {
 
     static final int SIZE = 32;
 
-    long  key      = 0L;
-    short value    = Evaluation.NOVALUE;
-    byte  depth    = 0;
-    byte  type     = TT_EntryType.NONE;
-    int   bestMove = Move.NOMOVE;
-    byte  age      = 0;
+    long    key        = 0L;
+    byte    age        = 0;
+    boolean mateThreat = false;
+    short   value      = Evaluation.NOVALUE;
+    byte    depth      = 0;
+    byte    type       = TT_EntryType.NONE;
+    int     bestMove   = Move.NOMOVE;
     //String fen = "";
   }
 

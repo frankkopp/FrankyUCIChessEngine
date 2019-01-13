@@ -32,7 +32,6 @@ import fko.UCI.UCIOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,14 +44,13 @@ import java.util.Properties;
  * TODO:
  *  Testing / Bug fixing
  *  --------------------------------
- *  Arena shows Illegal Moves (probably not 0.8 - better logging implemented)
- *  Arena shows forfeit for time (needs more analysis
- *  Mates found in lower depths lost in higher depths
- * <p>
+ *  3-fold repetition too often - pot. bug - more testing
+ *
  * <p>
  * TODO
  *  Performance
  *  --------------------------------
+ *
  * <p>
  * TODO
  *  Features
@@ -192,13 +190,20 @@ public class FrankyEngine implements IUCIEngine {
                 "",
                 "",
                 ""));
-//    iUciOptions.add(
-//        new UCIOption("Use_Aspiration_Window_Search",
-//                UCIOptionType.check,
-//                Boolean.toString(config.USE_ASPIRATION_WINDOW),
-//                "",
-//                "",
-//                ""));
+    iUciOptions.add(
+        new UCIOption("Use_Aspiration_Window_Search",
+                UCIOptionType.check,
+                Boolean.toString(config.USE_ASPIRATION_WINDOW),
+                "",
+                "",
+                ""));
+    iUciOptions.add(
+        new UCIOption("Aspiration_Start_Depth",
+                UCIOptionType.spin,
+                Integer.toString(config.ASPIRATION_START_DEPTH),
+                "2",
+                "2",
+                "8"));
     iUciOptions.add(
         new UCIOption("Use_PVS",
                 UCIOptionType.check,
@@ -452,13 +457,19 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      //      case "Use_Aspiration_Window_Search":
-      //        config.USE_ASPIRATION_WINDOW = Boolean.valueOf(value);
-      //        msg =
-      //          "Use Aspiration Window Search set to " + (config.USE_ASPIRATION_WINDOW ? "On" : "Off");
-      //        LOG.info(msg);
-      //        uciProtocolHandler.sendInfoStringToUCI(msg);
-      //        break;
+      case "Use_Aspiration_Window_Search":
+        config.USE_ASPIRATION_WINDOW = Boolean.valueOf(value);
+        msg =
+          "Use Aspiration Window Search set to " + (config.USE_ASPIRATION_WINDOW ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Aspiration_Start_Depth":
+        config.ASPIRATION_START_DEPTH = Integer.valueOf(value);
+        msg = "Aspiration Start Depth set to " + config.ASPIRATION_START_DEPTH;
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
       default:
         LOG.error("Unknown option: {}", name);
         break;

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fko.FrankyEngine</groupId>
   <artifactId>Franky</artifactId>
-  <version>0.8</version>
+  <version>0.9</version>
   <profiles>
     <profile>
       <id>Franky</id>
@@ -115,9 +115,9 @@
                 <configuration>
                   <executable>"C:\Program Files (x86)\Jar2Exe Wizard\j2ewiz.exe"</executable>
                   <commandlineArgs>/jar
-                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-0.8.jar
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-0.9.jar
                                         /o
-                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-0.8.exe
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-0.9.exe
                                         /m
                                         fko.FrankyEngine.Main
                                         /type
@@ -129,9 +129,9 @@
                                         /checksum
                                         /amd64
                                         /pv
-                                        0.8
+                                        0.9
                                         /ve
-                                        "ProductVersion=0.8"
+                                        "ProductVersion=0.9"
                                         /ve
                                         "ProductName=Franky Chess Engine"
                                         /ve

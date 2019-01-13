@@ -108,7 +108,6 @@ public class SearchMode {
   }
 
   private synchronized void setupLimits() {
-    LOG.trace("Setting up search mode limits");
     // time management necessary and set start and max depth?
     if (this.perft){
       // no limits
@@ -169,7 +168,6 @@ public class SearchMode {
       LOG.error(msg, e);
       throw e;
     }
-    LOG.trace("Finished up search mode limits");
   }
 
   public void ponderHit() {
