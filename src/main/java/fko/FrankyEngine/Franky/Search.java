@@ -34,7 +34,6 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 
@@ -668,7 +667,7 @@ public class Search implements Runnable {
     searchCounter.nodesVisited++;
 
     // check if root position is already draw
-    if (position.check50Moves() || position.check3Repetitions()) {
+    if (position.check50Moves() || position.checkRepetitions(1)) {
       principalVariation[ROOT_PLY].clear();
       principalVariation[ROOT_PLY].add(rootMoves.getMove(0));
       return Evaluation.DRAW;
@@ -871,16 +870,13 @@ public class Search implements Runnable {
       return qsearch(position, depth, ply, alpha, beta, pvNode);
     }
 
-    assert
-      (isPerftSearch() || !config.USE_ALPHABETA_PRUNING || (alpha >= Evaluation.MIN && alpha < beta
-                                                            && beta <= Evaluation.MAX));
     assert (pvNode || (alpha == beta - 1));
     assert ply >= 1;
     assert depth <= MAX_SEARCH_DEPTH;
 
     // check draw through 50-moves-rule, 3-fold-repetition
     if (!isPerftSearch()) {
-      if (position.check50Moves() || position.check3Repetitions()) {
+      if (position.check50Moves() || position.checkRepetitions(1)) {
         if (TRACE) {
           trace("%sSearch in ply %d for depth %d: REPETITON DRAW", getSpaces(ply), ply, depth);
         }
@@ -1311,7 +1307,7 @@ public class Search implements Runnable {
     if (isPerftSearch()) return evaluate(position, ply, alpha, beta);
 
     // check draw through 50-moves-rule, 3-fold-repetition, insufficient material
-    if (position.check50Moves() || position.check3Repetitions()) {
+    if (position.check50Moves() || position.checkRepetitions(1)) {
       if (TRACE) trace("%sQuiescence in ply %d: REPETITON DRAW", getSpaces(ply), ply);
       return contempt(position);
     }

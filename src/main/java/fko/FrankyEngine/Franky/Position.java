@@ -967,14 +967,16 @@ public class Position {
   }
 
   /**
-   * Threefold repetition of a position this most commonly occurs when neither side is able to avoid
+   * Repetition of a position.
+   *
+   * 3-fold repetition: This most commonly occurs when neither side is able to avoid
    * repeating moves without incurring a disadvantage. The three occurrences of the position need
    * not occur on consecutive moves for a claim to be valid. FIDE rules make no mention of perpetual
    * check; this is merely a specific type of draw by threefold repetition.
    *
-   * @return true if this position has been played three times
+   * @return true if this position has been played reps times
    */
-  public boolean check3Repetitions() {
+  public boolean checkRepetitions(int reps) {
     /*
     [0]     3185849660387886977 << 1st
     [1]     447745478729458041
@@ -986,15 +988,29 @@ public class Position {
     [7]     491763876012767476  <<< history
     [8]     3185849660387886977 <<< 3rd REPETITION from current zobrist
      */
-    if (historyCounter < 8) return false;
     int counter = 0;
     int i = historyCounter - 2;
     while (i >= 0) {
       if (this.zobristKey == zobristKeyHistory[i]) counter++;
-      if (counter >= 2) return true;
+      if (counter >= reps) return true;
       i -= 2;
     }
     return false;
+  }
+
+  /**
+   * Determines the repetitions of a position.
+   *
+   * @return number of repetitions
+   */
+  public int countRepetitions() {
+    int counter = 0;
+    int i = historyCounter - 2;
+    while (i >= 0) {
+      if (this.zobristKey == zobristKeyHistory[i]) counter++;
+      i -= 2;
+    }
+    return counter;
   }
 
   /**
