@@ -999,21 +999,6 @@ public class Position {
   }
 
   /**
-   * Determines the repetitions of a position.
-   *
-   * @return number of repetitions
-   */
-  public int countRepetitions() {
-    int counter = 0;
-    int i = historyCounter - 2;
-    while (i >= 0) {
-      if (this.zobristKey == zobristKeyHistory[i]) counter++;
-      i -= 2;
-    }
-    return counter;
-  }
-
-  /**
    * FIDE Draws - Evaluation might define some more draw values.
    *
    * @return true if neither side can win

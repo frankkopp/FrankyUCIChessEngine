@@ -442,7 +442,7 @@ public class SearchTest {
       search.startSearch(position, searchMode);
       search.waitWhileSearching();
       assertEquals("e7e3", Move.toSimpleString(search.getLastSearchResult().bestMove));
-      assertEquals(Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+      assertEquals(-Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
                    search.getLastSearchResult().resultValue);
       LOG.warn("Best Move: {} Value: {} Ponder {}",
                Move.toSimpleString(search.getLastSearchResult().bestMove),
