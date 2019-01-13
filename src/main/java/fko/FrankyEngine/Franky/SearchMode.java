@@ -39,7 +39,7 @@ public class SearchMode {
 
   private static final Logger LOG = LoggerFactory.getLogger(SearchMode.class);
 
-  private static final int MAX_SEARCH_DEPTH = 100;
+  private static final int MAX_SEARCH_DEPTH = Byte.MAX_VALUE;
 
   // defaults time control
   private Duration whiteTime = Duration.ZERO;
