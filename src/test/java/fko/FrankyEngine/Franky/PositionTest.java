@@ -87,119 +87,92 @@ public class PositionTest {
     assertFalse(position.checkInsufficientMaterial());
   }
 
-  /** Test Null Move */
   @Test
-  public void test3Repetitions() {
+  public void test3RepetitionsSimple() {
     Position position = new Position();
 
-    int move;
-
-    move =
-        Move.createMove(
-          MoveType.NORMAL,
-          Square.e2,
-          Square.e4,
-          Piece.WHITE_PAWN,
-          Piece.NOPIECE,
-          Piece.NOPIECE);
-    position.makeMove(move);
-    move =
-        Move.createMove(
-          MoveType.NORMAL,
-          Square.e7,
-          Square.e5,
-          Piece.BLACK_PAWN,
-          Piece.NOPIECE,
-          Piece.NOPIECE);
-    position.makeMove(move);
-
-    System.out.println("3-Repetitions: " + position.check3Repetitions());
-    assertFalse(position.check3Repetitions());
+    position.makeMove(Move.fromSANNotation(position, "e4"));
+    position.makeMove(Move.fromSANNotation(position, "e5"));
+    System.out.println("Repetitions: " + position.countRepetitions());
+    assertEquals(0, position.countRepetitions());
 
     // Simple repetition
-    for (int i = 0; i < 2; i++) {
-      move =
-          Move.createMove(
-            MoveType.NORMAL,
-            Square.b1,
-            Square.c3,
-            Piece.WHITE_KNIGHT,
-            Piece.NOPIECE,
-            Piece.NOPIECE);
-      position.makeMove(move);
-      move =
-          Move.createMove(
-            MoveType.NORMAL,
-            Square.b8,
-            Square.c6,
-            Piece.BLACK_KNIGHT,
-            Piece.NOPIECE,
-            Piece.NOPIECE);
-      position.makeMove(move);
-      move =
-          Move.createMove(
-            MoveType.NORMAL,
-            Square.c3,
-            Square.b1,
-            Piece.WHITE_KNIGHT,
-            Piece.NOPIECE,
-            Piece.NOPIECE);
-      position.makeMove(move);
-      move =
-          Move.createMove(
-            MoveType.NORMAL,
-            Square.c6,
-            Square.b8,
-            Piece.BLACK_KNIGHT,
-            Piece.NOPIECE,
-            Piece.NOPIECE);
-      position.makeMove(move);
+    // !EnPassant - takes 3 loops to get to repetition
+    for (int i = 0; i <= 2; i++) {
+      position.makeMove(Move.fromSANNotation(position, "Nf3"));
+      position.makeMove(Move.fromSANNotation(position, "Nc6"));
+      position.makeMove(Move.fromSANNotation(position, "Ng1"));
+      position.makeMove(Move.fromSANNotation(position, "Nb8"));
+      System.out.println("Repetitions: " + position.countRepetitions());
     }
-    System.out.println("3-Repetitions: " + position.check3Repetitions());
-    assertTrue(position.check3Repetitions());
 
-    // Simple repetition
-    move =
-        Move.createMove(
-          MoveType.NORMAL,
-          Square.g1,
-          Square.f3,
-          Piece.WHITE_KNIGHT,
-          Piece.NOPIECE,
-          Piece.NOPIECE);
-    position.makeMove(move);
-    move =
-        Move.createMove(
-          MoveType.NORMAL,
-          Square.g8,
-          Square.f6,
-          Piece.BLACK_KNIGHT,
-          Piece.NOPIECE,
-          Piece.NOPIECE);
-    position.makeMove(move);
-    System.out.println("3-Repetitions: " + position.check3Repetitions());
-    assertFalse(position.check3Repetitions());
+    System.out.println("3-Repetitions: " + position.countRepetitions());
+    assertTrue(position.checkRepetitions(2));
+  }
 
-    move =
-        Move.createMove(
-          MoveType.NORMAL,
-          Square.f3,
-          Square.g1,
-          Piece.WHITE_KNIGHT,
-          Piece.NOPIECE,
-          Piece.NOPIECE);
-    position.makeMove(move);
-    move =
-        Move.createMove(
-          MoveType.NORMAL,
-          Square.f6,
-          Square.g8,
-          Piece.BLACK_KNIGHT,
-          Piece.NOPIECE,
-          Piece.NOPIECE);
-    position.makeMove(move);
-    System.out.println("3-Repetitions: " + position.check3Repetitions());
-    assertTrue(position.check3Repetitions());
+  @Test
+  public void test3RepetitionsAdvanced() {
+    Position position = new Position("6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -");
+
+    position.makeMove(Move.fromSANNotation(position, "Qe3"));
+    position.makeMove(Move.fromSANNotation(position, "Kg2"));
+    System.out.println("Repetitions: " + position.countRepetitions());
+    assertEquals(0, position.countRepetitions());
+
+    // takes 2 loops to get to repetition
+    for (int i = 0; i < 2; i++) {
+      position.makeMove(Move.fromSANNotation(position, "Qe2"));
+      position.makeMove(Move.fromSANNotation(position, "Kg1"));
+      position.makeMove(Move.fromSANNotation(position, "Qe3"));
+      position.makeMove(Move.fromSANNotation(position, "Kg2"));
+      System.out.println("Repetitions: " + position.countRepetitions());
+    }
+
+    System.out.println("3-Repetitions: " + position.countRepetitions());
+    assertTrue(position.checkRepetitions(2));
+  }
+
+  @Test
+  public void test3RepetitionsCanceled() {
+    Position position = new Position("6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -");
+
+    position.makeMove(Move.fromSANNotation(position, "Qe3"));
+    position.makeMove(Move.fromSANNotation(position, "Kg2"));
+    System.out.println("Repetitions: " + position.countRepetitions());
+    assertEquals(0, position.countRepetitions());
+
+    // takes 2 loops to get to repetition
+    for (int i = 0; i < 2; i++) {
+      position.makeMove(Move.fromSANNotation(position, "Qe2"));
+      position.makeMove(Move.fromSANNotation(position, "Kg1"));
+      position.makeMove(Move.fromSANNotation(position, "Qe3"));
+      position.makeMove(Move.fromSANNotation(position, "Kg2"));
+      System.out.println("Repetitions: " + position.countRepetitions());
+    }
+
+    System.out.println("3-Repetitions: " + position.countRepetitions());
+    assertTrue(position.checkRepetitions(2));
+
+    position.makeMove(Move.fromSANNotation(position, "a5"));
+    position.makeMove(Move.fromSANNotation(position, "Kf1"));
+    position.makeMove(Move.fromSANNotation(position, "Qf3"));
+    position.makeMove(Move.fromSANNotation(position, "Kg1"));
+    position.makeMove(Move.fromSANNotation(position, "Qe3"));
+    position.makeMove(Move.fromSANNotation(position, "Kg2"));
+    System.out.println("Repetitions: " + position.countRepetitions());
+
+    // takes 2 loops to get to repetition
+    for (int i = 0; i < 2; i++) {
+      position.makeMove(Move.fromSANNotation(position, "Qe2"));
+      position.makeMove(Move.fromSANNotation(position, "Kg1"));
+      position.makeMove(Move.fromSANNotation(position, "Qe3"));
+      position.makeMove(Move.fromSANNotation(position, "Kg2"));
+      System.out.println("Repetitions: " + position.countRepetitions());
+    }
+
+    System.out.println("3-Repetitions: " + position.countRepetitions());
+    assertTrue(position.checkRepetitions(2));
+
   }
 
   /** Test Null Move */
@@ -491,8 +464,9 @@ public class PositionTest {
     Piece[] _x88Board2 = new Piece[128];
     start = Instant.now();
     // clear board
-    for (int i = 0; i < ITERATIONS; i++)
+    for (int i = 0; i < ITERATIONS; i++) {
       System.arraycopy(x88Board, 0, _x88Board2, 0, x88Board.length);
+    }
     end = Instant.now();
     System.out.println(Duration.between(start, end));
     start = Instant.now();
@@ -556,10 +530,10 @@ public class PositionTest {
     assertEquals(fen, obp.toFENString());
 
     // Test invalid en passant square
-    assertThrows(IllegalArgumentException.class,()->{
-        //do whatever you want to do here
-        String fen2 = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq k9 0 113";
-        Position obp2 = new Position(fen2);
+    assertThrows(IllegalArgumentException.class, () -> {
+      //do whatever you want to do here
+      String fen2 = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq k9 0 113";
+      Position obp2 = new Position(fen2);
     });
   }
 
@@ -585,13 +559,8 @@ public class PositionTest {
     Position omegaBoard = new Position(testFen);
 
     int testMove =
-        Move.createMove(
-          MoveType.NORMAL,
-          Square.b7,
-          Square.b6,
-          Piece.BLACK_PAWN,
-          Piece.NOPIECE,
-          Piece.NOPIECE);
+      Move.createMove(MoveType.NORMAL, Square.b7, Square.b6, Piece.BLACK_PAWN, Piece.NOPIECE,
+                      Piece.NOPIECE);
 
     System.out.println("Test if zobrist after move/undo are equal.");
     initialZobrist = omegaBoard.getZobristKey();
@@ -670,7 +639,7 @@ public class PositionTest {
       //            System.out.println(board);
       //            System.out.println(moves);
       System.out.println(
-          String.format("%,d runs/s for %s (%b)", ITERATIONS / DURATION, fens[i], test));
+        String.format("%,d runs/s for %s (%b)", ITERATIONS / DURATION, fens[i], test));
       i++;
       ITERATIONS = 0;
     }

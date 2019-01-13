@@ -667,7 +667,10 @@ public class Search implements Runnable {
     searchCounter.nodesVisited++;
 
     // check if root position is already draw
-    if (position.check50Moves() || position.checkRepetitions(1)) {
+    if (position.check50Moves() || position.checkRepetitions(2)) {
+      if (TRACE) {
+        trace("Root Search for depth %d: REPETITION DRAW", depth);
+      }
       principalVariation[ROOT_PLY].clear();
       principalVariation[ROOT_PLY].add(rootMoves.getMove(0));
       return Evaluation.DRAW;
@@ -875,10 +878,13 @@ public class Search implements Runnable {
     assert depth <= MAX_SEARCH_DEPTH;
 
     // check draw through 50-moves-rule, 3-fold-repetition
+    // we evaluate ech repetition as draw within the search tree - this weay we detect repetition
+    // earlier - this should not weeken the search
     if (!isPerftSearch()) {
       if (position.check50Moves() || position.checkRepetitions(1)) {
         if (TRACE) {
-          trace("%sSearch in ply %d for depth %d: REPETITON DRAW", getSpaces(ply), ply, depth);
+          trace("%sSearch in ply %d for depth %d: REPETITION DRAW (repetitions=%d)", getSpaces(ply),
+                ply, depth, position.countRepetitions());
         }
         return contempt(position);
       }
@@ -1306,9 +1312,14 @@ public class Search implements Runnable {
     // if PERFT return with eval to count all captures etc.
     if (isPerftSearch()) return evaluate(position, ply, alpha, beta);
 
-    // check draw through 50-moves-rule, 3-fold-repetition, insufficient material
+    // check draw through 50-moves-rule, 3-fold-repetition
+    // we evaluate ech repetition as draw within the search tree - this weay we detect repetition
+    // earlier - this should not weeken the search
     if (position.check50Moves() || position.checkRepetitions(1)) {
-      if (TRACE) trace("%sQuiescence in ply %d: REPETITON DRAW", getSpaces(ply), ply);
+      if (TRACE) {
+        trace("%sQuiescence in ply %d: REPETITION DRAW (repetitions=%d)", getSpaces(ply), ply,
+              position.countRepetitions());
+      }
       return contempt(position);
     }
 

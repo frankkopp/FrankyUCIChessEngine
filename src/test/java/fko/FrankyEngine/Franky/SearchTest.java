@@ -437,8 +437,7 @@ public class SearchTest {
       String fen = "6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -";
       Position position = new Position(fen);
 
-      SearchMode searchMode =
-        new SearchMode(0, 0, 0, 0, 0, 10000, 0, 0, 0, null, false, false, false);
+      SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, false, false);
       search.startSearch(position, searchMode);
       search.waitWhileSearching();
       assertEquals("e7e3", Move.toSimpleString(search.getLastSearchResult().bestMove));

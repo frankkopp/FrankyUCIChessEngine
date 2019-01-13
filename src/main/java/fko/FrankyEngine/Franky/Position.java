@@ -968,13 +968,16 @@ public class Position {
 
   /**
    * Repetition of a position.
-   *
+   * <p>
+   * To detect a 3-fold repetition the given position most occurr >=2 times before:<br/>
+   * <code>position.checkRepetitions(2)</code> checks for 3 fold-repetition
+   * <p>
    * 3-fold repetition: This most commonly occurs when neither side is able to avoid
    * repeating moves without incurring a disadvantage. The three occurrences of the position need
    * not occur on consecutive moves for a claim to be valid. FIDE rules make no mention of perpetual
    * check; this is merely a specific type of draw by threefold repetition.
    *
-   * @return true if this position has been played reps times
+   * @return true if this position has been played reps times before
    */
   public boolean checkRepetitions(int reps) {
     /*
@@ -990,12 +993,43 @@ public class Position {
      */
     int counter = 0;
     int i = historyCounter - 2;
+    int lastHalfMove = halfMoveClock;
     while (i >= 0) {
-      if (this.zobristKey == zobristKeyHistory[i]) counter++;
+      // every time the half move clock gets reset (non reversible position) there
+      // can't be any more repetition of positions before this position
+      if (halfMoveClockHistory[i] >= lastHalfMove) {
+        break;
+      } else {
+        lastHalfMove = halfMoveClockHistory[i];
+      }
+      if (zobristKey == zobristKeyHistory[i]) counter++;
       if (counter >= reps) return true;
       i -= 2;
     }
     return false;
+  }
+
+  /**
+   * Determines the repetitions of a position.
+   *
+   * @return number of repetitions
+   */
+  public int countRepetitions() {
+    int counter = 0;
+    int i = historyCounter - 2;
+    int lastHalfMove = halfMoveClock;
+    while (i >= 0) {
+      // every time the half move clock gets reset (non reversible position) there
+      // can't be any more repetition of positions before this position
+      if (halfMoveClockHistory[i] >= lastHalfMove) {
+        break;
+      } else {
+        lastHalfMove = halfMoveClockHistory[i];
+      }
+      if (zobristKey == zobristKeyHistory[i]) counter++;
+      i -= 2;
+    }
+    return counter;
   }
 
   /**
