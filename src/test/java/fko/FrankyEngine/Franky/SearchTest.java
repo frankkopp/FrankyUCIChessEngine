@@ -73,7 +73,7 @@ public class SearchTest {
     search.waitWhileSearching();
     final long endTime = System.currentTimeMillis() - startTime;
     System.out.printf("MoveTime was %,d and Duration was %,d %n", moveTime, endTime);
-    assertTrue(endTime < moveTime + 100);
+    assertTrue(endTime < moveTime + 200);
   }
 
   @Test

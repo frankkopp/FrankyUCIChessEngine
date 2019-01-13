@@ -34,6 +34,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 
@@ -1847,8 +1848,10 @@ public class Search implements Runnable {
    * @param factor factor for changing the time for the current search
    */
   private void timeLimitChange(double factor) {
-    hardTimeLimit *= factor;
-    softTimeLimit = (long) (hardTimeLimit * 0.8);
+    if (searchMode.getMoveTime().toMillis() == 0) {
+      hardTimeLimit *= factor;
+      softTimeLimit = (long) (hardTimeLimit * 0.8);
+    }
   }
 
   /**
