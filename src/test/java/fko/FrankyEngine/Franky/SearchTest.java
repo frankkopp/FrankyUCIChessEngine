@@ -430,6 +430,36 @@ public class SearchTest {
   }
 
   @Test
+  public void test3FoldRep2() {
+
+    {
+      // black can force repetition 1. ... Qe3+ 3.Kg2 Qe2+ 4.Kh3 Qh5+ 5.Kg2
+      String fen = "6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -";
+      Position position = new Position(fen);
+
+      SearchMode searchMode =
+        new SearchMode(0, 0, 0, 0, 0, 10000, 0, 0, 0, null, false, false, false);
+      search.startSearch(position, searchMode);
+      search.waitWhileSearching();
+      assertEquals("e7e3", Move.toSimpleString(search.getLastSearchResult().bestMove));
+      assertEquals(Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+                   search.getLastSearchResult().resultValue);
+      LOG.warn("Best Move: {} Value: {} Ponder {}",
+               Move.toSimpleString(search.getLastSearchResult().bestMove),
+               search.getLastSearchResult().resultValue / 100f,
+               Move.toSimpleString(search.getLastSearchResult().ponderMove));
+    }
+
+    {
+      // black can force repetition 1. ... Rd6 2.Qxd6 Qe3+ 3.Kg2 Qe2+ 4.Kh3 Qh5+ 5.Kg2
+      String fen = "6k1/p3q2p/1nr3pB/8/3Q1P2/6P1/PP5P/3R2K1 b - -";
+      Position position = new Position(fen);
+
+    }
+
+  }
+
+  @Test
   void TT_Root_Test() {
     String fen = Position.STANDARD_BOARD_FEN;
     fen = "8/6R1/1rp1k3/6p1/3KPp1p/5P1P/8/8 b - -";
