@@ -34,6 +34,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 
@@ -48,10 +49,8 @@ import java.util.concurrent.CountDownLatch;
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: More extensions and reductions
  * TODO: Better time management - dynamic adjustments
- *       After last book move
- *       When aspiration fails low
  *       When iteration has stable best move
- *       Obvious replies / single moves
+ *       Obvious replies
  *       Big fail lows on evaluation between iterations
  * TODO: Use fail-soft and test
  */
@@ -277,6 +276,7 @@ public class Search implements Runnable {
     // age TT
     transpositionTable.ageEntries();
 
+    // print info about search mode
     if (isPerftSearch()) {
       LOG.info("****** PERFT SEARCH (" + searchMode.getMaxDepth() + ") *******");
     }
@@ -298,7 +298,7 @@ public class Search implements Runnable {
     }
 
     // reset lastSearchResult
-    lastSearchResult = new SearchResult();
+    lastSearchResult = null;
 
     // reset counter
     searchCounter.resetCounter();
@@ -309,31 +309,14 @@ public class Search implements Runnable {
     // release latch so the caller can continue
     waitForInitializationLatch.countDown();
 
-    // Opening book move
-    if (config.USE_BOOK && !isPerftSearch()) {
-      if (searchMode.isTimeControl()) {
-        LOG.info("Time controlled search => Using book");
-        // initialize book - only happens the first time
-        book.initialize();
-        // retrieve a move from the book
-        int bookMove = book.getBookMove(currentPosition.toFENString());
-        if (bookMove != Move.NOMOVE && Move.isValid(bookMove)) {
-          LOG.info("Book move found: {}", Move.toString(bookMove));
-          hadBookMove = true;
-          lastSearchResult.bestMove = bookMove;
-          lastSearchResult.ponderMove = Move.NOMOVE;
-          sendUCIBestMove();
-          return;
-        } else {
-          LOG.info("No Book move found");
-        }
-      } else {
-        LOG.info("Non time controlled search => not using book");
-      }
-    }
+    // try to get book move
+    lastSearchResult = getBookMove(currentPosition);
 
-    // run the search itself
-    lastSearchResult = iterativeDeepening(currentPosition);
+    // if we did get a book move start the search
+    if (lastSearchResult == null) {
+      lastSearchResult = iterativeDeepening(currentPosition);
+    }
+    assert lastSearchResult != null;
 
     // if the mode still is ponder at this point we finished the ponder
     // search early before a miss or hit has been signaled. We need to
@@ -351,37 +334,6 @@ public class Search implements Runnable {
   }
 
   /**
-   * Is called when our last ponder suggestion has been executed by opponent.
-   * If we are already pondering just continue the search but switch to time control.
-   */
-  public void ponderHit() {
-    if (searchMode.isPonder()) {
-      LOG.info("****** PONDERHIT *******");
-      if (isSearching()) {
-        LOG.info("Ponderhit when ponder search still running. Continue searching.");
-        startTime = System.currentTimeMillis();
-        searchMode.ponderHit();
-        String threadName = "Engine: " + myColor.toString();
-        threadName += " (PHit)";
-        searchThread.setName(threadName);
-        // if time based game setup the time soft and hard time limits
-        if (searchMode.isTimeControl()) {
-          configureTimeLimits();
-        }
-      } else {
-        LOG.info("Ponderhit when ponder search already ended. Sending result.");
-        LOG.info("Search result was: {} PV {}", lastSearchResult.toString(),
-                 principalVariation[ROOT_PLY].toNotationString());
-
-        sendUCIBestMove();
-      }
-
-    } else {
-      LOG.warn("Ponderhit when not pondering!");
-    }
-  }
-
-  /**
    * Generates root moves and starts the actual iterative search by calling the
    * root moves search <code>rootMovesSearch()</code>.
    * <p>
@@ -391,7 +343,6 @@ public class Search implements Runnable {
    * @return search result
    */
   private SearchResult iterativeDeepening(Position position) {
-
     LOG.trace("Iterative deepening");
 
     // remember the start of the search
@@ -406,8 +357,6 @@ public class Search implements Runnable {
     // no iterative deepening
     int depth = searchMode.getStartDepth();
 
-    // prepare search result
-    SearchResult searchResult = new SearchResult();
 
     // if time based game setup the time soft and hard time limits
     if (searchMode.isTimeControl()) {
@@ -494,6 +443,9 @@ public class Search implements Runnable {
         }
       }
     }
+
+    // prepare search result
+    SearchResult searchResult = new SearchResult();
 
     // no legal root moves - game already ended!
     if (rootMoves.size() == 0) {
@@ -613,7 +565,7 @@ public class Search implements Runnable {
    * @param position
    * @param depth
    */
-  public int aspiration_search(Position position, int depth) {
+  private int aspiration_search(Position position, int depth) {
 
     // need to have a good guess for the score of the best move
     assert searchCounter.currentBestRootValue != Evaluation.NOVALUE;
@@ -645,7 +597,8 @@ public class Search implements Runnable {
 
       // add some extra time because of fail low - we might have found strong opponents move
       timeLimitChange(1.5);
-      LOG.debug("1st Aspiration failed low. Time increase 50%");
+      LOG.debug("1st Aspiration failed low ({}). Time increase 50% depth {} best {} ({})", value,
+                depth, Move.toString(searchCounter.currentBestRootMove), bestValue);
 
       alpha = Math.max(Evaluation.MIN, bestValue - 200);
 
@@ -667,8 +620,7 @@ public class Search implements Runnable {
 
     if (stopSearch && (value <= alpha || value >= beta)) return bestValue;
 
-    // full window search
-    // FAIL
+    // FAIL - full window search
     if (value <= alpha || value >= beta) {
       LOG.trace("{}", String.format("2nd Aspiration %s: value = %d window %d/%d",
                                     value <= alpha ? "FAIL-LOW" : "FAIL-HIGH", value, alpha, beta));
@@ -677,7 +629,8 @@ public class Search implements Runnable {
       // add some extra time because of fail low - we might have found strong opponents move
       if (value <= alpha) {
         timeLimitChange(1.5);
-        LOG.debug("2nd Aspiration failed low. Time increase 50%");
+        LOG.debug("2nd Aspiration failed low ({}). Time increase 50% depth {} best {} ({})", value,
+                  depth, Move.toString(searchCounter.currentBestRootMove), bestValue);
       }
 
       alpha = Evaluation.MIN;
@@ -1592,6 +1545,41 @@ public class Search implements Runnable {
   }
 
   /**
+   * Probes the openbook for the given position and returns a move from
+   * the opening book or null if no move was found.
+   *
+   * @param position
+   * @return move from opening book or null if no move was found
+   */
+  private SearchResult getBookMove(Position position) {
+    // prepare search result
+    SearchResult searchResult = new SearchResult();
+
+    // Look for a possible opening book move and send it as result
+    if (config.USE_BOOK && !isPerftSearch()) {
+      if (searchMode.isTimeControl()) {
+        LOG.info("Time controlled search => Using book");
+        // initialize book - only happens the first time
+        book.initialize();
+        // retrieve a move from the book
+        int bookMove = book.getBookMove(position.toFENString());
+        if (bookMove != Move.NOMOVE && Move.isValid(bookMove)) {
+          LOG.info("Book move found: {}", Move.toString(bookMove));
+          hadBookMove = true;
+          searchResult.bestMove = bookMove;
+          searchResult.ponderMove = Move.NOMOVE;
+          return searchResult;
+        } else {
+          LOG.info("No Book move found");
+        }
+      } else {
+        LOG.info("Non time controlled search => not using book");
+      }
+    }
+    return null;
+  }
+
+  /**
    * Returns true if at least on non pawn/king piece is on the
    * board for the moving side.
    *
@@ -1636,7 +1624,11 @@ public class Search implements Runnable {
    * @return value depending on game phase to avoid easy draws
    */
   private int contempt(Position position) {
-    return Evaluation.DRAW; // -Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR;
+    if (position.getNextPlayer().equals(myColor)) {
+      return -Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR;
+    } else {
+      return Evaluation.DRAW;
+    }
   }
 
   /**
@@ -1683,9 +1675,9 @@ public class Search implements Runnable {
 
       // when we have a time increase per move we estimate the additional time we should have
       if (myColor.isWhite()) {
-        timeLeft += searchMode.getWhiteInc().toMillis();
+        timeLeft += 40 * searchMode.getWhiteInc().toMillis();
       } else if (myColor.isBlack()) {
-        timeLeft += searchMode.getBlackInc().toMillis();
+        timeLeft += 40 * searchMode.getBlackInc().toMillis();
       }
 
       // for timed games with remaining time
@@ -1803,6 +1795,37 @@ public class Search implements Runnable {
       LOG.error("Last Move: " + currentPosition.getLastMove());
     }
     engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
+  }
+
+  /**
+   * Is called when our last ponder suggestion has been executed by opponent.
+   * If we are already pondering just continue the search but switch to time control.
+   */
+  public void ponderHit() {
+    if (searchMode.isPonder()) {
+      LOG.info("****** PONDERHIT *******");
+      if (isSearching()) {
+        LOG.info("Ponderhit when ponder search still running. Continue searching.");
+        startTime = System.currentTimeMillis();
+        searchMode.ponderHit();
+        String threadName = "Engine: " + myColor.toString();
+        threadName += " (PHit)";
+        searchThread.setName(threadName);
+        // if time based game setup the time soft and hard time limits
+        if (searchMode.isTimeControl()) {
+          configureTimeLimits();
+        }
+      } else {
+        LOG.info("Ponderhit when ponder search already ended. Sending result.");
+        LOG.info("Search result was: {} PV {}", lastSearchResult.toString(),
+                 principalVariation[ROOT_PLY].toNotationString());
+
+        sendUCIBestMove();
+      }
+
+    } else {
+      LOG.warn("Ponderhit when not pondering!");
+    }
   }
 
   /**
