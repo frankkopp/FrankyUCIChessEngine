@@ -1858,14 +1858,12 @@ public class Search implements Runnable {
    * @param factor factor for changing the time for the current search
    */
   private void timeLimitChange(double factor) {
-    LOG.info(
+    LOG.debug(
       String.format("Time limit change. From %,d to %,d", hardTimeLimit, (long) (hardTimeLimit * factor)));
-    LOG.debug("Stack {}",new RuntimeException().getStackTrace());
     if (searchMode.getMoveTime().toMillis() == 0) {
       hardTimeLimit *= factor;
       softTimeLimit = (long) (hardTimeLimit * 0.8);
     }
-
   }
 
   /**
