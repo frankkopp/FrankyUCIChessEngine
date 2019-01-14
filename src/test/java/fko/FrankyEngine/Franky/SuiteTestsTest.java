@@ -75,6 +75,19 @@ public class SuiteTestsTest {
 
   @Test
   @Disabled
+  void startECM98Suite() {
+    /*
+    5000, 0
+    Successful: 322 (41 Prozent)
+    Failed:     447 (58 Prozent)
+     */
+    testSuite = new TestSuite("./testsets/ecm98.epd");
+    testSuite.setSearchTime(10000);
+    testSuite.startTests();
+  }
+
+  @Test
+  @Disabled
   void startTestSuite() {
     testSuite.setSearchTime(5000);
     testSuite.startTests();
