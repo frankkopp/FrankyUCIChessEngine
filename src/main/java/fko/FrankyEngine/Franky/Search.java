@@ -57,8 +57,11 @@ public class Search implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Search.class);
 
+  // to turn of tracing of search - LOG.trace is too slow - need additional
+  // constant so the compiler can completely remove it if set to false
   private static final boolean TRACE = false;
 
+  // how often shall an update of the search be send to UCI in ms
   private static final int UCI_UPDATE_INTERVAL = 500;
 
   /** Maximum depth this search can go. */
@@ -592,7 +595,7 @@ public class Search implements Runnable {
       searchCounter.aspirationResearches++;
 
       // add some extra time because of fail low - we might have found strong opponents move
-      timeLimitChange(1.5);
+      timeLimitChange(1.3);
 
       alpha = Math.max(Evaluation.MIN, bestValue - 200);
 
@@ -625,7 +628,7 @@ public class Search implements Runnable {
       searchCounter.aspirationResearches++;
 
       // add some extra time because of fail low - we might have found strong opponents move
-      if (value <= alpha) timeLimitChange(1.5);
+      if (value <= alpha) timeLimitChange(1.3);
 
       alpha = Evaluation.MIN;
       beta = Evaluation.MAX;

@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -661,5 +662,80 @@ public class PositionTest {
     fen[i++] = "8/8/8/8/8/8/8/6N1 w - - 0 1";
 
     return fen;
+  }
+
+  @Test
+  @Disabled
+  public void testTiming() {
+
+    ArrayList<String> result = new ArrayList<>();
+
+    int ROUNDS = 5;
+    int ITERATIONS = 25;
+    int REPETITIONS = 100;
+
+    for (int round = 0; round < ROUNDS; round++) {
+      long start = 0, end = 0, sum = 0;
+
+      System.out.printf("Running round %d of Timing Test Test 1 vs. Test 2%n", round);
+      System.gc();
+
+      int i = 0;
+      final Position position = new Position("6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -");
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          test1(position);
+        }
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg1 = ((float) sum / ITERATIONS) / 1e9f;
+
+      i = 0;
+      sum = 0;
+      final Position positionNew = new Position("6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -");
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          test2(positionNew);
+        }
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg2 = ((float) sum / ITERATIONS) / 1e9f;
+
+      result.add(String.format("Round %d Test 1 avg: %,.3f sec", round, avg1));
+      result.add(String.format("Round %d Test 2 avg: %,.3f sec", round, avg2));
+    }
+
+    System.out.println();
+    for (String s : result) {
+      System.out.println(s);
+    }
+
+  }
+
+  private void test1(final Position position) {
+
+    // takes 2 loops to get to repetition
+    for (int i = 0; i < 500; i++) {
+      position.makeMove(Move.fromSANNotation(position, "Qe3"));
+      position.countRepetitions();
+      position.undoMove();
+    }
+
+  }
+
+  private void test2(final Position position) {
+
+    // takes 2 loops to get to repetition
+    for (int i = 0; i < 500; i++) {
+      position.makeMove(Move.fromSANNotation(position, "Qe3"));
+      position.countRepetitions();
+      position.undoMove();
+    }
+
+
   }
 }

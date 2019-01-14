@@ -80,6 +80,9 @@ public class SuiteTestsTest {
     5000, 0
     Successful: 322 (41 Prozent)
     Failed:     447 (58 Prozent)
+    10000
+    Successful: 367 (47 Prozent)
+    Failed:     402 (52 Prozent)
      */
     testSuite = new TestSuite("./testsets/ecm98.epd");
     testSuite.setSearchTime(10000);
