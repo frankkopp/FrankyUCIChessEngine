@@ -217,7 +217,7 @@
                                     <commandlineArgs>
                                         /C
                                         COPY
-                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\*
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\${project.artifactId}-${project.version}*
                                         C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\Releases
                                     </commandlineArgs>
                                     <workingDirectory>C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine</workingDirectory>
