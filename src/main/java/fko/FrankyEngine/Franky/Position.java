@@ -1137,39 +1137,23 @@ public class Position {
 
   public boolean isCastlingWQ() { return castlingWQ; }
 
-  boolean isCastlingBK() { return castlingBK; }
+  public boolean isCastlingBK() { return castlingBK; }
 
-  public boolean isCastlingBQ() {
-    return castlingBQ;
-  }
+  public boolean isCastlingBQ() { return castlingBQ; }
 
-  public SquareList[] getPawnSquares() {
-    return pawnSquares;
-  }
+  public SquareList[] getPawnSquares() { return pawnSquares; }
 
-  public SquareList[] getKnightSquares() {
-    return knightSquares;
-  }
+  public SquareList[] getKnightSquares() { return knightSquares; }
 
-  public SquareList[] getBishopSquares() {
-    return bishopSquares;
-  }
+  public SquareList[] getBishopSquares() { return bishopSquares; }
 
-  public SquareList[] getRookSquares() {
-    return rookSquares;
-  }
+  public SquareList[] getRookSquares() { return rookSquares; }
 
-  public SquareList[] getQueenSquares() {
-    return queenSquares;
-  }
+  public SquareList[] getQueenSquares() { return queenSquares; }
 
-  public Square[] getKingSquares() {
-    return kingSquares;
-  }
+  public Square[] getKingSquares() { return kingSquares; }
 
-  public Square getEnPassantSquare() {
-    return enPassantSquare;
-  }
+  public Square getEnPassantSquare() { return enPassantSquare; }
 
   /**
    * Initialize the lists for the pieces and the material counter
