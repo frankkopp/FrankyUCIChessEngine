@@ -720,8 +720,8 @@ public class Search implements Runnable {
           && depth >= config.LMR_MIN_DEPTH
           && !isPerftSearch()
           && !position.hasCheck()
-          && Move.getTarget(move).equals(Piece.NOPIECE)
-          && !Move.getMoveType(move).equals(MoveType.PROMOTION)
+          && Move.getTarget(move) == Piece.NOPIECE
+          && Move.getMoveType(move) != MoveType.PROMOTION
           && !killerMoves[ply].contains(move)
       ) { // @formatter:on
         lmrReduce = config.LMR_REDUCTION;
@@ -1120,8 +1120,8 @@ public class Search implements Runnable {
           && !position.hasCheck()
           && !mateThreat[ply]
           && !isCheckMateValue(beta)
-          && Move.getTarget(move).equals(Piece.NOPIECE)
-          && !Move.getMoveType(move).equals(MoveType.PROMOTION)
+          && Move.getTarget(move) == Piece.NOPIECE
+          && Move.getMoveType(move) != MoveType.PROMOTION
           && !killerMoves[ply].contains(move)
       ) { // @formatter:on
         lmrReduce = config.LMR_REDUCTION;
@@ -1207,7 +1207,7 @@ public class Search implements Runnable {
         if (value >= beta) { // fail-high
           if (config.USE_ALPHABETA_PRUNING) {
             // save killer moves so they will be search earlier on following nodes
-            if (config.USE_KILLER_MOVES && Move.getTarget(move).equals(Piece.NOPIECE)) {
+            if (config.USE_KILLER_MOVES && Move.getTarget(move) == Piece.NOPIECE) {
               if (!killerMoves[ply].pushToHeadStable(move)) {
                 killerMoves[ply].addFront(move);
                 while (killerMoves[ply].size() > config.NO_KILLER_MOVES) {
@@ -1872,9 +1872,7 @@ public class Search implements Runnable {
    * @return true if soft time limit is reached, false otherwise
    */
   private boolean softTimeLimitReached() {
-    if (!searchMode.isTimeControl()) {
-      return false;
-    }
+    if (!searchMode.isTimeControl()) return false;
     stopSearch = elapsedTime() >= softTimeLimit;
     return stopSearch;
   }
@@ -1886,9 +1884,7 @@ public class Search implements Runnable {
    * @return true if hard time limit is reached, false otherwise
    */
   private boolean hardTimeLimitReached() {
-    if (!searchMode.isTimeControl()) {
-      return false;
-    }
+    if (!searchMode.isTimeControl()) return false;
     stopSearch = elapsedTime() >= hardTimeLimit;
     return stopSearch;
   }

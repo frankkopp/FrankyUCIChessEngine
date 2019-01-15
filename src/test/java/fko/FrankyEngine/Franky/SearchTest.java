@@ -1021,4 +1021,11 @@ public class SearchTest {
     System.out.println(ClassLayout.parseClass(TTHit.class).toPrintable());
     //System.out.println(ClassLayout.parseClass(Search.class).toPrintable());
   }
+
+  @Test
+  @Disabled
+  public void test() {
+    ArrayList t = new ArrayList();
+    t.listIterator().hasNext();
+  }
 }

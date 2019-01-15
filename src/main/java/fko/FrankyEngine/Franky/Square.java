@@ -129,7 +129,7 @@ public enum Square {
 
   /**
    * @param index
-   * @return the Square for the given index of a 0x88 board - returns INVALID if not a valid
+   * @return the Square for the given index of a 0x88 board - returns NOSQUARE if not a valid
    * index
    */
   public static Square getSquare(int index) {

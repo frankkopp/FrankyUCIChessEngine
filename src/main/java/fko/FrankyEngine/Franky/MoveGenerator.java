@@ -427,7 +427,7 @@ public class MoveGenerator {
     MoveList qSearchMoves = new MoveList();
     for (int move : capturingMoves) {
       // all pawn captures - they never loose material
-      if (Move.getPiece(move).getType().equals(PieceType.PAWN)) {
+      if (Move.getPiece(move).getType() == PieceType.PAWN) {
         qSearchMoves.add(move);
       }
       // Lower value piece captures higher value piece (with a margin)
@@ -556,7 +556,7 @@ public class MoveGenerator {
   private int getSortValue(int move) {
 
     // capturing moves
-    if (!Move.getTarget(move).equals(Piece.NOPIECE)) {
+    if (Move.getTarget(move) != Piece.NOPIECE) {
       return Move.getPiece(move).getType().getValue() - Move.getTarget(move).getType().getValue();
     }
     // non capturing
@@ -568,7 +568,7 @@ public class MoveGenerator {
       }
       // promotions
       final PieceType pieceType = Move.getPromotion(move).getType();
-      if (!pieceType.equals(PieceType.NOTYPE)) {
+      if (pieceType != PieceType.NOTYPE) {
         switch (pieceType) {
           case QUEEN:
             return 9000;
@@ -581,7 +581,7 @@ public class MoveGenerator {
         }
       }
       // castling
-      else if (Move.getMoveType(move).equals(MoveType.CASTLING)) {
+      else if (Move.getMoveType(move) == MoveType.CASTLING) {
         return 9200;
       }
       // all other moves
