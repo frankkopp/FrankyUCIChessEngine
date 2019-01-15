@@ -123,13 +123,14 @@ public class MoveList extends SimpleIntList {
 
   @Override
   public String toString() {
-    String s = "MoveList size=" + size() + " available capacity=" + getAvailableCapacity() + " [";
+    StringBuilder s = new StringBuilder("MoveList size=");
+    s.append(size()).append(" available capacity=").append(getAvailableCapacity()).append(" [");
     for (int i = 0; i < size(); i++) {
-      s += get(i) + " (" + Move.toString(get(i)) + ")";
-      if (i < size() - 1) s += ", ";
+      s.append(get(i)).append(" (").append(Move.toString(get(i))).append(")");
+      if (i < size() - 1) s.append(", ");
     }
-    s += "]";
-    return s;
+    s.append("]");
+    return s.toString();
   }
 
   /**
@@ -138,11 +139,11 @@ public class MoveList extends SimpleIntList {
    * @return string containing the moves of the list
    */
   public String toNotationString() {
-    String s = "";
+    StringBuilder s = new StringBuilder();
     for (int i = 0; i < size(); i++) {
-      s += Move.toSimpleString(get(i)) + " ";
+      s.append(Move.toSimpleString(get(i))).append(" ");
     }
-    return s;
+    return s.toString();
   }
 
   /**
