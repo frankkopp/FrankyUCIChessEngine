@@ -746,11 +746,7 @@ public class Evaluation {
    * Iterates over all squares an does evaluations specific to the square
    */
   private void iterateOverSquares() {
-
-    for (Square square : validSquares) {
-
-    }
-
+    // not yet used
   }
 
   /**
