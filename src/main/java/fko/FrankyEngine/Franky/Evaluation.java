@@ -727,6 +727,43 @@ public class Evaluation {
   }
 
   /**
+   * @param type
+   * @param square
+   * @param pieceDirections
+   */
+  private int mobilityForPiece(PieceType type, Square square, int[] pieceDirections) {
+
+    int numberOfMoves = 0;
+    for (int d : pieceDirections) {
+      int to = square.ordinal() + d;
+      while ((to & 0x88) == 0) { // slide while valid square
+        final Piece target = position.getPiece(Square.getSquare(to));
+        // free square - no capture
+        if (target == NOPIECE) {
+          numberOfMoves++;
+        }
+        // occupied square - capture if opponent and stop sliding
+        else {
+          /*
+           * Either only count moves which capture an opponent's piece or also
+           * count moves which defend one of our own piece
+           */
+          //if (target.getColor() == color.getInverseColor())
+          numberOfMoves++;
+          break; // stop sliding;
+        }
+
+        if (type.isSliding()) {
+          to += d; // next sliding field in this direction
+        } else {
+          break; // no sliding piece type
+        }
+      }
+    }
+    return numberOfMoves;
+  }
+
+  /**
    * Iterates over all squares an does evaluations specific to the square
    */
   private void iterateOverSquares() {
@@ -801,43 +838,6 @@ public class Evaluation {
     // midGameMobility is done in the squares iteration
     evaluate(position);
     return kingSafety;
-  }
-
-  /**
-   * @param type
-   * @param square
-   * @param pieceDirections
-   */
-  private int mobilityForPiece(PieceType type, Square square, int[] pieceDirections) {
-
-    int numberOfMoves = 0;
-    for (int d : pieceDirections) {
-      int to = square.ordinal() + d;
-      while ((to & 0x88) == 0) { // slide while valid square
-        final Piece target = position.getPiece(Square.getSquare(to));
-        // free square - non capture
-        if (target == NOPIECE) {
-          numberOfMoves++;
-        }
-        // occupied square - capture if opponent and stop sliding
-        else {
-          /*
-           * Either only count moves which capture an opponent's piece or also
-           * count moves which defend one of our own piece
-           */
-          //if (target.getColor() == color.getInverseColor())
-          numberOfMoves++;
-          break; // stop sliding;
-        }
-
-        if (type.isSliding()) {
-          to += d; // next sliding field in this direction
-        } else {
-          break; // no sliding piece type
-        }
-      }
-    }
-    return numberOfMoves;
   }
 
   @Override
