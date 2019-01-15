@@ -25,7 +25,6 @@
 
 package fko.FrankyEngine.Franky;
 
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -77,27 +76,29 @@ public class Position {
 
   // **********************************************************
   // Board State START ----------------------------------------
-  // unique chess position
+  // unique chess position (exception is 3-fold repetition
+  // which is also not represented in a FEN string)
   //
   // 0x88 Board
   private Piece[] x88Board = new Piece[BOARDSIZE];
 
   // hash for pieces - piece, board
-  private static final long[][] pieceZobrist = new long[Piece.values.length][Square.values.length];
+  private static final long[][] pieceZobrist =
+    new long[Piece.values.length][Square.values.length];
 
   // Castling rights
-  private        boolean   castlingWK         = true;
-  private        boolean[] castlingWK_History = new boolean[MAX_HISTORY];
-  private static long      castlingWK_Zobrist;
-  private        boolean   castlingWQ         = true;
-  private        boolean[] castlingWQ_History = new boolean[MAX_HISTORY];
-  private static long      castlingWQ_Zobrist;
-  private        boolean   castlingBK         = true;
-  private        boolean[] castlingBK_History = new boolean[MAX_HISTORY];
-  private static long      castlingBK_Zobrist;
-  private        boolean   castlingBQ         = true;
-  private        boolean[] castlingBQ_History = new boolean[MAX_HISTORY];
-  private static long      castlingBQ_Zobrist;
+  private              boolean   castlingWK         = true;
+  private              boolean[] castlingWK_History = new boolean[MAX_HISTORY];
+  private static final long      castlingWK_Zobrist;
+  private              boolean   castlingWQ         = true;
+  private              boolean[] castlingWQ_History = new boolean[MAX_HISTORY];
+  private static final long      castlingWQ_Zobrist;
+  private              boolean   castlingBK         = true;
+  private              boolean[] castlingBK_History = new boolean[MAX_HISTORY];
+  private static final long      castlingBK_Zobrist;
+  private              boolean   castlingBQ         = true;
+  private              boolean[] castlingBQ_History = new boolean[MAX_HISTORY];
+  private static final long      castlingBQ_Zobrist;
 
   // en passant field - if NOSQUARE then we do not have an en passant option
   private              Square   enPassantSquare         = Square.NOSQUARE;
@@ -110,8 +111,8 @@ public class Position {
   // has no zobrist key
 
   // next player color
-  private        Color nextPlayer = Color.WHITE;
-  private static long  nextPlayer_Zobrist;
+  private              Color nextPlayer = Color.WHITE;
+  private static final long  nextPlayer_Zobrist;
   //
   // Board State END ------------------------------------------
   // **********************************************************
@@ -121,6 +122,7 @@ public class Position {
   // not necessary for a unique position
 
   // we can recreate the board through the last move - no need for history of board itself
+  // with this we can also capture 3-fold repetition
   private int[] moveHistory = new int[MAX_HISTORY];
 
   // half move number - the actual half move number to determine the full move number
@@ -144,11 +146,9 @@ public class Position {
   private Flag   hasMate             = Flag.TBD;
   private Flag[] hasMateFlagHistory  = new Flag[MAX_HISTORY];
 
+  // internal move generator for check if position is mate - might not be good place
+  // as it couples this class to the MoveGernerator class
   private final MoveGenerator mateCheckMG = new MoveGenerator();
-
-  public void setCastlingWK(boolean castlingWK) {
-    this.castlingWK = castlingWK;
-  }
 
   // Flag for boolean states with undetermined state
   private enum Flag {
@@ -159,14 +159,9 @@ public class Position {
   // Static Initialization for zobrist key generation
   // For testing purposes these fields are not final and also
   // accessible from external.
-  public static int SEED = 61;
-
+  public static int SEED = 0;
   static {
-    setZobristRandoms(SEED);
-  }
-
-  public static void setZobristRandoms(final int seed) {
-    Random random = new Random(0);
+    Random random = new Random(SEED);
 
     // all pieces on all squares
     for (Piece p : Piece.values) {
@@ -344,8 +339,7 @@ public class Position {
         clearEnPassant();
         // set new en passant target field - always one "behind" the toSquare
         enPassantSquare = piece.getColor().isWhite() ? toSquare.getSouth() : toSquare.getNorth();
-        zobristKey =
-          this.zobristKey ^ enPassantSquare_Zobrist[enPassantSquare.ordinal()]; // in
+        zobristKey = this.zobristKey ^ enPassantSquare_Zobrist[enPassantSquare.ordinal()]; // in
         halfMoveClock = 0; // reset half move clock because of pawn move
         break;
       case ENPASSANT:
@@ -932,8 +926,7 @@ public class Position {
    */
   public boolean hasCheck() {
     if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
-    boolean check =
-      isAttacked(nextPlayer.getInverseColor(), kingSquares[nextPlayer.ordinal()]);
+    boolean check = isAttacked(nextPlayer.getInverseColor(), kingSquares[nextPlayer.ordinal()]);
     hasCheck = check ? Flag.TRUE : Flag.FALSE;
     return check;
   }
