@@ -376,7 +376,7 @@ public class Search implements Runnable {
       return searchResult;
     }
 
-    // remember the start of the search
+    // remember the start time of the search
     startTime = System.currentTimeMillis();
     uciUpdateTicker = System.currentTimeMillis();
 
@@ -504,7 +504,7 @@ public class Search implements Runnable {
 
       } else {
 
-        value = rootMovesSearch(position, depth, Evaluation.MIN, Evaluation.MAX);
+        value = rootMovesSearch(position, depth, alpha, beta);
 
       }
       // @formatter:on
@@ -582,6 +582,7 @@ public class Search implements Runnable {
 
     int value = rootMovesSearch(position, depth, alpha, beta);
 
+    // if search has been stopped and value has missed window return current best value
     if (stopSearch && (value <= alpha || value >= beta)) return bestValue;
 
     // 2nd aspiration
@@ -617,6 +618,7 @@ public class Search implements Runnable {
       value = rootMovesSearch(position, depth, alpha, beta);
     }
 
+    // if search has been stopped and value has missed window return current best value
     if (stopSearch && (value <= alpha || value >= beta)) return bestValue;
 
     // FAIL - full window search
@@ -688,7 +690,6 @@ public class Search implements Runnable {
 
     // Prepare hash type
     byte ttType = TT_EntryType.ALPHA;
-    String nodeType;
 
     // ##########################################################
     // ##### ROOT_PLY MOVES -Iterate through all available root moves

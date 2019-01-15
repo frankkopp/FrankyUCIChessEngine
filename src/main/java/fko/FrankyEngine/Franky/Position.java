@@ -267,18 +267,23 @@ public class Position {
   }
 
   /**
-   * Initialize the lists for the pieces and the material counter
+   * Retrieve piece on given square.
+   *
+   * @param square
+   * @return returns the piece or <code>NOPIECE</code> of the given square
    */
-  private void initializeLists() {
-    for (int i = 0; i <= 1; i++) { // foreach color
-      pawnSquares[i] = new SquareList();
-      knightSquares[i] = new SquareList();
-      bishopSquares[i] = new SquareList();
-      rookSquares[i] = new SquareList();
-      queenSquares[i] = new SquareList();
-      kingSquares[i] = Square.NOSQUARE;
-    }
-    material = new int[2];
+  public Piece getPiece(final Square square) {
+    return x88Board[square.ordinal()];
+  }
+
+  /**
+   * Retrieve piece on given index on x88Board.
+   *
+   * @param x88idx
+   * @return returns the piece or <code>NOPIECE</code> of the given square
+   */
+  public Piece getPiece(final int x88idx) {
+    return x88Board[x88idx];
   }
 
   /**
@@ -456,6 +461,61 @@ public class Position {
     hasMate = hasMateFlagHistory[historyCounter];
   }
 
+  /**
+   * Makes a null move. Essentially switches sides within same position.
+   */
+  public void makeNullMove() {
+    // Save state for undoMove
+    castlingWK_History[historyCounter] = castlingWK;
+    castlingWQ_History[historyCounter] = castlingWQ;
+    castlingBK_History[historyCounter] = castlingBK;
+    castlingBQ_History[historyCounter] = castlingBQ;
+    enPassantSquare_History[historyCounter] = enPassantSquare;
+    halfMoveClockHistory[historyCounter] = halfMoveClock;
+    zobristKeyHistory[historyCounter] = this.zobristKey;
+    hasCheckFlagHistory[historyCounter] = hasCheck;
+    hasMateFlagHistory[historyCounter] = hasMate;
+    historyCounter++;
+    // reset check and mate flag
+    hasCheck = Flag.TBD;
+    hasMate = Flag.TBD;
+    // clear en passant
+    clearEnPassant();
+    // increase half move clock
+    halfMoveClock++;
+    // increase halfMoveNumber
+    nextHalfMoveNumber++;
+    // change color (active player)
+    nextPlayer = nextPlayer.getInverseColor();
+    zobristKey = this.zobristKey ^ nextPlayer_Zobrist;
+  }
+
+  /**
+   * Undo a null move. Essentially switches back sides within same position.
+   */
+  public void undoNullMove() {
+    // Get state for undoMove
+    historyCounter--;
+    // restore castling rights
+    castlingWK = castlingWK_History[historyCounter];
+    castlingWQ = castlingWQ_History[historyCounter];
+    castlingBK = castlingBK_History[historyCounter];
+    castlingBQ = castlingBQ_History[historyCounter];
+    // restore en passant square
+    enPassantSquare = enPassantSquare_History[historyCounter];
+    // restore halfMoveClock
+    halfMoveClock = halfMoveClockHistory[historyCounter];
+    // decrease _halfMoveNumber
+    nextHalfMoveNumber--;
+    // change back color
+    nextPlayer = nextPlayer.getInverseColor();
+    // zobristKey - just overwrite - should be the same as before the move
+    zobristKey = zobristKeyHistory[historyCounter];
+    // get the check and mate flag from history
+    hasCheck = hasCheckFlagHistory[historyCounter];
+    hasMate = hasMateFlagHistory[historyCounter];
+  }
+
   private void clearEnPassant() {
     if (enPassantSquare != Square.NOSQUARE) {
       zobristKey = this.zobristKey ^ enPassantSquare_Zobrist[enPassantSquare.ordinal()]; // out
@@ -604,61 +664,6 @@ public class Position {
   }
 
   /**
-   * Makes a null move. Essentially switches sides within same position.
-   */
-  public void makeNullMove() {
-    // Save state for undoMove
-    castlingWK_History[historyCounter] = castlingWK;
-    castlingWQ_History[historyCounter] = castlingWQ;
-    castlingBK_History[historyCounter] = castlingBK;
-    castlingBQ_History[historyCounter] = castlingBQ;
-    enPassantSquare_History[historyCounter] = enPassantSquare;
-    halfMoveClockHistory[historyCounter] = halfMoveClock;
-    zobristKeyHistory[historyCounter] = this.zobristKey;
-    hasCheckFlagHistory[historyCounter] = hasCheck;
-    hasMateFlagHistory[historyCounter] = hasMate;
-    historyCounter++;
-    // reset check and mate flag
-    hasCheck = Flag.TBD;
-    hasMate = Flag.TBD;
-    // clear en passant
-    clearEnPassant();
-    // increase half move clock
-    halfMoveClock++;
-    // increase halfMoveNumber
-    nextHalfMoveNumber++;
-    // change color (active player)
-    nextPlayer = nextPlayer.getInverseColor();
-    zobristKey = this.zobristKey ^ nextPlayer_Zobrist;
-  }
-
-  /**
-   * Undo a null move. Essentially switches back sides within same position.
-   */
-  public void undoNullMove() {
-    // Get state for undoMove
-    historyCounter--;
-    // restore castling rights
-    castlingWK = castlingWK_History[historyCounter];
-    castlingWQ = castlingWQ_History[historyCounter];
-    castlingBK = castlingBK_History[historyCounter];
-    castlingBQ = castlingBQ_History[historyCounter];
-    // restore en passant square
-    enPassantSquare = enPassantSquare_History[historyCounter];
-    // restore halfMoveClock
-    halfMoveClock = halfMoveClockHistory[historyCounter];
-    // decrease _halfMoveNumber
-    nextHalfMoveNumber--;
-    // change back color
-    nextPlayer = nextPlayer.getInverseColor();
-    // zobristKey - just overwrite - should be the same as before the move
-    zobristKey = zobristKeyHistory[historyCounter];
-    // get the check and mate flag from history
-    hasCheck = hasCheckFlagHistory[historyCounter];
-    hasMate = hasMateFlagHistory[historyCounter];
-  }
-
-  /**
    * @param fromSquare
    * @param toSquare
    * @param piece
@@ -724,16 +729,6 @@ public class Position {
     material[color] -= piece.getType().getValue();
     // return the remove piece
     return old;
-  }
-
-  /**
-   * Retrieve piece on given square.
-   *
-   * @param square
-   * @return returns the piece or <code>NOPIECE</code> of the given square
-   */
-  public Piece getPiece(final Square square) {
-    return x88Board[square.ordinal()];
   }
 
   /**
@@ -932,8 +927,8 @@ public class Position {
   }
 
   /**
-   * Tests for mate on this position. If true the next player has lost. Expensive test as all legal
-   * moves have to be generated.
+   * Tests for mate on this position. If true the next player has has no move and is in check.
+   * Expensive test as all legal moves have to be generated.
    *
    * @return true if current position is mate for next player
    */
@@ -1138,52 +1133,57 @@ public class Position {
     return moveHistory[historyCounter - 1];
   }
 
-  Piece[] getX88Board() {
-    return x88Board;
-  }
+  public boolean isCastlingWK() { return castlingWK; }
 
-  boolean isCastlingWK() {
-    return castlingWK;
-  }
+  public boolean isCastlingWQ() { return castlingWQ; }
 
-  boolean isCastlingWQ() {
-    return castlingWQ;
-  }
+  boolean isCastlingBK() { return castlingBK; }
 
-  boolean isCastlingBK() {
-    return castlingBK;
-  }
-
-  boolean isCastlingBQ() {
+  public boolean isCastlingBQ() {
     return castlingBQ;
   }
 
-  SquareList[] getPawnSquares() {
+  public SquareList[] getPawnSquares() {
     return pawnSquares;
   }
 
-  SquareList[] getKnightSquares() {
+  public SquareList[] getKnightSquares() {
     return knightSquares;
   }
 
-  SquareList[] getBishopSquares() {
+  public SquareList[] getBishopSquares() {
     return bishopSquares;
   }
 
-  SquareList[] getRookSquares() {
+  public SquareList[] getRookSquares() {
     return rookSquares;
   }
 
-  SquareList[] getQueenSquares() {
+  public SquareList[] getQueenSquares() {
     return queenSquares;
   }
 
-  Square[] getKingSquares() {
+  public Square[] getKingSquares() {
     return kingSquares;
   }
 
-  Square getEnPassantSquare() {
+  public Square getEnPassantSquare() {
     return enPassantSquare;
+  }
+
+  /**
+   * Initialize the lists for the pieces and the material counter
+   */
+  private void initializeLists() {
+    for (int i = 0; i <= 1; i++) { // foreach color
+      pawnSquares[i] = new SquareList();
+      knightSquares[i] = new SquareList();
+      bishopSquares[i] = new SquareList();
+      rookSquares[i] = new SquareList();
+      queenSquares[i] = new SquareList();
+      kingSquares[i] = Square.NOSQUARE;
+    }
+    material = new int[2];
   }
 
   /**

@@ -641,7 +641,7 @@ public class MoveGenerator {
     for (int i = 0; i < size; i++) {
       final Square square = squareList.get(i);
 
-      assert position.getX88Board()[square.ordinal()].getType() == PieceType.PAWN;
+      assert position.getPiece(square).getType() == PieceType.PAWN;
 
       // get all possible x88 index values for pawn moves
       // these are basically int values to add or subtract from the
@@ -658,7 +658,7 @@ public class MoveGenerator {
           final Square fromSquare = Square.getSquare(square.ordinal());
           final Square toSquare = Square.getSquare(to);
           final Piece piece = Piece.getPiece(PieceType.PAWN, activePlayer);
-          final Piece target = position.getX88Board()[to];
+          final Piece target = position.getPiece(to);
           final Piece promotion = Piece.NOPIECE;
 
           // capture
@@ -708,7 +708,7 @@ public class MoveGenerator {
                                 : position.getEnPassantSquare().getNorth().ordinal();
                   capturingMoves.add(
                     Move.createMove(MoveType.ENPASSANT, fromSquare, toSquare, piece,
-                                    position.getX88Board()[t], promotion));
+                                    position.getPiece(t), promotion));
                 }
               }
             }
@@ -749,14 +749,14 @@ public class MoveGenerator {
               } else {
                 // pawndouble
                 if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow() &&
-                    (position.getX88Board()[fromSquare.ordinal() + (2 * Square.N)]) ==
+                    (position.getPiece(fromSquare.ordinal() + (2 * Square.N))) ==
                     Piece.NOPIECE) {
                   // on rank 2 && rank 4 is free(rank 3 already checked via target)
                   nonCapturingMoves.add(
                     Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getNorth(), piece,
                                     target, promotion));
                 } else if (activePlayer.isBlack() && fromSquare.isBlackPawnBaseRow() &&
-                           position.getX88Board()[fromSquare.ordinal() + (2 * Square.S)] ==
+                           position.getPiece(fromSquare.ordinal() + (2 * Square.S)) ==
                            Piece.NOPIECE) {
                   // on rank 7 && rank 5 is free(rank 6 already checked via target)
                   nonCapturingMoves.add(
@@ -781,7 +781,7 @@ public class MoveGenerator {
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square square = squareList.get(i);
-      assert position.getX88Board()[square.ordinal()].getType() == type;
+      assert position.getPiece(square).getType() == type;
       generateMoves(type, square, Square.knightDirections);
     }
   }
@@ -793,7 +793,7 @@ public class MoveGenerator {
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square square = squareList.get(i);
-      assert position.getX88Board()[square.ordinal()].getType() == type;
+      assert position.getPiece(square).getType() == type;
       generateMoves(type, square, Square.bishopDirections);
     }
   }
@@ -805,7 +805,7 @@ public class MoveGenerator {
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square square = squareList.get(i);
-      assert position.getX88Board()[square.ordinal()].getType() == type;
+      assert position.getPiece(square).getType() == type;
       generateMoves(type, square, Square.rookDirections);
     }
   }
@@ -817,7 +817,7 @@ public class MoveGenerator {
     final int size = squareList.size();
     for (int i = 0; i < size; i++) {
       final Square square = squareList.get(i);
-      assert position.getX88Board()[square.ordinal()].getType() == type;
+      assert position.getPiece(square).getType() == type;
       generateMoves(type, square, Square.queenDirections);
     }
   }
@@ -825,7 +825,7 @@ public class MoveGenerator {
   private void generateKingMoves() {
     final PieceType type = PieceType.KING;
     Square square = position.getKingSquares()[activePlayer.ordinal()];
-    assert position.getX88Board()[square.ordinal()].getType() == type;
+    assert position.getPiece(square.ordinal()).getType() == type;
     generateMoves(type, square, Square.kingDirections);
   }
 
@@ -842,7 +842,7 @@ public class MoveGenerator {
       int to = square.ordinal() + d;
 
       while ((to & 0x88) == 0) { // slide while valid square
-        final Piece target = position.getX88Board()[to];
+        final Piece target = position.getPiece(to);
 
         // free square - non capture
         if (target == Piece.NOPIECE) { // empty
@@ -890,10 +890,10 @@ public class MoveGenerator {
         // f1 free, g1 free and f1 not attacked
         // we will not check if g1 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
-        if (position.getX88Board()[Square.f1.ordinal()] == Piece.NOPIECE // passing square free
+        if (position.getPiece(Square.f1.ordinal()) == Piece.NOPIECE // passing square free
             && !position.isAttacked(activePlayer.getInverseColor(), Square.f1)
             // passing square not attacked
-            && position.getX88Board()[Square.g1.ordinal()] == Piece.NOPIECE) // to square free
+            && position.getPiece(Square.g1.ordinal()) == Piece.NOPIECE) // to square free
         {
           nonCapturingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e1, Square.g1, Piece.WHITE_KING,
@@ -904,12 +904,12 @@ public class MoveGenerator {
         // d1 free, c1 free and d1 not attacked
         // we will not check if d1 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
-        if (position.getX88Board()[Square.d1.ordinal()] == Piece.NOPIECE // passing square free
-            && position.getX88Board()[Square.b1.ordinal()] == Piece.NOPIECE
+        if (position.getPiece(Square.d1.ordinal()) == Piece.NOPIECE // passing square free
+            && position.getPiece(Square.b1.ordinal()) == Piece.NOPIECE
             // rook passing square free
             && !position.isAttacked(activePlayer.getInverseColor(), Square.d1)
             // passing square not attacked
-            && position.getX88Board()[Square.c1.ordinal()] == Piece.NOPIECE) // to square free
+            && position.getPiece(Square.c1.ordinal()) == Piece.NOPIECE) // to square free
         {
           nonCapturingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e1, Square.c1, Piece.WHITE_KING,
@@ -921,10 +921,10 @@ public class MoveGenerator {
         // f8 free, g8 free and f8 not attacked
         // we will not check if g8 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
-        if (position.getX88Board()[Square.f8.ordinal()] == Piece.NOPIECE // passing square free
+        if (position.getPiece(Square.f8.ordinal()) == Piece.NOPIECE // passing square free
             && !position.isAttacked(activePlayer.getInverseColor(), Square.f8)
             // passing square not attacked
-            && position.getX88Board()[Square.g8.ordinal()] == Piece.NOPIECE) // to square free
+            && position.getPiece(Square.g8.ordinal()) == Piece.NOPIECE) // to square free
         {
           nonCapturingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e8, Square.g8, Piece.BLACK_KING,
@@ -935,12 +935,12 @@ public class MoveGenerator {
         // d8 free, c8 free and d8 not attacked
         // we will not check if d8 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
-        if (position.getX88Board()[Square.d8.ordinal()] == Piece.NOPIECE // passing square free
-            && position.getX88Board()[Square.b8.ordinal()] == Piece.NOPIECE
+        if (position.getPiece(Square.d8.ordinal()) == Piece.NOPIECE // passing square free
+            && position.getPiece(Square.b8.ordinal()) == Piece.NOPIECE
             // rook passing square free
             && !position.isAttacked(activePlayer.getInverseColor(), Square.d8)
             // passing square not attacked
-            && position.getX88Board()[Square.c8.ordinal()] == Piece.NOPIECE) // to square free
+            && position.getPiece(Square.c8.ordinal()) == Piece.NOPIECE) // to square free
         {
           nonCapturingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e8, Square.c8, Piece.BLACK_KING,
@@ -1081,7 +1081,7 @@ public class MoveGenerator {
     for (int d : pieceDirections) {
       int to = square.ordinal() + d;
       while ((to & 0x88) == 0) { // slide while valid square
-        final Piece target = position.getX88Board()[to];
+        final Piece target = position.getPiece(to);
         // free square - non capture
         if (target == Piece.NOPIECE) { // empty
           move = Move.createMove(MoveType.NORMAL, Square.getSquare(square.ordinal()),
@@ -1138,7 +1138,7 @@ public class MoveGenerator {
           final Square fromSquare = Square.getSquare(square.ordinal());
           final Square toSquare = Square.getSquare(to);
           final Piece piece = Piece.getPiece(PieceType.PAWN, activePlayer);
-          final Piece target = position.getX88Board()[to];
+          final Piece target = position.getPiece(to);
           final Piece promotion = Piece.NOPIECE;
           // capture
           if (d != Square.N) { // not straight
@@ -1153,7 +1153,7 @@ public class MoveGenerator {
                               ? position.getEnPassantSquare().getSouth().ordinal()
                               : position.getEnPassantSquare().getNorth().ordinal();
                 move = Move.createMove(MoveType.ENPASSANT, fromSquare, toSquare, piece,
-                                       position.getX88Board()[t], promotion);
+                                       position.getPiece(t), promotion);
                 if (isLegalMove(move)) return true;
               }
             }
