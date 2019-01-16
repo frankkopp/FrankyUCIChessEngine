@@ -54,7 +54,7 @@ class EvaluationConfig {
 
   // @formatter:off
   // PAWN Tables
-    static int[] pawnsMidGame  = new int[] {
+  static int[] pawnsMidGame  = new int[] {
      0,  0,  0,  0,  0,  0,  0,  0,
      0,  0,  0,  0,  0,  0,  0,  0,
      0,  5,  5,  5,  5,  5,  5,  0,
