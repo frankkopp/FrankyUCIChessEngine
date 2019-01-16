@@ -48,9 +48,9 @@ import java.util.concurrent.CountDownLatch;
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: More extensions and reductions
  * TODO: Better time management - dynamic adjustments
- * When iteration has stable best move
- * Obvious replies
- * Big fail low on evaluation between iterations
+ *       When iteration has stable best move
+ *       Obvious replies
+ *       Big fail low on evaluation between iterations
  * TODO: Use fail-soft and test
  * TODO: Lazy SMP
  */
