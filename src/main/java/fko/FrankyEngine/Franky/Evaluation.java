@@ -220,7 +220,12 @@ public class Evaluation {
     // Sum up per game phase
     // ######################################
 
-    assert (Evaluation.MIN < value && value < Evaluation.MAX);
+    // In very rare cases evaluation can be below or above the MIN or MAX.
+    // Mostly in artificial cases with many queens - some test cases do this.
+    // Therefore we limit the value to MIN+1 or MAX-1.
+    if (value <= Evaluation.MIN) value = Evaluation.MIN+1;
+    else if (value >= Evaluation.MAX) value = Evaluation.MAX-1;
+
     return value;
   }
 

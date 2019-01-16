@@ -48,10 +48,11 @@ import java.util.concurrent.CountDownLatch;
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: More extensions and reductions
  * TODO: Better time management - dynamic adjustments
- *       When iteration has stable best move
- *       Obvious replies
- *       Big fail low on evaluation between iterations
+ * When iteration has stable best move
+ * Obvious replies
+ * Big fail low on evaluation between iterations
  * TODO: Use fail-soft and test
+ * TODO: Lazy SMP
  */
 public class Search implements Runnable {
 
@@ -64,7 +65,9 @@ public class Search implements Runnable {
   // how often shall an update of the search be send to UCI in ms
   private static final int UCI_UPDATE_INTERVAL = 500;
 
-  /** Maximum depth this search can go. */
+  /**
+   * Maximum depth this search can go.
+   */
   public static final int MAX_SEARCH_DEPTH = Byte.MAX_VALUE;
 
   // Readability constants
@@ -75,7 +78,9 @@ public class Search implements Runnable {
   private static final int     DEPTH_NONE = 0;
   private static final int     ROOT_PLY   = 0;
 
-  /** Configuration object for direct manipulation */
+  /**
+   * Configuration object for direct manipulation
+   */
   public final Configuration config;
 
   // search counters
@@ -125,6 +130,7 @@ public class Search implements Runnable {
   private long stopTime;
   private long hardTimeLimit;
   private long softTimeLimit;
+  private long extraTime;
 
   // search state - valid for one call to startSearch
   private Position     currentPosition;
@@ -281,7 +287,7 @@ public class Search implements Runnable {
     // Initialize for new search
     lastSearchResult = null;
     searchCounter.resetCounter();
-    softTimeLimit = hardTimeLimit = 0;
+    softTimeLimit = hardTimeLimit = extraTime = 0;
 
     // Initialize ply based data
     // Each depth in search gets it own global field to avoid object creation
@@ -399,7 +405,7 @@ public class Search implements Runnable {
       LOG.debug("Last book move detected. Adding some extra time. Before: {} After: {}",
                 hardTimeLimit, (long) (extraTimeFactor * hardTimeLimit));
       hadBookMove = false;
-      timeLimitChange(extraTimeFactor);
+      addExtraTime(extraTimeFactor);
     }
 
     // print search setup for debugging
@@ -479,7 +485,7 @@ public class Search implements Runnable {
       singleReply[ROOT_PLY] = true;
       // reduce time for this move
       if (searchMode.isTimeControl()) {
-        timeLimitChange(0.5);
+        addExtraTime(0.5);
       }
     } else {
       singleReply[ROOT_PLY] = false;
@@ -596,7 +602,7 @@ public class Search implements Runnable {
       searchCounter.aspirationResearches++;
 
       // add some extra time because of fail low - we might have found strong opponents move
-      timeLimitChange(1.3);
+      addExtraTime(1.3);
 
       alpha = Math.max(Evaluation.MIN, bestValue - 200);
 
@@ -630,7 +636,7 @@ public class Search implements Runnable {
       searchCounter.aspirationResearches++;
 
       // add some extra time because of fail low - we might have found strong opponents move
-      if (value <= alpha) timeLimitChange(1.3);
+      if (value <= alpha) addExtraTime(1.3);
 
       alpha = Evaluation.MIN;
       beta = Evaluation.MAX;
@@ -1847,7 +1853,7 @@ public class Search implements Runnable {
 
     // limits for very short available time
     if (hardTimeLimit < 100) {
-      timeLimitChange(0.9);
+      addExtraTime(0.9);
     }
 
   }
@@ -1855,15 +1861,19 @@ public class Search implements Runnable {
   /**
    * Changes the time limit by the given factor and also sets the soft time limit
    * to 0.8 of the hard time limit.
+   * Factor 1 is neutral. <1 shortens the time, >1 adds time<br/>
+   * Example: factor 0.8 is 20% less time. Factor 1.2 is 20% additional time
+   * Always calculated from the initial time budget.
+   * *
    *
    * @param factor factor for changing the time for the current search
    */
-  private void timeLimitChange(double factor) {
-    LOG.debug(
-      String.format("Time limit change. From %,d to %,d", hardTimeLimit, (long) (hardTimeLimit * factor)));
+  private void addExtraTime(double factor) {
+
     if (searchMode.getMoveTime().toMillis() == 0) {
-      hardTimeLimit *= factor;
-      softTimeLimit = (long) (hardTimeLimit * 0.8);
+      extraTime += hardTimeLimit * (factor - 1);
+      LOG.debug(String.format("Time added %,d ms to %,d ms", (long) (hardTimeLimit * (factor - 1)),
+                              hardTimeLimit + extraTime));
     }
   }
 
@@ -1874,7 +1884,7 @@ public class Search implements Runnable {
    */
   private boolean softTimeLimitReached() {
     if (!searchMode.isTimeControl()) return false;
-    stopSearch = elapsedTime() >= softTimeLimit;
+    stopSearch = elapsedTime() >= softTimeLimit + (extraTime * 0.8);
     return stopSearch;
   }
 
@@ -1886,7 +1896,7 @@ public class Search implements Runnable {
    */
   private boolean hardTimeLimitReached() {
     if (!searchMode.isTimeControl()) return false;
-    stopSearch = elapsedTime() >= hardTimeLimit;
+    stopSearch = elapsedTime() >= hardTimeLimit + extraTime;
     return stopSearch;
   }
 
@@ -1920,9 +1930,13 @@ public class Search implements Runnable {
       LOG.info("Search Depth was {} ({})", searchCounter.currentSearchDepth,
                searchCounter.currentExtraSearchDepth);
       LOG.info("Search took {}", DurationFormatUtils.formatDurationHMS(elapsedTime(stopTime)));
+      if (hardTimeLimit > 0) {
+        LOG.info("Initial time budget was {} ({}%)",
+                 DurationFormatUtils.formatDurationHMS(hardTimeLimit),
+                 (100 * searchCounter.lastSearchTime) / hardTimeLimit);
+      }
       LOG.info("Speed: {}", String.format("%,d nps", 1000 * (searchCounter.nodesVisited / (
         elapsedTime(stopTime) + 2L))));
-      LOG.info("Aspiration Researches: {}", searchCounter.aspirationResearches);
     }
   }
 
@@ -1992,6 +2006,7 @@ public class Search implements Runnable {
 
   /**
    * Logs formatted trace messages to LOG
+   *
    * @param format
    * @param args
    */
