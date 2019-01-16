@@ -223,7 +223,7 @@ public class Search implements Runnable {
 
   /**
    * Stops a current search. If no search is running it does nothing.<br>
-   * The search will stop gracefully by sending the best move so far
+   * The search will stop gracefully by sending the best move so far.
    */
   public void stopSearch() {
     // return if no search is running

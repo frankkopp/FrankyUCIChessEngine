@@ -41,6 +41,10 @@ import java.util.Properties;
  */
 public class Main {
 
+  /*
+   * This helps the log files use an application specific file name based on Maven artifact ID and
+   * Maven version number.
+   */
   static {
     String PROJECT_PROPERTIES = "project.properties";
     final Properties properties = new Properties();
@@ -56,7 +60,7 @@ public class Main {
   }
 
   /**
-   * The main() method parses the command line arguments<br>
+   * main()
    *
    * @param args command line options
    */
