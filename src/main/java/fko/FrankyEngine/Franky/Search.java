@@ -48,7 +48,6 @@ import java.util.concurrent.CountDownLatch;
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: More extensions and reductions
  *       Futility Pruning
- *
  * TODO: Better time management - dynamic adjustments
  *       When iteration has stable best move
  *       Obvious replies
