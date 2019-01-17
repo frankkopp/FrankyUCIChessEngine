@@ -133,7 +133,7 @@ r1b1kb1Q/qp2pp2/p3n1p1/2nN2Pp/2B4P/7N/PPP5/2KRR3 w q - bm Nc7+; id "ECM.152";
 r1r3k1/p4n2/3p4/5NpR/8/2q2P2/P1PQ4/2K4R w - - bm Rh8+; id "ECM.157";
 8/p5Q1/2ppq2p/3n1ppk/3B4/2P2P1P/P5P1/6K1 w - - bm g4+; id "ECM.158";
 r1r3k1/1p1b1nq1/6p1/pN1p4/P2Np2R/1P2P3/1Q3PP1/1K5R w - - bm Nd6; id "ECM.159";
-1r2k2r/3q2pp/p3pp2/P7/2P1Q3/8/1nB3PP/1R3R1K w kq - bm Ba4; id "ECM.160";
+#1r2k2r/3q2pp/p3pp2/P7/2P1Q3/8/1nB3PP/1R3R1K w kq - bm Ba4; id "ECM.160";
 r1bq3k/ppp2Qp1/2n1p2p/6N1/2BPN3/2P1n3/PP4PP/R5K1 w - - bm Nf6; id "ECM.161";
 3R4/1p2kp2/p1b1nN2/6p1/8/6BP/2r1qPPK/Q7 w - - bm Rd7+; id "ECM.162";
 6k1/p5p1/1p1p1nN1/1B1P4/4PK2/8/2r3b1/7R w - - bm Rh8+; id "ECM.163";

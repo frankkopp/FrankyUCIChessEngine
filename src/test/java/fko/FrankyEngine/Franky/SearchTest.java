@@ -28,6 +28,7 @@ package fko.FrankyEngine.Franky;
 
 import fko.FrankyEngine.Franky.Search.TTHit;
 import fko.UCI.IUCIEngine;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -73,7 +74,7 @@ public class SearchTest {
     search.waitWhileSearching();
     final long endTime = System.currentTimeMillis() - startTime;
     System.out.printf("MoveTime was %,d and Duration was %,d %n", moveTime, endTime);
-    assertTrue(endTime < moveTime + 100);
+    assertTrue(endTime < moveTime + 200);
   }
 
   @Test
@@ -104,7 +105,7 @@ public class SearchTest {
   public void testDepthSearch() {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -115,7 +116,7 @@ public class SearchTest {
   public void testIterativeSearch() {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 10, 0, null, false, true, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, true, false);
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -430,6 +431,35 @@ public class SearchTest {
   }
 
   @Test
+  public void test3FoldRep2() {
+
+    {
+      // black can force repetition 1. ... Qe3+ 3.Kg2 Qe2+ 4.Kh3 Qh5+ 5.Kg2
+      String fen = "6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -";
+      Position position = new Position(fen);
+
+      SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, false, false);
+      search.startSearch(position, searchMode);
+      search.waitWhileSearching();
+      assertEquals("e7e3", Move.toSimpleString(search.getLastSearchResult().bestMove));
+      assertEquals(-Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+                   search.getLastSearchResult().resultValue);
+      LOG.warn("Best Move: {} Value: {} Ponder {}",
+               Move.toSimpleString(search.getLastSearchResult().bestMove),
+               search.getLastSearchResult().resultValue / 100f,
+               Move.toSimpleString(search.getLastSearchResult().ponderMove));
+    }
+
+    {
+      // black can force repetition 1. ... Rd6 2.Qxd6 Qe3+ 3.Kg2 Qe2+ 4.Kh3 Qh5+ 5.Kg2
+      String fen = "6k1/p3q2p/1nr3pB/8/3Q1P2/6P1/PP5P/3R2K1 b - -";
+      Position position = new Position(fen);
+
+    }
+
+  }
+
+  @Test
   void TT_Root_Test() {
     String fen = Position.STANDARD_BOARD_FEN;
     fen = "8/6R1/1rp1k3/6p1/3KPp1p/5P1P/8/8 b - -";
@@ -456,7 +486,7 @@ public class SearchTest {
     SearchMode searchMode;
     Position position;
 
-    int maxDepth = 6;
+    int maxDepth = 8;
     int moveTime = 0;
     int mateIn = 0;
     boolean infinite = true;
@@ -567,136 +597,6 @@ public class SearchTest {
     search.waitWhileSearching();
   }
 
-  @Test
-  @Disabled
-  public void sizeOfSearchTreeTest() {
-
-    int depth = 6;
-    List<String> resultStrings = new ArrayList<>();
-    List<String> fens = new ArrayList<>();
-
-    search.config.USE_BOOK = false;
-
-    LOG.info("Start SIZE Test for depth {}", depth);
-
-    fens.add(Position.STANDARD_BOARD_FEN);
-    fens.add("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
-    fens.add("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -");
-    fens.add("r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -");
-    fens.add("1r1r2k1/2p1qp1p/6p1/ppQB1b2/5Pn1/2R1P1P1/PP5P/R1B3K1 b - -");
-
-    measureTreeSize(new Position(),
-                    new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false),
-                    resultStrings, "WARM UP", true);
-
-    search.clearHashTables();
-
-    for (String fen : fens) {
-      resultStrings.add("");
-      resultStrings.add(fen);
-      featureMeasurements(depth, resultStrings, fen);
-      resultStrings.add("");
-    }
-
-    LOG.info("");
-    LOG.info("################## RESULTS ####################");
-    for (String value : resultStrings) {
-      LOG.info(value);
-    }
-  }
-
-  private void featureMeasurements(final int depth, final List<String> values, final String fen) {
-    Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false);
-
-    // turn off all optimizations to get a reference value of the search tree size
-    search.config.USE_ALPHABETA_PRUNING = false;
-    search.config.USE_PVS = false;
-    search.config.USE_PVS_MOVE_ORDERING = false;
-    search.config.USE_ASPIRATION_WINDOW = false;
-
-    search.config.USE_TRANSPOSITION_TABLE = false;
-    search.config.USE_TT_ROOT = false;
-
-    search.config.USE_MATE_DISTANCE_PRUNING = false;
-    search.config.USE_MINOR_PROMOTION_PRUNING = false;
-
-    search.config.USE_NULL_MOVE_PRUNING = false;
-    search.config.USE_KILLER_MOVES = false;
-    search.config.USE_STATIC_NULL_PRUNING = false;
-    search.config.USE_RAZOR_PRUNING = false;
-    search.config.USE_LMR = false;
-
-    search.config.USE_QUIESCENCE = false;
-
-    //    measureTreeSize(position, searchMode, values, "REFERENCE", true);
-
-    search.config.USE_ALPHABETA_PRUNING = true;
-    //    measureTreeSize(position, searchMode, values, "BASE", true);
-
-    search.config.USE_TRANSPOSITION_TABLE = true;
-    //    measureTreeSize(position, searchMode, values, "TT", true);
-
-    search.config.USE_PVS = true;
-    search.config.USE_PVS_MOVE_ORDERING = true;
-    //    measureTreeSize(position, searchMode, values, "PVS_ORDER", true);
-
-    search.config.USE_TT_ROOT = true;
-    //    measureTreeSize(position, searchMode, values, "TT_ROOT", false);
-    //    search.config.USE_TT_ROOT = false;
-
-    search.config.USE_KILLER_MOVES = true;
-    //    measureTreeSize(position, searchMode, values, "KILLER_PUSH", true);
-
-    search.config.USE_MATE_DISTANCE_PRUNING = true;
-    search.config.USE_MINOR_PROMOTION_PRUNING = true;
-    //    measureTreeSize(position, searchMode, values, "MDP/MPP", true);
-
-    search.config.USE_STATIC_NULL_PRUNING = true;
-    search.config.USE_RAZOR_PRUNING = true;
-    //    measureTreeSize(position, searchMode, values, "STATIC/RAZOR", true);
-
-    search.config.USE_LMR = true;
-    //    measureTreeSize(position, searchMode, values, "LMR", true);
-
-    search.config.USE_NULL_MOVE_PRUNING = true;
-    //    search.config.NULL_MOVE_DEPTH = 3;
-    //    search.config.USE_VERIFY_NMP = true;
-    //    search.config.NULL_MOVE_REDUCTION_VERIFICATION = 4;
-    //    measureTreeSize(position, searchMode, values, "NMP", true);
-
-    search.config.USE_QUIESCENCE = true;
-    //    measureTreeSize(position, searchMode, values, "QS", true);
-
-    //    search.config.USE_TT_ROOT = true;
-    measureTreeSize(position, searchMode, values, "ALL", true);
-
-    search.config.USE_ASPIRATION_WINDOW = true;
-    measureTreeSize(position, searchMode, values, "ASPIRATION", true);
-
-    // REPEAT
-    //    measureTreeSize(position, searchMode, values, "REPEAT+TT", false);
-  }
-
-  private void measureTreeSize(final Position position, final SearchMode searchMode,
-                               final List<String> values, final String feature,
-                               final boolean clearTT) {
-
-    System.out.println("Testing. " + feature);
-    if (clearTT) {
-      search.clearHashTables();
-    }
-    search.startSearch(position, searchMode);
-    search.waitWhileSearching();
-    values.add(String.format("SIZE %-12s : %,14d >> %-18s (%4d) >> nps %,.0f >> %s ", feature,
-                             search.getSearchCounter().leafPositionsEvaluated,
-                             Move.toString(search.getLastSearchResult().bestMove),
-                             search.getLastSearchResult().resultValue,
-                             (1e3 * search.getSearchCounter().nodesVisited)
-                             / search.getSearchCounter().lastSearchTime,
-                             search.getSearchCounter().toString()));
-  }
-
   /**
    * Razor and LMR make the search miss this mate at higher depths
    * Might be a consequence from these "optimizations" might be a bug
@@ -790,7 +690,8 @@ public class SearchTest {
 
     String result = "";
 
-    fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+    fen = "R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1";
+    // fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
     // fen = "r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -";
     // fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
     // fen = "r2q1rk1/1p1nbppp/3p1n2/1Pp2b2/p1P5/2N1Pp1P/PBNPB1P1/R2Q1RK1 w - -";
@@ -992,4 +893,12 @@ public class SearchTest {
     System.out.println(ClassLayout.parseClass(TTHit.class).toPrintable());
     //System.out.println(ClassLayout.parseClass(Search.class).toPrintable());
   }
+
+  @Test
+  @Disabled
+  public void test() {
+    ArrayList t = new ArrayList();
+    t.listIterator().hasNext();
+  }
+
 }

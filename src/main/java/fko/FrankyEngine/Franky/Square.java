@@ -129,13 +129,11 @@ public enum Square {
 
   /**
    * @param index
-   * @return the Square for the given index of a 0x88 board - returns INVALID if not a valid
+   * @return the Square for the given index of a 0x88 board - returns NOSQUARE if not a valid
    * index
    */
   public static Square getSquare(int index) {
-    if ((index & 0x88) != 0) {
-      return NOSQUARE;
-    }
+    if ((index & 0x88) != 0) return NOSQUARE;
     return Square.values[index];
   }
 
@@ -164,17 +162,16 @@ public enum Square {
   }
 
   /**
-   *
+   * Returns the Square for the given file and rank
+   * @param file
+   * @param rank
+   * @return the Square for the given file and rank
    */
   public static Square getSquare(int file, int rank) {
-    if (file < 1 || file > 8 || rank < 1 || rank > 8) {
-      return Square.NOSQUARE;
-    }
+    if (file < 1 || file > 8 || rank < 1 || rank > 8) return Square.NOSQUARE;
     // index starts with 0 while file and rank start with 1 - decrease
     final int index = (rank - 1) * 16 + (file - 1);
-    if ((index & 0x88) != 0) {
-      return NOSQUARE; // is this extra check necessary?
-    }
+    assert (index & 0x88) == 0; // is this extra check necessary?
     return Square.values[index];
   }
 
@@ -185,9 +182,7 @@ public enum Square {
    */
   public Square getNorth() {
     int index = this.ordinal() + N;
-    if ((index & 0x88) != 0) {
-      return NOSQUARE;
-    }
+    if ((index & 0x88) != 0) return NOSQUARE;
     return Square.values[index];
   }
 
@@ -198,9 +193,7 @@ public enum Square {
    */
   public Square getSouth() {
     int index = this.ordinal() + S;
-    if ((index & 0x88) != 0) {
-      return NOSQUARE;
-    }
+    if ((index & 0x88) != 0) return NOSQUARE;
     return Square.values[index];
   }
 
@@ -211,9 +204,7 @@ public enum Square {
    */
   public Square getEast() {
     int index = this.ordinal() + E;
-    if ((index & 0x88) != 0) {
-      return NOSQUARE;
-    }
+    if ((index & 0x88) != 0) return NOSQUARE;
     return Square.values[index];
   }
 
@@ -224,9 +215,7 @@ public enum Square {
    */
   public Square getWest() {
     int index = this.ordinal() + W;
-    if ((index & 0x88) != 0) {
-      return NOSQUARE;
-    }
+    if ((index & 0x88) != 0) return NOSQUARE;
     return Square.values[index];
   }
 
@@ -234,9 +223,7 @@ public enum Square {
    * @return Square.File for this QmegaSquare
    */
   public File getFile() {
-    if (!this.validSquare) {
-      return File.NOFILE;
-    }
+    if (!this.validSquare) return File.NOFILE;
     return File.values()[this.ordinal() % 16];
   }
 
@@ -244,9 +231,7 @@ public enum Square {
    * @return Square.Rank for this QmegaSquare
    */
   public Rank getRank() {
-    if (!this.validSquare) {
-      return Rank.NORANK;
-    }
+    if (!this.validSquare) return Rank.NORANK;
     return Rank.values()[this.ordinal() >>> 4];
   }
 

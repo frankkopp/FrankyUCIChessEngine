@@ -61,6 +61,11 @@ public class SuiteTestsTest {
 
   @Test
   void startFrankySuite() {
+    /*
+    Frank 0.10 - 10sec
+    Successful:   9 (75 Prozent)
+    Failed:       2 (16 Prozent)
+     */
     testSuite = new TestSuite("./testsets/franky_tests.epd");
     testSuite.setSearchTime(10000);
     testSuite.startTests();
@@ -68,6 +73,11 @@ public class SuiteTestsTest {
 
   @Test
   void startMateSuite() {
+    /*
+    Frank 0.10 - 10sec
+    Successful:  11 (55 Prozent)
+    Failed:       9 (45 Prozent)
+     */
     testSuite = new TestSuite("./testsets/mate_test_suite.epd");
     testSuite.setSearchTime(10000);
     testSuite.startTests();
@@ -75,7 +85,25 @@ public class SuiteTestsTest {
 
   @Test
   @Disabled
+  void startECM98Suite() {
+    /*
+    Frank 0.10 - 10sec
+    Successful: 375 (48 Prozent)
+    Failed:     394 (51 Prozent)
+     */
+    testSuite = new TestSuite("./testsets/ecm98.epd");
+    testSuite.setSearchTime(10000);
+    testSuite.startTests();
+  }
+
+  @Test
+  @Disabled
   void startTestSuite() {
+    /*
+    Frank 0.10 - 10sec
+    Successful: 172 (49 Prozent)
+    Failed:     174 (50 Prozent)
+    */
     testSuite.setSearchTime(5000);
     testSuite.startTests();
   }

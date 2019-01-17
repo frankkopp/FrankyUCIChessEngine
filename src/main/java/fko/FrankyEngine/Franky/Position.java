@@ -25,7 +25,6 @@
 
 package fko.FrankyEngine.Franky;
 
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -77,27 +76,29 @@ public class Position {
 
   // **********************************************************
   // Board State START ----------------------------------------
-  // unique chess position
+  // unique chess position (exception is 3-fold repetition
+  // which is also not represented in a FEN string)
   //
   // 0x88 Board
   private Piece[] x88Board = new Piece[BOARDSIZE];
 
   // hash for pieces - piece, board
-  private static final long[][] pieceZobrist = new long[Piece.values.length][Square.values.length];
+  private static final long[][] pieceZobrist =
+    new long[Piece.values.length][Square.values.length];
 
   // Castling rights
-  private        boolean   castlingWK         = true;
-  private        boolean[] castlingWK_History = new boolean[MAX_HISTORY];
-  private static long      castlingWK_Zobrist;
-  private        boolean   castlingWQ         = true;
-  private        boolean[] castlingWQ_History = new boolean[MAX_HISTORY];
-  private static long      castlingWQ_Zobrist;
-  private        boolean   castlingBK         = true;
-  private        boolean[] castlingBK_History = new boolean[MAX_HISTORY];
-  private static long      castlingBK_Zobrist;
-  private        boolean   castlingBQ         = true;
-  private        boolean[] castlingBQ_History = new boolean[MAX_HISTORY];
-  private static long      castlingBQ_Zobrist;
+  private              boolean   castlingWK         = true;
+  private              boolean[] castlingWK_History = new boolean[MAX_HISTORY];
+  private static final long      castlingWK_Zobrist;
+  private              boolean   castlingWQ         = true;
+  private              boolean[] castlingWQ_History = new boolean[MAX_HISTORY];
+  private static final long      castlingWQ_Zobrist;
+  private              boolean   castlingBK         = true;
+  private              boolean[] castlingBK_History = new boolean[MAX_HISTORY];
+  private static final long      castlingBK_Zobrist;
+  private              boolean   castlingBQ         = true;
+  private              boolean[] castlingBQ_History = new boolean[MAX_HISTORY];
+  private static final long      castlingBQ_Zobrist;
 
   // en passant field - if NOSQUARE then we do not have an en passant option
   private              Square   enPassantSquare         = Square.NOSQUARE;
@@ -110,8 +111,8 @@ public class Position {
   // has no zobrist key
 
   // next player color
-  private        Color nextPlayer = Color.WHITE;
-  private static long  nextPlayer_Zobrist;
+  private              Color nextPlayer = Color.WHITE;
+  private static final long  nextPlayer_Zobrist;
   //
   // Board State END ------------------------------------------
   // **********************************************************
@@ -121,6 +122,7 @@ public class Position {
   // not necessary for a unique position
 
   // we can recreate the board through the last move - no need for history of board itself
+  // with this we can also capture 3-fold repetition
   private int[] moveHistory = new int[MAX_HISTORY];
 
   // half move number - the actual half move number to determine the full move number
@@ -144,11 +146,9 @@ public class Position {
   private Flag   hasMate             = Flag.TBD;
   private Flag[] hasMateFlagHistory  = new Flag[MAX_HISTORY];
 
+  // internal move generator for check if position is mate - might not be good place
+  // as it couples this class to the MoveGernerator class
   private final MoveGenerator mateCheckMG = new MoveGenerator();
-
-  public void setCastlingWK(boolean castlingWK) {
-    this.castlingWK = castlingWK;
-  }
 
   // Flag for boolean states with undetermined state
   private enum Flag {
@@ -159,14 +159,9 @@ public class Position {
   // Static Initialization for zobrist key generation
   // For testing purposes these fields are not final and also
   // accessible from external.
-  public static int SEED = 61;
-
+  public static int SEED = 0;
   static {
-    setZobristRandoms(SEED);
-  }
-
-  public static void setZobristRandoms(final int seed) {
-    Random random = new Random(0);
+    Random random = new Random(SEED);
 
     // all pieces on all squares
     for (Piece p : Piece.values) {
@@ -272,18 +267,23 @@ public class Position {
   }
 
   /**
-   * Initialize the lists for the pieces and the material counter
+   * Retrieve piece on given square.
+   *
+   * @param square
+   * @return returns the piece or <code>NOPIECE</code> of the given square
    */
-  private void initializeLists() {
-    for (int i = 0; i <= 1; i++) { // foreach color
-      pawnSquares[i] = new SquareList();
-      knightSquares[i] = new SquareList();
-      bishopSquares[i] = new SquareList();
-      rookSquares[i] = new SquareList();
-      queenSquares[i] = new SquareList();
-      kingSquares[i] = Square.NOSQUARE;
-    }
-    material = new int[2];
+  public Piece getPiece(final Square square) {
+    return x88Board[square.ordinal()];
+  }
+
+  /**
+   * Retrieve piece on given index on x88Board.
+   *
+   * @param x88idx
+   * @return returns the piece or <code>NOPIECE</code> of the given square
+   */
+  public Piece getPiece(final int x88idx) {
+    return x88Board[x88idx];
   }
 
   /**
@@ -344,8 +344,7 @@ public class Position {
         clearEnPassant();
         // set new en passant target field - always one "behind" the toSquare
         enPassantSquare = piece.getColor().isWhite() ? toSquare.getSouth() : toSquare.getNorth();
-        zobristKey =
-          this.zobristKey ^ enPassantSquare_Zobrist[enPassantSquare.ordinal()]; // in
+        zobristKey = this.zobristKey ^ enPassantSquare_Zobrist[enPassantSquare.ordinal()]; // in
         halfMoveClock = 0; // reset half move clock because of pawn move
         break;
       case ENPASSANT:
@@ -457,6 +456,61 @@ public class Position {
     // zobristKey - just overwrite - should be the same as before the move
     zobristKey = zobristKeyHistory[historyCounter];
 
+    // get the check and mate flag from history
+    hasCheck = hasCheckFlagHistory[historyCounter];
+    hasMate = hasMateFlagHistory[historyCounter];
+  }
+
+  /**
+   * Makes a null move. Essentially switches sides within same position.
+   */
+  public void makeNullMove() {
+    // Save state for undoMove
+    castlingWK_History[historyCounter] = castlingWK;
+    castlingWQ_History[historyCounter] = castlingWQ;
+    castlingBK_History[historyCounter] = castlingBK;
+    castlingBQ_History[historyCounter] = castlingBQ;
+    enPassantSquare_History[historyCounter] = enPassantSquare;
+    halfMoveClockHistory[historyCounter] = halfMoveClock;
+    zobristKeyHistory[historyCounter] = this.zobristKey;
+    hasCheckFlagHistory[historyCounter] = hasCheck;
+    hasMateFlagHistory[historyCounter] = hasMate;
+    historyCounter++;
+    // reset check and mate flag
+    hasCheck = Flag.TBD;
+    hasMate = Flag.TBD;
+    // clear en passant
+    clearEnPassant();
+    // increase half move clock
+    halfMoveClock++;
+    // increase halfMoveNumber
+    nextHalfMoveNumber++;
+    // change color (active player)
+    nextPlayer = nextPlayer.getInverseColor();
+    zobristKey = this.zobristKey ^ nextPlayer_Zobrist;
+  }
+
+  /**
+   * Undo a null move. Essentially switches back sides within same position.
+   */
+  public void undoNullMove() {
+    // Get state for undoMove
+    historyCounter--;
+    // restore castling rights
+    castlingWK = castlingWK_History[historyCounter];
+    castlingWQ = castlingWQ_History[historyCounter];
+    castlingBK = castlingBK_History[historyCounter];
+    castlingBQ = castlingBQ_History[historyCounter];
+    // restore en passant square
+    enPassantSquare = enPassantSquare_History[historyCounter];
+    // restore halfMoveClock
+    halfMoveClock = halfMoveClockHistory[historyCounter];
+    // decrease _halfMoveNumber
+    nextHalfMoveNumber--;
+    // change back color
+    nextPlayer = nextPlayer.getInverseColor();
+    // zobristKey - just overwrite - should be the same as before the move
+    zobristKey = zobristKeyHistory[historyCounter];
     // get the check and mate flag from history
     hasCheck = hasCheckFlagHistory[historyCounter];
     hasMate = hasMateFlagHistory[historyCounter];
@@ -610,61 +664,6 @@ public class Position {
   }
 
   /**
-   * Makes a null move. Essentially switches sides within same position.
-   */
-  public void makeNullMove() {
-    // Save state for undoMove
-    castlingWK_History[historyCounter] = castlingWK;
-    castlingWQ_History[historyCounter] = castlingWQ;
-    castlingBK_History[historyCounter] = castlingBK;
-    castlingBQ_History[historyCounter] = castlingBQ;
-    enPassantSquare_History[historyCounter] = enPassantSquare;
-    halfMoveClockHistory[historyCounter] = halfMoveClock;
-    zobristKeyHistory[historyCounter] = this.zobristKey;
-    hasCheckFlagHistory[historyCounter] = hasCheck;
-    hasMateFlagHistory[historyCounter] = hasMate;
-    historyCounter++;
-    // reset check and mate flag
-    hasCheck = Flag.TBD;
-    hasMate = Flag.TBD;
-    // clear en passant
-    clearEnPassant();
-    // increase half move clock
-    halfMoveClock++;
-    // increase halfMoveNumber
-    nextHalfMoveNumber++;
-    // change color (active player)
-    nextPlayer = nextPlayer.getInverseColor();
-    zobristKey = this.zobristKey ^ nextPlayer_Zobrist;
-  }
-
-  /**
-   * Undo a null move. Essentially switches back sides within same position.
-   */
-  public void undoNullMove() {
-    // Get state for undoMove
-    historyCounter--;
-    // restore castling rights
-    castlingWK = castlingWK_History[historyCounter];
-    castlingWQ = castlingWQ_History[historyCounter];
-    castlingBK = castlingBK_History[historyCounter];
-    castlingBQ = castlingBQ_History[historyCounter];
-    // restore en passant square
-    enPassantSquare = enPassantSquare_History[historyCounter];
-    // restore halfMoveClock
-    halfMoveClock = halfMoveClockHistory[historyCounter];
-    // decrease _halfMoveNumber
-    nextHalfMoveNumber--;
-    // change back color
-    nextPlayer = nextPlayer.getInverseColor();
-    // zobristKey - just overwrite - should be the same as before the move
-    zobristKey = zobristKeyHistory[historyCounter];
-    // get the check and mate flag from history
-    hasCheck = hasCheckFlagHistory[historyCounter];
-    hasMate = hasMateFlagHistory[historyCounter];
-  }
-
-  /**
    * @param fromSquare
    * @param toSquare
    * @param piece
@@ -730,16 +729,6 @@ public class Position {
     material[color] -= piece.getType().getValue();
     // return the remove piece
     return old;
-  }
-
-  /**
-   * Retrieve piece on given square.
-   *
-   * @param square
-   * @return returns the piece or <code>NOPIECE</code> of the given square
-   */
-  public Piece getPiece(final Square square) {
-    return x88Board[square.ordinal()];
   }
 
   /**
@@ -932,15 +921,14 @@ public class Position {
    */
   public boolean hasCheck() {
     if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
-    boolean check =
-      isAttacked(nextPlayer.getInverseColor(), kingSquares[nextPlayer.ordinal()]);
+    boolean check = isAttacked(nextPlayer.getInverseColor(), kingSquares[nextPlayer.ordinal()]);
     hasCheck = check ? Flag.TRUE : Flag.FALSE;
     return check;
   }
 
   /**
-   * Tests for mate on this position. If true the next player has lost. Expensive test as all legal
-   * moves have to be generated.
+   * Tests for mate on this position. If true the next player has has no move and is in check.
+   * Expensive test as all legal moves have to be generated.
    *
    * @return true if current position is mate for next player
    */
@@ -967,14 +955,19 @@ public class Position {
   }
 
   /**
-   * Threefold repetition of a position this most commonly occurs when neither side is able to avoid
+   * Repetition of a position.
+   * <p>
+   * To detect a 3-fold repetition the given position most occurr >=2 times before:<br/>
+   * <code>position.checkRepetitions(2)</code> checks for 3 fold-repetition
+   * <p>
+   * 3-fold repetition: This most commonly occurs when neither side is able to avoid
    * repeating moves without incurring a disadvantage. The three occurrences of the position need
    * not occur on consecutive moves for a claim to be valid. FIDE rules make no mention of perpetual
    * check; this is merely a specific type of draw by threefold repetition.
    *
-   * @return true if this position has been played three times
+   * @return true if this position has been played reps times before
    */
-  public boolean check3Repetitions() {
+  public boolean checkRepetitions(int reps) {
     /*
     [0]     3185849660387886977 << 1st
     [1]     447745478729458041
@@ -986,15 +979,45 @@ public class Position {
     [7]     491763876012767476  <<< history
     [8]     3185849660387886977 <<< 3rd REPETITION from current zobrist
      */
-    if (historyCounter < 8) return false;
     int counter = 0;
     int i = historyCounter - 2;
+    int lastHalfMove = halfMoveClock;
     while (i >= 0) {
-      if (this.zobristKey == zobristKeyHistory[i]) counter++;
-      if (counter >= 2) return true;
+      // every time the half move clock gets reset (non reversible position) there
+      // can't be any more repetition of positions before this position
+      if (halfMoveClockHistory[i] >= lastHalfMove) {
+        break;
+      } else {
+        lastHalfMove = halfMoveClockHistory[i];
+      }
+      if (zobristKey == zobristKeyHistory[i]) counter++;
+      if (counter >= reps) return true;
       i -= 2;
     }
     return false;
+  }
+
+  /**
+   * Determines the repetitions of a position.
+   *
+   * @return number of repetitions
+   */
+  public int countRepetitions() {
+    int counter = 0;
+    int i = historyCounter - 2;
+    int lastHalfMove = halfMoveClock;
+    while (i >= 0) {
+      // every time the half move clock gets reset (non reversible position) there
+      // can't be any more repetition of positions before this position
+      if (halfMoveClockHistory[i] >= lastHalfMove) {
+        break;
+      } else {
+        lastHalfMove = halfMoveClockHistory[i];
+      }
+      if (zobristKey == zobristKeyHistory[i]) counter++;
+      i -= 2;
+    }
+    return counter;
   }
 
   /**
@@ -1110,52 +1133,41 @@ public class Position {
     return moveHistory[historyCounter - 1];
   }
 
-  Piece[] getX88Board() {
-    return x88Board;
-  }
+  public boolean isCastlingWK() { return castlingWK; }
 
-  boolean isCastlingWK() {
-    return castlingWK;
-  }
+  public boolean isCastlingWQ() { return castlingWQ; }
 
-  boolean isCastlingWQ() {
-    return castlingWQ;
-  }
+  public boolean isCastlingBK() { return castlingBK; }
 
-  boolean isCastlingBK() {
-    return castlingBK;
-  }
+  public boolean isCastlingBQ() { return castlingBQ; }
 
-  boolean isCastlingBQ() {
-    return castlingBQ;
-  }
+  public SquareList[] getPawnSquares() { return pawnSquares; }
 
-  SquareList[] getPawnSquares() {
-    return pawnSquares;
-  }
+  public SquareList[] getKnightSquares() { return knightSquares; }
 
-  SquareList[] getKnightSquares() {
-    return knightSquares;
-  }
+  public SquareList[] getBishopSquares() { return bishopSquares; }
 
-  SquareList[] getBishopSquares() {
-    return bishopSquares;
-  }
+  public SquareList[] getRookSquares() { return rookSquares; }
 
-  SquareList[] getRookSquares() {
-    return rookSquares;
-  }
+  public SquareList[] getQueenSquares() { return queenSquares; }
 
-  SquareList[] getQueenSquares() {
-    return queenSquares;
-  }
+  public Square[] getKingSquares() { return kingSquares; }
 
-  Square[] getKingSquares() {
-    return kingSquares;
-  }
+  public Square getEnPassantSquare() { return enPassantSquare; }
 
-  Square getEnPassantSquare() {
-    return enPassantSquare;
+  /**
+   * Initialize the lists for the pieces and the material counter
+   */
+  private void initializeLists() {
+    for (int i = 0; i <= 1; i++) { // foreach color
+      pawnSquares[i] = new SquareList();
+      knightSquares[i] = new SquareList();
+      bishopSquares[i] = new SquareList();
+      rookSquares[i] = new SquareList();
+      queenSquares[i] = new SquareList();
+      kingSquares[i] = Square.NOSQUARE;
+    }
+    material = new int[2];
   }
 
   /**

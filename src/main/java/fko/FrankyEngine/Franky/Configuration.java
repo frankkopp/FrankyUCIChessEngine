@@ -156,7 +156,6 @@ public class Configuration {
   public boolean USE_KILLER_MOVES = true;
   public int     NO_KILLER_MOVES  = 2;
 
-
   /**
    * Late Move Reduction
    */
@@ -170,7 +169,13 @@ public class Configuration {
    * Aspiration will not be efficient.
    */
   public boolean USE_ASPIRATION_WINDOW  = true;
-  public int     ASPIRATION_START_DEPTH = 2;
+  public int     ASPIRATION_START_DEPTH = 5;
+
+  /**
+   * Use LAZY SMP - not sofisticated multithreading to fill up the TT quicker
+   */
+//  public boolean USE_LAZY_SMP = true;
+//  public int SMP_CPUS = 4;
 
   /**
    * Experimental sorting of moves in move generation.
@@ -193,21 +198,23 @@ public class Configuration {
 
   @Override
   public String toString() {
-    return "Configuration{" + "PERFT=" + PERFT + "HASH_SIZE=" + HASH_SIZE + "PONDER=" + PONDER
-           + "DEBUG=" + DEBUG + "UCI_ShowCurrLine=" + UCI_ShowCurrLine + "USE_BOOK=" + USE_BOOK
-           + "OB_FolderPath='" + OB_FolderPath + '\'' + "OB_fileNamePlain='" + OB_fileNamePlain
-           + '\'' + "OB_Mode=" + OB_Mode + "USE_QUIESCENCE=" + USE_QUIESCENCE
-           + "USE_PVS_MOVE_ORDERING=" + USE_PVS_MOVE_ORDERING + "USE_ALPHABETA_PRUNING="
-           + USE_ALPHABETA_PRUNING + "USE_PVS=" + USE_PVS + "USE_TRANSPOSITION_TABLE="
-           + USE_TRANSPOSITION_TABLE + "USE_MATE_DISTANCE_PRUNING=" + USE_MATE_DISTANCE_PRUNING
-           + "USE_MINOR_PROMOTION_PRUNING=" + USE_MINOR_PROMOTION_PRUNING + "USE_NULL_MOVE_PRUNING="
-           + USE_NULL_MOVE_PRUNING + "NULL_MOVE_DEPTH=" + NULL_MOVE_DEPTH
-           + "USE_STATIC_NULL_PRUNING=" + USE_STATIC_NULL_PRUNING + "STATIC_NULL_PRUNING_DEPTH="
-           + STATIC_NULL_PRUNING_DEPTH + "STATIC_NULL_PRUNING_MARGIN=" + STATIC_NULL_PRUNING_MARGIN
-           + "USE_RAZOR_PRUNING=" + USE_RAZOR_PRUNING + "RAZOR_PRUNING_DEPTH=" + RAZOR_PRUNING_DEPTH
-           + "RAZOR_PRUNING_MARGIN=" + RAZOR_PRUNING_MARGIN + "USE_KILLER_MOVES=" + USE_KILLER_MOVES
-           + "USE_SORT_ALL_MOVES=" + USE_SORT_ALL_MOVES + "USE_LMR=" + USE_LMR + "LMR_MIN_DEPTH="
-           + LMR_MIN_DEPTH + "LMR_REDUCTION=" + LMR_REDUCTION + "USE_ASPIRATION_WINDOW="
+    return "Configuration{" + "PERFT=" + PERFT + " HASH_SIZE=" + HASH_SIZE + " PONDER=" + PONDER
+           + " DEBUG=" + DEBUG + " UCI_ShowCurrLine=" + UCI_ShowCurrLine + " USE_BOOK=" + USE_BOOK
+           + " OB_FolderPath='" + OB_FolderPath + '\'' + " OB_fileNamePlain='" + OB_fileNamePlain
+           + '\'' + " OB_Mode=" + OB_Mode + " USE_QUIESCENCE=" + USE_QUIESCENCE
+           + " USE_PVS_MOVE_ORDERING=" + USE_PVS_MOVE_ORDERING + " USE_ALPHABETA_PRUNING="
+           + USE_ALPHABETA_PRUNING + " USE_PVS=" + USE_PVS + " USE_TRANSPOSITION_TABLE="
+           + USE_TRANSPOSITION_TABLE + " USE_MATE_DISTANCE_PRUNING=" + USE_MATE_DISTANCE_PRUNING
+           + " USE_MINOR_PROMOTION_PRUNING=" + USE_MINOR_PROMOTION_PRUNING
+           + " USE_NULL_MOVE_PRUNING=" + USE_NULL_MOVE_PRUNING + " NULL_MOVE_DEPTH="
+           + NULL_MOVE_DEPTH + " USE_STATIC_NULL_PRUNING=" + USE_STATIC_NULL_PRUNING
+           + " STATIC_NULL_PRUNING_DEPTH=" + STATIC_NULL_PRUNING_DEPTH
+           + " STATIC_NULL_PRUNING_MARGIN=" + STATIC_NULL_PRUNING_MARGIN + " USE_RAZOR_PRUNING="
+           + USE_RAZOR_PRUNING + " RAZOR_PRUNING_DEPTH=" + RAZOR_PRUNING_DEPTH
+           + " RAZOR_PRUNING_MARGIN=" + RAZOR_PRUNING_MARGIN + " USE_KILLER_MOVES="
+           + USE_KILLER_MOVES + " USE_SORT_ALL_MOVES=" + USE_SORT_ALL_MOVES + " USE_LMR=" + USE_LMR
+           + " LMR_MIN_DEPTH=" + LMR_MIN_DEPTH + " LMR_REDUCTION=" + LMR_REDUCTION
+           + " USE_ASPIRATION_WINDOW="
            + USE_ASPIRATION_WINDOW + '}';
   }
 }

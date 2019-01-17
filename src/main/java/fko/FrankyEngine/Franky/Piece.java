@@ -87,7 +87,7 @@ public enum Piece {
     }
 
     /**
-     * Returns the Omega piece for this type and color.
+     * Returns the piece for this type and color.
      * @param type
      * @param color
      * @return matching Piece
@@ -99,53 +99,11 @@ public enum Piece {
     }
 
     /**
-     * Convert this Piece to the matching GamePiece
-     */
-//    public GamePiece convertToGamePiece() {
-//        switch (this) {
-//            case WHITE_KING:   return King.create(GameColor.WHITE);
-//            case WHITE_QUEEN:  return Queen.create(GameColor.WHITE);
-//            case WHITE_ROOK:   return Rook.create(GameColor.WHITE);
-//            case WHITE_BISHOP: return Bishop.create(GameColor.WHITE);
-//            case WHITE_KNIGHT: return Knight.create(GameColor.WHITE);
-//            case WHITE_PAWN:   return Pawn.create(GameColor.WHITE);
-//            case BLACK_KING:   return King.create(GameColor.BLACK);
-//            case BLACK_QUEEN:  return Queen.create(GameColor.BLACK);
-//            case BLACK_ROOK:   return Rook.create(GameColor.BLACK);
-//            case BLACK_BISHOP: return Bishop.create(GameColor.BLACK);
-//            case BLACK_KNIGHT: return Knight.create(GameColor.BLACK);
-//            case BLACK_PAWN:   return Pawn.create(GameColor.BLACK);
-//            default:
-//                throw new RuntimeException("Invalid Piece");
-//        }
-//    }
-
-    /**
-     * Convert e GamePiece to an Piece
-     * @return matching Piece
-     */
-//    public static Piece convertFromGamePiece(GamePiece gp) {
-//        if (gp == null) return Piece.NOPIECE;
-//        assert (gp.isWhite() || gp.isBlack());
-//        switch (gp.getType()) {
-//            case KING:   return gp.isWhite() ? Piece.WHITE_KING : Piece.BLACK_KING;
-//            case QUEEN:  return gp.isWhite() ? Piece.WHITE_QUEEN : Piece.BLACK_QUEEN;
-//            case ROOK:   return gp.isWhite() ? Piece.WHITE_ROOK : Piece.BLACK_ROOK;
-//            case BISHOP: return gp.isWhite() ? Piece.WHITE_BISHOP : Piece.BLACK_BISHOP;
-//            case KNIGHT: return gp.isWhite() ? Piece.WHITE_KNIGHT : Piece.BLACK_KNIGHT;
-//            case PAWN:   return gp.isWhite() ? Piece.WHITE_PAWN : Piece.BLACK_PAWN;
-//            default:
-//                throw new RuntimeException("Invalid GamePieceType: "+gp);
-//        }
-//    }
-
-    /**
      * @param i
-     * @return
+     * @return returns true if this is a valid piece type
      */
     public static boolean isValid(int i) {
-        if (i<0 || i>12) return false;
-        return true;
+        return i >= 0 && i <= 12;
     }
 
 }
