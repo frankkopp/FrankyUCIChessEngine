@@ -156,7 +156,6 @@ public class Configuration {
   public boolean USE_KILLER_MOVES = true;
   public int     NO_KILLER_MOVES  = 2;
 
-
   /**
    * Late Move Reduction
    */
@@ -171,6 +170,12 @@ public class Configuration {
    */
   public boolean USE_ASPIRATION_WINDOW  = true;
   public int     ASPIRATION_START_DEPTH = 5;
+
+  /**
+   * Use LAZY SMP - not sofisticated multithreading to fill up the TT quicker
+   */
+//  public boolean USE_LAZY_SMP = true;
+//  public int SMP_CPUS = 4;
 
   /**
    * Experimental sorting of moves in move generation.
