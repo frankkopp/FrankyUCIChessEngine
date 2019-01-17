@@ -3,4 +3,5 @@ target/
 Arena Tests/
 ArenaTests/
 var/
-~$*.xlsx
+
+ChessEngines/
