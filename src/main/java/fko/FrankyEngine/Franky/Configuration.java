@@ -170,7 +170,7 @@ public class Configuration {
    * Aspiration will not be efficient.
    */
   public boolean USE_ASPIRATION_WINDOW  = true;
-  public int     ASPIRATION_START_DEPTH = 2;
+  public int     ASPIRATION_START_DEPTH = 5;
 
   /**
    * Experimental sorting of moves in move generation.

@@ -105,7 +105,7 @@ public class SearchTest {
   public void testDepthSearch() {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 4, 0, null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 0, null, false, false, false);
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -116,7 +116,7 @@ public class SearchTest {
   public void testIterativeSearch() {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 10, 0, null, false, true, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, true, false);
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -486,7 +486,7 @@ public class SearchTest {
     SearchMode searchMode;
     Position position;
 
-    int maxDepth = 6;
+    int maxDepth = 8;
     int moveTime = 0;
     int mateIn = 0;
     boolean infinite = true;

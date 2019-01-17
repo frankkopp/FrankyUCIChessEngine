@@ -47,6 +47,8 @@ import java.util.concurrent.CountDownLatch;
  * TODO: Improve ASPIRATION WINDOWS
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: More extensions and reductions
+ *       Futility Pruning
+ *
  * TODO: Better time management - dynamic adjustments
  *       When iteration has stable best move
  *       Obvious replies
@@ -515,7 +517,7 @@ public class Search implements Runnable {
       }
       // @formatter:on
 
-      assert value != Evaluation.NOVALUE;
+      assert (value >= Evaluation.MIN && value <= Evaluation.MAX);
       assert !principalVariation[ROOT_PLY].empty();
 
       // update the current best move and value
@@ -691,7 +693,7 @@ public class Search implements Runnable {
     int numberOfSearchedMoves = 0;
 
     // Initialize best values
-    int bestNodeValue = -Evaluation.INFINITE;
+    int bestNodeValue = Evaluation.MIN;
     int bestNodeMove = Move.NOMOVE;
 
     // Prepare hash type
@@ -802,8 +804,8 @@ public class Search implements Runnable {
           searchCounter.prunings++;
           // store the bestNodeMove any way as this is the a refutation and
           // should be checked in other nodes very early
-          storeTT(position, beta, ttType, depth, bestNodeMove, mateThreat[ply]);
-          return beta; // return beta in a fail-hard / value in fail-soft
+          storeTT(position, value, ttType, depth, bestNodeMove, mateThreat[ply]);
+          return value; // return beta in a fail-hard / value in fail-soft
         }
 
         // if we indeed found a better move (value > alpha) then we need to update
@@ -846,12 +848,13 @@ public class Search implements Runnable {
     }
 
     // push PV move to head of list
+    assert !principalVariation[ROOT_PLY].empty();
     rootMoves.pushToHead(principalVariation[ROOT_PLY].getFirst());
 
     // store the best alpha
-    storeTT(position, alpha, ttType, depth, bestNodeMove, mateThreat[ply]);
+    storeTT(position, bestNodeValue, ttType, depth, bestNodeMove, mateThreat[ply]);
     if (TRACE) trace("Root Search for depth %d: END. (alpha=%d beta==%d)", depth, alpha, beta);
-    return alpha;
+    return bestNodeValue; // fail-hard: alpha / fail.soft: bestValue
   }
 
   /**
@@ -967,7 +970,8 @@ public class Search implements Runnable {
       final int evalMargin = config.STATIC_NULL_PRUNING_MARGIN * depth;
       if (staticEval - evalMargin >= beta ){
         if (TRACE) trace("%sSearch in ply %d for depth %d: STATIC CUT", getSpaces(ply), ply, depth);
-        return beta; // fail-hard / fail-soft: staticEval - evalMargin;
+        storeTT(position, staticEval, TT_EntryType.BETA, depth, Move.NOMOVE, mateThreat[ply]);
+        return staticEval; // fail-hard / fail-soft: staticEval;
       }
     }
     // @formatter:on
@@ -1014,7 +1018,8 @@ public class Search implements Runnable {
       if (nullValue >= beta && !mateThreat[ply]) {
         if (TRACE) trace("%sSearch in ply %d for depth %d: NULL CUT", getSpaces(ply), ply, depth);
         searchCounter.nullMovePrunings++;
-        return beta; // fail-hard, fail-soft: nullValue;
+        storeTT(position, nullValue, TT_EntryType.BETA, depth, Move.NOMOVE, mateThreat[ply]);
+        return nullValue; // fail-hard, fail-soft: nullValue;
       }
     }
     // NULL MOVE PRUNING
@@ -1048,7 +1053,7 @@ public class Search implements Runnable {
     principalVariation[ply].clear();
 
     // Initialize best values
-    int bestNodeValue = -Evaluation.INFINITE;
+    int bestNodeValue = Evaluation.MIN;
     int bestNodeMove = Move.NOMOVE;
 
     // Prepare hash type
@@ -1093,6 +1098,8 @@ public class Search implements Runnable {
         // @formatter:on
       }
       // ###############################################
+
+      // TODO: Futility Pruning here?
 
       position.makeMove(move);
 
@@ -1230,8 +1237,8 @@ public class Search implements Runnable {
             }
             // store the bestNodeMove any way as this is the a refutation and
             // should be checked in other nodes very early
-            storeTT(position, beta, ttType, depth, bestNodeMove, mateThreat[ply]);
-            return beta; // return beta in a fail-hard / value in fail-soft
+            storeTT(position, value, ttType, depth, bestNodeMove, mateThreat[ply]);
+            return value; // return beta in a fail-hard / value in fail-soft
           }
         }
 
@@ -1267,11 +1274,11 @@ public class Search implements Runnable {
       if (position.hasCheck()) {
         // We have a check mate. Return a -CHECKMATE.
         if (TRACE) trace("%sSearch in ply %d for depth %d: CHECKMATE", getSpaces(ply), ply, depth);
-        alpha = -Evaluation.CHECKMATE + ply;
+        bestNodeValue = -Evaluation.CHECKMATE + ply;
       } else {
         // We have a stale mate. Return the draw value.
         if (TRACE) trace("%sSearch in ply %d for depth %d: STALEMATE", getSpaces(ply), ply, depth);
-        alpha = Evaluation.DRAW;
+        bestNodeValue = Evaluation.DRAW;
       }
       assert ttType == TT_EntryType.ALPHA;
     }
@@ -1282,8 +1289,8 @@ public class Search implements Runnable {
             currentVariation.toNotationString());
     }
 
-    storeTT(position, alpha, ttType, depth, bestNodeMove, mateThreat[ply]);
-    return alpha;
+    storeTT(position, bestNodeValue, ttType, depth, bestNodeMove, mateThreat[ply]);
+    return bestNodeValue; // fail-hard: alpha / fail-soft: bestValue
   }
 
   /**
@@ -1360,7 +1367,7 @@ public class Search implements Runnable {
     byte ttType = TT_EntryType.ALPHA;
 
     // Initialize best values
-    int bestNodeValue = -Evaluation.INFINITE;
+    int bestNodeValue = Evaluation.MIN;
     int bestNodeMove = Move.NOMOVE;
 
     // ###############################################
@@ -1400,18 +1407,18 @@ public class Search implements Runnable {
     // current position. So if we are already >beta we don't need to look at it.
     if (!position.hasCheck()) {
       int statEval = evaluate(position, ply, alpha, beta);
+      bestNodeValue = statEval;
       if (TRACE) trace("%sQuiescence in ply %d: STANDPAT %d", getSpaces(ply), ply, statEval);
       if (statEval >= beta) {
-        storeTT(position, beta, TT_EntryType.BETA, DEPTH_NONE, Move.NOMOVE, mateThreat[ply]);
-        assert beta != Evaluation.NOVALUE;
+        storeTT(position, bestNodeValue, TT_EntryType.BETA, DEPTH_NONE, Move.NOMOVE, mateThreat[ply]);
         if (TRACE) {
           trace("%sQuiescence in ply %d: STANDPAT CUT (%d > %d beta)", getSpaces(ply), ply,
-                statEval, beta);
+                bestNodeValue, beta);
         }
-        return beta; // fail-hard, fail-soft: value
+        return bestNodeValue; // fail-hard: beta, fail-soft: statEval
       }
-      if (statEval > alpha) {
-        alpha = statEval;
+      if (bestNodeValue > alpha) {
+        alpha = bestNodeValue;
       }
     }
 
@@ -1482,7 +1489,7 @@ public class Search implements Runnable {
 
       // go one ply deeper into the search tree
       value = -qsearch(position, depth, ply + 1, -beta, -alpha, pvNode);
-      assert value > Evaluation.MIN && value < Evaluation.MAX;
+      assert value >= Evaluation.MIN && value <= Evaluation.MAX;
 
       // needed to remember if we even had a legal move
       numberOfSearchedMoves++;
@@ -1515,7 +1522,7 @@ public class Search implements Runnable {
             }
             assert beta != Evaluation.NOVALUE;
             storeTT(position, value, TT_EntryType.BETA, DEPTH_NONE, bestNodeMove, mateThreat[ply]);
-            return beta; // return beta in a fail-hard / value in fail-soft
+            return value; // return beta in a fail-hard / value in fail-soft
           }
         }
 
@@ -1541,20 +1548,19 @@ public class Search implements Runnable {
       searchCounter.nonLeafPositionsEvaluated++;
       // We have a check mate. Return a -CHECKMATE.
       if (TRACE) trace("%sQuiescence in ply %d: CHECKMATE", getSpaces(ply), ply);
-      alpha = -Evaluation.CHECKMATE + ply;
+      bestNodeValue = -Evaluation.CHECKMATE + ply;
       assert ttType == TT_EntryType.ALPHA;
     }
 
-    assert alpha != Evaluation.NOVALUE;
-    assert alpha > Evaluation.MIN;
+    assert bestNodeValue > Evaluation.MIN;
 
     if (TRACE) {
       trace("%sQuiescence in ply %d: END value=%d (%d moves searched) (%s)", getSpaces(ply), ply,
             alpha, numberOfSearchedMoves, currentVariation.toNotationString());
     }
 
-    storeTT(position, alpha, ttType, 0, bestNodeMove, mateThreat[ply]);
-    return alpha;
+    storeTT(position, bestNodeValue, ttType, 0, bestNodeMove, mateThreat[ply]);
+    return bestNodeValue; /// fail-hard: alpha / fail-soft: bestvalue
   }
 
   /**
