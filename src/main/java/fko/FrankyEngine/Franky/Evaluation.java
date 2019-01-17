@@ -63,7 +63,7 @@ public class Evaluation {
 
   // Constants for evaluations
   public static final int NOVALUE             = Short.MIN_VALUE; // TT uses shorts
-  public static final int INFINITE            = Short.MAX_VALUE; // TT uses shorts
+  public static final int INFINITE            = 30000; // TT uses shorts
   public static final int MIN                 = -10000;
   public static final int MAX                 = 10000;
   public static final int DRAW                = 0;

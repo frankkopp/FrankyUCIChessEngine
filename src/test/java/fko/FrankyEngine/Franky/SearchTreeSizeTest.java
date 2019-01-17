@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /*
  * MIT License
  *
@@ -37,13 +36,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-=======
-package fko.FrankyEngine.Franky;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
->>>>>>> f7323c8b6ee64be1739a5881a88393ffd0cfc313
 /**
  * SearchTreeSizeTest
  */
@@ -51,7 +43,6 @@ public class SearchTreeSizeTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(SearchTreeSizeTest.class);
 
-<<<<<<< HEAD
   private IUCIEngine engine;
   private Search     search;
 
@@ -581,6 +572,4 @@ public class SearchTreeSizeTest {
     return fen;
   }
 
-=======
->>>>>>> f7323c8b6ee64be1739a5881a88393ffd0cfc313
 }
