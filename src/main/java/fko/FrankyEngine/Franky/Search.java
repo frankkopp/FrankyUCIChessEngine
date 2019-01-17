@@ -2174,8 +2174,6 @@ public class Search implements Runnable {
     long lastSearchTime          = 0;
 
     // PERFT Values
-    // For PERFT nonLeafPositionsEvaluated have to be subtracted
-    // from leafPositionsEvaluated as PERFT only counts visited lead nodes.
     long leafPositionsEvaluated    = 0;
     long nonLeafPositionsEvaluated = 0;
     long checkCounter              = 0;
