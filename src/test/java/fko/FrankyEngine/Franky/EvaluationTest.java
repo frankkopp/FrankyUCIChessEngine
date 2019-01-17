@@ -78,13 +78,13 @@ public class EvaluationTest {
   @Test
   void getGamePhaseFactor() {
     position = new Position();
-    assertEquals(24, evaluation.getGamePhaseFactor(position));
+    assertEquals(24, Evaluation.getGamePhaseFactor(position));
 
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
-    assertEquals(11, evaluation.getGamePhaseFactor(position));
+    assertEquals(11, Evaluation.getGamePhaseFactor(position));
 
     position = new Position("k6n/7p/6P1/7K/8/8/8/8 w - - 0 1");
-    assertEquals(1, evaluation.getGamePhaseFactor(position));
+    assertEquals(1, Evaluation.getGamePhaseFactor(position));
   }
 
   @Test
@@ -174,17 +174,17 @@ public class EvaluationTest {
   public final void testCheckPosition() {
     // no in check
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
-    assertEquals(221, evaluation.evaluate(position));
+    assertEquals(163, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
 
     // white gives check to black
     position = new Position("r2R3k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2K5 b - - 0 1");
-    assertEquals(-304, evaluation.evaluate(position));
+    assertEquals(-222, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
 
     // black gives check to white
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1p1qPN2/6P1/1PPK4/3R4 w - - 0 2");
-    assertEquals(189, evaluation.evaluate(position));
+    assertEquals(147, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
   }
 
@@ -193,23 +193,10 @@ public class EvaluationTest {
 
     // king values
     position = new Position("8/4k3/8/8/8/8/8/4K3 w - -");
-    assertEquals(-30, evaluation.evaluate(position));
+    assertEquals(0, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
     position = new Position("8/4k3/8/8/8/8/8/4K3 b - -");
-    assertEquals(30, evaluation.evaluate(position));
-    LOG.info(evaluation.toString());
-    position = new Position("k7/8/8/8/4K3/8/8/8 w - -");
-    assertEquals(90, evaluation.evaluate(position));
-    LOG.info(evaluation.toString());
-    position = new Position("k7/8/8/8/4K3/8/8/8 b - -");
-    assertEquals(-90, evaluation.evaluate(position));
-    LOG.info(evaluation.toString());
-    position = new Position("K7/8/8/8/4k3/8/8/8 w - -");
-    assertEquals(-90, evaluation.evaluate(position));
-    LOG.info(evaluation.toString());
-    position = new Position("K7/8/8/8/4k3/8/8/8 b - -");
-    assertEquals(90, evaluation.evaluate(position));
-    LOG.info(evaluation.toString());
+    assertEquals(0, evaluation.evaluate(position));
 
   }
 
@@ -238,7 +225,7 @@ public class EvaluationTest {
    int move;
 
    move = Move.fromSANNotation(position, "e4");
-   assertEquals(20, Evaluation.getPositionValue(position, move));
+   assertEquals(25, Evaluation.getPositionValue(position, move));
 
    move = Move.fromSANNotation(position, "c3");
    assertEquals(-10, Evaluation.getPositionValue(position, move));
