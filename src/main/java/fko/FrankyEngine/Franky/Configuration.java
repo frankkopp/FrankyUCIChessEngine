@@ -27,6 +27,8 @@ package fko.FrankyEngine.Franky;
 
 import fko.FrankyEngine.Franky.openingbook.OpeningBookImpl;
 
+import java.security.Principal;
+
 /**
  * This is the engines configuration. All fields are package visible
  * and can be changed during runtime. They are deliberately not static
@@ -108,8 +110,24 @@ public class Configuration {
 
   /**
    * Principal Variation Search
+   * Turn off MTDf when using this
    */
   public boolean USE_PVS = true;
+
+  /**
+   * Use Aspiration Window in root search
+   * TODO: Make evaluation more stable between different depths - otherwise
+   * Aspiration will not be efficient.
+   */
+  public boolean USE_ASPIRATION_WINDOW  = true;
+  public int     ASPIRATION_START_DEPTH = 4;
+
+  /**
+   * MTDf
+   * Turn off PVS when using this
+   */
+  public boolean USE_MTDf = false;
+  public int     MTDf_START_DEPTH = 4;
 
   /**
    * Use Transposition Tables for visited nodes (needs extra memory)
@@ -163,13 +181,6 @@ public class Configuration {
   public int     LMR_MIN_DEPTH = 2;
   public int     LMR_REDUCTION = 1;
 
-  /**
-   * Use Aspiration Window in root search
-   * TODO: Make evaluation more stable between different depths - otherwise
-   * Aspiration will not be efficient.
-   */
-  public boolean USE_ASPIRATION_WINDOW  = true;
-  public int     ASPIRATION_START_DEPTH = 5;
 
   /**
    * Use LAZY SMP - not sofisticated multithreading to fill up the TT quicker

@@ -499,22 +499,31 @@ public class Search implements Runnable {
 
       searchCounter.currentIterationDepth = depth;
 
-      // @formatter:off
       int value;
       assert config.ASPIRATION_START_DEPTH > 1 : "ASPIRATION_START_DEPTH must be > 1";
-      if (config.USE_ASPIRATION_WINDOW
-          && depth >= config.ASPIRATION_START_DEPTH
-          && !isPerftSearch()
+      assert config.MTDf_START_DEPTH > 1 : "MTDf_START_DEPTH must be > 1";
+
+      if (config.USE_MTDf && depth >= config.MTDf_START_DEPTH && !isPerftSearch()
           && searchCounter.currentBestRootValue != Evaluation.NOVALUE) {
 
-        value = aspiration_search(position, depth);
+        assert !config.USE_PVS;
+
+        // MTDf
+        value = mtdf_search(position, searchCounter.currentBestRootValue, depth);
+
+      } else if (config.USE_ASPIRATION_WINDOW && depth >= config.ASPIRATION_START_DEPTH
+                 && !isPerftSearch() && searchCounter.currentBestRootValue != Evaluation.NOVALUE) {
+
+        assert !config.USE_MTDf;
+
+        // ASPIRATION
+        value = aspiration_search(position, searchCounter.currentBestRootValue, depth);
 
       } else {
 
         value = rootMovesSearch(position, depth, alpha, beta);
 
       }
-      // @formatter:on
 
       assert (value >= Evaluation.MIN && value <= Evaluation.MAX);
       assert !principalVariation[ROOT_PLY].empty();
@@ -558,6 +567,30 @@ public class Search implements Runnable {
   }
 
   /**
+   *
+   * https://askeplaat.wordpress.com/534-2/mtdf-algorithm/
+   * @param position
+   * @param f
+   * @param depth
+   * @return
+   */
+  private int mtdf_search(Position position, int f, int depth) {
+    int beta;
+    int g = f;
+    int upperbound = Evaluation.MAX;
+    int lowerbound = Evaluation.MIN;
+
+    do {
+      if (g == lowerbound) { beta = g + 1; } else beta = g;
+      g = rootMovesSearch(position, depth, beta - 1, beta);
+      if (g < beta) { upperbound = g; } else lowerbound = g;
+      searchCounter.mtdf_searches++;
+    } while (lowerbound >= upperbound);
+
+    return g;
+  }
+
+  /**
    * Aspiration search works with the assumption that the value from previous searches will not
    * change too much and therefore the search can be tried with a narrow window for alpha and beta
    * around the previous value to cause more cut offs. If the result is at the edge or outside
@@ -567,16 +600,8 @@ public class Search implements Runnable {
    * @param position
    * @param depth
    */
-  private int aspiration_search(Position position, int depth) {
+  private int aspiration_search(Position position, final int bestValue, final int depth) {
     if (TRACE) trace("Aspiration for depth %d: START", depth);
-
-    // need to have a good guess for the score of the best move
-    assert searchCounter.currentBestRootValue != Evaluation.NOVALUE;
-    assert searchCounter.currentBestRootMove != Move.NOMOVE;
-    assert !principalVariation[ROOT_PLY].empty();
-    assert principalVariation[ROOT_PLY].getFirst() == searchCounter.currentBestRootMove;
-
-    final int bestValue = searchCounter.currentBestRootValue;
 
     // 1st aspiration
     int alpha = Math.max(Evaluation.MIN, bestValue - 30);
@@ -1409,7 +1434,8 @@ public class Search implements Runnable {
       bestNodeValue = statEval;
       if (TRACE) trace("%sQuiescence in ply %d: STANDPAT %d", getSpaces(ply), ply, statEval);
       if (statEval >= beta) {
-        storeTT(position, bestNodeValue, TT_EntryType.BETA, DEPTH_NONE, Move.NOMOVE, mateThreat[ply]);
+        storeTT(position, bestNodeValue, TT_EntryType.BETA, DEPTH_NONE, Move.NOMOVE,
+                mateThreat[ply]);
         if (TRACE) {
           trace("%sQuiescence in ply %d: STANDPAT CUT (%d > %d beta)", getSpaces(ply), ply,
                 bestNodeValue, beta);
@@ -2197,6 +2223,7 @@ public class Search implements Runnable {
     int  nullMoveVerifications  = 0;
     int  lmrReductions          = 0;
     int  aspirationResearches   = 0;
+    int  mtdf_searches          = 0;
 
     private void resetCounter() {
       currentBestRootMove = Move.NOMOVE;
@@ -2228,6 +2255,7 @@ public class Search implements Runnable {
       nullMoveVerifications = 0;
       lmrReductions = 0;
       aspirationResearches = 0;
+      mtdf_searches = 0;
     }
 
     @Override
@@ -2263,6 +2291,7 @@ public class Search implements Runnable {
              ", nullMoveVerifications=" + nullMoveVerifications +
              ", lmrReductions=" + lmrReductions +
              ", aspirationResearches=" + aspirationResearches +
+             ", mtdf_searches=" + mtdf_searches +
              '}';
       // @formatter:on
     }

@@ -26,15 +26,13 @@
 package fko.FrankyEngine.Franky;
 
 import fko.UCI.IUCIEngine;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * SearchTreeSizeTest
@@ -46,48 +44,101 @@ public class SearchTreeSizeTest {
   private IUCIEngine engine;
   private Search     search;
 
+  class SingleTest {
+    String name  = "";
+    long   nodes = 0;
+    int    nps   = 0;
+    long   time  = 0;
+    int    move  = Move.NOMOVE;
+  }
+
+  class Result {
+    String           fen;
+    List<SingleTest> tests = new ArrayList<>();
+
+    public Result(String fen) {
+      this.fen = fen;
+    }
+  }
+
   @BeforeEach
   void setUp() {
-
     engine = new FrankyEngine();
     search = ((FrankyEngine) engine).getSearch();
     search.config.USE_BOOK = false;
-
   }
 
   @Test
   @Disabled
   public void sizeOfSearchTreeTest() {
 
-    int depth = 6;
+    int depth = 8;
     List<String> resultStrings = new ArrayList<>();
     List<String> fens = getFENs();
 
+    search.setHashSize(4096);
     search.config.USE_BOOK = false;
 
     LOG.info("Start SIZE Test for depth {}", depth);
 
-    //    measureTreeSize(new Position(),
-    //                    new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false),
-    //                    resultStrings, "WARM UP", true);
+    measureTreeSize(new Position(),
+                    new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false),
+                    "WARM UP", true);
 
     search.clearHashTables();
 
-    fens.stream().limit(10000).forEach(fen -> {
+    List<Result> results = new ArrayList<>();
+
+    fens.stream().limit(10).forEach(fen -> {
       resultStrings.add("");
       resultStrings.add(fen);
-      featureMeasurements(depth, resultStrings, fen);
+      results.add(featureMeasurements(depth, resultStrings, fen));
       resultStrings.add("");
     });
 
-    LOG.info("");
-    LOG.info("################## RESULTS ####################");
-    for (String value : resultStrings) {
-      LOG.info(value);
+    // Print result
+    System.out.println();
+    System.out.println("################## RESULTS ##############################################");
+    System.out.println();
+    System.out.printf("%-12s | %-4s | %12s | %12s | %12s | %s %n", "Test Name", "Move", "Nodes",
+                      "Nps", "Time", "Fen");
+    System.out.println("-----------------------------------------------------------------------"
+                       + "-----------------------------------------------------------------------");
+
+    Map<String, Long> sumNodes = new LinkedHashMap<>();
+    Map<String, Long> sumNps = new LinkedHashMap<>();
+    Map<String, Long> sumTime = new LinkedHashMap<>();
+
+    for (Result result : results) {
+      for (SingleTest test : result.tests) {
+        long oldNodes = sumNodes.get(test.name) == null ? 0 : sumNodes.get(test.name);
+        long oldNps = sumNps.get(test.name) == null ? 0 : sumNps.get(test.name);
+        long oldTime = sumTime.get(test.name) == null ? 0 : sumTime.get(test.name);
+        sumNodes.put(test.name, oldNodes + test.nodes);
+        sumNps.put(test.name, oldNps + test.nps);
+        sumTime.put(test.name, oldTime + test.time);
+        System.out.printf("%-12s | %4s | %,12d | %,12d | %,12d | %s", test.name,
+                          Move.toSimpleString(test.move), test.nodes, test.nps, test.time,
+                          result.fen);
+        System.out.println();
+      }
+      System.out.println();
     }
+    System.out.println("-----------------------------------------------------------------------"
+                       + "-----------------------------------------------------------------------");
+    System.out.println();
+    for (String key : sumNodes.keySet()) {
+      System.out.printf("Test: %-12s  Nodes: %,15d  Nps: %,15d  Time: %,15d %n", key, sumNodes.get(key),
+                        sumNps.get(key), sumTime.get(key));
+    }
+    System.out.println();
+
   }
 
-  private void featureMeasurements(final int depth, final List<String> values, final String fen) {
+  private Result featureMeasurements(final int depth, final List<String> values, final String fen) {
+
+    Result result = new Result(fen);
+
     Position position = new Position(fen);
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false);
 
@@ -96,6 +147,7 @@ public class SearchTreeSizeTest {
     search.config.USE_PVS = false;
     search.config.USE_PVS_MOVE_ORDERING = false;
     search.config.USE_ASPIRATION_WINDOW = false;
+    search.config.USE_MTDf = false;
 
     search.config.USE_TRANSPOSITION_TABLE = false;
     search.config.USE_TT_ROOT = false;
@@ -116,7 +168,7 @@ public class SearchTreeSizeTest {
     search.config.USE_ALPHABETA_PRUNING = true;
     search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_TT_ROOT = true;
-    measureTreeSize(position, searchMode, values, "BASE", true);
+//    result.tests.add(measureTreeSize(position, searchMode, "BASE", true));
 
     search.config.USE_PVS = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
@@ -133,32 +185,38 @@ public class SearchTreeSizeTest {
     // measureTreeSize(position, searchMode, values, "NMP", true);
     search.config.USE_QUIESCENCE = true;
 
-    measureTreeSize(position, searchMode, values, "ALL", true);
+    result.tests.add(measureTreeSize(position, searchMode, "ALL", true));
 
     search.config.USE_ASPIRATION_WINDOW = true;
-    measureTreeSize(position, searchMode, values, "ASPIRATION", true);
+    result.tests.add(measureTreeSize(position, searchMode, "ASPIRATION", true));
+
+    search.config.USE_PVS = false;
+    search.config.USE_ASPIRATION_WINDOW = false;
+    search.config.USE_MTDf = true;
+    result.tests.add(measureTreeSize(position, searchMode, "MTDf", true));
+
+    return result;
 
   }
 
-  private void measureTreeSize(final Position position, final SearchMode searchMode,
-                               final List<String> values, final String feature,
-                               final boolean clearTT) {
+  private SingleTest measureTreeSize(final Position position, final SearchMode searchMode,
+                                     final String feature, final boolean clearTT) {
 
     System.out.println("Testing. " + feature);
-    if (clearTT) {
-      search.clearHashTables();
-    }
+    if (clearTT) search.clearHashTables();
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
-    values.add(
-      String.format("SIZE %-12s : %,14d >> %-18s (%4d) >> nps %,.0f >> time %s >> %s ", feature,
-                    search.getSearchCounter().nodesVisited,
-                    Move.toString(search.getLastSearchResult().bestMove),
-                    search.getLastSearchResult().resultValue,
-                    (1e3 * search.getSearchCounter().nodesVisited)
-                    / search.getSearchCounter().lastSearchTime,
-                    DurationFormatUtils.formatDurationHMS(search.getSearchCounter().lastSearchTime),
-                    search.getSearchCounter().toString()));
+
+    SingleTest test = new SingleTest();
+    test.name = feature;
+    test.nodes = search.getSearchCounter().nodesVisited;
+    test.move = search.getLastSearchResult().bestMove;
+    test.nps = (int) ((1e3 * search.getSearchCounter().nodesVisited) / (
+      search.getSearchCounter().lastSearchTime + 1));
+    test.time = search.getSearchCounter().lastSearchTime;
+
+    return test;
+
   }
 
   ArrayList<String> getFENs() {
@@ -166,7 +224,7 @@ public class SearchTreeSizeTest {
     ArrayList<String> fen = new ArrayList<>();
 
     fen.add(Position.STANDARD_BOARD_FEN);
-    fen.add("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"); // 218 moves to make
+//    fen.add("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"); // 218 moves to make
     fen.add("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
     fen.add("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -");
     fen.add("r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -");
