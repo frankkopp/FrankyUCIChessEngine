@@ -970,7 +970,7 @@ public class Search implements Runnable {
       final int evalMargin = config.STATIC_NULL_PRUNING_MARGIN * depth;
       if (staticEval - evalMargin >= beta ){
         if (TRACE) trace("%sSearch in ply %d for depth %d: STATIC CUT", getSpaces(ply), ply, depth);
-        //storeTT(position, staticEval, TT_EntryType.BETA, depth, Move.NOMOVE, mateThreat[ply]);
+        storeTT(position, staticEval, TT_EntryType.BETA, depth, Move.NOMOVE, mateThreat[ply]);
         return staticEval; // fail-hard / fail-soft: staticEval;
       }
     }
@@ -1018,7 +1018,7 @@ public class Search implements Runnable {
       if (nullValue >= beta && !mateThreat[ply]) {
         if (TRACE) trace("%sSearch in ply %d for depth %d: NULL CUT", getSpaces(ply), ply, depth);
         searchCounter.nullMovePrunings++;
-        //storeTT(position, nullValue, TT_EntryType.BETA, depth, Move.NOMOVE, mateThreat[ply]);
+        storeTT(position, nullValue, TT_EntryType.BETA, depth, Move.NOMOVE, mateThreat[ply]);
         return nullValue; // fail-hard, fail-soft: nullValue;
       }
     }

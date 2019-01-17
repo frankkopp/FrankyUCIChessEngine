@@ -486,7 +486,7 @@ public class SearchTest {
     SearchMode searchMode;
     Position position;
 
-    int maxDepth = 6;
+    int maxDepth = 8;
     int moveTime = 0;
     int mateIn = 0;
     boolean infinite = true;
