@@ -32,7 +32,10 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * SearchTreeSizeTest
@@ -50,6 +53,7 @@ public class SearchTreeSizeTest {
     int    nps   = 0;
     long   time  = 0;
     int    move  = Move.NOMOVE;
+    int    value = Evaluation.NOVALUE;
   }
 
   class Result {
@@ -72,11 +76,13 @@ public class SearchTreeSizeTest {
   @Disabled
   public void sizeOfSearchTreeTest() {
 
+    final int NO_OF_TESTS = 5;
     int depth = 8;
+
     List<String> resultStrings = new ArrayList<>();
     List<String> fens = getFENs();
 
-    search.setHashSize(4096);
+    search.setHashSize(1024);
     search.config.USE_BOOK = false;
 
     LOG.info("Start SIZE Test for depth {}", depth);
@@ -89,7 +95,7 @@ public class SearchTreeSizeTest {
 
     List<Result> results = new ArrayList<>();
 
-    fens.stream().limit(10).forEach(fen -> {
+    fens.stream().limit(NO_OF_TESTS).forEach(fen -> {
       resultStrings.add("");
       resultStrings.add(fen);
       results.add(featureMeasurements(depth, resultStrings, fen));
@@ -98,10 +104,11 @@ public class SearchTreeSizeTest {
 
     // Print result
     System.out.println();
-    System.out.println("################## RESULTS ##############################################");
+    System.out.printf("################## RESULTS for depth %d ##########################%n",
+                      depth);
     System.out.println();
-    System.out.printf("%-12s | %-4s | %12s | %12s | %12s | %s %n", "Test Name", "Move", "Nodes",
-                      "Nps", "Time", "Fen");
+    System.out.printf("%-12s | %-4s | %-8s | %12s | %12s | %12s | %s %n", "Test Name", "Move",
+                      "Value", "Nodes", "Nps", "Time", "Fen");
     System.out.println("-----------------------------------------------------------------------"
                        + "-----------------------------------------------------------------------");
 
@@ -117,9 +124,9 @@ public class SearchTreeSizeTest {
         sumNodes.put(test.name, oldNodes + test.nodes);
         sumNps.put(test.name, oldNps + test.nps);
         sumTime.put(test.name, oldTime + test.time);
-        System.out.printf("%-12s | %4s | %,12d | %,12d | %,12d | %s", test.name,
-                          Move.toSimpleString(test.move), test.nodes, test.nps, test.time,
-                          result.fen);
+        System.out.printf("%-12s | %4s | %8s | %,12d | %,12d | %,12d | %s", test.name,
+                          Move.toSimpleString(test.move), test.value, test.nodes, test.nps,
+                          test.time, result.fen);
         System.out.println();
       }
       System.out.println();
@@ -147,7 +154,6 @@ public class SearchTreeSizeTest {
     search.config.USE_PVS = false;
     search.config.USE_PVS_MOVE_ORDERING = false;
     search.config.USE_ASPIRATION_WINDOW = false;
-    //    search.config.USE_MTDf = false;
 
     search.config.USE_TRANSPOSITION_TABLE = false;
     search.config.USE_TT_ROOT = false;
@@ -157,8 +163,10 @@ public class SearchTreeSizeTest {
 
     search.config.USE_NULL_MOVE_PRUNING = false;
     search.config.USE_KILLER_MOVES = false;
-    search.config.USE_STATIC_NULL_PRUNING = false;
+    search.config.USE_RF_PRUNING = false;
     search.config.USE_RAZOR_PRUNING = false;
+    search.config.USE_FUTILITY_PRUNING = false;
+    search.config.USE_LMP = false;
     search.config.USE_LMR = false;
 
     search.config.USE_QUIESCENCE = false;
@@ -168,31 +176,28 @@ public class SearchTreeSizeTest {
     search.config.USE_ALPHABETA_PRUNING = true;
     search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_TT_ROOT = true;
-    //    result.tests.add(measureTreeSize(position, searchMode, "BASE", true));
+//    result.tests.add(measureTreeSize(position, searchMode, "BASE", true));
 
     search.config.USE_PVS = true;
     search.config.USE_PVS_MOVE_ORDERING = true;
     search.config.USE_KILLER_MOVES = true;
     search.config.USE_MATE_DISTANCE_PRUNING = true;
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
-    search.config.USE_STATIC_NULL_PRUNING = true;
+    search.config.USE_RF_PRUNING = true;
     search.config.USE_RAZOR_PRUNING = true;
-    search.config.USE_LMR = true;
     search.config.USE_NULL_MOVE_PRUNING = true;
-    // search.config.NULL_MOVE_DEPTH = 3;
-    // search.config.USE_VERIFY_NMP = true;
-    // search.config.NULL_MOVE_REDUCTION_VERIFICATION = 4;
-    // measureTreeSize(position, searchMode, values, "NMP", true);
+    search.config.USE_ASPIRATION_WINDOW = true;
     search.config.USE_QUIESCENCE = true;
     result.tests.add(measureTreeSize(position, searchMode, "ALL", true));
 
-    search.config.USE_ASPIRATION_WINDOW = true;
-    result.tests.add(measureTreeSize(position, searchMode, "ASPIRATION", true));
+    search.config.USE_FUTILITY_PRUNING = true;
+    result.tests.add(measureTreeSize(position, searchMode, "FP", true));
 
-    search.config.USE_PVS = false;
-    search.config.USE_ASPIRATION_WINDOW = false;
-    //    search.config.USE_MTDf = true;
-    //    result.tests.add(measureTreeSize(position, searchMode, "MTDf", true));
+    search.config.USE_LMP = true;
+    result.tests.add(measureTreeSize(position, searchMode, "LMP", true));
+
+    search.config.USE_LMR = true;
+    result.tests.add(measureTreeSize(position, searchMode, "LMR", true));
 
     return result;
 
@@ -210,6 +215,7 @@ public class SearchTreeSizeTest {
     test.name = feature;
     test.nodes = search.getSearchCounter().nodesVisited;
     test.move = search.getLastSearchResult().bestMove;
+    test.value = search.getLastSearchResult().resultValue;
     test.nps = (int) ((1e3 * search.getSearchCounter().nodesVisited) / (
       search.getSearchCounter().lastSearchTime + 1));
     test.time = search.getSearchCounter().lastSearchTime;
@@ -223,7 +229,6 @@ public class SearchTreeSizeTest {
     ArrayList<String> fen = new ArrayList<>();
 
     fen.add(Position.STANDARD_BOARD_FEN);
-    //    fen.add("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"); // 218 moves to make
     fen.add("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
     fen.add("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -");
     fen.add("r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -");
@@ -237,6 +242,7 @@ public class SearchTreeSizeTest {
     fen.add("8/8/8/4N3/2R5/4k3/8/5K2 w - -");
     fen.add("2r1r1k1/pb1n1pp1/1p1qpn1p/4N1B1/2PP4/3B4/P2Q1PPP/3RR1K1 w - - ");
     fen.add("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3");
+    fen.add("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"); // 218 moves to make
 
     fen.add("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 b kq e3");
     fen.add("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq -");

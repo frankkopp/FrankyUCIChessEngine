@@ -256,7 +256,7 @@ public class FrankyEngine implements IUCIEngine {
      iUciOptions.add(
         new UCIOption("Use_Eval_Pruning",
                 UCIOptionType.check,
-                Boolean.toString(config.USE_STATIC_NULL_PRUNING),
+                Boolean.toString(config.USE_RF_PRUNING),
                 "",
                 "",
                 ""));
@@ -422,8 +422,8 @@ public class FrankyEngine implements IUCIEngine {
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Eval_Pruning":
-        config.USE_STATIC_NULL_PRUNING = Boolean.valueOf(value);
-        msg = "Use Eval Pruning set to " + (config.USE_STATIC_NULL_PRUNING ? "On" : "Off");
+        config.USE_RF_PRUNING = Boolean.valueOf(value);
+        msg = "Use Eval Pruning set to " + (config.USE_RF_PRUNING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;

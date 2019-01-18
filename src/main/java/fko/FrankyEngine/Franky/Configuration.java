@@ -129,19 +129,19 @@ public class Configuration {
   /**
    * Null Move Pruning
    */
-  public boolean USE_NULL_MOVE_PRUNING            = true;
-  public int     NULL_MOVE_DEPTH                  = 2;
-  public boolean USE_VERIFY_NMP                   = true;
-  public int     NULL_MOVE_REDUCTION_VERIFICATION = 3;
+  public boolean USE_NULL_MOVE_PRUNING  = true;
+  public int     NULL_MOVE_DEPTH        = 2;
+  public boolean USE_VERIFY_NMP         = true;
+  public int     NMP_VERIFICATION_DEPTH = 3;
 
   /**
    * Eval Pruning - early cut for low static evals
    * Reverse Futility Pruning
    * https://www.chessprogramming.org/Reverse_Futility_Pruning
    */
-  public boolean USE_STATIC_NULL_PRUNING    = true;
-  public int     STATIC_NULL_PRUNING_DEPTH  = 2;
-  public int     STATIC_NULL_PRUNING_MARGIN = 300;
+  public boolean USE_RF_PRUNING = true;
+  public int     RFP_DEPTH      = 2;
+  public int     RFP_MARGIN     = 300;
 
   /**
    * Razor  - early qsearch for low static evals
@@ -157,11 +157,23 @@ public class Configuration {
   public int     NO_KILLER_MOVES  = 2;
 
   /**
+   * Futility Pruning
+   */
+  public boolean USE_FUTILITY_PRUNING = false;
+  public int     FP_DEPTH             = 4;
+
+  /**
+   * Late Move Pruning
+   */
+  public boolean USE_LMP       = false;
+  public int     LMP_DEPTH     = 4;
+  public int     LMP_MIN_MOVES = 4;
+  /**
    * Late Move Reduction
    */
   public boolean USE_LMR       = true;
-  public int     LMR_MIN_DEPTH = 2;
-  public int     LMR_REDUCTION = 1;
+  public int     LMR_MIN_DEPTH = 3;
+  public int     LMR_REDUCTION = 2;
 
   /**
    * Use Aspiration Window in root search
@@ -174,8 +186,8 @@ public class Configuration {
   /**
    * Use LAZY SMP - not sofisticated multithreading to fill up the TT quicker
    */
-//  public boolean USE_LAZY_SMP = true;
-//  public int SMP_CPUS = 4;
+  //  public boolean USE_LAZY_SMP = true;
+  //  public int SMP_CPUS = 4;
 
   /**
    * Experimental sorting of moves in move generation.
@@ -193,7 +205,6 @@ public class Configuration {
    */
   public boolean USE_SORT_ALL_MOVES = false;
 
-
   // TODO vvvvvvvv
 
   @Override
@@ -207,14 +218,12 @@ public class Configuration {
            + USE_TRANSPOSITION_TABLE + " USE_MATE_DISTANCE_PRUNING=" + USE_MATE_DISTANCE_PRUNING
            + " USE_MINOR_PROMOTION_PRUNING=" + USE_MINOR_PROMOTION_PRUNING
            + " USE_NULL_MOVE_PRUNING=" + USE_NULL_MOVE_PRUNING + " NULL_MOVE_DEPTH="
-           + NULL_MOVE_DEPTH + " USE_STATIC_NULL_PRUNING=" + USE_STATIC_NULL_PRUNING
-           + " STATIC_NULL_PRUNING_DEPTH=" + STATIC_NULL_PRUNING_DEPTH
-           + " STATIC_NULL_PRUNING_MARGIN=" + STATIC_NULL_PRUNING_MARGIN + " USE_RAZOR_PRUNING="
-           + USE_RAZOR_PRUNING + " RAZOR_PRUNING_DEPTH=" + RAZOR_PRUNING_DEPTH
-           + " RAZOR_PRUNING_MARGIN=" + RAZOR_PRUNING_MARGIN + " USE_KILLER_MOVES="
-           + USE_KILLER_MOVES + " USE_SORT_ALL_MOVES=" + USE_SORT_ALL_MOVES + " USE_LMR=" + USE_LMR
-           + " LMR_MIN_DEPTH=" + LMR_MIN_DEPTH + " LMR_REDUCTION=" + LMR_REDUCTION
-           + " USE_ASPIRATION_WINDOW="
-           + USE_ASPIRATION_WINDOW + '}';
+           + NULL_MOVE_DEPTH + " USE_RF_PRUNING=" + USE_RF_PRUNING + " RFP_DEPTH=" + RFP_DEPTH
+           + " RFP_MARGIN=" + RFP_MARGIN + " USE_RAZOR_PRUNING=" + USE_RAZOR_PRUNING
+           + " RAZOR_PRUNING_DEPTH=" + RAZOR_PRUNING_DEPTH + " RAZOR_PRUNING_MARGIN="
+           + RAZOR_PRUNING_MARGIN + " USE_KILLER_MOVES=" + USE_KILLER_MOVES + " USE_SORT_ALL_MOVES="
+           + USE_SORT_ALL_MOVES + " USE_LMR=" + USE_LMR + " LMR_MIN_DEPTH=" + LMR_MIN_DEPTH
+           + " LMR_REDUCTION=" + LMR_REDUCTION + " USE_ASPIRATION_WINDOW=" + USE_ASPIRATION_WINDOW
+           + '}';
   }
 }

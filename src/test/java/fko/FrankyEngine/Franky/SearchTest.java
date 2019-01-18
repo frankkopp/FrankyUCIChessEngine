@@ -28,7 +28,6 @@ package fko.FrankyEngine.Franky;
 
 import fko.FrankyEngine.Franky.Search.TTHit;
 import fko.UCI.IUCIEngine;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -628,7 +626,7 @@ public class SearchTest {
     search.config.USE_NULL_MOVE_PRUNING = true;
     search.config.NULL_MOVE_DEPTH = 2;
     search.config.USE_VERIFY_NMP = true;
-    search.config.NULL_MOVE_REDUCTION_VERIFICATION = 3;
+    search.config.NMP_VERIFICATION_DEPTH = 3;
 
     search.config.USE_RAZOR_PRUNING = true;
     search.config.USE_LMR = true;
@@ -675,9 +673,9 @@ public class SearchTest {
     search.config.USE_NULL_MOVE_PRUNING = true;
     search.config.NULL_MOVE_DEPTH = 2;
     search.config.USE_VERIFY_NMP = true;
-    search.config.NULL_MOVE_REDUCTION_VERIFICATION = 3;
+    search.config.NMP_VERIFICATION_DEPTH = 3;
 
-    search.config.USE_STATIC_NULL_PRUNING = true;
+    search.config.USE_RF_PRUNING = true;
     search.config.USE_RAZOR_PRUNING = true;
     search.config.USE_LMR = true;
 
@@ -791,7 +789,7 @@ public class SearchTest {
     search.config.USE_MINOR_PROMOTION_PRUNING = true;
     search.config.USE_QUIESCENCE = true;
     search.config.USE_NULL_MOVE_PRUNING = true;
-    search.config.USE_STATIC_NULL_PRUNING = true;
+    search.config.USE_RF_PRUNING = true;
     search.config.USE_RAZOR_PRUNING = true;
     search.config.USE_KILLER_MOVES = true;
     search.config.USE_LMR = true;

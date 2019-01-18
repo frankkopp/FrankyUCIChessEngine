@@ -189,8 +189,6 @@ public class Evaluation {
     material = midGameMaterial * (gamePhaseFactor / GAME_PHASE_MAX) +
                endGameMaterial * (1 - gamePhaseFactor / GAME_PHASE_MAX);
 
-    // TODO: LAZY EVALUATION
-
     // Stage 2
     iterateOverPieces();
 
@@ -202,8 +200,6 @@ public class Evaluation {
 
     kingSafety = midGameKingSafety * (gamePhaseFactor / GAME_PHASE_MAX) +
                  endGameKingSafety * (1 - gamePhaseFactor / GAME_PHASE_MAX);
-
-    // TODO: LAZY EVALUATION
 
     // Stage 3
     iterateOverSquares();
@@ -223,8 +219,10 @@ public class Evaluation {
     // In very rare cases evaluation can be below or above the MIN or MAX.
     // Mostly in artificial cases with many queens - some test cases do this.
     // Therefore we limit the value to MIN+1 or MAX-1.
-    if (value <= Evaluation.MIN) value = Evaluation.MIN+1;
-    else if (value >= Evaluation.MAX) value = Evaluation.MAX-1;
+    if (value <= -Evaluation.CHECKMATE_THRESHOLD)
+      value = -Evaluation.CHECKMATE_THRESHOLD+1;
+    else if (value >= Evaluation.CHECKMATE_THRESHOLD)
+      value = Evaluation.CHECKMATE_THRESHOLD-1;
 
     return value;
   }
