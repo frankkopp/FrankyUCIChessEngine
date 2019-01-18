@@ -72,7 +72,7 @@ public class SearchTreeSizeTest {
   @Disabled
   public void sizeOfSearchTreeTest() {
 
-    int depth = 8;
+    int depth = 6;
     List<String> resultStrings = new ArrayList<>();
     List<String> fens = getFENs();
 
@@ -184,7 +184,6 @@ public class SearchTreeSizeTest {
     // search.config.NULL_MOVE_REDUCTION_VERIFICATION = 4;
     // measureTreeSize(position, searchMode, values, "NMP", true);
     search.config.USE_QUIESCENCE = true;
-
     result.tests.add(measureTreeSize(position, searchMode, "ALL", true));
 
     search.config.USE_ASPIRATION_WINDOW = true;
