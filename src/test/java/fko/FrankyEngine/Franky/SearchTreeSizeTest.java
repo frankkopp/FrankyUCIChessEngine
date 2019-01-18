@@ -72,7 +72,7 @@ public class SearchTreeSizeTest {
   @Disabled
   public void sizeOfSearchTreeTest() {
 
-    int depth = 6;
+    int depth = 8;
     List<String> resultStrings = new ArrayList<>();
     List<String> fens = getFENs();
 
