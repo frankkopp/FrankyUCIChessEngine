@@ -120,14 +120,14 @@ public class Configuration {
    * Aspiration will not be efficient.
    */
   public boolean USE_ASPIRATION_WINDOW  = true;
-  public int     ASPIRATION_START_DEPTH = 4;
+  public int     ASPIRATION_START_DEPTH = 2;
 
   /**
    * MTDf
    * Turn off PVS when using this
    */
   public boolean USE_MTDf = false;
-  public int     MTDf_START_DEPTH = 4;
+  public int     MTDf_START_DEPTH = 2;
 
   /**
    * Use Transposition Tables for visited nodes (needs extra memory)

@@ -581,11 +581,11 @@ public class Search implements Runnable {
     int lowerbound = Evaluation.MIN;
 
     do {
-      if (g == lowerbound) { beta = g + 1; } else beta = g;
+      if (g == lowerbound) beta = g + 1; else beta = g;
       g = rootMovesSearch(position, depth, beta - 1, beta);
-      if (g < beta) { upperbound = g; } else lowerbound = g;
+      if (g < beta) upperbound = g; else lowerbound = g;
       searchCounter.mtdf_searches++;
-    } while (lowerbound >= upperbound);
+    } while (lowerbound < upperbound);
 
     return g;
   }
@@ -1872,9 +1872,9 @@ public class Search implements Runnable {
 
       // when we have a time increase per move we estimate the additional time we should have
       if (myColor.isWhite()) {
-        timeLeft += 40 * searchMode.getWhiteInc().toMillis();
+        timeLeft += movesLeft * searchMode.getWhiteInc().toMillis();
       } else if (myColor.isBlack()) {
-        timeLeft += 40 * searchMode.getBlackInc().toMillis();
+        timeLeft += movesLeft * searchMode.getBlackInc().toMillis();
       }
 
       // for timed games with remaining time
@@ -1958,6 +1958,7 @@ public class Search implements Runnable {
         searchCounter.nonLeafPositionsEvaluated, searchCounter.captureCounter,
         searchCounter.enPassantCounter, searchCounter.checkCounter,
         searchCounter.checkMateCounter));
+      LOG.info("Stats: {}",searchCounter.toString());
       LOG.info("Search Depth was {} ({})", searchCounter.currentSearchDepth,
                searchCounter.currentExtraSearchDepth);
       LOG.info("Search took {}", DurationFormatUtils.formatDurationHMS(elapsedTime(stopTime)));
