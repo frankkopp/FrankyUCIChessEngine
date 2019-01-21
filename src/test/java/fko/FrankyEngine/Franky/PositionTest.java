@@ -196,6 +196,30 @@ public class PositionTest {
     assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq - 1 114", f1null);
   }
 
+  /** Test Null Move */
+  @Test
+  public void testNullMoveEnPassant() {
+    String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
+    Position position = new Position(fen);
+
+    String f1 = position.toFENString();
+    long zobrist1 = position.getZobristKey();
+    position.makeNullMove();
+    String f1null = position.toFENString();
+    long zobristNull = position.getZobristKey();
+    position.undoNullMove();
+    String f2 = position.toFENString();
+    long zobrist2 = position.getZobristKey();
+
+    System.out.println(String.format("f1    : %-65s  zobrist1   : %d ", f1, zobrist1));
+    System.out.println(String.format("f1null: %-65s  zobristNull: %d ", f1null, zobristNull));
+    System.out.println(String.format("f2    : %-65s  zobrist2   : %d ", f2, zobrist2));
+
+    assertEquals(f1, f2);
+    assertEquals(zobrist1, zobrist2);
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq - 1 114", f1null);
+  }
+
   /** Test Null Move MoveGeneration */
   @Test
   public void testNullMove_moveGen() {
