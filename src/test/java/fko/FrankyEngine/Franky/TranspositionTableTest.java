@@ -34,6 +34,8 @@ import org.openjdk.jol.info.ClassLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -166,6 +168,66 @@ public class TranspositionTableTest {
   public void showSize() {
     //System.out.println(VM.current().details());
     System.out.println(ClassLayout.parseClass(TranspositionTable.TT_Entry.class).toPrintable());
+  }
+
+  @Test
+  @Disabled
+  public void testTiming() {
+
+    ArrayList<String> result = new ArrayList<>();
+
+    int ROUNDS = 5;
+    int ITERATIONS = 10;
+    int REPETITIONS = 20;
+
+    for (int round = 0; round < ROUNDS; round++) {
+      long start = 0, end = 0, sum = 0;
+
+      System.out.printf("Running round %d of Timing Test Test 1 vs. Test 2%n", round);
+      System.gc();
+
+      int i = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          test1();
+        }
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg1 = ((float) sum / ITERATIONS) / 1e9f;
+
+      i = 0;
+      sum = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          test2();
+        }
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg2 = ((float) sum / ITERATIONS) / 1e9f;
+
+      result.add(String.format("Round %d Test 1 avg: %,.3f sec", round, avg1));
+      result.add(String.format("Round %d Test 2 avg: %,.3f sec", round, avg2));
+    }
+
+    System.out.println();
+    for (String s : result) {
+      System.out.println(s);
+    }
+
+  }
+
+  TranspositionTable tt = new TranspositionTable(1024);
+
+  private void test1() {
+    tt.ageEntries();
+  }
+
+  private void test2() {
+   //tt.ageEntries2();
   }
 
 }
