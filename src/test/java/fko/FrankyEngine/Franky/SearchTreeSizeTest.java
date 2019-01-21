@@ -75,9 +75,9 @@ public class SearchTreeSizeTest {
   public void sizeOfSearchTreeTest() throws ExecutionException, InterruptedException {
 
     final int NO_OF_TESTS = 5;
-    final int DEPTH = 8;
+    final int DEPTH = 5;
     HASH_SIZE = 2048;
-    THREADS = 2;
+    THREADS = 1;
 
     LOG.info("Start SIZE Test for depth {}", DEPTH);
     List<String> fens = getFENs();
@@ -187,6 +187,7 @@ public class SearchTreeSizeTest {
     search.config.USE_PVS_ORDERING = false;
     search.config.USE_KILLER_MOVES = false;
     search.config.USE_ASPIRATION_WINDOW = false;
+    search.config.USE_MTDf = false;
 
     search.config.USE_TRANSPOSITION_TABLE = false;
     search.config.USE_TT_ROOT = false;
@@ -227,7 +228,7 @@ public class SearchTreeSizeTest {
     // PVS
     search.config.USE_PVS = true;
     search.config.USE_PVS_ORDERING = true;
-    result.tests.add(measureTreeSize(search, position, searchMode, "BASE", true));
+    result.tests.add(measureTreeSize(search, position, searchMode, "PVS", true));
 
     // Aspiration
     search.config.USE_ASPIRATION_WINDOW = true;
