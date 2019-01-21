@@ -40,7 +40,7 @@ public class TimingTests {
 
     int ROUNDS = 5;
     int ITERATIONS = 50;
-    int REPETITIONS = 2000000;
+    int REPETITIONS = 100000000;
 
     for (int round = 0; round < ROUNDS; round++) {
       long start = 0, end = 0, sum = 0;
@@ -82,15 +82,27 @@ public class TimingTests {
 
   }
 
+  boolean TEST_B = true;
+  int TEST_I = 1;
+  long TEST = 1;
+
   private void test1() {
-    final long longValue = (long) Math.abs(Math.random() * Long.MAX_VALUE);
-    int test = (int) (longValue % Integer.MAX_VALUE);
-//    System.out.println("Test1: "+test);
+    if (TEST_B) {
+        TEST++;
+        if (TEST < 0) TEST_B = false;
+    }
+    //final long longValue = (long) Math.abs(Math.random() * Long.MAX_VALUE);
+    //int test = (int) (longValue % Integer.MAX_VALUE);
+    //System.out.println("Test1: "+test);
   }
 
   private void test2() {
-    final long longValue = (long) Math.abs(Math.random() * Long.MAX_VALUE);
-    int test = (int) (longValue ^ (longValue >>> 32));
-//    System.out.println("Test2: "+test);
+    if (TEST_I != 0) {
+      TEST++;
+      if (TEST < 0) TEST_I = 0;
+    }
+    //final long longValue = (long) Math.abs(Math.random() * Long.MAX_VALUE);
+    //int test = (int) (longValue ^ (longValue >>> 32));
+    //System.out.println("Test2: "+test);
   }
 }
