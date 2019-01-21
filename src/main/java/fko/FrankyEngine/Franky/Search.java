@@ -45,9 +45,11 @@ import java.util.concurrent.CountDownLatch;
  * the search is finished it calls <code>engine.sendResult</code> ith the best move and a ponder
  * move if it has one.
  * <p>
+ * FIXME: MTDf has different result
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: More extensions and reductions
  * TODO: Lazy SMP
+ *
  */
 public class Search implements Runnable {
 
