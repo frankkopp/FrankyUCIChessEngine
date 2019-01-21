@@ -114,7 +114,7 @@ public class SearchTest {
   public void testIterativeSearch() {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 0, null, false, true, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 5, 0, null, false, true, false);
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);

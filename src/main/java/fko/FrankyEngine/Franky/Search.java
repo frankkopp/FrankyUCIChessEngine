@@ -34,8 +34,8 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.directory.SearchResult;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -78,6 +78,7 @@ public class Search implements Runnable {
   private static final int     FRONTIER         = 1;
   private static final int     PRE_FRONTIER     = 2;
   private static final int     PRE_PRE_FRONTIER = 3;
+  private static final int     MAX_MOVES        = 128;
 
   // search counters
   private final SearchCounter searchCounter;
@@ -135,6 +136,9 @@ public class Search implements Runnable {
   private SearchResult lastSearchResult;
   private long         uciUpdateTicker;
   private boolean      hadBookMove = false;
+
+  // counter for cut off to measure qualitiy of move ordering
+  private long[] betaCutOffs = new long[MAX_MOVES];
 
   /**
    * Creates a search object and stores a back reference to the engine object and also the
@@ -304,6 +308,9 @@ public class Search implements Runnable {
 
     // age TT entries
     transpositionTable.ageEntries();
+
+    // init betaCutOff counter
+    for (int i = 0; i < MAX_MOVES; i++) betaCutOffs[i] = 0;
 
     // print info about search mode
     if (isPerftSearch()) {
@@ -540,7 +547,6 @@ public class Search implements Runnable {
       // ### @formatter:on
       // ###########################################
 
-
       assert value != Evaluation.MIN || stopSearch : "MIN value without STOPSEARCH";
       assert searchCounter.currentSearchDepth > 0 : "Current search depth <= 0";
 
@@ -607,14 +613,16 @@ public class Search implements Runnable {
     int g = f;
     int upperbound = Evaluation.MAX;
     int lowerbound = Evaluation.MIN;
-    LOG.debug("Start MDTf");
+    LOG.debug("Start MDTf with value={}", f);
     do {
-      if (g == lowerbound) beta = g + 1; else beta = g;
+      if (g == lowerbound) beta = g + 1;
+      else beta = g;
       g = search(position, depth, ROOT_PLY, beta - 1, beta, PV_NODE, DO_NULL);
-      if (g < beta) upperbound = g; else lowerbound = g;
+      if (g < beta) upperbound = g;
+      else lowerbound = g;
       mtdf_searches++;
     } while (lowerbound < upperbound);
-    LOG.debug("MDTf researches: {}", mtdf_searches);
+    LOG.debug("MDTf value {} researches: {}", g, mtdf_searches);
     return g;
   }
 
@@ -983,7 +991,7 @@ public class Search implements Runnable {
                 Move.toSimpleString(move), i, movesSize);
         }
         // store the current move
-        searchCounter.currentRootMoveNumber = i + 1;
+        searchCounter.currentRootMoveNumber = i;
         searchCounter.currentRootMove = move;
       }
 
@@ -1169,7 +1177,8 @@ public class Search implements Runnable {
         }
         value = -search(position, nDepth, ply + 1, -alpha - 1, -alpha, NPV_NODE, DO_NULL);
         if (value > alpha && value < beta && !stopSearch) {
-          searchCounter.pvs_root_researches++;
+          if (ROOT) searchCounter.pvs_root_researches++;
+          else searchCounter.pvs_researches++;
           if (TRACE) {
             trace("%sSearch in ply %d for depth %d: RE-SEARCH: %d/%d %s value=%d window %d/%d",
                   getSpaces(ply), ply, depth, i, rootMoves.size(), Move.toString(move), value,
@@ -1178,7 +1187,8 @@ public class Search implements Runnable {
           value = -search(position, nDepth, ply + 1, -beta, -alpha, PV_NODE, DO_NULL);
         }
         else {
-          searchCounter.pvs_root_cutoffs++;
+          if (ROOT) searchCounter.pvs_root_cutoffs++;
+          else searchCounter.pvs_cutoffs++;
         }
       }
       // ### END PVS ROOT_PLY SEARCH
@@ -1222,27 +1232,28 @@ public class Search implements Runnable {
         // If we found a move that is better or equal than beta this means that the
         // opponent can/will avoid this position altogether so we can stop search
         // this node
-        if(value >= beta && config.USE_ALPHABETA_PRUNING){ // fail-high
-            // save killer moves so they will be search earlier on following nodes
-            if (config.USE_KILLER_MOVES && Move.getTarget(move) == Piece.NOPIECE) {
-              if (!killerMoves[ply].pushToHeadStable(move)) {
-                killerMoves[ply].addFront(move);
-                while (killerMoves[ply].size() > config.NO_KILLER_MOVES) {
-                  killerMoves[ply].removeLast(); // keep size stable
-                }
+        if (value >= beta && config.USE_ALPHABETA_PRUNING) { // fail-high
+          // save killer moves so they will be search earlier on following nodes
+          if (config.USE_KILLER_MOVES && Move.getTarget(move) == Piece.NOPIECE) {
+            if (!killerMoves[ply].pushToHeadStable(move)) {
+              killerMoves[ply].addFront(move);
+              while (killerMoves[ply].size() > config.NO_KILLER_MOVES) {
+                killerMoves[ply].removeLast(); // keep size stable
               }
             }
-            searchCounter.prunings++;
-            ttType = TT_EntryType.BETA;
-            if (TRACE) {
-              trace("%sSearch in ply %d for depth %d: CUT NODE %d > %d (beta)", getSpaces(ply), ply,
-                    depth, value, beta);
-            }
-            // store the bestNodeMove any way as this is the a refutation and
-            // should be checked in other nodes very early
-            storeTT(position, value, ttType, depth, bestNodeMove, mateThreat[ply]);
-            return value; // return beta in a fail-hard / value in fail-soft
           }
+          searchCounter.prunings++;
+          if (i < MAX_MOVES) betaCutOffs[i - 1]++;
+          ttType = TT_EntryType.BETA;
+          if (TRACE) {
+            trace("%sSearch in ply %d for depth %d: CUT NODE %d > %d (beta)", getSpaces(ply), ply,
+                  depth, value, beta);
+          }
+          // store the bestNodeMove any way as this is the a refutation and
+          // should be checked in other nodes very early
+          storeTT(position, value, ttType, depth, bestNodeMove, mateThreat[ply]);
+          return value; // return beta in a fail-hard / value in fail-soft
+        }
 
         // Did we find a better move than in previous nodes then this is our new
         // PV and best move for this ply.
@@ -1545,6 +1556,7 @@ public class Search implements Runnable {
         if (value >= beta) { // fail-high
           if (config.USE_ALPHABETA_PRUNING && !PERFT) {
             searchCounter.prunings++;
+            if (i < MAX_MOVES) betaCutOffs[i]++;
             if (TRACE) {
               trace("%sQuiescence in ply %d: CUT NODE %d > %d (beta)", getSpaces(ply), ply, value,
                     beta);
@@ -1973,12 +1985,10 @@ public class Search implements Runnable {
   private void printSearchResultInfo() {
     if (LOG.isInfoEnabled()) {
       LOG.info("{}", String.format(
-        "Search complete. " + "Nodes visited: %,d " + "Boards Evaluated: %,d (+%,d) "
-        + "Captures: %,d " + "EP: %,d " + "Checks: %,d " + "Mates: %,d ",
+        "Search complete. Nodes visited: %,d Boards Evaluated: %,d (+%,d) re-pvs-root=%d re-asp=%d betaCutOffs=%s",
         searchCounter.nodesVisited, searchCounter.leafPositionsEvaluated,
-        searchCounter.nonLeafPositionsEvaluated, searchCounter.captureCounter,
-        searchCounter.enPassantCounter, searchCounter.checkCounter,
-        searchCounter.checkMateCounter));
+        searchCounter.nonLeafPositionsEvaluated, searchCounter.pvs_root_researches,
+        searchCounter.aspirationResearches, Arrays.toString(betaCutOffs)));
       LOG.info(searchCounter.toString());
       LOG.info("Search Depth was {} ({})", searchCounter.currentSearchDepth,
                searchCounter.currentExtraSearchDepth);
