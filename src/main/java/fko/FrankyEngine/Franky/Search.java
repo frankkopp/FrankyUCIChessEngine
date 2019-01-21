@@ -516,6 +516,7 @@ public class Search implements Runnable {
       // ### CALL SEARCH for depth    @formatter:off
       // ###
       // MTDf just for debugging for now
+      // https://www.chessprogramming.org/Debugging
       if (config.USE_MTDf
           && depth >= config.MTDf_START_DEPTH
           && !PERFT
@@ -593,7 +594,7 @@ public class Search implements Runnable {
   }
 
   /**
-   *
+   * MTDf Search
    * https://askeplaat.wordpress.com/534-2/mtdf-algorithm/
    * @param position
    * @param f
@@ -601,16 +602,19 @@ public class Search implements Runnable {
    * @return
    */
   private int mtdf_search(Position position, int f, int depth) {
+    int mtdf_searches = 0;
     int beta;
     int g = f;
     int upperbound = Evaluation.MAX;
     int lowerbound = Evaluation.MIN;
+    LOG.debug("Start MDTf");
     do {
       if (g == lowerbound) beta = g + 1; else beta = g;
       g = search(position, depth, ROOT_PLY, beta - 1, beta, PV_NODE, DO_NULL);
       if (g < beta) upperbound = g; else lowerbound = g;
-      //searchCounter.mtdf_searches++;
+      mtdf_searches++;
     } while (lowerbound < upperbound);
+    LOG.debug("MDTf researches: {}", mtdf_searches);
     return g;
   }
 

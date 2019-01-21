@@ -113,15 +113,17 @@ public class Configuration {
   public int     NO_KILLER_MOVES  = 2;
 
   /**
-   * Principal Variation Search
+   * NTDf Search
+   * for Debugging
+   * https://www.chessprogramming.org/Debugging
    */
-  public boolean USE_PVS = false;
+  public boolean USE_MTDf = false;
+  public int     MTDf_START_DEPTH = 5;
 
   /**
    * Principal Variation Search
    */
-  public boolean USE_MTDf = false;
-  public int     MTDf_START_DEPTH = 5;
+  public boolean USE_PVS = false;
 
   /**
    * Push last PV move to search first position for iterations.
