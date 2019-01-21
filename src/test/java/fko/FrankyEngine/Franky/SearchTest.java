@@ -114,7 +114,7 @@ public class SearchTest {
   public void testIterativeSearch() {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, true, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 0, null, false, true, false);
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
     assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
@@ -271,24 +271,27 @@ public class SearchTest {
   @Test
   public void testMultipleStartAndStopSearch() throws InterruptedException {
     String fen = Position.STANDARD_BOARD_FEN;
+    fen = "8/2P5/1P2r3/8/1bBP2Rp/4k2P/5r2/3K4 w - -";
     Position position = new Position(fen);
+
     // Test start and stop search
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 50; i++) {
       SearchMode searchMode =
-        new SearchMode(0, 0, 0, 0, 0, 10000, 0, 0, 0, null, false, false, false);
+        new SearchMode(0, 0, 0, 0, 0, 5000, 0, 0, 0, null, false, false, false);
+
       search.startSearch(position, searchMode);
-
       Thread.sleep(new Random().nextInt(1000) + 100);
-
       search.stopSearch();
 
       assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+
       if (search.getLastSearchResult().bestMove == Move.NOMOVE) {
         System.out.println(search.getLastSearchResult());
         System.out.println();
       }
       assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE
-                 || search.getLastSearchResult().resultValue == -Evaluation.CHECKMATE);
+                 || search.getLastSearchResult().resultValue == Evaluation.MIN);
+      assertTrue(search.getLastSearchResult().resultValue != Evaluation.MIN);
     }
   }
 
@@ -396,7 +399,7 @@ public class SearchTest {
     position.makeMove(Move.fromUCINotation(position, "g8h7"));
     // next white move would be 3-fold draw
 
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 0, null, false, false, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 0, null, false, true, false);
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
     assertEquals("d8h4", Move.toSimpleString(search.getLastSearchResult().bestMove));
@@ -436,12 +439,12 @@ public class SearchTest {
       String fen = "6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -";
       Position position = new Position(fen);
 
-      SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, false, false);
+      SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, true, false);
       search.startSearch(position, searchMode);
       search.waitWhileSearching();
       assertEquals("e7e3", Move.toSimpleString(search.getLastSearchResult().bestMove));
-      assertEquals(-Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
-                   search.getLastSearchResult().resultValue);
+//      assertEquals(-Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+//                   search.getLastSearchResult().resultValue);
       LOG.warn("Best Move: {} Value: {} Ponder {}",
                Move.toSimpleString(search.getLastSearchResult().bestMove),
                search.getLastSearchResult().resultValue / 100f,
@@ -453,16 +456,31 @@ public class SearchTest {
       String fen = "6k1/p3q2p/1nr3pB/8/3Q1P2/6P1/PP5P/3R2K1 b - -";
       Position position = new Position(fen);
 
+      SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, true, false);
+      search.startSearch(position, searchMode);
+      search.waitWhileSearching();
+      assertEquals("c6d6", Move.toSimpleString(search.getLastSearchResult().bestMove));
+//      assertEquals(-Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+//                   search.getLastSearchResult().resultValue);
+      LOG.warn("Best Move: {} Value: {} Ponder {}",
+               Move.toSimpleString(search.getLastSearchResult().bestMove),
+               search.getLastSearchResult().resultValue / 100f,
+               Move.toSimpleString(search.getLastSearchResult().ponderMove));
+
     }
 
   }
 
   @Test
   void TT_Root_Test() {
+
+    search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_TT_ROOT = true;
+
     String fen = Position.STANDARD_BOARD_FEN;
     fen = "8/6R1/1rp1k3/6p1/3KPp1p/5P1P/8/8 b - -";
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 12, 0, null, false, true, false);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 8, 0, null, false, true, false);
 
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
@@ -470,7 +488,7 @@ public class SearchTest {
     //    position.makeMove(Move.fromSANNotation(position, "e4"));
     //    position.makeMove(Move.fromSANNotation(position, "e5"));
 
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 14, 0, null, false, true, false);
+    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 10, 0, null, false, true, false);
 
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
@@ -484,7 +502,7 @@ public class SearchTest {
     SearchMode searchMode;
     Position position;
 
-    int maxDepth = 8;
+    int maxDepth = 4;
     int moveTime = 0;
     int mateIn = 0;
     boolean infinite = true;
@@ -614,17 +632,17 @@ public class SearchTest {
     // these should not change result
     search.config.USE_ALPHABETA_PRUNING = true;
     search.config.USE_PVS = true;
-    search.config.USE_PVS_MOVE_ORDERING = true;
+    search.config.USE_PVS_ORDERING = true;
     search.config.USE_KILLER_MOVES = true;
     search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.USE_MATE_DISTANCE_PRUNING = true;
-    search.config.USE_MINOR_PROMOTION_PRUNING = true;
+    search.config.USE_MDP = true;
+    search.config.USE_MPP = true;
 
     // these can change result
     // some of these make the search miss this mate at higher depths
     // might be a consequence from these "optimizations" might be a bug
-    search.config.USE_NULL_MOVE_PRUNING = true;
-    search.config.NULL_MOVE_DEPTH = 2;
+    search.config.USE_NMP = true;
+    search.config.NMP_DEPTH = 2;
     search.config.USE_VERIFY_NMP = true;
     search.config.NMP_VERIFICATION_DEPTH = 3;
 
@@ -661,21 +679,21 @@ public class SearchTest {
 
     search.config.USE_ALPHABETA_PRUNING = true;
     search.config.USE_PVS = true;
-    search.config.USE_PVS_MOVE_ORDERING = true;
+    search.config.USE_PVS_ORDERING = true;
     search.config.USE_KILLER_MOVES = true;
     search.config.USE_ASPIRATION_WINDOW = true;
-    search.config.USE_MATE_DISTANCE_PRUNING = true;
-    search.config.USE_MINOR_PROMOTION_PRUNING = true;
+    search.config.USE_MDP = true;
+    search.config.USE_MPP = true;
 
     search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_TT_ROOT = true;
 
-    search.config.USE_NULL_MOVE_PRUNING = true;
-    search.config.NULL_MOVE_DEPTH = 2;
+    search.config.USE_NMP = true;
+    search.config.NMP_DEPTH = 2;
     search.config.USE_VERIFY_NMP = true;
     search.config.NMP_VERIFICATION_DEPTH = 3;
 
-    search.config.USE_RF_PRUNING = true;
+    search.config.USE_RFP = true;
     search.config.USE_RAZOR_PRUNING = true;
     search.config.USE_LMR = true;
 
@@ -783,13 +801,13 @@ public class SearchTest {
     search.config.USE_ALPHABETA_PRUNING = true;
     search.config.USE_ASPIRATION_WINDOW = true;
     search.config.USE_PVS = true;
-    search.config.USE_PVS_MOVE_ORDERING = true;
+    search.config.USE_PVS_ORDERING = true;
     search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.USE_MATE_DISTANCE_PRUNING = true;
-    search.config.USE_MINOR_PROMOTION_PRUNING = true;
+    search.config.USE_MDP = true;
+    search.config.USE_MPP = true;
     search.config.USE_QUIESCENCE = true;
-    search.config.USE_NULL_MOVE_PRUNING = true;
-    search.config.USE_RF_PRUNING = true;
+    search.config.USE_NMP = true;
+    search.config.USE_RFP = true;
     search.config.USE_RAZOR_PRUNING = true;
     search.config.USE_KILLER_MOVES = true;
     search.config.USE_LMR = true;
