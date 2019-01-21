@@ -251,6 +251,7 @@ public class TranspositionTable {
    * Mark all entries unused and clear for overwriting
    */
   public void ageEntries() {
+    // for() is about 60% slower than  parallel()
     IntStream.range(0, entries.length)
              .parallel()
              .filter(i -> entries[i].key != 0)
