@@ -109,6 +109,8 @@ public class MoveGenerator {
    * @param position
    */
   public void setPosition(Position position) {
+    // TODO: Optimize when the position given is already our position
+    //  this happens when PVS re-searches are done
     assert position != null : "parameter null not allowed";
     this.position = position;
     this.activePlayer = position.getNextPlayer();
