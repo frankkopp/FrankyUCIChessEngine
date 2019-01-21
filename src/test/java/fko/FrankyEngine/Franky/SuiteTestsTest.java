@@ -40,8 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * https://www.chessprogramming.org/Test-Positions#Test_Suites
  * http://www.bergbomconsulting.se/chess/testsuites.html
  * <p>
- * TODO: Implement test set testing
- * TODO: Implement reading test sets from file - Extended Position Description (EPD)
  * https://www.chessprogramming.org/Extended_Position_Description
  */
 public class SuiteTestsTest {
@@ -62,9 +60,12 @@ public class SuiteTestsTest {
   @Test
   void startFrankySuite() {
     /*
-    Frank 0.10 - 10sec
+    Franky 0.10 - 10sec
     Successful:   9 (75 Prozent)
     Failed:       2 (16 Prozent)
+    Franky 0.11 - 10sec
+    Successful:  10 (83 Prozent)
+    Failed:       1 (8 Prozent)
      */
     testSuite = new TestSuite("./testsets/franky_tests.epd");
     testSuite.setSearchTime(10000);
@@ -74,11 +75,26 @@ public class SuiteTestsTest {
   @Test
   void startMateSuite() {
     /*
-    Frank 0.10 - 10sec
+    Franky 0.10 - 10sec
     Successful:  11 (55 Prozent)
     Failed:       9 (45 Prozent)
+    Franky 0.11 - 10sec
+    Successful:   9 (45 Prozent)
+    Failed:      11 (55 Prozent)
      */
     testSuite = new TestSuite("./testsets/mate_test_suite.epd");
+    testSuite.setSearchTime(10000);
+    testSuite.startTests();
+  }
+
+  @Test
+  void startNullMOveZuzwangSuite() {
+    /*
+    Franky-0.11 - 10sec
+    Successful:   4 (80 Prozent)
+    Failed:       1 (20 Prozent)
+    */
+    testSuite = new TestSuite("./testsets/nullMoveZufZwangTest.epd");
     testSuite.setSearchTime(10000);
     testSuite.startTests();
   }
@@ -90,7 +106,10 @@ public class SuiteTestsTest {
     Frank 0.10 - 10sec
     Successful: 375 (48 Prozent)
     Failed:     394 (51 Prozent)
-     */
+    Franky-0.11 - 10sec
+    Successful: 376 (48 Prozent)
+    Failed:     393 (51 Prozent)
+    */
     testSuite = new TestSuite("./testsets/ecm98.epd");
     testSuite.setSearchTime(10000);
     testSuite.startTests();
@@ -98,12 +117,27 @@ public class SuiteTestsTest {
 
   @Test
   @Disabled
-  void startTestSuite() {
+  void startWACSuite() {
     /*
-    Frank 0.10 - 10sec
+
+    */
+    testSuite = new TestSuite("./testsets/wac.epd");
+    testSuite.setSearchTime(10000);
+    testSuite.startTests();
+  }
+
+  @Test
+  @Disabled
+  void startDefaultTestSuite() {
+    /*
+    Franky-0.10 - 10sec
     Successful: 172 (49 Prozent)
     Failed:     174 (50 Prozent)
+    Franky-0.11 - 10sec
+    Successful: 157 (45 Prozent)
+    Failed:     189 (54 Prozent)
     */
+    // ./testsets/crafty_test.epd
     testSuite.setSearchTime(5000);
     testSuite.startTests();
   }
@@ -113,21 +147,18 @@ public class SuiteTestsTest {
 
     // bm test time limited
     assertTrue(
-      testSuite
-        .startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
-                      5000, 0));
+      testSuite.startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
+                             5000, 0));
 
     // bm test depth limited
     assertTrue(
-      testSuite
-        .startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
-                      0, 8));
+      testSuite.startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;", 0,
+                             8));
 
     // bm test time & depth limited
     assertTrue(
-      testSuite
-        .startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
-                      5000, 8));
+      testSuite.startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
+                             5000, 8));
 
   }
 
@@ -135,22 +166,13 @@ public class SuiteTestsTest {
   void startOneMateTest() {
 
     // dm test depth limited
-    assertTrue(
-      testSuite
-        .startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;",
-                      0, 12));
+    assertTrue(testSuite.startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;", 0, 12));
 
     // dm test time limited
-    assertTrue(
-      testSuite
-        .startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;",
-                      10000, 0));
+    assertTrue(testSuite.startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;", 10000, 0));
 
     // dm test depth limited
-    assertTrue(
-      testSuite
-        .startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;",
-                      10000, 16));
+    assertTrue(testSuite.startOneTest("8/8/8/8/8/3K4/R7/5k2 w - - dm 4;", 10000, 16));
   }
 
   @Test
