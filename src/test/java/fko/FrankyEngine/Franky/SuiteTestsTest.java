@@ -119,7 +119,9 @@ public class SuiteTestsTest {
   @Disabled
   void startWACSuite() {
     /*
-
+    0.11 BASE
+    Successful: 110 (36 Prozent)
+    Failed:     190 (63 Prozent)
     */
     testSuite = new TestSuite("./testsets/wac.epd");
     testSuite.setSearchTime(10000);
