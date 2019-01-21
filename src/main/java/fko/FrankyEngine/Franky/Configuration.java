@@ -101,7 +101,6 @@ public class Configuration {
    */
   public boolean USE_QUIESCENCE = false;
 
-
   /**
    * Use AlphaBeta Pruning
    */
@@ -117,6 +116,12 @@ public class Configuration {
    * Principal Variation Search
    */
   public boolean USE_PVS = false;
+
+  /**
+   * Principal Variation Search
+   */
+  public boolean USE_MTDf = false;
+  public int     MTDf_START_DEPTH = 5;
 
   /**
    * Push last PV move to search first position for iterations.

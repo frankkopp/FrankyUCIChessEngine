@@ -218,15 +218,21 @@ public class SearchTreeSizeTest {
     search.config.NO_KILLER_MOVES = 2;
     result.tests.add(measureTreeSize(search, position, searchMode, "ALPHABETA", true));
 
+    // MTDf - just for debugging for now
+    search.config.USE_MTDf = true;
+    search.config.MTDf_START_DEPTH = 2;
+    result.tests.add(measureTreeSize(search, position, searchMode, "MTDf", true));
+    search.config.USE_MTDf = false;
+
     // PVS
     search.config.USE_PVS = true;
     search.config.USE_PVS_ORDERING = true;
     result.tests.add(measureTreeSize(search, position, searchMode, "BASE", true));
 
     // Aspiration
-//    search.config.USE_ASPIRATION_WINDOW = true;
-//    search.config.ASPIRATION_START_DEPTH = 2;
-//    result.tests.add(measureTreeSize(search, position, searchMode, "ASPIRATION", true));
+    search.config.USE_ASPIRATION_WINDOW = true;
+    search.config.ASPIRATION_START_DEPTH = 2;
+    result.tests.add(measureTreeSize(search, position, searchMode, "ASPIRATION", true));
 
     // Minor Pruning
     search.config.USE_MDP = true;

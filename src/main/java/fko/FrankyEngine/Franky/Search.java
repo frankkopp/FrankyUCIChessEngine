@@ -489,7 +489,7 @@ public class Search implements Runnable {
     if (rootMoves.size() == 1) {
       singleReply[ROOT_PLY] = true;
       // reduce time for this move
-      if (searchMode.isTimeControl()) addExtraTime(0.5);
+      if (searchMode.isTimeControl()) addExtraTime(1.5);
     }
     else {
       singleReply[ROOT_PLY] = false;
@@ -512,17 +512,33 @@ public class Search implements Runnable {
 
       int value;
 
-      // @formatter:off
-      if (config.USE_ASPIRATION_WINDOW
+      // ###########################################
+      // ### CALL SEARCH for depth    @formatter:off
+      // ###
+      // MTDf just for debugging for now
+      if (config.USE_MTDf
+          && depth >= config.MTDf_START_DEPTH
+          && !PERFT
+          && bestRootValue != Evaluation.NOVALUE
+      ) {
+        assert !config.USE_PVS : "If using MTDf PVS should turned off";
+        value = mtdf_search(position, searchCounter.currentBestRootValue, depth);
+      }
+      // ASPIRATION yet not efficient
+      else if (config.USE_ASPIRATION_WINDOW
           && depth >= config.ASPIRATION_START_DEPTH
           && !PERFT
           && bestRootValue != Evaluation.NOVALUE
       ) {
+        assert !config.USE_MTDf : "If using Aspiration MTDF should be turned off";
         value = aspiration_search(position, depth, bestRootValue);
-      } else {
+      }
+      else {
         value = search(position, depth, ROOT_PLY,alpha, beta, PV_NODE, DO_NULL);
       }
-      // @formatter:on
+      // ### @formatter:on
+      // ###########################################
+
 
       assert value != Evaluation.MIN || stopSearch : "MIN value without STOPSEARCH";
       assert searchCounter.currentSearchDepth > 0 : "Current search depth <= 0";
@@ -574,6 +590,28 @@ public class Search implements Runnable {
 
     if (TRACE) trace("Iterative deepening end");
     return searchResult;
+  }
+
+  /**
+   *
+   * https://askeplaat.wordpress.com/534-2/mtdf-algorithm/
+   * @param position
+   * @param f
+   * @param depth
+   * @return
+   */
+  private int mtdf_search(Position position, int f, int depth) {
+    int beta;
+    int g = f;
+    int upperbound = Evaluation.MAX;
+    int lowerbound = Evaluation.MIN;
+    do {
+      if (g == lowerbound) beta = g + 1; else beta = g;
+      g = search(position, depth, ROOT_PLY, beta - 1, beta, PV_NODE, DO_NULL);
+      if (g < beta) upperbound = g; else lowerbound = g;
+      //searchCounter.mtdf_searches++;
+    } while (lowerbound < upperbound);
+    return g;
   }
 
   /**
