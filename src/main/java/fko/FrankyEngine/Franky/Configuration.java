@@ -82,106 +82,111 @@ public class Configuration {
   //Mode _OB_Mode = Mode.SAN;
   //Mode _OB_Mode = Mode.SIMPLE;
 
-  /** ##################################################
+  /* ##################################################
    * OPTIMIZATIONS
-   * ###################################################*/
-
-  /**
-   * Do quiescence evaluation and search extension for non quiet positions
-   */
-  public boolean USE_QUIESCENCE = true;
-
-  /**
-   * Uses TT to determine best move of previous searches and also start depth
-   */
-  public boolean USE_TT_ROOT = true;
-
-  /**
-   * Push last PV move to search first position for iterations.
-   */
-  public boolean USE_PVS_MOVE_ORDERING = true;
-
-  /**
-   * Use AlphaBeta Pruning
-   */
-  public boolean USE_ALPHABETA_PRUNING = true;
-
-  /**
-   * Principal Variation Search
-   */
-  public boolean USE_PVS = true;
+   * ##################################################*/
 
   /**
    * Use Transposition Tables for visited nodes (needs extra memory)
    */
-  public boolean USE_TRANSPOSITION_TABLE = true;
+  public boolean USE_TRANSPOSITION_TABLE = false;
 
   /**
-   * Mate Distance Pruning
+   * Uses TT to determine best move of previous searches and also start depth
    */
-  public boolean USE_MATE_DISTANCE_PRUNING = true;
+  public boolean USE_TT_ROOT = false;
 
   /**
-   * Minor Promotion Pruning
+   * Do quiescence evaluation and search extension for non quiet positions
    */
-  public boolean USE_MINOR_PROMOTION_PRUNING = true;
+  public boolean USE_QUIESCENCE = false;
+
 
   /**
-   * Null Move Pruning
+   * Use AlphaBeta Pruning
    */
-  public boolean USE_NULL_MOVE_PRUNING  = true;
-  public int     NULL_MOVE_DEPTH        = 2;
-  public boolean USE_VERIFY_NMP         = true;
-  public int     NMP_VERIFICATION_DEPTH = 3;
-
-  /**
-   * Eval Pruning - early cut for low static evals
-   * Reverse Futility Pruning
-   * https://www.chessprogramming.org/Reverse_Futility_Pruning
-   */
-  public boolean USE_RF_PRUNING = true;
-  public int     RFP_DEPTH      = 2;
-  public int     RFP_MARGIN     = 300;
-
-  /**
-   * Razor  - early qsearch for low static evals
-   */
-  public boolean USE_RAZOR_PRUNING    = true;
-  public int     RAZOR_PRUNING_DEPTH  = 3;
-  public int     RAZOR_PRUNING_MARGIN = 600;
+  public boolean USE_ALPHABETA_PRUNING = false;
 
   /**
    * Killer moves - move which caused cut offs in previous iterations
    */
-  public boolean USE_KILLER_MOVES = true;
+  public boolean USE_KILLER_MOVES = false;
   public int     NO_KILLER_MOVES  = 2;
 
   /**
-   * Futility Pruning
+   * Principal Variation Search
    */
-  public boolean USE_FUTILITY_PRUNING = false;
-  public int     FP_DEPTH             = 4;
+  public boolean USE_PVS = false;
 
   /**
-   * Late Move Pruning
+   * Push last PV move to search first position for iterations.
    */
-  public boolean USE_LMP       = false;
-  public int     LMP_DEPTH     = 4;
-  public int     LMP_MIN_MOVES = 4;
-  /**
-   * Late Move Reduction
-   */
-  public boolean USE_LMR       = true;
-  public int     LMR_MIN_DEPTH = 3;
-  public int     LMR_REDUCTION = 2;
+  public boolean USE_PVS_ORDERING = false;
 
   /**
    * Use Aspiration Window in root search
    * TODO: Make evaluation more stable between different depths - otherwise
    * Aspiration will not be efficient.
    */
-  public boolean USE_ASPIRATION_WINDOW  = true;
+  public boolean USE_ASPIRATION_WINDOW  = false;
   public int     ASPIRATION_START_DEPTH = 5;
+
+  /**
+   * Mate Distance Pruning
+   */
+  public boolean USE_MDP = false;
+
+  /**
+   * Minor Promotion Pruning
+   */
+  public boolean USE_MPP = false;
+
+  /**
+   * Eval Pruning - early cut for low static evals
+   * Reverse Futility Pruning
+   * https://www.chessprogramming.org/Reverse_Futility_Pruning
+   */
+  public boolean USE_RFP    = false;
+  public int     RFP_MARGIN = 300;
+
+  /**
+   * Null Move Pruning
+   */
+  public boolean USE_NMP                = false;
+  public int     NMP_DEPTH              = 3;
+  public boolean USE_VERIFY_NMP         = true;
+  public int     NMP_VERIFICATION_DEPTH = 3;
+
+  /**
+   * Razor  - early qsearch for low static evals
+   * https://www.chessprogramming.org/Razoring
+   */
+  public boolean USE_RAZOR_PRUNING = false;
+  public int     RAZOR_DEPTH       = 3;
+  public int     RAZOR_MARGIN      = 600;
+
+  /**
+   * Limited Razoring
+   * http://people.csail.mit.edu/heinz/dt/node18.html
+   */
+  public boolean USE_LIMITED_RAZORING = false;
+  public boolean USE_EXTENDED_FUTILITY_PRUNING = false;
+  public boolean USE_FUTILITY_PRUNING = false;
+
+  /**
+   * Late Move Pruning
+   */
+  public boolean USE_LMP       = false;
+  public int     LMP_MIN_DEPTH = 3;
+  public int     LMP_MIN_MOVES = 6;
+  /**
+   * Late Move Reduction
+   */
+  public boolean USE_LMR       = false;
+  public int     LMR_MIN_DEPTH = 3;
+  public int     LMR_MIN_MOVES = 3;
+  public int     LMR_REDUCTION = 1;
+
 
   /**
    * Use LAZY SMP - not sofisticated multithreading to fill up the TT quicker
@@ -209,21 +214,25 @@ public class Configuration {
 
   @Override
   public String toString() {
-    return "Configuration{" + "PERFT=" + PERFT + " HASH_SIZE=" + HASH_SIZE + " PONDER=" + PONDER
-           + " DEBUG=" + DEBUG + " UCI_ShowCurrLine=" + UCI_ShowCurrLine + " USE_BOOK=" + USE_BOOK
-           + " OB_FolderPath='" + OB_FolderPath + '\'' + " OB_fileNamePlain='" + OB_fileNamePlain
-           + '\'' + " OB_Mode=" + OB_Mode + " USE_QUIESCENCE=" + USE_QUIESCENCE
-           + " USE_PVS_MOVE_ORDERING=" + USE_PVS_MOVE_ORDERING + " USE_ALPHABETA_PRUNING="
-           + USE_ALPHABETA_PRUNING + " USE_PVS=" + USE_PVS + " USE_TRANSPOSITION_TABLE="
-           + USE_TRANSPOSITION_TABLE + " USE_MATE_DISTANCE_PRUNING=" + USE_MATE_DISTANCE_PRUNING
-           + " USE_MINOR_PROMOTION_PRUNING=" + USE_MINOR_PROMOTION_PRUNING
-           + " USE_NULL_MOVE_PRUNING=" + USE_NULL_MOVE_PRUNING + " NULL_MOVE_DEPTH="
-           + NULL_MOVE_DEPTH + " USE_RF_PRUNING=" + USE_RF_PRUNING + " RFP_DEPTH=" + RFP_DEPTH
-           + " RFP_MARGIN=" + RFP_MARGIN + " USE_RAZOR_PRUNING=" + USE_RAZOR_PRUNING
-           + " RAZOR_PRUNING_DEPTH=" + RAZOR_PRUNING_DEPTH + " RAZOR_PRUNING_MARGIN="
-           + RAZOR_PRUNING_MARGIN + " USE_KILLER_MOVES=" + USE_KILLER_MOVES + " USE_SORT_ALL_MOVES="
-           + USE_SORT_ALL_MOVES + " USE_LMR=" + USE_LMR + " LMR_MIN_DEPTH=" + LMR_MIN_DEPTH
-           + " LMR_REDUCTION=" + LMR_REDUCTION + " USE_ASPIRATION_WINDOW=" + USE_ASPIRATION_WINDOW
-           + '}';
+    return "Configuration{" + "PERFT=" + PERFT + ", HASH_SIZE=" + HASH_SIZE + ", PONDER=" + PONDER
+           + ", DEBUG=" + DEBUG + ", UCI_ShowCurrLine=" + UCI_ShowCurrLine + ", USE_BOOK="
+           + USE_BOOK + ", OB_FolderPath='" + OB_FolderPath + '\'' + ", OB_fileNamePlain='"
+           + OB_fileNamePlain + '\'' + ", OB_Mode=" + OB_Mode + ", USE_QUIESCENCE=" + USE_QUIESCENCE
+           + ", USE_ALPHABETA_PRUNING=" + USE_ALPHABETA_PRUNING + ", USE_KILLER_MOVES="
+           + USE_KILLER_MOVES + ", NO_KILLER_MOVES=" + NO_KILLER_MOVES + ", USE_PVS=" + USE_PVS
+           + ", USE_PVS_ORDERING=" + USE_PVS_ORDERING + ", USE_TRANSPOSITION_TABLE="
+           + USE_TRANSPOSITION_TABLE + ", USE_TT_ROOT=" + USE_TT_ROOT + ", USE_ASPIRATION_WINDOW="
+           + USE_ASPIRATION_WINDOW + ", ASPIRATION_START_DEPTH=" + ASPIRATION_START_DEPTH
+           + ", USE_MDP=" + USE_MDP + ", USE_MPP=" + USE_MPP + ", USE_RFP=" + USE_RFP
+           + ", RFP_MARGIN=" + RFP_MARGIN + ", USE_NMP=" + USE_NMP + ", NMP_DEPTH=" + NMP_DEPTH
+           + ", USE_VERIFY_NMP=" + USE_VERIFY_NMP + ", NMP_VERIFICATION_DEPTH="
+           + NMP_VERIFICATION_DEPTH + ", USE_RAZOR_PRUNING=" + USE_RAZOR_PRUNING + ", RAZOR_DEPTH="
+           + RAZOR_DEPTH + ", RAZOR_MARGIN=" + RAZOR_MARGIN + ", USE_LIMITED_RAZORING="
+           + USE_LIMITED_RAZORING + ", USE_EXTENDED_FUTILITY_PRUNING="
+           + USE_EXTENDED_FUTILITY_PRUNING + ", USE_FUTILITY_PRUNING=" + USE_FUTILITY_PRUNING
+           + ", USE_LMP=" + USE_LMP + ", LMP_MIN_DEPTH=" + LMP_MIN_DEPTH + ", LMP_MIN_MOVES="
+           + LMP_MIN_MOVES + ", USE_LMR=" + USE_LMR + ", LMR_MIN_DEPTH=" + LMR_MIN_DEPTH
+           + ", LMR_MIN_MOVES=" + LMR_MIN_MOVES + ", LMR_REDUCTION=" + LMR_REDUCTION
+           + ", USE_SORT_ALL_MOVES=" + USE_SORT_ALL_MOVES + '}';
   }
 }
