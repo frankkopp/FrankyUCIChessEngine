@@ -112,8 +112,8 @@ public class Search implements Runnable {
   // Move Generators - each depth in search gets it own to avoid object creation during search
   private final MoveGenerator[] moveGenerators;
   // to store the best move or principal variation we need to generate the move sequence backwards
-  private final MoveList[]      principalVariation;
   // in the recursion. This field stores the pv for each ply so far
+  private final MoveList[]      principalVariation;
   // killer move lists per ply
   private       MoveList[]      killerMoves;
   // remember if there have been mate threads in a ply
@@ -275,8 +275,8 @@ public class Search implements Runnable {
    * Calls <code>iterativeDeepening()</code> when search is initialized.
    * <p>
    * The finished search calls <code>Engine.sendResult(searchResult)</code> to
-   * store the result is it has found one. After storing the result
-   * the search is ended and the thread terminated.<br>
+   * store/hand over the result. After storing the result the search is ended 
+   * and the thread terminated.<br>
    */
   @Override
   public void run() {
