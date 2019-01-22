@@ -139,9 +139,6 @@ public class Search implements Runnable {
   private long         uciUpdateTicker;
   private boolean      hadBookMove = false;
 
-  // counter for cut off to measure qualitiy of move ordering
-  private long[] betaCutOffs = new long[MAX_MOVES];
-
   /**
    * Creates a search object and stores a back reference to the engine object and also the
    * used configuration instance.<br>
@@ -310,9 +307,6 @@ public class Search implements Runnable {
 
     // age TT entries
     transpositionTable.ageEntries();
-
-    // init betaCutOff counter
-    for (int i = 0; i < MAX_MOVES; i++) betaCutOffs[i] = 0;
 
     // print info about search mode
     if (isPerftSearch()) {
@@ -1243,7 +1237,7 @@ public class Search implements Runnable {
             }
           }
           searchCounter.prunings++;
-          if (i < MAX_MOVES) betaCutOffs[i - 1]++;
+          if (i < MAX_MOVES) searchCounter.betaCutOffs[i - 1]++;
           ttType = TT_EntryType.BETA;
           if (TRACE) {
             trace("%sSearch in ply %d for depth %d: CUT NODE %d > %d (beta)", getSpaces(ply), ply,
@@ -1558,7 +1552,7 @@ public class Search implements Runnable {
         if (value >= beta) { // fail-high
           if (config.USE_ALPHABETA_PRUNING && !PERFT) {
             searchCounter.prunings++;
-            if (i < MAX_MOVES) betaCutOffs[i]++;
+            if (i < MAX_MOVES) searchCounter.betaCutOffs[i]++;
             if (TRACE) {
               trace("%sQuiescence in ply %d: CUT NODE %d > %d (beta)", getSpaces(ply), ply, value,
                     beta);
@@ -1990,7 +1984,7 @@ public class Search implements Runnable {
         "Search complete. Nodes visited: %,d Boards Evaluated: %,d (+%,d) re-pvs-root=%d re-asp=%d betaCutOffs=%s",
         searchCounter.nodesVisited, searchCounter.leafPositionsEvaluated,
         searchCounter.nonLeafPositionsEvaluated, searchCounter.pvs_root_researches,
-        searchCounter.aspirationResearches, Arrays.toString(betaCutOffs)));
+        searchCounter.aspirationResearches, Arrays.toString(searchCounter.betaCutOffs)));
       LOG.info(searchCounter.toString());
       LOG.info("Search Depth was {} ({})", searchCounter.currentSearchDepth,
                searchCounter.currentExtraSearchDepth);
@@ -2237,6 +2231,9 @@ public class Search implements Runnable {
    */
   public class SearchCounter {
 
+    // counter for cut off to measure qualitiy of move ordering
+    private long[] betaCutOffs = new long[MAX_MOVES];
+
     // Info values
     int  currentBestRootMove     = Move.NOMOVE;
     int  currentBestRootValue    = Evaluation.NOVALUE;
@@ -2280,7 +2277,15 @@ public class Search implements Runnable {
     int  lmrReductions          = 0;
     int  aspirationResearches   = 0;
 
+    public SearchCounter() {
+      // init betaCutOff counter
+      for (int i = 0; i < MAX_MOVES; i++) betaCutOffs[i] = 0;
+    }
+
     private void resetCounter() {
+      // init betaCutOff counter
+      for (int i = 0; i < MAX_MOVES; i++) betaCutOffs[i] = 0;
+
       currentBestRootMove = Move.NOMOVE;
       currentBestRootValue = Evaluation.NOVALUE;
       currentIterationDepth = 0;
