@@ -75,7 +75,7 @@ public class SearchTreeSizeTest {
   public void sizeOfSearchTreeTest() throws ExecutionException, InterruptedException {
 
     final int NO_OF_TESTS = 5;
-    final int DEPTH = 5;
+    final int DEPTH = 4;
     HASH_SIZE = 2048;
     THREADS = 1;
 
@@ -83,6 +83,8 @@ public class SearchTreeSizeTest {
     List<String> fens = getFENs();
     List<Result> results = new ArrayList<>();
 
+    // ForkJoinPool allows to limit the number of threads for lambda .parallel
+    // to individual values.
     ForkJoinPool forkJoinPool = new ForkJoinPool(THREADS);
     forkJoinPool.submit(() -> fens.parallelStream()
                                   .limit(NO_OF_TESTS)
