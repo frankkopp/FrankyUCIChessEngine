@@ -275,7 +275,7 @@ public class Search implements Runnable {
    * Calls <code>iterativeDeepening()</code> when search is initialized.
    * <p>
    * The finished search calls <code>Engine.sendResult(searchResult)</code> to
-   * store/hand over the result. After storing the result the search is ended 
+   * store/hand over the result. After storing the result the search is ended
    * and the thread terminated.<br>
    */
   @Override
@@ -387,7 +387,7 @@ public class Search implements Runnable {
     int alpha = Evaluation.MIN;
     int beta = Evaluation.MAX;
     int bestRootValue = Evaluation.NOVALUE;
-    
+
     // clear principal Variation for root depth
     principalVariation[ROOT_PLY].clear();
 
@@ -434,7 +434,7 @@ public class Search implements Runnable {
     // current search depth
     searchCounter.currentSearchDepth = ROOT_PLY;
     searchCounter.currentExtraSearchDepth = ROOT_PLY;
- 
+
     // Do a TT lookup to try to find a first best move for this position and
     // maybe even be able to skip some iterations when a valid cache hit has been
     // found.
@@ -691,6 +691,7 @@ public class Search implements Runnable {
     if (stopSearch && (value <= alpha || value >= beta)) return bestValue;
 
     // ##########################################################
+    // 3rd aspiration
     // FAIL - full window search
     if (value <= alpha || value >= beta) {
       if (TRACE) {
@@ -1392,8 +1393,10 @@ public class Search implements Runnable {
         || hardTimeLimitReached()
         || (searchMode.getNodes() > 0
             && searchCounter.nodesVisited >= searchMode.getNodes())) {
-      if (TRACE) if (!stopSearch) trace("%sQuiescence in ply %d: STOPPED (time=%,d)",
+      if (TRACE) {
+        if (!stopSearch) trace("%sQuiescence in ply %d: STOPPED (time=%,d)",
                                         getSpaces(ply), ply, hardTimeLimit);
+      }
       stopSearch = true;
       return Evaluation.MIN; // value does ont matter because of top flag
     }
