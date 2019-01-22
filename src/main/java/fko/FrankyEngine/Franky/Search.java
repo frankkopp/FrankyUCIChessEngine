@@ -387,6 +387,9 @@ public class Search implements Runnable {
     int alpha = Evaluation.MIN;
     int beta = Evaluation.MAX;
     int bestRootValue = Evaluation.NOVALUE;
+    
+    // clear principal Variation for root depth
+    principalVariation[ROOT_PLY].clear();
 
     // prepare search result
     SearchResult searchResult = new SearchResult();
@@ -402,7 +405,7 @@ public class Search implements Runnable {
     // no iterative deepening
     int depth = searchMode.getStartDepth();
 
-    // if time based game setup the time soft and hard time limits
+    // if time based game setup the soft and hard time limits
     if (searchMode.isTimeControl()) configureTimeLimits();
 
     // add some extra time for the move after the last book move
@@ -431,10 +434,7 @@ public class Search implements Runnable {
     // current search depth
     searchCounter.currentSearchDepth = ROOT_PLY;
     searchCounter.currentExtraSearchDepth = ROOT_PLY;
-
-    // clear principal Variation for root depth
-    principalVariation[ROOT_PLY].clear();
-
+ 
     // Do a TT lookup to try to find a first best move for this position and
     // maybe even be able to skip some iterations when a valid cache hit has been
     // found.
@@ -481,15 +481,12 @@ public class Search implements Runnable {
     for (int i = 0; i < legalMoves.size(); i++) {
       if (searchMode.getMoves().isEmpty()) {
         rootMoves.add(legalMoves.get(i), Evaluation.NOVALUE);
-      }
-      else {
-        if (searchMode.getMoves().contains(Move.toUCINotation(position, legalMoves.get(i)))) {
+      } else if (searchMode.getMoves().contains(Move.toUCINotation(position, legalMoves.get(i)))) {
           rootMoves.add(legalMoves.get(i), Evaluation.NOVALUE);
-        }
       }
     }
 
-    // if we did not get a PV from the TT
+    // if we did not get a PV from the TT set a temporary PV
     if (principalVariation[ROOT_PLY].empty()) {
       principalVariation[ROOT_PLY].add(rootMoves.getMove(0));
     }
@@ -497,7 +494,7 @@ public class Search implements Runnable {
     // single reply in root
     if (rootMoves.size() == 1) {
       singleReply[ROOT_PLY] = true;
-      // reduce time for this move
+      // add time for this move
       if (searchMode.isTimeControl()) addExtraTime(1.5);
     }
     else {
