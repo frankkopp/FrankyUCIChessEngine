@@ -149,6 +149,11 @@ public class Configuration {
   public boolean USE_MPP = false;
 
   /**
+   * Use search depth extensions
+   */
+  public boolean USE_EXTENSIONS = false;
+
+  /**
    * Eval Pruning - early cut for low static evals
    * Reverse Futility Pruning
    * https://www.chessprogramming.org/Reverse_Futility_Pruning

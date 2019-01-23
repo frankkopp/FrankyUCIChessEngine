@@ -46,7 +46,6 @@ import java.util.concurrent.CountDownLatch;
  * move if it has one.
  * <p>
  * FIXME: MTDf has different result
- * TODO: make it work without PV - PV is just "on-top"
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: More extensions and reductions
  * TODO: Lazy SMP
@@ -197,6 +196,16 @@ public class Search implements Runnable {
       IllegalStateException e = new IllegalStateException(s);
       LOG.error(s, e);
     }
+    if (position == null) {
+      final String s = "Null for position is not allowed";
+      IllegalArgumentException e = new IllegalArgumentException(s);
+      LOG.error(s, e);
+    }
+    if (searchMode == null) {
+      final String s = "Null for searchMode is not allowed";
+      IllegalArgumentException e = new IllegalArgumentException(s);
+      LOG.error(s, e);
+    }
 
     // create a deep copy of the position to do not change
     // the original position given
@@ -315,7 +324,8 @@ public class Search implements Runnable {
     transpositionTable.ageEntries();
 
     // print info about search mode
-    if (isPerftSearch()) {
+    assert searchMode != null : "Null for searchMode is not allowed";
+    if (config.PERFT || searchMode.isPerft()) {
       LOG.info("****** PERFT SEARCH (" + searchMode.getMaxDepth() + ") *******");
       PERFT = true;
     }
@@ -589,11 +599,6 @@ public class Search implements Runnable {
 
       // update the UCI current best move and value
       sendUCIIterationEndInfo();
-
-      //@formatter:off
-      //System.out.println(pv[ROOT_PLY].toNotationString());
-      //System.out.println(semiPv[ROOT_PLY].toNotationString());
-      //@formatter:on
 
       // if the last iteration had many bestMoveChanges extend time
       if (depth > 4 && searchCounter.bestMoveChanges > (depth / 2) + 1) addExtraTime(1.4);
@@ -1057,17 +1062,19 @@ public class Search implements Runnable {
       int extension = 0;
       if (position.hasCheck()
           || mateThreat[ply]
-          || !isCheckMateValue(bestNodeValue)
-          || Move.getTarget(move) != Piece.NOPIECE
+          //|| Move.getTarget(move) != Piece.NOPIECE
           || Move.getMoveType(move) == MoveType.PROMOTION
-        // TODO: pushed pawns
-        // TODO: giving check
-        // TODO: castling?
+          || Move.getMoveType(move) == MoveType.CASTLING
+          || (Move.getPiece(move).getType() == PieceType.PAWN
+             && (position.getNextPlayer().isWhite()
+              ? Move.getEnd(move).getRank() == Square.Rank.r7
+              : Move.getEnd(move).getRank() == Square.Rank.r2))
+        // TODO: giving check without doing the move? how?
       ) {
         extension = 1;
+        // TODO: Figure out good way for search extensions
+        if (config.USE_EXTENSIONS) nDepth += extension;
       } // @formatter:on
-      // TODO: Figure out good way for search extensions
-      // nDepth += extension;
       // ###############################################
 
       // ###############################################
@@ -1193,6 +1200,7 @@ public class Search implements Runnable {
               Move.toSimpleString(move), numberOfSearchedMoves + 1, movesSize);
       }
 
+
       // ###############################################
       // ### START PVS SEARCH
       int value;
@@ -1224,6 +1232,7 @@ public class Search implements Runnable {
           else searchCounter.pvs_cutoffs++;
         }
       }
+
       // ### END PVS ROOT_PLY SEARCH
       // ###############################################
 
@@ -1946,13 +1955,6 @@ public class Search implements Runnable {
   }
 
   /**
-   * @return if configuration of search mode are in PERFT mode
-   */
-  private boolean isPerftSearch() {
-    return config.PERFT || (searchMode != null && searchMode.isPerft());
-  }
-
-  /**
    * Configure time limits-
    * <p>
    * Chooses if search mode is time per move or remaining time
@@ -2121,7 +2123,7 @@ public class Search implements Runnable {
     if (System.currentTimeMillis() - uciUpdateTicker >= UCI_UPDATE_INTERVAL) {
 
       String infoString = String.format("depth %d seldepth %d nodes %d nps %d time %d hashfull %d",
-                                        searchCounter.currentSearchDepth,
+                                        searchCounter.currentIterationDepth,
                                         searchCounter.currentExtraSearchDepth,
                                         searchCounter.nodesVisited,
                                         1000 * searchCounter.nodesVisited / (1 + elapsedTime()),

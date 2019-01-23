@@ -44,8 +44,8 @@ import java.util.concurrent.ForkJoinPool;
 public class SearchTreeSizeTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(SearchTreeSizeTest.class);
-  private int HASH_SIZE;
-  private int THREADS;
+  private              int    HASH_SIZE;
+  private              int    THREADS;
 
   class SingleTest {
     String name  = "";
@@ -54,6 +54,7 @@ public class SearchTreeSizeTest {
     long   time  = 0;
     int    move  = Move.NOMOVE;
     int    value = Evaluation.NOVALUE;
+    String pv    = "";
   }
 
   class Result {
@@ -75,7 +76,8 @@ public class SearchTreeSizeTest {
   public void sizeOfSearchTreeTest() throws ExecutionException, InterruptedException {
 
     final int NO_OF_TESTS = 5;
-    final int DEPTH = 4;
+    final int START_NO = 30;
+    final int DEPTH = 6;
     HASH_SIZE = 2048;
     THREADS = 1;
 
@@ -86,7 +88,7 @@ public class SearchTreeSizeTest {
     // ForkJoinPool allows to limit the number of threads for lambda .parallel
     // to individual values.
     ForkJoinPool forkJoinPool = new ForkJoinPool(THREADS);
-    forkJoinPool.submit(() -> fens.parallelStream()
+    forkJoinPool.submit(() -> fens.parallelStream().skip(START_NO)
                                   .limit(NO_OF_TESTS)
                                   .forEach(fen -> results.add(featureMeasurements(DEPTH, fen))))
                 .get();
@@ -96,8 +98,8 @@ public class SearchTreeSizeTest {
     System.out.printf("################## RESULTS for depth %d ##########################%n",
                       DEPTH);
     System.out.println();
-    System.out.printf("%-12s | %6s | %8s | %15s | %12s | %12s | %s %n", "Test Name", "Move",
-                      "Value", "Nodes", "Nps", "Time", "Fen");
+    System.out.printf("%-12s | %6s | %8s | %15s | %12s | %12s | %s | %s %n", "Test Name", "Move",
+                      "Value", "Nodes", "Nps", "Time", "PV", "Fen");
     System.out.println("-----------------------------------------------------------------------"
                        + "-----------------------------------------------------------------------");
 
@@ -128,7 +130,7 @@ public class SearchTreeSizeTest {
         lastNodes = test.nodes;
 
         // @formatter:off
-        System.out.printf("%-12s | %1s%5s | %8s | %1s%,14d | %,12d | %,12d | %s %n",
+        System.out.printf("%-12s | %1s%5s | %8s | %1s%,14d | %,12d | %,12d | %s | %s %n",
                           test.name,
                           changeFlagMove,
                           Move.toSimpleString(test.move),
@@ -137,6 +139,7 @@ public class SearchTreeSizeTest {
                           test.nodes,
                           test.nps,
                           test.time,
+                          test.pv,
                           result.fen);
         // @formatter:on
       }
@@ -197,6 +200,8 @@ public class SearchTreeSizeTest {
     search.config.USE_MDP = false;
     search.config.USE_MPP = false;
 
+    search.config.USE_EXTENSIONS = false;
+
     search.config.USE_RFP = false;
     search.config.USE_NMP = false;
     search.config.USE_RAZOR_PRUNING = false;
@@ -222,10 +227,10 @@ public class SearchTreeSizeTest {
     result.tests.add(measureTreeSize(search, position, searchMode, "ALPHABETA", true));
 
     // MTDf - just for debugging for now
-    search.config.USE_MTDf = true;
-    search.config.MTDf_START_DEPTH = 2;
-    result.tests.add(measureTreeSize(search, position, searchMode, "MTDf", true));
-    search.config.USE_MTDf = false;
+    //    search.config.USE_MTDf = true;
+    //    search.config.MTDf_START_DEPTH = 2;
+    //    result.tests.add(measureTreeSize(search, position, searchMode, "MTDf", true));
+    //    search.config.USE_MTDf = false;
 
     // PVS
     search.config.USE_PVS = true;
@@ -241,6 +246,10 @@ public class SearchTreeSizeTest {
     search.config.USE_MDP = true;
     search.config.USE_MPP = true;
     result.tests.add(measureTreeSize(search, position, searchMode, "MDP_MPP", true));
+
+    // Search extensions
+    search.config.USE_EXTENSIONS = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "EXT", true));
 
     // Reverse Futility Pruning
     search.config.USE_RFP = true;
@@ -302,6 +311,7 @@ public class SearchTreeSizeTest {
     test.nps = (int) ((1e3 * search.getSearchCounter().nodesVisited) / (
       search.getSearchCounter().lastSearchTime + 1));
     test.time = search.getSearchCounter().lastSearchTime;
+    test.pv = search.getPrincipalVariationString(0);
 
     return test;
 
