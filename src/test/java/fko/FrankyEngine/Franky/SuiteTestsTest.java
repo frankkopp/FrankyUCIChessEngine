@@ -25,6 +25,7 @@
 
 package fko.FrankyEngine.Franky;
 
+import org.apache.commons.text.WordUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -119,12 +120,15 @@ public class SuiteTestsTest {
   @Disabled
   void startWACSuite() {
     /*
-    0.11 BASE
-    Successful: 110 (36 Prozent)
-    Failed:     190 (63 Prozent)
+    0.11 BASE (PV earlier)
+    Successful: 103 (34 Prozent)
+    Failed:     197 (65 Prozent)
+    0.11 BASE (PV later)
+    Successful: 104 (34 Prozent)
+    Failed:     196 (65 Prozent)
     */
     testSuite = new TestSuite("./testsets/wac.epd");
-    testSuite.setSearchTime(10000);
+    testSuite.setSearchTime(5000);
     testSuite.startTests();
   }
 
@@ -141,6 +145,48 @@ public class SuiteTestsTest {
     */
     // ./testsets/crafty_test.epd
     testSuite.setSearchTime(5000);
+    testSuite.startTests();
+  }
+
+  @Test
+  @Disabled
+  void startWACSuiteFeatureRun() {
+    testSuite = new TestSuite("./testsets/wac.epd");
+    final Configuration config = new Configuration();
+
+    config.USE_BOOK = false;
+
+    config.USE_ALPHABETA_PRUNING = false;
+    config.USE_PVS = false;
+    config.USE_PVS_ORDERING = false;
+    config.USE_KILLER_MOVES = false;
+    config.USE_ASPIRATION_WINDOW = false;
+    config.USE_MTDf = false;
+
+    config.USE_TRANSPOSITION_TABLE = false;
+    config.USE_TT_ROOT = false;
+
+    config.USE_MDP = false;
+    config.USE_MPP = false;
+
+    config.USE_RFP = false;
+    config.USE_NMP = false;
+    config.USE_RAZOR_PRUNING = false;
+
+    config.USE_LIMITED_RAZORING = false;
+    config.USE_EXTENDED_FUTILITY_PRUNING = false;
+    config.USE_FUTILITY_PRUNING = false;
+    config.USE_LMP = false;
+    config.USE_LMR = false;
+
+    config.USE_QUIESCENCE = false;
+
+    final int time = 5000;
+
+    System.out.printf("WAC Test: %,d ms %nCONFG: %s %n%n", time,
+                      WordUtils.wrap(config.toString(), 80));
+    testSuite.setConfig(config);
+    testSuite.setSearchTime(time);
     testSuite.startTests();
   }
 

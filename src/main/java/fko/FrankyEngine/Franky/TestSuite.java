@@ -57,6 +57,8 @@ public class TestSuite {
   private int            searchDepth;
   private List<TestCase> testCases = new ArrayList<>();
 
+  private Configuration config = new Configuration();
+
   /**
    * Creates a TestSuite instance based on the configuration in the main properties
    * files (TestSuiteConfig.properties)
@@ -218,9 +220,8 @@ public class TestSuite {
     System.out.printf("Search for best move: %s in %,.1f sec and %,d search depth.\n",
                       testCase.operand, searchTime/1e3, searchDepth);
 
-    FrankyEngine engine = new FrankyEngine();
-    Search search = engine.getSearch();
-    search.config.USE_BOOK = false;
+    Search search = new Search(null, config);
+    config.USE_BOOK = false;
 
     Position position = new Position(testCase.fen);
     testCase.bestMoves = getMovesFromOperand(position, testCase.operand);
@@ -264,9 +265,8 @@ public class TestSuite {
     System.out.printf("Search for mate in %,d moves within %,.1f sec and %,d search depth.%n",
                       mateDepth, searchTime/1e3, searchDepth);
 
-    FrankyEngine engine = new FrankyEngine();
-    Search search = engine.getSearch();
-    search.config.USE_BOOK = false;
+    Search search = new Search(null, config);
+    config.USE_BOOK = false;
 
     Position position = new Position(testCase.fen);
 
@@ -555,6 +555,12 @@ public class TestSuite {
   public void setSearchDepth(int searchDepth) {
     this.searchDepth = searchDepth;
   }
+
+  /**
+   * Sets a new config for the search.  If set to null search uses its default.
+   * @param config
+   */
+  public void setConfig(Configuration config) { this.config = config; }
 
   /**
    * Parameter object for TestCases
