@@ -156,10 +156,14 @@ public class SuiteTestsTest {
 
     config.USE_BOOK = false;
 
-    config.USE_ALPHABETA_PRUNING = false;
-    config.USE_PVS = false;
-    config.USE_PVS_ORDERING = false;
-    config.USE_KILLER_MOVES = false;
+    // Successful: 105 (35 Prozent)
+    // Failed:     195 (65 Prozent)
+    config.USE_ALPHABETA_PRUNING = true;
+    config.USE_PVS = true;
+    config.USE_PVS_ORDERING = true;
+    config.USE_KILLER_MOVES = true;
+
+
     config.USE_ASPIRATION_WINDOW = false;
     config.USE_MTDf = false;
 
@@ -172,6 +176,8 @@ public class SuiteTestsTest {
     config.USE_RFP = false;
     config.USE_NMP = false;
     config.USE_RAZOR_PRUNING = false;
+
+    config.USE_EXTENSIONS = false;
 
     config.USE_LIMITED_RAZORING = false;
     config.USE_EXTENDED_FUTILITY_PRUNING = false;

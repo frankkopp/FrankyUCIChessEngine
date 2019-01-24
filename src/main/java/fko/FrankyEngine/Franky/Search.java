@@ -46,6 +46,7 @@ import java.util.concurrent.CountDownLatch;
  * move if it has one.
  * <p>
  * FIXME: MTDf has different result
+ * TODO: History Heuristic / http://www.frayn.net/beowulf/theory.html#history
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: More extensions and reductions
  * TODO: Lazy SMP
@@ -1054,13 +1055,12 @@ public class Search implements Runnable {
       int nDepth = depth - 1;
 
       // ###############################################
-      // EXTENSIONS                       @formatter:off
-      // Some positions should not be searched to a higher
+      // EXTENSIONS PRE MOVE              @formatter:off
+      // Some positions should be searched to a higher
       // depth or at least they should not be reduced.
-      // For now we only avoid reduction of such moves
-      // as otherwise there will be a search explosion.
       int extension = 0;
-      if (position.hasCheck()
+      if (config.USE_EXTENSIONS && (
+             position.hasCheck()
           || mateThreat[ply]
           //|| Move.getTarget(move) != Piece.NOPIECE
           || Move.getMoveType(move) == MoveType.PROMOTION
@@ -1068,12 +1068,10 @@ public class Search implements Runnable {
           || (Move.getPiece(move).getType() == PieceType.PAWN
              && (position.getNextPlayer().isWhite()
               ? Move.getEnd(move).getRank() == Square.Rank.r7
-              : Move.getEnd(move).getRank() == Square.Rank.r2))
-        // TODO: giving check without doing the move? how?
-      ) {
+              : Move.getEnd(move).getRank() == Square.Rank.r2
+      )))) {
         extension = 1;
-        // TODO: Figure out good way for search extensions
-        if (config.USE_EXTENSIONS) nDepth += extension;
+        nDepth += extension;
       } // @formatter:on
       // ###############################################
 
@@ -1200,6 +1198,18 @@ public class Search implements Runnable {
               Move.toSimpleString(move), numberOfSearchedMoves + 1, movesSize);
       }
 
+      // ###############################################
+      // EXTENSIONS POST MOVE             @formatter:off
+      // Check extensions after we made the move e.g.
+      // giving check with the move
+      if (config.USE_EXTENSIONS
+          && extension==0
+          && position.hasCheck() // check after hte move
+      ) {
+        extension = 1;
+        nDepth += extension;
+      } // @formatter:on
+      // ###############################################
 
       // ###############################################
       // ### START PVS SEARCH

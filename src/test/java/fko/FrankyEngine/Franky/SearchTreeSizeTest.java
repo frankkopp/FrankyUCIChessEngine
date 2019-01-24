@@ -200,11 +200,11 @@ public class SearchTreeSizeTest {
     search.config.USE_MDP = false;
     search.config.USE_MPP = false;
 
-    search.config.USE_EXTENSIONS = false;
-
     search.config.USE_RFP = false;
     search.config.USE_NMP = false;
     search.config.USE_RAZOR_PRUNING = false;
+
+    search.config.USE_EXTENSIONS = false;
 
     search.config.USE_LIMITED_RAZORING = false;
     search.config.USE_EXTENDED_FUTILITY_PRUNING = false;
