@@ -168,6 +168,7 @@ public class FrankyEngine implements IUCIEngine {
     option("Use_Razor_Pruning", UCIOptionType.check, Boolean.toString(config.USE_RAZOR_PRUNING), "", "", "");
     option("Razor_Depth", UCIOptionType.spin, Integer.toString(config.RAZOR_DEPTH), "1", "5", "");
     option("Razor_Margin", UCIOptionType.spin, Integer.toString(config.RAZOR_MARGIN), "0", "1800", "");
+    option("Use_Extensions", UCIOptionType.check, Boolean.toString(config.USE_EXTENSIONS), "", "", "");
     option("Use_Limited_Razoring", UCIOptionType.check, Boolean.toString(config.USE_LIMITED_RAZORING), "", "", "");
     option("Use_Extended_Futility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_EXTENDED_FUTILITY_PRUNING), "", "", "");
     option("Use_Futility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_FUTILITY_PRUNING), "", "", "");
@@ -350,6 +351,12 @@ public class FrankyEngine implements IUCIEngine {
       case "Razor_Margin":
         config.RFP_MARGIN = Integer.valueOf(value);
         msg = "Razor Margin set to " + (config.RAZOR_MARGIN);
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Extensions":
+        config.USE_EXTENSIONS = Boolean.valueOf(value);
+        msg = "Use Search Extensions set to " + (config.USE_EXTENSIONS ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
