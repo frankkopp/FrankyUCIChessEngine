@@ -115,7 +115,7 @@ public class SearchMode {
       startDepth = this.depth;
       maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
     } else if (this.infinite) {
-      // no limits
+      // limited by depth only (identical to depth limit in this case)
       timeControl = false;
       startDepth = 1;
       maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
@@ -149,9 +149,9 @@ public class SearchMode {
       // might be limited be depth as well
       maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
     } else if (this.depth > 0 && this.nodes == 0) {
-      // limited only by depth and starts by depth directly
+      // limited only by depth but still iterating
       timeControl = false;
-      startDepth = this.depth;
+      startDepth = 1;
       // might be limited be depth as well
       maxDepth = this.depth;
     } else if (this.nodes > 0) {
@@ -159,7 +159,7 @@ public class SearchMode {
       timeControl = false;
       startDepth = 1;
       // might be limited be depth as well
-      maxDepth = maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
+      maxDepth = this.depth > 0 ? this.depth : MAX_SEARCH_DEPTH;
     } else {
       // INVALID SearchMode
       String msg =
@@ -243,13 +243,9 @@ public class SearchMode {
     return ponder;
   }
 
-  public boolean isPerft() {
-    return perft;
-  }
+  public boolean isPerft() { return perft; }
 
-  public boolean isInfinite() {
-    return infinite;
-  }
+  public boolean isInfinite() { return infinite && depth == 0; }
 
   public synchronized boolean isTimeControl() { return timeControl; }
 
