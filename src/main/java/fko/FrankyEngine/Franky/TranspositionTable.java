@@ -40,6 +40,8 @@ import java.util.stream.IntStream;
  * <p>
  * The TT_Entry elements are tailored for small memory footprint and use primitive data types
  * for value (short), depth (byte), type (byte), age (byte).
+ *
+ * TODO: This class can be decoupled from Position by using the key as parameter instead of a Position
  */
 public class TranspositionTable {
 
@@ -141,7 +143,6 @@ public class TranspositionTable {
       //entries[hash].fen = position.toFENString();
       entries[hash].age = 1;
       entries[hash].mateThreat = mateThreat;
-
       entries[hash].value = value;
       entries[hash].type = type;
       entries[hash].depth = depth;
@@ -168,7 +169,6 @@ public class TranspositionTable {
       // if from same depth only update when quality of new entry is better
       // e.g. don't replace EXACT with ALPHA or BETA
       if (depth == entries[hash].depth) {
-
         numberOfUpdates++;
 
         // entries[hash].fen = position.toFENString();
@@ -187,6 +187,7 @@ public class TranspositionTable {
           assert entries[hash].type == type;
           assert entries[hash].depth == depth;
         }
+        // overwrite bestNive only with a valid move
         if (bestMove != Move.NOMOVE) entries[hash].bestMove = bestMove;
       }
       // if depth is greater then we update in any case
@@ -196,16 +197,14 @@ public class TranspositionTable {
         // entries[hash].fen = position.toFENString();
         entries[hash].age = 1;
         entries[hash].mateThreat = mateThreat;
-
         entries[hash].value = value;
         entries[hash].type = type;
         entries[hash].depth = depth;
 
+        // overwrite bestNive only with a valid move
         if (bestMove != Move.NOMOVE) entries[hash].bestMove = bestMove;
       }
-
     }
-    // ignore new values for cache
   }
 
   /**
@@ -219,6 +218,7 @@ public class TranspositionTable {
   public TT_Entry get(Position position) {
     final int hash = getHash(position.getZobristKey());
     if (entries[hash].key == position.getZobristKey()) { // hash hit
+      // decrease age of entry until 0
       entries[hash].age = (byte) Math.max(entries[hash].age - 1, 0);
       return entries[hash];
     }
@@ -251,7 +251,7 @@ public class TranspositionTable {
    * Mark all entries unused and clear for overwriting
    */
   public void ageEntries() {
-    // for() is about 60% slower than  parallel()
+    // tests show for() is about 60% slower than lambda parallel()
     IntStream.range(0, entries.length)
              .parallel()
              .filter(i -> entries[i].key != 0)
@@ -260,8 +260,6 @@ public class TranspositionTable {
   }
 
   /**
-   * TODO: better hash function?
-   *
    * @param key
    * @return returns a hash key
    */
@@ -296,7 +294,6 @@ public class TranspositionTable {
   public long getNumberOfCollisions() {
     return numberOfCollisions;
   }
-
 
   /**
    * @return number of entry updates of same position but deeper search
@@ -339,6 +336,8 @@ public class TranspositionTable {
 
   /**
    * Defines the type of transposition table entry for alpha beta search.
+   *
+   * Byte is smaller than enum!
    */
   public static class TT_EntryType {
     public static final byte NONE  = 0;
