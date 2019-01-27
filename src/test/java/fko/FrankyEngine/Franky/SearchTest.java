@@ -25,9 +25,10 @@
 
 package fko.FrankyEngine.Franky;
 
-
 import fko.FrankyEngine.Franky.Search.TTHit;
 import fko.UCI.IUCIEngine;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.commons.text.WordUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -135,7 +136,6 @@ public class SearchTest {
     assertEquals(nodes, search.getSearchCounter().nodesVisited);
   }
 
-
   @Test
   public void testBasicTimeControl_RemainingTime() {
     String fen = Position.STANDARD_BOARD_FEN;
@@ -181,26 +181,26 @@ public class SearchTest {
     SearchMode searchMode;
 
     // mate
-    fen = "8/8/8/8/8/3K4/8/R2k4 b - -"; // Position
-    position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 3, null, false, false, false);
-    search.startSearch(position, searchMode);
-    search.waitWhileSearching();
-    search.stopSearch();
-    assertEquals(-Evaluation.CHECKMATE, search.getLastSearchResult().resultValue);
-
-    System.out.println();
-
-    // mate 1
-    fen = "8/8/8/8/8/3K4/R7/3k4 w - -"; // Position
-    position = new Position(fen);
-    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 3, null, false, false, false);
-    search.startSearch(position, searchMode);
-    search.waitWhileSearching();
-    search.stopSearch();
-    assertEquals(Evaluation.CHECKMATE - 1, search.getLastSearchResult().resultValue);
-
-    System.out.println();
+//    fen = "8/8/8/8/8/3K4/8/R2k4 b - -"; // Position
+//    position = new Position(fen);
+//    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 3, null, false, false, false);
+//    search.startSearch(position, searchMode);
+//    search.waitWhileSearching();
+//    search.stopSearch();
+//    assertEquals(-Evaluation.CHECKMATE, search.getLastSearchResult().resultValue);
+//
+//    System.out.println();
+//
+//    // mate 1
+//    fen = "8/8/8/8/8/3K4/R7/3k4 w - -"; // Position
+//    position = new Position(fen);
+//    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 3, null, false, false, false);
+//    search.startSearch(position, searchMode);
+//    search.waitWhileSearching();
+//    search.stopSearch();
+//    assertEquals(Evaluation.CHECKMATE - 1, search.getLastSearchResult().resultValue);
+//
+//    System.out.println();
 
     // mate in 2 (3 plys)
     fen = "8/8/8/8/8/5K2/R7/7k w - -"; // Position
@@ -443,8 +443,8 @@ public class SearchTest {
       search.startSearch(position, searchMode);
       search.waitWhileSearching();
       assertEquals("e7e3", Move.toSimpleString(search.getLastSearchResult().bestMove));
-//      assertEquals(-Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
-//                   search.getLastSearchResult().resultValue);
+      //      assertEquals(-Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+      //                   search.getLastSearchResult().resultValue);
       LOG.warn("Best Move: {} Value: {} Ponder {}",
                Move.toSimpleString(search.getLastSearchResult().bestMove),
                search.getLastSearchResult().resultValue / 100f,
@@ -460,8 +460,8 @@ public class SearchTest {
       search.startSearch(position, searchMode);
       search.waitWhileSearching();
       assertEquals("c6d6", Move.toSimpleString(search.getLastSearchResult().bestMove));
-//      assertEquals(-Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
-//                   search.getLastSearchResult().resultValue);
+      //      assertEquals(-Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+      //                   search.getLastSearchResult().resultValue);
       LOG.warn("Best Move: {} Value: {} Ponder {}",
                Move.toSimpleString(search.getLastSearchResult().bestMove),
                search.getLastSearchResult().resultValue / 100f,
@@ -577,8 +577,15 @@ public class SearchTest {
     assertEquals(perftResults[depth][4], search.getSearchCounter().checkCounter);
     assertEquals(perftResults[depth][5], search.getSearchCounter().checkMateCounter);
 
-    LOG.info("BOARDS: {}", String.format("%,d", search.getSearchCounter().leafPositionsEvaluated));
-    LOG.info("PERFT Test for depth 5 successful.");
+    LOG.info("PERFT        : Test for depth {} successful.", depth);
+    LOG.info("BOARDS       : {}",
+             String.format("%,d", search.getSearchCounter().leafPositionsEvaluated));
+    LOG.info("NODES VISITED: {}", String.format("%,d", search.getSearchCounter().nodesVisited));
+    LOG.info("TIME         : {}", String.format("%s", DurationFormatUtils.formatDurationHMS(
+      search.getSearchCounter().lastSearchTime)));
+    LOG.info("PERFT NPS    : {} ", String.format("%,.0f",
+                                             (1e3 * search.getSearchCounter().nodesVisited) / search
+                                               .getSearchCounter().lastSearchTime));
   }
 
   @Test
@@ -671,48 +678,51 @@ public class SearchTest {
   @Test
   @Disabled
   public void evaluationTest() {
-    String fen;
+    String fen = Position.STANDARD_BOARD_FEN;
     SearchMode searchMode;
     Position position;
 
     search.config.USE_BOOK = false;
-
     search.config.USE_ALPHABETA_PRUNING = false;
+    search.config.USE_TRANSPOSITION_TABLE = false;
+    search.config.USE_TT_ROOT = false;
     search.config.USE_PVS = false;
     search.config.USE_PVS_ORDERING = false;
     search.config.USE_KILLER_MOVES = false;
     search.config.USE_ASPIRATION_WINDOW = false;
     search.config.USE_MTDf = false;
-
-    search.config.USE_TRANSPOSITION_TABLE = false;
-    search.config.USE_TT_ROOT = false;
-
     search.config.USE_MDP = false;
     search.config.USE_MPP = false;
-
     search.config.USE_RFP = false;
     search.config.USE_NMP = false;
     search.config.USE_RAZOR_PRUNING = false;
-
+    search.config.USE_EXTENSIONS = false;
     search.config.USE_LIMITED_RAZORING = false;
     search.config.USE_EXTENDED_FUTILITY_PRUNING = false;
     search.config.USE_FUTILITY_PRUNING = false;
     search.config.USE_LMP = false;
     search.config.USE_LMR = false;
-
     search.config.USE_QUIESCENCE = false;
 
-    int maxDepth = 2;
+    int whiteTime = 0;
+    int blackTime = 0;
+    int whiteInc = 0;
+    int blackInc = 0;
+    int movesToGo = 0;
     int moveTime = 0;
-    int mateIn = 0;
-    boolean infinite = true;
+    int depth = 6;
+    int mateIn = 3;
+    boolean infinite = false;
 
     String result = "";
 
-    //fen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -";
-    //fen = "R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1";
-    //fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
-    fen = "r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -";
+    fen = "8/8/8/8/8/5K2/R7/7k w - -"; // Position
+    // fen = "1r2kb1r/2Rn4/p4p2/4pN1p/4N1p1/6B1/P4PPP/3R2K1 w k -";
+    // fen = "r2qkb1r/p1p1pppp/2pp1n2/5b2/P2P4/2N5/1PP1PPPP/R1BQKB1R b KQkq d3";
+    // fen = "1b1qrr2/1p4pk/1np4p/p3Np1B/Pn1P4/R1N3B1/1Pb2PPP/2Q1R1K1 b - -";
+    // fen = "R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1";
+    // fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+    // fen = "r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -";
     // fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
     // fen = "r2q1rk1/1p1nbppp/3p1n2/1Pp2b2/p1P5/2N1Pp1P/PBNPB1P1/R2Q1RK1 w - -";
     // fen = "4k3/4p3/8/8/8/8/8/3KQ3 w - -";
@@ -720,20 +730,32 @@ public class SearchTest {
 
     position = new Position(fen);
     searchMode =
-      new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
+      new SearchMode(whiteTime, blackTime, whiteInc, blackInc, movesToGo, moveTime, 0, depth,
+                     mateIn, null, false, infinite, false);
 
-    // AlphaBeta with TT and SORT
     search.config.USE_ALPHABETA_PRUNING = true;
     search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.USE_TT_ROOT = true;
-    search.config.USE_KILLER_MOVES = true;
-    search.config.NO_KILLER_MOVES = 2;
-
+    search.config.USE_TT_ROOT = false;
     search.config.USE_PVS = true;
     search.config.USE_PVS_ORDERING = true;
+    search.config.USE_KILLER_MOVES = true;
+    search.config.USE_ASPIRATION_WINDOW = false;
+    search.config.USE_MDP = false;
+    search.config.USE_MPP = false;
+    search.config.USE_RFP = false;
+    search.config.USE_NMP = false;
+    search.config.USE_EXTENSIONS = false;
+    search.config.USE_LIMITED_RAZORING = false;
+    search.config.USE_EXTENDED_FUTILITY_PRUNING = false;
+    search.config.USE_FUTILITY_PRUNING = false;
+    search.config.USE_LMP = false;
+    search.config.USE_LMR = false;
+    search.config.USE_QUIESCENCE = false;
 
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
+
+    System.out.println();
 
     result += String.format("%nSIZE: %,14d >> %-18s (%4d) >> nps %,.0f >> %s %n",
                             search.getSearchCounter().leafPositionsEvaluated,
@@ -745,29 +767,36 @@ public class SearchTest {
 
     int bestMove1 = search.getLastSearchResult().bestMove;
 
-    // MTDf - just for debugging for now
-    search.config.USE_PVS = false;
-    search.config.USE_PVS_ORDERING = false;
-    search.config.USE_MTDf = true;
-    search.config.MTDf_START_DEPTH = 2;
+    System.out.println(WordUtils.wrap(result, 120));
 
-    search.clearHashTables();
-    search.startSearch(position, searchMode);
-    search.waitWhileSearching();
+    assertTrue(search.getSearchCounter().leafPositionsEvaluated > 0);
+    assertTrue(search.getSearchCounter().currentIterationDepth > 1);
+    assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE);
+    assertEquals(Evaluation.CHECKMATE - 3, search.getLastSearchResult().resultValue);
 
-    result += String.format("SIZE: %,14d >> %-18s (%4d) >> nps %,.0f >> %s %n",
-                            search.getSearchCounter().leafPositionsEvaluated,
-                            Move.toString(search.getLastSearchResult().bestMove),
-                            search.getLastSearchResult().resultValue,
-                            (1e3 * search.getSearchCounter().nodesVisited)
-                            / search.getSearchCounter().lastSearchTime,
-                            search.getSearchCounter().toString());
-
-    int bestMove2 = search.getLastSearchResult().bestMove;
-
-    System.out.println(result);
-
-    assertEquals(bestMove1, bestMove2);
+    //    // MTDf - just for debugging for now
+    //    search.config.USE_PVS = false;
+    //    search.config.USE_PVS_ORDERING = false;
+    //    search.config.USE_MTDf = true;
+    //    search.config.MTDf_START_DEPTH = 2;
+    //
+    //    search.clearHashTables();
+    //    search.startSearch(position, searchMode);
+    //    search.waitWhileSearching();
+    //
+    //    result += String.format("SIZE: %,14d >> %-18s (%4d) >> nps %,.0f >> %s %n",
+    //                            search.getSearchCounter().leafPositionsEvaluated,
+    //                            Move.toString(search.getLastSearchResult().bestMove),
+    //                            search.getLastSearchResult().resultValue,
+    //                            (1e3 * search.getSearchCounter().nodesVisited)
+    //                            / search.getSearchCounter().lastSearchTime,
+    //                            search.getSearchCounter().toString());
+    //
+    //    int bestMove2 = search.getLastSearchResult().bestMove;
+    //
+    //    System.out.println(result);
+    //
+    //    assertEquals(bestMove1, bestMove2);
   }
 
   @Test

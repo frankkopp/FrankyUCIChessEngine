@@ -76,7 +76,7 @@ public class SearchTreeSizeTest {
   public void sizeOfSearchTreeTest() throws ExecutionException, InterruptedException {
 
     final int NO_OF_TESTS = 5;
-    final int START_NO = 30;
+    final int START_NO = 5;
     final int DEPTH = 6;
     HASH_SIZE = 2048;
     THREADS = 1;
@@ -227,10 +227,10 @@ public class SearchTreeSizeTest {
     result.tests.add(measureTreeSize(search, position, searchMode, "ALPHABETA", true));
 
     // MTDf - just for debugging for now
-    //    search.config.USE_MTDf = true;
-    //    search.config.MTDf_START_DEPTH = 2;
-    //    result.tests.add(measureTreeSize(search, position, searchMode, "MTDf", true));
-    //    search.config.USE_MTDf = false;
+//    search.config.USE_MTDf = true;
+//    search.config.MTDf_START_DEPTH = 2;
+//    result.tests.add(measureTreeSize(search, position, searchMode, "MTDf", true));
+//    search.config.USE_MTDf = false;
 
     // PVS
     search.config.USE_PVS = true;
@@ -249,7 +249,7 @@ public class SearchTreeSizeTest {
 
     // Search extensions
     search.config.USE_EXTENSIONS = true;
-    result.tests.add(measureTreeSize(search, position, searchMode, "EXT", true));
+    result.tests.add(measureTreeSize(search, position, searchMode, "EXTENSION", true));
 
     // Reverse Futility Pruning
     search.config.USE_RFP = true;
