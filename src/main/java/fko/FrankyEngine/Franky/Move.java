@@ -341,7 +341,7 @@ public class Move {
 
       // same end square
       if (Move.getEnd(move).name().equals(targetSquare)) {
-        if (piece != null && Move.getPiece(move).getType().getShortName().equals(piece)) {
+        if (Move.getPiece(move).getType().getShortName().equals(piece)) {
           LOG.trace("Piece MATCH " + Move.getPiece(move).getType().toString());
         } else if (piece == null && Move.getPiece(move).getType().equals(PieceType.PAWN)) {
           LOG.trace("Piece MATCH PAWN");
