@@ -42,23 +42,23 @@ public class SearchMode {
   private static final int MAX_SEARCH_DEPTH = Byte.MAX_VALUE;
 
   // defaults time control
-  private Duration whiteTime = Duration.ZERO;
-  private Duration blackTime = Duration.ZERO;
-  private Duration whiteInc  = Duration.ZERO;
-  private Duration blackInc  = Duration.ZERO;
-  private int      movesToGo = 0;
-  private Duration moveTime  = Duration.ZERO;
+  private Duration whiteTime;
+  private Duration blackTime;
+  private Duration whiteInc;
+  private Duration blackInc;
+  private int      movesToGo;
+  private Duration moveTime;
 
   // extra limits
-  private int          depth = 0;
-  private long         nodes = 0;
-  private List<String> moves = new ArrayList<>();
+  private int          depth;
+  private long         nodes;
+  private List<String> moves;
 
   // no time control
-  private int     mate     = 0;
-  private boolean ponder   = false;
-  private boolean infinite = false;
-  private boolean perft    = false;
+  private int     mate;
+  private boolean ponder;
+  private boolean infinite;
+  private boolean perft;
 
   // state
   private boolean timeControl = false;
