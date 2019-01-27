@@ -79,7 +79,7 @@ public class SquareList {
             }
             elements[i+1] = elements[i]; // move the element to the right
         }
-        // we did not a place -> element seams to be first in order
+      // we did not find a place -> element seams to be first in order
         // add it to place 0 as this is now free
         elements[0] = square;
         size++;
