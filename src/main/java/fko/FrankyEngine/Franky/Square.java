@@ -25,8 +25,10 @@
 
 package fko.FrankyEngine.Franky;
 
-
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -111,14 +113,14 @@ public enum Square {
 
   static {
     values = Square.values();
-    validSquares = Collections.unmodifiableList(Arrays.stream(values()).filter(Square::isValidSquare).collect(
-      Collectors.toList()));
+    validSquares = Collections.unmodifiableList(
+      Arrays.stream(values()).filter(Square::isValidSquare).collect(Collectors.toList()));
   }
 
   Square() {
     if ((this.ordinal() & 0x88) == 0) {
       validSquare = true;
-      index64 = this.ordinal()/16 * 8 + this.ordinal() % 16;
+      index64 = this.ordinal() / 16 * 8 + this.ordinal() % 16;
     }
     else {
       validSquare = false;
@@ -171,7 +173,6 @@ public enum Square {
     if (file < 1 || file > 8 || rank < 1 || rank > 8) return Square.NOSQUARE;
     // index starts with 0 while file and rank start with 1 - decrease
     final int index = (rank - 1) * 16 + (file - 1);
-    assert (index & 0x88) == 0; // is this extra check necessary?
     return Square.values[index];
   }
 
@@ -245,16 +246,7 @@ public enum Square {
   /**
    * This enum represents all files of a chess board. If used in a loop via values() omit NOFILE.
    */
-  public enum File {
-    a,
-    b,
-    c,
-    d,
-    e,
-    f,
-    g,
-    h,
-    NOFILE;
+  public enum File {a, b, c, d, e, f, g, h, NOFILE;
 
     // pre-filled list with all squares
     static final File[] values;
@@ -293,16 +285,7 @@ public enum Square {
   /**
    * This enum represents all ranks of a chess board If used in a loop via values() omit NORANK.
    */
-  public enum Rank {
-    r1,
-    r2,
-    r3,
-    r4,
-    r5,
-    r6,
-    r7,
-    r8,
-    NORANK;
+  public enum Rank {r1, r2, r3, r4, r5, r6, r7, r8, NORANK;
 
     // pre-filled list with all squares
     static final Rank[] values;
@@ -338,14 +321,14 @@ public enum Square {
       return "" + (this.ordinal() + 1);
     }}
 
-  public static final EnumSet<Square> WHITE_PAWNBASE_ROW  = EnumSet.of(a2, b2, c2, d2, e2, f2, g2,
-                                                                       h2);
-  public static final EnumSet<Square> BLACK_PAWNBASE_ROW  = EnumSet.of(a7, b7, c7, d7, e7, f7, g7,
-                                                                       h7);
-  public static final EnumSet<Square> WHITE_PROMOTION_ROW = EnumSet.of(a8, b8, c8, d8, e8, f8, g8,
-                                                                       h8);
-  public static final EnumSet<Square> BLACK_PROMOTION_ROW = EnumSet.of(a1, b1, c1, d1, e1, f1, g1,
-                                                                       h1);
+  public static final EnumSet<Square> WHITE_PAWNBASE_ROW  =
+    EnumSet.of(a2, b2, c2, d2, e2, f2, g2, h2);
+  public static final EnumSet<Square> BLACK_PAWNBASE_ROW  =
+    EnumSet.of(a7, b7, c7, d7, e7, f7, g7, h7);
+  public static final EnumSet<Square> WHITE_PROMOTION_ROW =
+    EnumSet.of(a8, b8, c8, d8, e8, f8, g8, h8);
+  public static final EnumSet<Square> BLACK_PROMOTION_ROW =
+    EnumSet.of(a1, b1, c1, d1, e1, f1, g1, h1);
 
   public boolean isWhitePawnBaseRow() {
     return WHITE_PAWNBASE_ROW.contains(this);
