@@ -217,7 +217,7 @@ public class Search implements Runnable {
       LOG.error(s, e);
     }
 
-    // create a deep copy of the position to do not change
+    // create a deep copy of the position to not change
     // the original position given
     this.currentPosition = new Position(position);
 
@@ -614,7 +614,7 @@ public class Search implements Runnable {
       sendUCIIterationEndInfo();
 
       // if the last iteration had many bestMoveChanges extend time
-      if (depth > 4 && searchCounter.bestMoveChanges > (depth / 2) + 1) addExtraTime(1.4);
+      // if (depth > 4 && searchCounter.bestMoveChanges > (depth / 2) + 1) addExtraTime(1.4);
 
       // check if we need to stop search - could be external or time.
       if (stopSearch || softTimeLimitReached() || hardTimeLimitReached()) break;
@@ -651,10 +651,14 @@ public class Search implements Runnable {
   /**
    * MTDf Search
    * https://askeplaat.wordpress.com/534-2/mtdf-algorithm/
+   *
+   * Is for testing only - evaluation per iteration is changing
+   * too much for this to be useful.
+   *
    * @param position
    * @param depth
    * @param f
-   * @return
+   * @return bestValue
    */
   private int mtdf_search(Position position, int depth, int f) {
     int mtdf_searches = 0;
@@ -792,7 +796,7 @@ public class Search implements Runnable {
 
     assert depth >= 0 && depth <= MAX_SEARCH_DEPTH;
     assert alpha >= Evaluation.MIN && beta <= Evaluation.MAX;
-    assert (pvNode || (alpha == beta - 1));
+    assert pvNode || alpha == beta - 1;
 
     // update current search depth stats
     searchCounter.currentSearchDepth = Math.max(searchCounter.currentSearchDepth, ply);
@@ -820,7 +824,7 @@ public class Search implements Runnable {
                                         getSpaces(ply), ply, depth, hardTimeLimit);
       }
       stopSearch = true;
-      return Evaluation.MIN; // value does ont matter because of top flag
+      return Evaluation.MIN; // value does not matter because of top flag
     }
     // @formatter:on
 
@@ -971,7 +975,7 @@ public class Search implements Runnable {
         ) {
           searchCounter.nullMoveVerifications++;
           nullValue =
-            search(position, depth - config.NMP_VERIFICATION_DEPTH, ply, alpha, beta, PV_NODE,
+            search(position, depth - config.NMP_VERIFICATION_DEPTH, ply, alpha, beta, pvNode,
                    NO_NULL);
         }
 
@@ -1449,10 +1453,9 @@ public class Search implements Runnable {
             alpha, beta, pvNode, currentVariation.toNotationString());
     }
 
-    assert (PERFT || !config.USE_ALPHABETA_PRUNING || (alpha >= Evaluation.MIN && alpha < beta
-                                                       && beta <= Evaluation.MAX));
-    assert (pvNode || (alpha == beta - 1));
     assert ply >= 1;
+    assert alpha >= Evaluation.MIN && beta <= Evaluation.MAX;
+    assert pvNode || alpha == beta - 1;
 
     // update current search depth stats
     searchCounter.currentExtraSearchDepth = Math.max(searchCounter.currentExtraSearchDepth, ply);
