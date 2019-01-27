@@ -52,10 +52,13 @@ public class TranspositionTable {
 
   private long sizeInByte;
   private int  maxNumberOfEntries;
-
   private int  numberOfEntries    = 0;
+
   private long numberOfCollisions = 0L;
   private long numberOfUpdates    = 0L;
+  private long numberOfProbes     = 0L;
+  private long numberOfHits       = 0L;
+  private long numberOfMisses     = 0L;
 
   private final TT_Entry[] entries;
 
@@ -216,12 +219,15 @@ public class TranspositionTable {
    * @return value for key or <tt>Integer.MIN_VALUE</tt> if not found
    */
   public TT_Entry get(Position position) {
+    numberOfProbes++;
     final int hash = getHash(position.getZobristKey());
     if (entries[hash].key == position.getZobristKey()) { // hash hit
+      numberOfHits++;
       // decrease age of entry until 0
       entries[hash].age = (byte) Math.max(entries[hash].age - 1, 0);
       return entries[hash];
     }
+    else numberOfMisses++;
     // cache miss or collision
     return null;
   }
@@ -260,14 +266,6 @@ public class TranspositionTable {
   }
 
   /**
-   * @param key
-   * @return returns a hash key
-   */
-  private int getHash(long key) {
-    return (int) (key % maxNumberOfEntries);
-  }
-
-  /**
    * @return the numberOfEntries
    */
   public int getNumberOfEntries() {
@@ -300,6 +298,35 @@ public class TranspositionTable {
    */
   public long getNumberOfUpdates() {
     return numberOfUpdates;
+  }
+
+  /**
+   * @return number of queries
+   */
+  public long getNumberOfProbes() {
+    return numberOfProbes;
+  }
+
+  /**
+   * @return number of hits when queried
+   */
+  public long getNumberOfHits() {
+    return numberOfHits;
+  }
+
+  /**
+   * @return number of misses when queried
+   */
+  public long getNumberOfMisses() {
+    return numberOfMisses;
+  }
+
+  /**
+   * @param key
+   * @return returns a hash key
+   */
+  private int getHash(long key) {
+    return (int) (key % maxNumberOfEntries);
   }
 
   // @formatter:off
