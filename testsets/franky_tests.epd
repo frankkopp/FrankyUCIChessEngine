@@ -15,7 +15,7 @@
 
 # Disambiguation tests
 7k/8/3p4/4N3/8/5p2/P7/1K2N3 w - - bm N5xf3; id "FRANKY-1 #6";
-7k/8/8/8/6p1/3N3N/P4p2/1K6 w - - bm Nhxf2; id "FRANKY-1 #7";
+2b4k/8/8/8/8/3N3N/P4p2/1K6 w - - bm Nhxf2; id "FRANKY-1 #7";
 8/3r1pk1/p1R2p2/1p5p/r2p4/PRP1K1P1/5P1P/8 w - - bm cxd4; id "Franky-1 #8";
 
 # en passant
