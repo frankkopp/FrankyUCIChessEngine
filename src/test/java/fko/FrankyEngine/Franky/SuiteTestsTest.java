@@ -80,8 +80,8 @@ public class SuiteTestsTest {
     Successful:  11 (55 Prozent)
     Failed:       9 (45 Prozent)
     Franky 0.11 - 10sec
-    Successful:   9 (45 Prozent)
-    Failed:      11 (55 Prozent)
+    Successful:  11 (55 Prozent)
+    Failed:       9 (45 Prozent)
      */
     testSuite = new TestSuite("./testsets/mate_test_suite.epd");
     testSuite.setSearchTime(10000);
@@ -92,11 +92,24 @@ public class SuiteTestsTest {
   void startNullMOveZuzwangSuite() {
     /*
     Franky-0.11 - 10sec
-    Successful:   4 (80 Prozent)
-    Failed:       1 (20 Prozent)
+    Successful:   2 (40 Prozent)
+    Failed:       3 (60 Prozent)
     */
     testSuite = new TestSuite("./testsets/nullMoveZufZwangTest.epd");
     testSuite.setSearchTime(10000);
+    testSuite.startTests();
+  }
+
+  @Test
+  @Disabled
+  void startWACSuite() {
+    /*
+    0.11 BASE
+    Successful: 253 (84 Prozent)
+    Failed:      47 (15 Prozent)
+    */
+    testSuite = new TestSuite("./testsets/wac.epd");
+    testSuite.setSearchTime(5000);
     testSuite.startTests();
   }
 
@@ -118,30 +131,14 @@ public class SuiteTestsTest {
 
   @Test
   @Disabled
-  void startWACSuite() {
-    /*
-    0.11 BASE (PV earlier)
-    Successful: 103 (34 Prozent)
-    Failed:     197 (65 Prozent)
-    0.11 BASE (PV later)
-    Successful: 104 (34 Prozent)
-    Failed:     196 (65 Prozent)
-    */
-    testSuite = new TestSuite("./testsets/wac.epd");
-    testSuite.setSearchTime(5000);
-    testSuite.startTests();
-  }
-
-  @Test
-  @Disabled
   void startDefaultTestSuite() {
     /*
     Franky-0.10 - 10sec
     Successful: 172 (49 Prozent)
     Failed:     174 (50 Prozent)
     Franky-0.11 - 10sec
-    Successful: 157 (45 Prozent)
-    Failed:     189 (54 Prozent)
+    Successful: 150 (43 Prozent)
+    Failed:     196 (56 Prozent)
     */
     // ./testsets/crafty_test.epd
     testSuite.setSearchTime(5000);
@@ -155,41 +152,108 @@ public class SuiteTestsTest {
     final Configuration config = new Configuration();
 
     config.USE_BOOK = false;
-
     // Successful: 105 (35 Prozent)
     // Failed:     195 (65 Prozent)
+
     config.USE_ALPHABETA_PRUNING = true;
     config.USE_PVS = true;
     config.USE_PVS_ORDERING = true;
     config.USE_KILLER_MOVES = true;
+    // Successful: 194 (64 Prozent)
+    // Failed:     106 (35 Prozent)
 
+    config.USE_QUIESCENCE = true;
+    // Successful: 239 (79 Prozent)
+    // Failed:      61 (20 Prozent)
 
-    config.USE_ASPIRATION_WINDOW = false;
+    config.USE_TRANSPOSITION_TABLE = true;
+    config.USE_TT_ROOT = true;
+    // Successful: 255 (85 Prozent)
+    // Failed:      45 (15 Prozent)
+
+    config.USE_ASPIRATION_WINDOW = true;
     config.USE_MTDf = false;
+    // Successful: 254 (84 Prozent)
+    // Failed:      46 (15 Prozent)
 
-    config.USE_TRANSPOSITION_TABLE = false;
-    config.USE_TT_ROOT = false;
+    config.USE_MDP = true;
+    config.USE_MPP = true;
+    // Successful: 255 (85 Prozent)
+    // Failed:      45 (15 Prozent)
 
-    config.USE_MDP = false;
-    config.USE_MPP = false;
+    config.USE_RFP = true;
+    // Successful: 256 (85 Prozent)
+    // Failed:      44 (14 Prozent)
 
-    config.USE_RFP = false;
-    config.USE_NMP = false;
-    config.USE_RAZOR_PRUNING = false;
+    config.USE_NMP = true;
+    // Successful: 259 (86 Prozent)
+    // Failed:      41 (13 Prozent)
 
-    config.USE_EXTENSIONS = false;
+    config.USE_RAZOR_PRUNING = true;
+    // Successful: 254 (84 Prozent)
+    // Failed:      46 (15 Prozent)
 
-    config.USE_LIMITED_RAZORING = false;
-    config.USE_EXTENDED_FUTILITY_PRUNING = false;
-    config.USE_FUTILITY_PRUNING = false;
+    config.USE_EXTENSIONS = true;
+    // Successful: 254 (84 Prozent)
+    // Failed:      46 (15 Prozent)
+
+    config.USE_LIMITED_RAZORING = true;
+    config.USE_EXTENDED_FUTILITY_PRUNING = true;
+    config.USE_FUTILITY_PRUNING = true;
+    // Successful: 251 (83 Prozent)
+    // Failed:      49 (16 Prozent)
+
+    config.USE_LMR = true;
+    // Successful: 252 (84 Prozent)
+    // Failed:      48 (16 Prozent)
+
     config.USE_LMP = false;
-    config.USE_LMR = false;
 
-    config.USE_QUIESCENCE = false;
 
     final int time = 5000;
 
     System.out.printf("WAC Test: %,d ms %nCONFG: %s %n%n", time,
+                      WordUtils.wrap(config.toString(), 80));
+    testSuite.setConfig(config);
+    testSuite.setSearchTime(time);
+    testSuite.startTests();
+  }
+
+  @Test
+  @Disabled
+  void startSTSSuiteFeatureRun() {
+    testSuite = new TestSuite("./testsets/STS1-STS15_LAN.EPD");
+    final Configuration config = new Configuration();
+
+    config.USE_BOOK = false;
+    // Successful: 323 (21 Prozent)
+    // Failed:     1.177 (78 Prozent)
+
+    config.USE_ALPHABETA_PRUNING = true;
+    config.USE_PVS = true;
+    config.USE_PVS_ORDERING = true;
+    config.USE_KILLER_MOVES = true;
+    config.USE_QUIESCENCE = true;
+    config.USE_TRANSPOSITION_TABLE = true;
+    config.USE_TT_ROOT = true;
+    config.USE_ASPIRATION_WINDOW = true;
+    config.USE_MTDf = false;
+    config.USE_MDP = true;
+    config.USE_MPP = true;
+    config.USE_RFP = true;
+    config.USE_NMP = true;
+    config.USE_RAZOR_PRUNING = true;
+    config.USE_EXTENSIONS = true;
+    config.USE_LIMITED_RAZORING = true;
+    config.USE_EXTENDED_FUTILITY_PRUNING = true;
+    config.USE_FUTILITY_PRUNING = true;
+    config.USE_LMR = true;
+    // Successful: 617 (41 Prozent)
+    // Failed:     883 (58 Prozent)
+
+    final int time = 5000;
+
+    System.out.printf("STS Test: %,d ms %nCONIFG: %s %n%n", time,
                       WordUtils.wrap(config.toString(), 80));
     testSuite.setConfig(config);
     testSuite.setSearchTime(time);
@@ -232,11 +296,53 @@ public class SuiteTestsTest {
   @Test
   @Disabled
   public void manualTest() {
+    testSuite = new TestSuite("./testsets/wac.epd");
+    final Configuration config = new Configuration();
+
+    config.USE_BOOK = false;
+    // Successful: 105 (35 Prozent)
+    // Failed:     195 (65 Prozent)
+
+    config.USE_ALPHABETA_PRUNING = true;
+    config.USE_PVS = true;
+    config.USE_PVS_ORDERING = true;
+    config.USE_KILLER_MOVES = true;
+
+    config.USE_QUIESCENCE = true;
+
+    config.USE_ASPIRATION_WINDOW = false;
+    config.USE_MTDf = false;
+
+    config.USE_TRANSPOSITION_TABLE = false;
+    config.USE_TT_ROOT = false;
+
+    config.USE_MDP = false;
+    config.USE_MPP = false;
+
+    config.USE_RFP = false;
+    config.USE_NMP = false;
+    config.USE_RAZOR_PRUNING = false;
+
+    config.USE_EXTENSIONS = false;
+
+    config.USE_LIMITED_RAZORING = false;
+    config.USE_EXTENDED_FUTILITY_PRUNING = false;
+    config.USE_FUTILITY_PRUNING = false;
+    config.USE_LMP = false;
+    config.USE_LMR = false;
+
+    System.out.printf("WAC Test: %,d ms %nCONFG: %s %n%n", 5000,
+                      WordUtils.wrap(config.toString(), 80));
+    testSuite.setConfig(config);
+
+    assertTrue(
+      testSuite.startOneTest("2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - bm Qg6; id \"WAC.001\";",
+                             5000, 0));
 
     // difficult for LMR because of Queen sacrifice
-    assertTrue(
-      testSuite.startOneTest("6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - - dm 3;",
-                             15000, 0));
+//    assertTrue(
+//      testSuite.startOneTest("6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - - dm 3;",
+//                             15000, 0));
 
   }
 
