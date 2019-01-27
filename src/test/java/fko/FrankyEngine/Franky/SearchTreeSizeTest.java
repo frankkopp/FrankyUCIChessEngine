@@ -76,7 +76,7 @@ public class SearchTreeSizeTest {
   public void sizeOfSearchTreeTest() throws ExecutionException, InterruptedException {
 
     final int NO_OF_TESTS = 5;
-    final int START_NO = 5;
+    final int START_NO = 15;
     final int DEPTH = 6;
     HASH_SIZE = 2048;
     THREADS = 1;
@@ -220,22 +220,24 @@ public class SearchTreeSizeTest {
 
     // AlphaBeta with TT and SORT
     search.config.USE_ALPHABETA_PRUNING = true;
-    search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.USE_TT_ROOT = true;
-    search.config.USE_KILLER_MOVES = true;
-    search.config.NO_KILLER_MOVES = 2;
     result.tests.add(measureTreeSize(search, position, searchMode, "ALPHABETA", true));
 
     // MTDf - just for debugging for now
-//    search.config.USE_MTDf = true;
-//    search.config.MTDf_START_DEPTH = 2;
-//    result.tests.add(measureTreeSize(search, position, searchMode, "MTDf", true));
-//    search.config.USE_MTDf = false;
+    //    search.config.USE_MTDf = true;
+    //    search.config.MTDf_START_DEPTH = 2;
+    //    result.tests.add(measureTreeSize(search, position, searchMode, "MTDf", true));
+    //    search.config.USE_MTDf = false;
 
     // PVS
     search.config.USE_PVS = true;
     search.config.USE_PVS_ORDERING = true;
+    search.config.USE_KILLER_MOVES = true;
+    search.config.NO_KILLER_MOVES = 2;
     result.tests.add(measureTreeSize(search, position, searchMode, "PVS", true));
+
+    search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_TT_ROOT = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "TT", true));
 
     // Aspiration
     search.config.USE_ASPIRATION_WINDOW = true;

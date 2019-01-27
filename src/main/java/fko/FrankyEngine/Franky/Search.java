@@ -34,7 +34,6 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
@@ -605,8 +604,10 @@ public class Search implements Runnable {
       assert currentBestRootMove != Move.NOMOVE : "We should have a best move here";
       assert !pv[ROOT_PLY].empty() : "PV should not be empty";
       assert currentBestRootMove == pv[ROOT_PLY].getFirst() : "best move is different from pv";
-      assert PERFT || currentBestRootValue != Evaluation.MIN : "Best root value is MIN, should be >MIN";
-      assert PERFT || (currentBestRootValue >= Evaluation.MIN && currentBestRootValue <= Evaluation.MAX)
+      assert PERFT || currentBestRootValue != Evaluation.MIN
+        : "Best root value is MIN, should be >MIN";
+      assert
+        PERFT || (currentBestRootValue >= Evaluation.MIN && currentBestRootValue <= Evaluation.MAX)
         : "Best root value out of MIN/MAX window";
 
       // update the UCI current best move and value
@@ -800,7 +801,8 @@ public class Search implements Runnable {
     // on leaf node call qsearch
     // also go into quiescence when depth is 1 deeper than current
     // iteration to avoid search explosion through extensions
-    if (depth <= LEAF || ply >= MAX_SEARCH_DEPTH - 1 || ply - 1 >= searchCounter.currentIterationDepth) {
+    if (depth <= LEAF || ply >= MAX_SEARCH_DEPTH - 1
+        || ply - 1 >= searchCounter.currentIterationDepth) {
       if (TRACE) trace("%sSearch in ply %d for depth %d: LEAF NODE", getSpaces(ply), ply, depth);
       return qsearch(position, ply, alpha, beta, pvNode);
     }
@@ -871,7 +873,7 @@ public class Search implements Runnable {
     // ###############################################
     // TT Lookup
     TTHit ttHit = null;
-    if (config.USE_TRANSPOSITION_TABLE  && !PERFT && !ROOT) {
+    if (config.USE_TRANSPOSITION_TABLE && !PERFT && !ROOT) {
       ttHit = probeTT(position, depth, alpha, beta, ply);
       if (ttHit != null && ttHit.type != TT_EntryType.NONE) {
         assert (ttHit.value >= Evaluation.MIN && ttHit.value <= Evaluation.MAX);
@@ -882,6 +884,7 @@ public class Search implements Runnable {
             trace("%sSearch in ply %d for depth %d: TT CUT value=%d", getSpaces(ply), ply, depth,
                   ttHit.value);
           }
+          searchCounter.tt_Cuts++;
           return ttHit.value;
         }
       }
@@ -1527,6 +1530,7 @@ public class Search implements Runnable {
         // in PV node only return ttHit if it was an exact hit
         if (!pvNode || ttHit.type == TT_EntryType.EXACT) {
           if (TRACE) trace("%sQuiescence in ply %d: TT CUT", getSpaces(ply), ply);
+          searchCounter.tt_Cuts++;
           return ttHit.value;
         }
       }
@@ -1807,7 +1811,7 @@ public class Search implements Runnable {
         TTHit hit = new TTHit();
 
         // hit
-        searchCounter.nodeCache_Hits++;
+        searchCounter.tt_Hits++;
 
         // return the depth as well
         hit.depth = ttEntry.depth;
@@ -1853,7 +1857,7 @@ public class Search implements Runnable {
         return hit;
       }
       // miss
-      searchCounter.nodeCache_Misses++;
+      searchCounter.tt_Misses++;
     }
     return null;
   }
@@ -2094,11 +2098,20 @@ public class Search implements Runnable {
    */
   private void printSearchResultInfo() {
     if (LOG.isInfoEnabled()) {
+      LOG.info(searchCounter.toString());
+      LOG.info(String.format("TT Entries %,d/%,d TT Updates %,d TT Collisions %,d "
+                              + "TT Hits %,d TT Misses %,d TT Cuts %,d",
+                              transpositionTable.getNumberOfEntries(),
+                              transpositionTable.getMaxEntries(),
+                              transpositionTable.getNumberOfUpdates(),
+                              transpositionTable.getNumberOfCollisions(), searchCounter.tt_Hits,
+                              searchCounter.tt_Misses, searchCounter.tt_Cuts));
       LOG.info("{}", String.format(
         "Search complete. Nodes visited: %,d Boards Evaluated: %,d (+%,d) re-pvs-root=%d re-asp=%d betaCutOffs=%s",
         searchCounter.nodesVisited, searchCounter.leafPositionsEvaluated,
         searchCounter.nonLeafPositionsEvaluated, searchCounter.pvs_root_researches,
         searchCounter.aspirationResearches, Arrays.toString(searchCounter.betaCutOffs)));
+
       LOG.info(searchCounter.toString());
       LOG.info("Search Depth was {} ({})", searchCounter.currentIterationDepth,
                searchCounter.currentExtraSearchDepth);
@@ -2179,16 +2192,14 @@ public class Search implements Runnable {
 
       }
 
-      //      LOG.debug(searchCounter.toString());
-      //      LOG.debug(String.format("TT Entries %,d/%,d TT Updates %,d TT Collisions %,d "
-      //                              + "TT Hits %,d TT Misses %,d"
-      //                              , transpositionTable.getNumberOfEntries()
-      //                              , transpositionTable.getMaxEntries()
-      //                              , transpositionTable.getNumberOfUpdates()
-      //                              , transpositionTable.getNumberOfCollisions()
-      //                              , searchCounter.nodeCache_Hits
-      //                              , searchCounter.nodeCache_Misses
-      //                              ));
+      LOG.debug(searchCounter.toString());
+      LOG.debug(String.format("TT Entries %,d/%,d TT Updates %,d TT Collisions %,d "
+                              + "TT Hits %,d TT Misses %,d TT Cuts %,d",
+                              transpositionTable.getNumberOfEntries(),
+                              transpositionTable.getMaxEntries(),
+                              transpositionTable.getNumberOfUpdates(),
+                              transpositionTable.getNumberOfCollisions(), searchCounter.tt_Hits,
+                              searchCounter.tt_Misses, searchCounter.tt_Cuts));
 
       uciUpdateTicker = System.currentTimeMillis();
     }
@@ -2384,7 +2395,7 @@ public class Search implements Runnable {
   public class SearchCounter {
 
     // counter for cut off to measure qualitiy of move ordering
-    private long[] betaCutOffs = new long[MAX_MOVES];
+    long[] betaCutOffs = new long[MAX_MOVES];
 
     // Info values
     int  currentIterationDepth   = 0;
@@ -2410,8 +2421,9 @@ public class Search implements Runnable {
     long pvs_root_cutoffs       = 0;
     long pvs_researches         = 0;
     long pvs_cutoffs            = 0;
-    long nodeCache_Hits         = 0;
-    long nodeCache_Misses       = 0;
+    long tt_Hits                = 0;
+    long tt_Misses              = 0;
+    int  tt_Cuts                = 0;
     long movesGenerated         = 0;
     long nodesVisited           = 0;
     int  minorPromotionPrunings = 0;
@@ -2444,14 +2456,16 @@ public class Search implements Runnable {
       bestMoveChanges = 0;
       nodesVisited = 0;
       leafPositionsEvaluated = 0;
+      nonLeafPositionsEvaluated = 0;
       positionsNonQuiet = 0;
       prunings = 0;
       pvs_root_researches = 0;
       pvs_root_cutoffs = 0;
       pvs_researches = 0;
       pvs_cutoffs = 0;
-      nodeCache_Hits = 0;
-      nodeCache_Misses = 0;
+      tt_Hits = 0;
+      tt_Misses = 0;
+      tt_Cuts = 0;
       movesGenerated = 0;
       checkCounter = 0;
       checkMateCounter = 0;
@@ -2491,8 +2505,9 @@ public class Search implements Runnable {
              ", captureCounter=" + captureCounter +
              ", enPassantCounter=" + enPassantCounter +
              ", positionsNonQuiet=" + positionsNonQuiet +
-             ", nodeCache_Hits=" + nodeCache_Hits +
-             ", nodeCache_Misses=" + nodeCache_Misses +
+             ", tt_Hits=" + tt_Hits +
+             ", tt_Misses=" + tt_Misses +
+             ", tt_Cuts=" + tt_Cuts +
              ", movesGenerated=" + movesGenerated +
              ", pvs_root_researches=" + pvs_root_researches +
              ", pvs_root_cutoffs=" + pvs_root_cutoffs +
