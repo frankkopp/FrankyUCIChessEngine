@@ -52,7 +52,7 @@ public class TranspositionTable {
 
   private long sizeInByte;
   private int  maxNumberOfEntries;
-  private int  numberOfEntries    = 0;
+  private int  numberOfEntries = 0;
 
   private long numberOfCollisions = 0L;
   private long numberOfUpdates    = 0L;
@@ -138,7 +138,7 @@ public class TranspositionTable {
 
     final int hash = getHash(position.getZobristKey());
 
-    // new value
+    // New hash
     if (entries[hash].key == 0) {
       numberOfEntries++;
 
@@ -151,8 +151,11 @@ public class TranspositionTable {
       entries[hash].depth = depth;
       entries[hash].bestMove = bestMove;
     }
-    // different position - overwrite if the previous entry has not been used (is aged)
-    else if (position.getZobristKey() != entries[hash].key && depth > entries[hash].depth
+    // Same hash but different position
+    // overwrite if
+    // - the new entry's depth is higher or equal
+    // - the previous entry has not been used (is aged)
+    else if (position.getZobristKey() != entries[hash].key && depth >= entries[hash].depth
              && entries[hash].age > 0) {
       numberOfCollisions++;
 
@@ -166,7 +169,7 @@ public class TranspositionTable {
       entries[hash].depth = depth;
       entries[hash].bestMove = bestMove;
     }
-    // Update same position
+    // Same hash and same position -> update entry?
     else if (position.getZobristKey() == entries[hash].key) {
 
       // if from same depth only update when quality of new entry is better
@@ -190,7 +193,7 @@ public class TranspositionTable {
           assert entries[hash].type == type;
           assert entries[hash].depth == depth;
         }
-        // overwrite bestNive only with a valid move
+        // overwrite bestMove only with a valid move
         if (bestMove != Move.NOMOVE) entries[hash].bestMove = bestMove;
       }
       // if depth is greater then we update in any case
@@ -206,7 +209,8 @@ public class TranspositionTable {
 
         // overwrite bestNive only with a valid move
         if (bestMove != Move.NOMOVE) entries[hash].bestMove = bestMove;
-      }
+      } // overwrite bestMove if there wastn't any before
+      else if (entries[hash].bestMove == Move.NOMOVE) entries[hash].bestMove = bestMove;
     }
   }
 
@@ -327,6 +331,15 @@ public class TranspositionTable {
    */
   private int getHash(long key) {
     return (int) (key % maxNumberOfEntries);
+  }
+
+  @Override
+  public String toString() {
+    return "TranspositionTable{" + "sizeInByte=" + sizeInByte + ", maxNumberOfEntries="
+           + maxNumberOfEntries + ", numberOfEntries=" + numberOfEntries + ", numberOfCollisions="
+           + numberOfCollisions + ", numberOfUpdates=" + numberOfUpdates + ", numberOfProbes="
+           + numberOfProbes + ", numberOfHits=" + numberOfHits + ", numberOfMisses="
+           + numberOfMisses + '}';
   }
 
   // @formatter:off
