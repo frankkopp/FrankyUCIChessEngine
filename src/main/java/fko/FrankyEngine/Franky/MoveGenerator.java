@@ -208,11 +208,13 @@ public class MoveGenerator {
           onDemandMoveList.add(capturingMoves);
 
           // all capturing moves are generated
-          generationCycleState = OnDemandState.NON_CAPTURING;
+          if (capturingOnly) generationCycleState = OnDemandState.ALL;
+          else generationCycleState = OnDemandState.NON_CAPTURING;
           break;
 
         case NON_CAPTURING:
-          if (capturingOnly) break;
+          assert !capturingOnly;
+
           generateNonCapturingMoves();
 
           // full sort of non-capturing moves
@@ -222,9 +224,7 @@ public class MoveGenerator {
           onDemandMoveList.add(nonCapturingMoves);
 
           // removing pv move as this has been handled in CAPTURING phase.
-          if (pvMove != Move.NOMOVE) {
-            onDemandMoveList.remove(pvMove);
-          }
+          if (pvMove != Move.NOMOVE) onDemandMoveList.remove(pvMove);
 
           generationCycleState = OnDemandState.ALL;
           break;
