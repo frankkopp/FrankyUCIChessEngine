@@ -28,6 +28,7 @@ package fko.FrankyEngine;
 import fko.FrankyEngine.Franky.FrankyEngine;
 import fko.UCI.IUCIEngine;
 import fko.UCI.UCIProtocolHandler;
+import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,17 +65,24 @@ public class Main {
    *
    * @param args command line options
    */
-  public static void main(final String[] args) {
+  public static void main(final String[] args) throws ParseException {
+
+    // Create Options object
+    Options options = new Options();
+    options.addOption("p", "logname-postfix", true, "Postfix for logfile name");
+    // Parse and execute Options
+    CommandLineParser parser = new DefaultParser();
+    CommandLine cmd = parser.parse(options, args);
+    if (cmd.hasOption("p")) {
+      System.setProperty("application-name",
+                         System.getProperty("application-name") + "-" + cmd.getOptionValue("p"));
+    }
 
     Logger LOG = LoggerFactory.getLogger(Main.class);
-
     LOG.debug("Start UCI Engine Framework " + Instant.now());
-
     final IUCIEngine uciEngine = new FrankyEngine();
     final UCIProtocolHandler handler = new UCIProtocolHandler(uciEngine);
-
     handler.startHandler();
-
     LOG.debug("Started UCI Engine Framework " + Instant.now());
   }
 
