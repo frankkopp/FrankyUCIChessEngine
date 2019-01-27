@@ -30,80 +30,80 @@ package fko.FrankyEngine.Franky;
  */
 public enum Piece {
 
-    NOPIECE      (PieceType.NOTYPE, Color.NOCOLOR, ""),// 0
-    WHITE_PAWN   (PieceType.PAWN, Color.WHITE, "P"), // 1
-    WHITE_KNIGHT (PieceType.KNIGHT, Color.WHITE, "N"), // 2
-    WHITE_BISHOP (PieceType.BISHOP, Color.WHITE, "B"), // 3
-    WHITE_ROOK   (PieceType.ROOK, Color.WHITE, "R"), // 4
-    WHITE_QUEEN  (PieceType.QUEEN, Color.WHITE, "Q"), // 5
-    WHITE_KING   (PieceType.KING, Color.WHITE, "K"), // 6
-    BLACK_PAWN   (PieceType.PAWN, Color.BLACK, "p"), // 7
-    BLACK_KNIGHT (PieceType.KNIGHT, Color.BLACK, "n"), // 8
-    BLACK_BISHOP (PieceType.BISHOP, Color.BLACK, "b"), // 9
-    BLACK_ROOK   (PieceType.ROOK, Color.BLACK, "r"), // 10
-    BLACK_QUEEN  (PieceType.QUEEN, Color.BLACK, "q"), // 11
-    BLACK_KING   (PieceType.KING, Color.BLACK, "k"); // 12
+  NOPIECE(PieceType.NOTYPE, Color.NOCOLOR, ""),// 0
+  WHITE_PAWN(PieceType.PAWN, Color.WHITE, "P"), // 1
+  WHITE_KNIGHT(PieceType.KNIGHT, Color.WHITE, "N"), // 2
+  WHITE_BISHOP(PieceType.BISHOP, Color.WHITE, "B"), // 3
+  WHITE_ROOK(PieceType.ROOK, Color.WHITE, "R"), // 4
+  WHITE_QUEEN(PieceType.QUEEN, Color.WHITE, "Q"), // 5
+  WHITE_KING(PieceType.KING, Color.WHITE, "K"), // 6
+  BLACK_PAWN(PieceType.PAWN, Color.BLACK, "p"), // 7
+  BLACK_KNIGHT(PieceType.KNIGHT, Color.BLACK, "n"), // 8
+  BLACK_BISHOP(PieceType.BISHOP, Color.BLACK, "b"), // 9
+  BLACK_ROOK(PieceType.ROOK, Color.BLACK, "r"), // 10
+  BLACK_QUEEN(PieceType.QUEEN, Color.BLACK, "q"), // 11
+  BLACK_KING(PieceType.KING, Color.BLACK, "k"); // 12
 
-    static final Piece[] values;
+  static final Piece[] values;
 
-    private final PieceType _type;
-    private final Color     _color;
-    private final String    _shortName;
+  private final PieceType _type;
+  private final Color     _color;
+  private final String    _shortName;
 
-    static {
-        values = Piece.values();
-    }
+  static {
+    values = Piece.values();
+  }
 
-    Piece(PieceType type, Color color, String shortName) {
-        _type = type;
-        _color = color;
-        _shortName = shortName;
-    }
+  Piece(PieceType type, Color color, String shortName) {
+    _type = type;
+    _color = color;
+    _shortName = shortName;
+  }
 
-    /**
-     * @return the type
-     */
-    public PieceType getType() {
-        return _type;
-    }
+  /**
+   * @return the type
+   */
+  public PieceType getType() {
+    return _type;
+  }
 
-    /**
-     * @return the color
-     */
-    public Color getColor() {
-        return _color;
-    }
+  /**
+   * @return the color
+   */
+  public Color getColor() {
+    return _color;
+  }
 
-    /**
-     * @return the shortName
-     */
-    public String getShortName() {
-        return _shortName;
-    }
+  /**
+   * @return the shortName
+   */
+  public String getShortName() {
+    return _shortName;
+  }
 
-    @Override
-    public String toString() {
-        return _shortName;
-    }
+  @Override
+  public String toString() {
+    return _shortName;
+  }
 
-    /**
-     * Returns the piece for this type and color.
-     * @param type
-     * @param color
-     * @return matching Piece
-     */
-    public static Piece getPiece(PieceType type, Color color) {
-        // this only works if the ordinal of all enums stay the same - if they change this
-        // has to be changed as well
-        return Piece.values[(color.ordinal() * 6) + type.ordinal() ];
-    }
+  /**
+   * Returns the piece for this type and color.
+   * @param type
+   * @param color
+   * @return matching Piece
+   */
+  public static Piece getPiece(PieceType type, Color color) {
+    // this only works if the ordinal of all enums stay the same - if they change this
+    // has to be changed as well
+    return Piece.values[(color.ordinal() * 6) + type.ordinal()];
+  }
 
-    /**
-     * @param i
-     * @return returns true if this is a valid piece type
-     */
-    public static boolean isValid(int i) {
-        return i >= 0 && i <= 12;
-    }
+  /**
+   * @param i
+   * @return returns true if this is a valid piece type
+   */
+  public static boolean isValid(int i) {
+    return i >= 0 && i <= 12;
+  }
 
 }
