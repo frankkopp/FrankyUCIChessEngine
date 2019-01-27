@@ -1494,16 +1494,9 @@ public class Position {
    */
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (!(obj instanceof Position)) {
-      return false;
-    }
-    Position other = (Position) obj;
-    return this.zobristKey == other.zobristKey;
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (!(obj instanceof Position)) return false;
+    return this.zobristKey == ((Position) obj).zobristKey;
   }
 }
