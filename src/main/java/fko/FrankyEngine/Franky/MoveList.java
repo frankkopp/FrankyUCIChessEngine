@@ -117,6 +117,15 @@ public class MoveList extends SimpleIntList {
   }
 
   @Override
+  public boolean remove(final int move) {
+    if (!Move.isValid(move)) throw new IllegalArgumentException("not a valid move: " + move);
+    return super.remove(move);
+  }
+
+
+
+
+  @Override
   public void sort(Comparator<Integer> comparator) {
     super.sort(comparator);
   }
