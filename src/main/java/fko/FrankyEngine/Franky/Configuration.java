@@ -89,27 +89,27 @@ public class Configuration {
   /**
    * Use Transposition Tables for visited nodes (needs extra memory)
    */
-  public boolean USE_TRANSPOSITION_TABLE = false;
+  public boolean USE_TRANSPOSITION_TABLE = true;
 
   /**
    * Uses TT to determine best move of previous searches and also start depth
    */
-  public boolean USE_TT_ROOT = false;
+  public boolean USE_TT_ROOT = true;
 
   /**
    * Do quiescence evaluation and search extension for non quiet positions
    */
-  public boolean USE_QUIESCENCE = false;
+  public boolean USE_QUIESCENCE = true;
 
   /**
    * Use AlphaBeta Pruning
    */
-  public boolean USE_ALPHABETA_PRUNING = false;
+  public boolean USE_ALPHABETA_PRUNING = true;
 
   /**
    * Killer moves - move which caused cut offs in previous iterations
    */
-  public boolean USE_KILLER_MOVES = false;
+  public boolean USE_KILLER_MOVES = true;
   public int     NO_KILLER_MOVES  = 2;
 
   /**
@@ -123,12 +123,12 @@ public class Configuration {
   /**
    * Principal Variation Search
    */
-  public boolean USE_PVS = false;
+  public boolean USE_PVS = true;
 
   /**
    * Push last PV move to search first position for iterations.
    */
-  public boolean USE_PVS_ORDERING = false;
+  public boolean USE_PVS_ORDERING = true;
 
   /**
    * Use Aspiration Window in root search
@@ -141,12 +141,12 @@ public class Configuration {
   /**
    * Mate Distance Pruning
    */
-  public boolean USE_MDP = false;
+  public boolean USE_MDP = true;
 
   /**
    * Minor Promotion Pruning
    */
-  public boolean USE_MPP = false;
+  public boolean USE_MPP = true;
 
 
   /**
@@ -154,13 +154,13 @@ public class Configuration {
    * Reverse Futility Pruning
    * https://www.chessprogramming.org/Reverse_Futility_Pruning
    */
-  public boolean USE_RFP    = false;
+  public boolean USE_RFP    = true;
   public int     RFP_MARGIN = 300;
 
   /**
    * Null Move Pruning
    */
-  public boolean USE_NMP                = false;
+  public boolean USE_NMP                = true;
   public int     NMP_DEPTH              = 3;
   public boolean USE_VERIFY_NMP         = true;
   public int     NMP_VERIFICATION_DEPTH = 3;
@@ -176,15 +176,15 @@ public class Configuration {
   /**
    * Use search depth extensions
    */
-  public boolean USE_EXTENSIONS = false;
+  public boolean USE_EXTENSIONS = true;
 
   /**
    * Limited Razoring
    * http://people.csail.mit.edu/heinz/dt/node18.html
    */
-  public boolean USE_LIMITED_RAZORING = false;
-  public boolean USE_EXTENDED_FUTILITY_PRUNING = false;
-  public boolean USE_FUTILITY_PRUNING = false;
+  public boolean USE_LIMITED_RAZORING = true;
+  public boolean USE_EXTENDED_FUTILITY_PRUNING = true;
+  public boolean USE_FUTILITY_PRUNING = true;
 
   /**
    * Late Move Pruning
@@ -195,7 +195,7 @@ public class Configuration {
   /**
    * Late Move Reduction
    */
-  public boolean USE_LMR       = false;
+  public boolean USE_LMR       = true;
   public int     LMR_MIN_DEPTH = 3;
   public int     LMR_MIN_MOVES = 3;
   public int     LMR_REDUCTION = 1;
