@@ -653,13 +653,10 @@ public class PositionTest {
 
       boolean test = false;
       Instant start = Instant.now();
-      while (true) {
+      do {
         ITERATIONS++;
         test = board.isAttacked(Color.WHITE, Square.d4);
-        if (Duration.between(start, Instant.now()).getSeconds() == DURATION) {
-          break;
-        }
-      }
+      } while (Duration.between(start, Instant.now()).getSeconds() != DURATION);
 
       //            System.out.println(board);
       //            System.out.println(moves);
