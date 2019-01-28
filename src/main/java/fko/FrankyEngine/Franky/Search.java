@@ -45,6 +45,19 @@ import java.util.concurrent.CountDownLatch;
  * the search is finished it calls <code>engine.sendResult</code> ith the best move and a ponder
  * move if it has one.
  * <p>
+ *
+ * TODO:
+ *  Testing / Bug fixing
+ *  --------------------------------
+ * <p>
+ * TODO
+ *  Performance
+ *  --------------------------------
+ *
+ * <p>
+ * TODO
+ *  Features
+ *  --------------------------------
  * TODO: History Heuristic / http://www.frayn.net/beowulf/theory.html#history
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: More extensions and reductions
@@ -2073,7 +2086,7 @@ public class Search implements Runnable {
 
   /**
    * @param t
-   * @returnthe elapsed time from the start of the search to the given t
+   * @return the elapsed time from the start of the search to the given t
    */
   private long elapsedTime(final long t) {
     return t - startTime;

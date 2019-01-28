@@ -41,20 +41,6 @@ import java.util.Properties;
 /**
  * Franky Engine for UCI GUIs
  * <p>
- * TODO:
- *  Testing / Bug fixing
- *  --------------------------------
- *  3-fold repetition too often - pot. bug - more testing
- *
- * <p>
- * TODO
- *  Performance
- *  --------------------------------
- *
- * <p>
- * TODO
- *  Features
- *  --------------------------------
  */
 public class FrankyEngine implements IUCIEngine {
 
