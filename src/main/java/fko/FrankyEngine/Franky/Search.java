@@ -1060,6 +1060,15 @@ public class Search implements Runnable {
     }
     // ###############################################
 
+    // Check if we need to stop search again - there is a lot happening since last check
+    if (stopSearch) {
+      if (TRACE) {
+        if (!stopSearch) trace("%sSearch in ply %d for depth %d: STOPPED2 (time=%,d)",
+                                        getSpaces(ply), ply, depth, hardTimeLimit);
+      }
+      return Evaluation.MIN; // value does not matter because of top flag
+    }
+
     // ###############################################
     // MOVE LOOP
     // Search all generated moves using the onDemand move generator.

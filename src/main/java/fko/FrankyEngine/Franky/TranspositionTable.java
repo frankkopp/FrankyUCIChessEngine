@@ -131,7 +131,6 @@ public class TranspositionTable {
     assert depth >= 0;
     assert type > 0;
     assert value > Evaluation.NOVALUE;
-    //assert (value >= Evaluation.MIN && value <= Evaluation.MAX);
 
     final int hash = getHash(key);
 
