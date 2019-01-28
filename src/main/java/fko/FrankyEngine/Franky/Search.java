@@ -822,8 +822,7 @@ public class Search implements Runnable {
     // @formatter:off
     if (stopSearch
         || hardTimeLimitReached()
-        || (searchMode.getNodes() > 0
-            && searchCounter.nodesVisited >= searchMode.getNodes())
+        || checkMaxNodes()
     ) {
       if (TRACE) {
         if (!stopSearch) trace("%sSearch in ply %d for depth %d: STOPPED (time=%,d)",
@@ -1056,44 +1055,48 @@ public class Search implements Runnable {
       }
 
       // ###############################################
-      // Minor Promotion Pruning          @formatter:off
+      // Minor Promotion Pruning
       // Skip non queen or knight promotion as they are
       // redundant. Exception would be stale mate situations
       // which we ignore.
-      if (config.USE_MPP && !PERFT
-          && Move.getMoveType(move) == MoveType.PROMOTION
+      if (config.USE_MPP && !PERFT) {
+        //@formatter:off
+        if (Move.getMoveType(move) == MoveType.PROMOTION
           && Move.getPromotion(move).getType() != PieceType.QUEEN
           && Move.getPromotion(move).getType() != PieceType.KNIGHT) {
-        searchCounter.minorPromotionPrunings++;
-        if (TRACE) trace("%sSearch in ply %d for depth %d: MPP CUT", getSpaces(ply), ply, depth);
-        move = getNextMove(ply, i++);
-        continue;
-      } // @formatter:on
+          searchCounter.minorPromotionPrunings++;
+          if (TRACE) trace("%sSearch in ply %d for depth %d: MPP CUT", getSpaces(ply), ply, depth);
+          move = getNextMove(ply, i++);
+          continue;
+        } // @formatter:on
+      }
       // ###############################################
 
       // prepare new search depth
       int newDepth = depth - 1;
 
       // ###############################################
-      // EXTENSIONS PRE MOVE              @formatter:off
+      // EXTENSIONS PRE MOVE
       // Some positions should be searched to a higher
       // depth or at least they should not be reduced.
       int extension = 0;
-      if (config.USE_EXTENSIONS && !PERFT
-          && (mateThreat[ply]
+      if (config.USE_EXTENSIONS && !PERFT) {
+        // @formatter:off
+        if (mateThreat[ply]
             || Move.getMoveType(move) == MoveType.PROMOTION
             || Move.getMoveType(move) == MoveType.CASTLING
             || (Move.getPiece(move).getType() == PieceType.PAWN
                 && (position.getNextPlayer().isWhite()
                 ? Move.getEnd(move).getRank() == Square.Rank.r7
-                : Move.getEnd(move).getRank() == Square.Rank.r2))
-            // TODO: recapture - some field same value
-      )) {
-        extension = 1;
-        newDepth += extension;
-        if (TRACE) trace("%sSearch in ply %d for depth %d: PRE EXTENSION %d",
-                             getSpaces(ply), ply, depth, newDepth);
-      } // @formatter:on
+                : Move.getEnd(move).getRank() == Square.Rank.r2))) {
+          extension = 1;
+          newDepth += extension;
+          if (TRACE) {
+          trace("%sSearch in ply %d for depth %d: PRE EXTENSION %d",
+                getSpaces(ply), ply, depth, newDepth);
+        }
+        } // @formatter:on
+      }
       // ###############################################
 
       // ###############################################
@@ -1465,7 +1468,7 @@ public class Search implements Runnable {
       return contempt(position);
     }
 
-    // If quiescence is turned off return evaluation
+    // If quiescence is turned off or we reach max depth return evaluation
     if (!config.USE_QUIESCENCE || ply >= MAX_SEARCH_DEPTH - 1) {
       if (TRACE) {
         trace("%sQuiescence in ply %d: EVAL value=%d", getSpaces(ply), ply,
@@ -1479,8 +1482,8 @@ public class Search implements Runnable {
     // @formatter:off
     if (stopSearch
         || hardTimeLimitReached()
-        || (searchMode.getNodes() > 0
-            && searchCounter.nodesVisited >= searchMode.getNodes())) {
+        || checkMaxNodes()
+    ) {
       if (TRACE) {
         if (!stopSearch) trace("%sQuiescence in ply %d: STOPPED (time=%,d)",
                                         getSpaces(ply), ply, hardTimeLimit);
@@ -1498,7 +1501,7 @@ public class Search implements Runnable {
     int bestNodeMove = Move.NOMOVE;
 
     // ###############################################
-    // ## BEGIN Mate Distance Pruning
+    // ## Mate Distance Pruning
     // ## Did we already find a shorter mate then ignore this one
     if (config.USE_MDP && !PERFT) {
       alpha = Math.max(-Evaluation.CHECKMATE + ply, alpha);
@@ -1581,13 +1584,14 @@ public class Search implements Runnable {
 
       // ###############################################
       // Minor Promotion Pruning
+      // Skip non queen or knight promotion as they are
+      // redundant. Exception would be stale mate situations
+      // which we ignore.
       if (config.USE_MPP && !PERFT) {
         // @formatter:off
         if (Move.getMoveType(move) == MoveType.PROMOTION
             && Move.getPromotion(move).getType() != PieceType.QUEEN
             && Move.getPromotion(move).getType() != PieceType.KNIGHT) {
-          // prune non queen or knight promotion as they are redundant
-          // exception would be stale mate situations.
           searchCounter.minorPromotionPrunings++;
           if (TRACE) trace("%sQuiescence in ply %d: MPP CUT", getSpaces(ply), ply);
           continue;
@@ -1865,6 +1869,14 @@ public class Search implements Runnable {
   }
 
   /**
+   * Checks if the maximum number of nodes has been searched
+   * @return true if maximum number of searched nodes is reached
+   */
+  private boolean checkMaxNodes() {
+    return searchMode.getNodes() > 0 && searchCounter.nodesVisited >= searchMode.getNodes();
+  }
+
+  /**
    * Retrieves the PV line from the transposition table in root search.
    *
    * @param position
@@ -2058,6 +2070,8 @@ public class Search implements Runnable {
   /**
    * Hard time limit is used to check time regularily in the search to stop the search when
    * time is out
+   *
+   * TODO instead of checking this regulary we could use a timer thread to set stopSearch to true.
    *
    * @return true if hard time limit is reached, false otherwise
    */
