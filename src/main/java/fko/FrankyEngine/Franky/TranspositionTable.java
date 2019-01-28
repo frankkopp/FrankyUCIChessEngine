@@ -76,13 +76,13 @@ public class TranspositionTable {
     long freeMemory = (Runtime.getRuntime().maxMemory() - usedMemory);
     long ttMemory = (long) (freeMemory * 0.9);
 
-    LOG.debug("{}", String.format("Max JVM memory:           %,5d MB",
+    LOG.debug("{}", String.format("Max JVM memory:              %,5d MB",
                                   Runtime.getRuntime().maxMemory() / MB));
-    LOG.debug("{}", String.format("Current total memory:     %,5d MB",
+    LOG.debug("{}", String.format("Current total memory:        %,5d MB",
                                   Runtime.getRuntime().totalMemory() / MB));
-    LOG.debug("{}", String.format("Current used memory:      %,5d MB", usedMemory / MB));
-    LOG.debug("{}", String.format("Current free memory:      %,5d MB", freeMemory / MB));
-    LOG.debug("{}", String.format("Memory available for TT:  %,5d MB", ttMemory / MB));
+    LOG.debug("{}", String.format("Current used memory:         %,5d MB", usedMemory / MB));
+    LOG.debug("{}", String.format("Current free memory:         %,5d MB", freeMemory / MB));
+    LOG.debug("{}", String.format("Memory available for TT:     %,5d MB", ttMemory / MB));
 
     if (ttMemory < sizeInByte) {
       LOG.warn("{}", String.format(
@@ -101,7 +101,8 @@ public class TranspositionTable {
       entries[i] = new TT_Entry();
     }
 
-    LOG.info("{}", String.format("Transposition Table Size: %,5d MB", sizeInByte / (KB * KB)));
+    LOG.info("{}", String.format("Transposition Table Size:    %,5d MB", sizeInByte / (KB * KB)));
+    LOG.info("{}", String.format("Transposition Table Entries: %,d", maxNumberOfEntries));
   }
 
   /**
@@ -322,14 +323,6 @@ public class TranspositionTable {
     return numberOfMisses;
   }
 
-  /**
-   * @param key
-   * @return returns a hash key
-   */
-  private int getHash(long key) {
-    return (int) (key % maxNumberOfEntries);
-  }
-
   @Override
   public String toString() {
     return "TranspositionTable{" + "sizeInByte=" + sizeInByte + ", maxNumberOfEntries="
@@ -337,6 +330,14 @@ public class TranspositionTable {
            + numberOfCollisions + ", numberOfUpdates=" + numberOfUpdates + ", numberOfProbes="
            + numberOfProbes + ", numberOfHits=" + numberOfHits + ", numberOfMisses="
            + numberOfMisses + '}';
+  }
+
+  /**
+   * @param key
+   * @return returns a hash key
+   */
+  private int getHash(long key) {
+    return (int) (key % maxNumberOfEntries);
   }
 
   // @formatter:off
