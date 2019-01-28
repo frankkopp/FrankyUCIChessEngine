@@ -168,6 +168,8 @@ public class Search implements Runnable {
   /**
    * Creates a search object and stores a back reference to the engine object and also the
    * used configuration instance.<br>
+   * The engine object can be null. Info and search result will only be written to
+   * log.
    *
    * @param engine
    * @param config
@@ -599,7 +601,10 @@ public class Search implements Runnable {
       assert PERFT || value != Evaluation.MIN || stopSearch : "MIN value without STOPSEARCH";
 
       // we can only use the value if there has not been a stop
-      if (!stopSearch) currentBestRootValue = value;
+      if (!stopSearch) {
+        currentBestRootValue = value;
+        rootMoves.pushToHead(pv[ROOT_PLY].getFirst());
+      }
 
       assert currentBestRootMove != Move.NOMOVE : "We should have a best move here";
       assert !pv[ROOT_PLY].empty() : "PV should not be empty";
@@ -911,14 +916,12 @@ public class Search implements Runnable {
           assert value != Evaluation.NOVALUE;
           // correct the mate value as this has been recorded
           // relative to a different ply
-          if (isCheckMateValue(value)) {
-            value = value > 0 ? value - ply : value + ply;
-          }
+          if (isCheckMateValue(value)) value = value > 0 ? value - ply : value + ply;
           // in PV node only return ttHit if it was an exact hit
           boolean cut = false;
           if (ttEntry.type == TT_EntryType.EXACT) cut = true;
-          else if (ttEntry.type == TT_EntryType.ALPHA && value <= alpha && !pvNode) cut = true;
-          else if (ttEntry.type == TT_EntryType.BETA && value >= beta && !pvNode) cut = true;
+          else if (!pvNode && ttEntry.type == TT_EntryType.ALPHA && value <= alpha) cut = true;
+          else if (!pvNode && ttEntry.type == TT_EntryType.BETA && value >= beta) cut = true;
           if (cut) {
             if (TRACE) {
               trace("%sSearch in ply %d for depth %d: TT CUT value=%d", getSpaces(ply), ply, depth,
@@ -927,10 +930,10 @@ public class Search implements Runnable {
             searchCounter.tt_Cuts++;
             return value;
           }
-          else searchCounter.tt_Ignored++;
         }
-        else searchCounter.tt_Misses++;
+        searchCounter.tt_Ignored++;
       }
+      else searchCounter.tt_Misses++;
     }
     // End TT Lookup
     // ###############################################
@@ -1076,8 +1079,9 @@ public class Search implements Runnable {
     // Check if we need to stop search again - there is a lot happening since last check
     if (stopSearch) {
       if (TRACE) {
-        if (!stopSearch) trace("%sSearch in ply %d for depth %d: STOPPED2 (time=%,d)",
-                                        getSpaces(ply), ply, depth, hardTimeLimit);
+        if (!stopSearch)
+          trace("%sSearch in ply %d for depth %d: STOPPED2 (time=%,d)", getSpaces(ply), ply, depth,
+                hardTimeLimit);
       }
       return Evaluation.MIN; // value does not matter because of top flag
     }
@@ -1454,17 +1458,10 @@ public class Search implements Runnable {
       assert ttType == TT_EntryType.ALPHA;
     }
 
-    if (ROOT) {
-      if (TRACE) trace("Root Search for depth %d: END. (alpha=%d beta==%d)", depth, alpha, beta);
-      // push PV move to head of list
-      rootMoves.pushToHead(pv[ROOT_PLY].getFirst());
-    }
-    else {
-      if (TRACE) {
-        trace("%sSearch in ply %d for depth %d: END value=%d (%d moves searched) (%s)",
-              getSpaces(ply), ply, depth, alpha, numberOfSearchedMoves,
-              currentVariation.toNotationString());
-      }
+    if (TRACE) {
+      trace("%sSearch in ply %d for depth %d: END value=%d (%d moves searched) (%s)",
+            getSpaces(ply), ply, depth, alpha, numberOfSearchedMoves,
+            currentVariation.toNotationString());
     }
 
     // store the best alpha
@@ -1571,30 +1568,28 @@ public class Search implements Runnable {
         mateThreat[ply] = ttEntry.mateThreat;
 
         // use value only if tt depth was equal or deeper
-        if (ttEntry.depth >= DEPTH_NONE) {
-          int value = ttEntry.value;
-          assert value != Evaluation.NOVALUE;
-          // correct the mate value as this has been recorded
-          // relative to a different ply
-          if (isCheckMateValue(value)) {
-            value = value > 0 ? value - ply : value + ply;
+        //if (ttEntry.depth >= DEPTH_NONE) {
+        int value = ttEntry.value;
+        assert value != Evaluation.NOVALUE;
+        // correct the mate value as this has been recorded
+        // relative to a different ply
+        if (isCheckMateValue(value)) value = value > 0 ? value - ply : value + ply;
+        // in PV node only return ttHit if it was an exact hit
+        boolean cut = false;
+        if (ttEntry.type == TT_EntryType.EXACT) cut = true;
+        else if (!pvNode && ttEntry.type == TT_EntryType.ALPHA && value <= alpha) cut = true;
+        else if (!pvNode && ttEntry.type == TT_EntryType.BETA && value >= beta) cut = true;
+        if (cut) {
+          if (TRACE) {
+            trace("%sSearch in ply %d: TT CUT value=%d", getSpaces(ply), ply, value);
           }
-          // in PV node only return ttHit if it was an exact hit
-          boolean cut = false;
-          if (ttEntry.type == TT_EntryType.EXACT) cut = true;
-          else if (ttEntry.type == TT_EntryType.ALPHA && value <= alpha && !pvNode) cut = true;
-          else if (ttEntry.type == TT_EntryType.BETA && value >= beta && !pvNode) cut = true;
-          if (cut) {
-            if (TRACE) {
-              trace("%sSearch in ply %d: TT CUT value=%d", getSpaces(ply), ply, value);
-            }
-            searchCounter.tt_Cuts++;
-            return value;
-          }
-          else searchCounter.tt_Ignored++;
+          searchCounter.tt_Cuts++;
+          return value;
         }
-        else searchCounter.tt_Misses++;
+        //}
+        searchCounter.tt_Ignored++;
       }
+      else searchCounter.tt_Misses++;
     }
     // End TT Lookup
     // ###############################################
@@ -1652,7 +1647,7 @@ public class Search implements Runnable {
     }
 
     // moves to search recursively
-    int value = Evaluation.MIN;
+    int value;
     for (int i = 0; i < moves.size(); i++) {
       int move = moves.get(i);
 
@@ -2099,12 +2094,13 @@ public class Search implements Runnable {
     if (LOG.isInfoEnabled()) {
       LOG.info(searchCounter.toString());
       LOG.info(String.format("TT Entries %,d/%,d TT Updates %,d TT Collisions %,d "
-                             + "TT Hits %,d TT Misses %,d TT Cuts %,d",
+                             + "TT Hits %,d TT Misses %,d TT Cuts %,d TT Ignored %,d",
                              transpositionTable.getNumberOfEntries(),
                              transpositionTable.getMaxEntries(),
                              transpositionTable.getNumberOfUpdates(),
                              transpositionTable.getNumberOfCollisions(), searchCounter.tt_Hits,
-                             searchCounter.tt_Misses, searchCounter.tt_Cuts));
+                             searchCounter.tt_Misses, searchCounter.tt_Cuts,
+                             searchCounter.tt_Ignored));
       LOG.info("{}", String.format(
         "Search complete. Nodes visited: %,d Boards Evaluated: %,d (+%,d) re-pvs-root=%d re-asp=%d betaCutOffs=%s",
         searchCounter.nodesVisited, searchCounter.leafPositionsEvaluated,

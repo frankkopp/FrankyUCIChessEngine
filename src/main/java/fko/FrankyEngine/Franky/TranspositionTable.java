@@ -151,7 +151,8 @@ public class TranspositionTable {
     // overwrite if
     // - the new entry's depth is higher or equal
     // - the previous entry has not been used (is aged)
-    else if (key != entries[hash].key && depth >= entries[hash].depth
+    else if (key != entries[hash].key
+             && depth >= entries[hash].depth
              && entries[hash].age > 0) {
       numberOfCollisions++;
 
@@ -192,7 +193,7 @@ public class TranspositionTable {
         // overwrite bestMove only with a valid move
         if (bestMove != Move.NOMOVE) entries[hash].bestMove = bestMove;
       }
-      // if depth is greater then we update in any case
+      // if depth is greater then update in any case
       else if (depth > entries[hash].depth) {
         numberOfUpdates++;
 
