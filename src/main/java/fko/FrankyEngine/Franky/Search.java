@@ -2093,8 +2093,9 @@ public class Search implements Runnable {
   private void printSearchResultInfo() {
     if (LOG.isInfoEnabled()) {
       LOG.info(searchCounter.toString());
-      LOG.info(String.format("TT Entries %,d/%,d TT Updates %,d TT Collisions %,d "
+      LOG.info(String.format("TT Stats: Nodes visited: %,d TT Entries %,d/%,d TT Updates %,d TT Collisions %,d "
                              + "TT Hits %,d TT Misses %,d TT Cuts %,d TT Ignored %,d",
+                             searchCounter.nodesVisited,
                              transpositionTable.getNumberOfEntries(),
                              transpositionTable.getMaxEntries(),
                              transpositionTable.getNumberOfUpdates(),
