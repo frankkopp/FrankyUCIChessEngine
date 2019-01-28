@@ -58,11 +58,11 @@ public class TranspositionTableTest {
     TranspositionTable cache = new TranspositionTable(32);
     Position position = new Position();
     assertEquals(32 * 1024 * 1024, cache.getSize());
-    cache.put(position, (short) 999, TT_EntryType.EXACT, (byte) 5);
+    cache.put(position.getZobristKey(), (short) 999, TT_EntryType.EXACT, (byte) 5);
     assertEquals(1, cache.getNumberOfEntries());
-    assertEquals(999, cache.get(position).value);
-    cache.put(position, (short) 1111, TT_EntryType.EXACT, (byte) 15);
-    assertEquals(1111, cache.get(position).value);
+    assertEquals(999, cache.get(position.getZobristKey()).value);
+    cache.put(position.getZobristKey(), (short) 1111, TT_EntryType.EXACT, (byte) 15);
+    assertEquals(1111, cache.get(position.getZobristKey()).value);
     assertEquals(1, cache.getNumberOfEntries());
     cache.clear();
     assertEquals(0, cache.getNumberOfEntries());

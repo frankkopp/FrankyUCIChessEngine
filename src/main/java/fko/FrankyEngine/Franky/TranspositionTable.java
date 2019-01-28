@@ -40,8 +40,6 @@ import java.util.stream.IntStream;
  * <p>
  * The TT_Entry elements are tailored for small memory footprint and use primitive data types
  * for value (short), depth (byte), type (byte), age (byte).
- *
- * TODO: This class can be decoupled from Position by using the key as parameter instead of a Position
  */
 public class TranspositionTable {
 
@@ -109,26 +107,25 @@ public class TranspositionTable {
   /**
    * Stores the node value and the depth it has been calculated at.
    *
-   * @param position
+   * @param key
    * @param value
    * @param type
    * @param depth
    */
-  public void put(Position position, short value, byte type, byte depth) {
-    put(position, value, type, depth, Move.NOMOVE, false);
+  public void put(long key, short value, byte type, byte depth) {
+    put(key, value, type, depth, Move.NOMOVE, false);
   }
 
   /**
    * Stores the node value and the depth it has been calculated at.
-   *
-   * @param position
+   * @param key
    * @param value
    * @param type
    * @param depth
    * @param bestMove
    * @param mateThreat
    */
-  public void put(Position position, short value, byte type, byte depth, int bestMove,
+  public void put(long key, short value, byte type, byte depth, int bestMove,
                   boolean mateThreat) {
 
     assert depth >= 0;
@@ -136,13 +133,13 @@ public class TranspositionTable {
     assert value > Evaluation.NOVALUE;
     //assert (value >= Evaluation.MIN && value <= Evaluation.MAX);
 
-    final int hash = getHash(position.getZobristKey());
+    final int hash = getHash(key);
 
     // New hash
     if (entries[hash].key == 0) {
       numberOfEntries++;
 
-      entries[hash].key = position.getZobristKey();
+      entries[hash].key = key;
       //entries[hash].fen = position.toFENString();
       entries[hash].age = 1;
       entries[hash].mateThreat = mateThreat;
@@ -155,11 +152,11 @@ public class TranspositionTable {
     // overwrite if
     // - the new entry's depth is higher or equal
     // - the previous entry has not been used (is aged)
-    else if (position.getZobristKey() != entries[hash].key && depth >= entries[hash].depth
+    else if (key != entries[hash].key && depth >= entries[hash].depth
              && entries[hash].age > 0) {
       numberOfCollisions++;
 
-      entries[hash].key = position.getZobristKey();
+      entries[hash].key = key;
       //entries[hash].fen = position.toFENString();
       entries[hash].age = 1;
       entries[hash].mateThreat = mateThreat;
@@ -170,7 +167,7 @@ public class TranspositionTable {
       entries[hash].bestMove = bestMove;
     }
     // Same hash and same position -> update entry?
-    else if (position.getZobristKey() == entries[hash].key) {
+    else if (key == entries[hash].key) {
 
       // if from same depth only update when quality of new entry is better
       // e.g. don't replace EXACT with ALPHA or BETA
@@ -219,13 +216,13 @@ public class TranspositionTable {
    * cached value has been calculated at a depth equal or deeper as the
    * depth value provided.
    *
-   * @param position
+   * @param key
    * @return value for key or <tt>Integer.MIN_VALUE</tt> if not found
    */
-  public TT_Entry get(Position position) {
+  public TT_Entry get(long key) {
     numberOfProbes++;
-    final int hash = getHash(position.getZobristKey());
-    if (entries[hash].key == position.getZobristKey()) { // hash hit
+    final int hash = getHash(key);
+    if (entries[hash].key == key) { // hash hit
       numberOfHits++;
       // decrease age of entry until 0
       entries[hash].age = (byte) Math.max(entries[hash].age - 1, 0);

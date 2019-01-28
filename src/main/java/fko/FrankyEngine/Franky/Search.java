@@ -454,41 +454,41 @@ public class Search implements Runnable {
     // Do a TT lookup to try to find a first best move for this position and
     // maybe even be able to skip some iterations when a valid cache hit has been
     // found.
-    if (config.USE_TT_ROOT) {
-      TTHit ttHit = probeTT(position, depth, alpha, beta, ROOT_PLY);
-      // TTHit
-      if (ttHit != null) {
+    if (config.USE_TT_ROOT && config.USE_TRANSPOSITION_TABLE && !PERFT) {
 
-        mateThreat[ROOT_PLY] = ttHit.mateThreat;
+      TT_Entry ttEntry = transpositionTable.get(position.getZobristKey());
+      if (ttEntry != null) {
+        searchCounter.tt_Hits++;
 
-        // determine pv moves from TT
-        if (ttHit.bestMove != Move.NOMOVE) {
+        // mate thread flag
+        mateThreat[ROOT_PLY] = ttEntry.mateThreat;
 
-          // best move from TT
-          currentBestRootMove = ttHit.bestMove;
-
-          // get PV line from TT
-          getPVLine(position, ttHit.depth, pv[ROOT_PLY]);
+        // get best move and PV from TT
+        if (ttEntry.bestMove != Move.NOMOVE) {
+          currentBestRootMove = ttEntry.bestMove;
+          getPVLine(position, ttEntry.depth, pv[ROOT_PLY]);
           semiPv[ROOT_PLY] = pv[ROOT_PLY].clone();
-          assert pv[ROOT_PLY].getFirst() == ttHit.bestMove;
+          assert pv[ROOT_PLY].getFirst() == currentBestRootMove;
+        }
 
-          // update depth if we already searched these depths and have a value
-          if (ttHit.value != Evaluation.NOVALUE && ttHit.type == TT_EntryType.EXACT) {
-            // set best move value from TT
-            currentBestRootValue = ttHit.value;
+        // use value only if tt depth was equal or deeper
+        if (ttEntry.depth >= depth) {
+          assert (int) ttEntry.value != Evaluation.NOVALUE;
+          // set best move value from TT
+          currentBestRootValue = (int) ttEntry.value;
 
-            // skip lower depths in next search
-            if (ttHit.depth >= depth) {
-              depth = ttHit.depth + 1;
-              LOG.debug("TT cached result of depth {}. Start depth is now {}", ttHit.depth, depth);
-              // send info to UCI to let the user know that we have a result for the cached depth
-              engine.sendInfoToUCI(String.format("depth %d %s time %d pv %s", ttHit.depth,
-                                                 getScoreString(currentBestRootValue),
-                                                 elapsedTime(), pv[ROOT_PLY].toNotationString()));
-            }
+          // skip lower depths in next search
+          if (ttEntry.depth >= depth) {
+            depth = ttEntry.depth + 1;
+            LOG.debug("TT cached result of depth {}. Start depth is now {}", ttEntry.depth, depth);
+            // send info to UCI to let the user know that we have a result for the cached depth
+            engine.sendInfoToUCI(String.format("depth %d %s time %d pv %s", ttEntry.depth,
+                                               getScoreString(currentBestRootValue), elapsedTime(),
+                                               pv[ROOT_PLY].toNotationString()));
           }
         }
       }
+      else searchCounter.tt_Misses++;
     }
 
     // generate all legal root moves, and set pv move if we got one from TT
@@ -540,7 +540,7 @@ public class Search implements Runnable {
     do {
       if (TRACE) trace("Depth %d start", depth);
 
-      assert currentBestRootMove == rootMoves.getMove(0);
+      assert currentBestRootMove != Move.NOMOVE;
 
       searchCounter.currentIterationDepth = depth;
       searchCounter.bestMoveChanges = 0;
@@ -881,18 +881,42 @@ public class Search implements Runnable {
 
     // ###############################################
     // TT Lookup
-    TTHit ttHit = probeTT(position, depth, alpha, beta, ply);
-    if (ttHit != null && ttHit.type != TT_EntryType.NONE) {
-      assert (ttHit.value >= Evaluation.MIN && ttHit.value <= Evaluation.MAX);
-      mateThreat[ply] = ttHit.mateThreat;
-      // in PV node only return ttHit if it was an exact hit
-      if (!pvNode || ttHit.type == TT_EntryType.EXACT) {
-        if (TRACE) {
-          trace("%sSearch in ply %d for depth %d: TT CUT value=%d", getSpaces(ply), ply, depth,
-                ttHit.value);
+    int ttMove = Move.NOMOVE;
+    if (config.USE_TRANSPOSITION_TABLE && !PERFT) {
+
+      TT_Entry ttEntry = transpositionTable.get(position.getZobristKey());
+      if (ttEntry != null) {
+        searchCounter.tt_Hits++;
+
+        // independend from tt entry depth
+        ttMove = ttEntry.bestMove;
+        mateThreat[ply] = ttEntry.mateThreat;
+
+        // use value only if tt depth was equal or deeper
+        if (ttEntry.depth >= depth) {
+          int value = ttEntry.value;
+          assert value != Evaluation.NOVALUE;
+          // correct the mate value as this has been recorded
+          // relative to a different ply
+          if (isCheckMateValue(value)) {
+            value = value > 0 ? value - ply : value + ply;
+          }
+          // in PV node only return ttHit if it was an exact hit
+          boolean cut = false;
+          if (ttEntry.type == TT_EntryType.EXACT) cut = true;
+          else if (ttEntry.type == TT_EntryType.ALPHA && value <= alpha && !pvNode) cut = true;
+          else if (ttEntry.type == TT_EntryType.BETA && value >= beta && !pvNode) cut = true;
+          if (cut) {
+            if (TRACE) {
+              trace("%sSearch in ply %d for depth %d: TT CUT value=%d", getSpaces(ply), ply, depth,
+                    value);
+            }
+            searchCounter.tt_Cuts++;
+            return value;
+          }
+          else searchCounter.tt_Ignored++;
         }
-        searchCounter.tt_Cuts++;
-        return ttHit.value;
+        else searchCounter.tt_Misses++;
       }
     }
     // End TT Lookup
@@ -903,9 +927,11 @@ public class Search implements Runnable {
     byte ttType = TT_EntryType.ALPHA;
     int bestNodeValue = Evaluation.MIN;
     int bestNodeMove;
-    if (ROOT) bestNodeMove = currentBestRootMove;
+    if (ROOT) {
+      bestNodeMove = currentBestRootMove;
+    }
     else {
-      bestNodeMove = ttHit != null ? ttHit.bestMove : Move.NOMOVE;
+      bestNodeMove = ttMove;
       pv[ply].clear();
       semiPv[ply].clear();
     }
@@ -1493,13 +1519,6 @@ public class Search implements Runnable {
     }
     // @formatter:on
 
-    // Prepare hash type
-    byte ttType = TT_EntryType.ALPHA;
-
-    // Initialize best values
-    int bestNodeValue = Evaluation.MIN;
-    int bestNodeMove = Move.NOMOVE;
-
     // ###############################################
     // ## Mate Distance Pruning
     // ## Did we already find a shorter mate then ignore this one
@@ -1518,19 +1537,59 @@ public class Search implements Runnable {
 
     // ###############################################
     // TT Lookup
-    TTHit ttHit = probeTT(position, 0, alpha, beta, ply);
-    if (ttHit != null && ttHit.type != TT_EntryType.NONE) {
-      assert (ttHit.value >= Evaluation.MIN && ttHit.value <= Evaluation.MAX);
-      mateThreat[ply] = ttHit.mateThreat;
-      // in PV node only return ttHit if it was an exact hit
-      if (!pvNode || ttHit.type == TT_EntryType.EXACT) {
-        if (TRACE) trace("%sQuiescence in ply %d: TT CUT", getSpaces(ply), ply);
-        searchCounter.tt_Cuts++;
-        return ttHit.value;
+    int ttMove = Move.NOMOVE;
+    if (config.USE_TRANSPOSITION_TABLE && !PERFT) {
+
+      TT_Entry ttEntry = transpositionTable.get(position.getZobristKey());
+      if (ttEntry != null) {
+        searchCounter.tt_Hits++;
+
+        // independend from tt entry depth
+        ttMove = ttEntry.bestMove;
+        mateThreat[ply] = ttEntry.mateThreat;
+
+        // use value only if tt depth was equal or deeper
+        if (ttEntry.depth >= DEPTH_NONE) {
+          int value = ttEntry.value;
+          assert value != Evaluation.NOVALUE;
+          // correct the mate value as this has been recorded
+          // relative to a different ply
+          if (isCheckMateValue(value)) {
+            value = value > 0 ? value - ply : value + ply;
+          }
+          // in PV node only return ttHit if it was an exact hit
+          boolean cut = false;
+          if (ttEntry.type == TT_EntryType.EXACT) cut = true;
+          else if (ttEntry.type == TT_EntryType.ALPHA && value <= alpha && !pvNode) cut = true;
+          else if (ttEntry.type == TT_EntryType.BETA && value >= beta && !pvNode) cut = true;
+          if (cut) {
+            if (TRACE) {
+              trace("%sSearch in ply %d: TT CUT value=%d", getSpaces(ply), ply, value);
+            }
+            searchCounter.tt_Cuts++;
+            return value;
+          }
+          else searchCounter.tt_Ignored++;
+        }
+        else searchCounter.tt_Misses++;
       }
     }
     // End TT Lookup
     // ###############################################
+
+    // Prepare hash type
+    byte ttType = TT_EntryType.ALPHA;
+
+    // Initialize best values
+    int bestNodeValue = Evaluation.MIN;
+    int bestNodeMove = ttMove;
+
+    // needed to remember if we even had a legal move
+    int numberOfSearchedMoves = 0;
+
+    // clear principal Variation for this depth
+    pv[ply].clear();
+    semiPv[ply].clear();
 
     // ###############################################
     // StandPat
@@ -1556,19 +1615,12 @@ public class Search implements Runnable {
     }
     // ###############################################
 
-    // needed to remember if we even had a legal move
-    int numberOfSearchedMoves = 0;
-
-    // clear principal Variation for this depth
-    pv[ply].clear();
-    semiPv[ply].clear();
-
     // Prepare move generator - set position, killers and TT move and generate
     // all PseudoLegalMoves for QSearch. Usually only capture moves and check
     // evasions will be determined in move generator
     moveGenerators[ply].setPosition(position);
-    if (config.USE_PVS_ORDERING && ttHit != null && ttHit.bestMove != Move.NOMOVE) {
-      moveGenerators[ply].setPVMove(ttHit.bestMove);
+    if (config.USE_PVS_ORDERING && bestNodeMove != Move.NOMOVE) {
+      moveGenerators[ply].setPVMove(bestNodeMove);
     }
     MoveList moves = moveGenerators[ply].getPseudoLegalQSearchMoves();
     searchCounter.movesGenerated += moves.size();
@@ -1769,90 +1821,12 @@ public class Search implements Runnable {
   private void storeTT(final Position position, final int value, final byte ttType,
                        final int depthLeft, int bestMove, boolean mateThreat) {
 
-    if (config.USE_TRANSPOSITION_TABLE && !PERFT && !stopSearch) {
-      assert depthLeft >= 0 && depthLeft <= MAX_SEARCH_DEPTH;
-      assert (value >= Evaluation.MIN && value <= Evaluation.MAX);
-      transpositionTable.put(position, (short) value, ttType, (byte) depthLeft, bestMove,
-                             mateThreat);
-    }
-  }
+    if (!config.USE_TRANSPOSITION_TABLE || PERFT || stopSearch) return;
 
-  /**
-   * Probes the transposition table. Translates and checks the parameters and also
-   * encapsulates the check for the type of entry/value (exact/alpha/beta). It also translates
-   * mate values to the correct ply.
-   * <p>
-   * Uses a small data structure TTHit as a return type.
-   *
-   * @param position
-   * @param depthLeft
-   * @param alpha
-   * @param beta
-   * @param ply
-   * @return
-   */
-  private TTHit probeTT(final Position position, final int depthLeft, final int alpha,
-                        final int beta, final int ply) {
-
-    if (config.USE_TRANSPOSITION_TABLE && !PERFT) {
-      assert alpha != Evaluation.NOVALUE;
-      assert beta != Evaluation.NOVALUE;
-      assert depthLeft >= 0 && depthLeft <= MAX_SEARCH_DEPTH;
-      assert ply >= 0 && ply <= Byte.MAX_VALUE;
-
-      TT_Entry ttEntry = transpositionTable.get(position);
-
-      if (ttEntry != null) {
-        TTHit hit = new TTHit();
-
-        // hit
-        searchCounter.tt_Hits++;
-
-        // return the depth as well
-        hit.depth = ttEntry.depth;
-        // get best move form last search of this node
-        hit.bestMove = ttEntry.bestMove;
-        // get mate threat
-        hit.mateThreat = ttEntry.mateThreat;
-
-        assert hit.type == TT_EntryType.NONE;
-
-        // only if tt depth was equal or deeper
-        if (ttEntry.depth >= depthLeft) {
-
-          int value = ttEntry.value;
-          assert value != Evaluation.NOVALUE;
-
-          // correct the mate value as this has been recorded
-          // relative to a different ply
-          if (isCheckMateValue(value)) {
-            value = value > 0 ? value - ply : value + ply;
-          }
-
-          // check the retrieved hash table entry
-          if (ttEntry.type == TT_EntryType.EXACT) {
-            hit.value = value;
-            hit.type = TT_EntryType.EXACT;
-          }
-          else if (ttEntry.type == TT_EntryType.ALPHA) {
-            if (value <= alpha) {
-              hit.value = value;
-              hit.type = TT_EntryType.ALPHA;
-            }
-          }
-          else if (ttEntry.type == TT_EntryType.BETA) {
-            if (value >= beta) {
-              hit.value = value;
-              hit.type = TT_EntryType.BETA;
-            }
-          }
-        }
-        return hit;
-      }
-      // miss
-      searchCounter.tt_Misses++;
-    }
-    return null;
+    assert depthLeft >= 0 && depthLeft <= MAX_SEARCH_DEPTH;
+    assert (value >= Evaluation.MIN && value <= Evaluation.MAX);
+    transpositionTable.put(position.getZobristKey(), (short) value, ttType, (byte) depthLeft,
+                           bestMove, mateThreat);
   }
 
   /**
@@ -1885,7 +1859,7 @@ public class Search implements Runnable {
    */
   private void getPVLine(final Position position, final byte depth, final MoveList pv) {
     if (depth < 0) return;
-    TT_Entry ttEntry = transpositionTable.get(position);
+    TT_Entry ttEntry = transpositionTable.get(position.getZobristKey());
     if (ttEntry != null && ttEntry.bestMove != Move.NOMOVE) {
       pv.add(ttEntry.bestMove);
       position.makeMove(ttEntry.bestMove);
@@ -2426,7 +2400,8 @@ public class Search implements Runnable {
     long pvs_cutoffs            = 0;
     long tt_Hits                = 0;
     long tt_Misses              = 0;
-    int  tt_Cuts                = 0;
+    long tt_Cuts                = 0;
+    long tt_Ignored             = 0;
     long movesGenerated         = 0;
     long nodesVisited           = 0;
     int  minorPromotionPrunings = 0;
@@ -2469,6 +2444,7 @@ public class Search implements Runnable {
       tt_Hits = 0;
       tt_Misses = 0;
       tt_Cuts = 0;
+      tt_Ignored = 0;
       movesGenerated = 0;
       checkCounter = 0;
       checkMateCounter = 0;
@@ -2511,6 +2487,7 @@ public class Search implements Runnable {
              ", tt_Hits=" + tt_Hits +
              ", tt_Misses=" + tt_Misses +
              ", tt_Cuts=" + tt_Cuts +
+             ", tt_Ignored=" + tt_Ignored +
              ", movesGenerated=" + movesGenerated +
              ", pvs_root_researches=" + pvs_root_researches +
              ", pvs_root_cutoffs=" + pvs_root_cutoffs +
