@@ -2189,13 +2189,15 @@ public class Search implements Runnable {
       }
 
       LOG.debug(searchCounter.toString());
-      LOG.debug(String.format("TT Entries %,d/%,d TT Updates %,d TT Collisions %,d "
-                              + "TT Hits %,d TT Misses %,d TT Cuts %,d",
-                              transpositionTable.getNumberOfEntries(),
-                              transpositionTable.getMaxEntries(),
-                              transpositionTable.getNumberOfUpdates(),
-                              transpositionTable.getNumberOfCollisions(), searchCounter.tt_Hits,
-                              searchCounter.tt_Misses, searchCounter.tt_Cuts));
+      LOG.info(String.format("TT Stats: Nodes visited: %,d TT Entries %,d/%,d TT Updates %,d TT Collisions %,d "
+                             + "TT Hits %,d TT Misses %,d TT Cuts %,d TT Ignored %,d",
+                             searchCounter.nodesVisited,
+                             transpositionTable.getNumberOfEntries(),
+                             transpositionTable.getMaxEntries(),
+                             transpositionTable.getNumberOfUpdates(),
+                             transpositionTable.getNumberOfCollisions(), searchCounter.tt_Hits,
+                             searchCounter.tt_Misses, searchCounter.tt_Cuts,
+                             searchCounter.tt_Ignored));
 
       uciUpdateTicker = System.currentTimeMillis();
     }
