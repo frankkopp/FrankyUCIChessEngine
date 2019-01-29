@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -164,6 +165,22 @@ public class TranspositionTableTest {
   }
 
   @Test
+  public void testStats() {
+
+    TranspositionTable tt = new TranspositionTable(2);
+
+    Random r = new Random(System.currentTimeMillis());
+
+    int i=0;
+    while (i++ < 1_000_000) {
+      tt.put(Math.abs(r.nextLong()), (short) 1, TT_EntryType.EXACT, (byte) 0);
+    }
+
+    System.out.println(tt.toString());
+
+  }
+
+  @Test
   @Disabled
   public void showSize() {
     //System.out.println(VM.current().details());
@@ -175,6 +192,7 @@ public class TranspositionTableTest {
   public void testTiming() {
 
     ArrayList<String> result = new ArrayList<>();
+    Random r = new Random();
 
     int ROUNDS = 5;
     int ITERATIONS = 10;
@@ -186,11 +204,13 @@ public class TranspositionTableTest {
       System.out.printf("Running round %d of Timing Test Test 1 vs. Test 2%n", round);
       System.gc();
 
+      long randomLong = r.nextLong();
+
       int i = 0;
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
         for (int j = 0; j < REPETITIONS; j++) {
-          test1();
+          test1(randomLong);
         }
         end = System.nanoTime();
         sum += end - start;
@@ -202,7 +222,7 @@ public class TranspositionTableTest {
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
         for (int j = 0; j < REPETITIONS; j++) {
-          test2();
+          test2(randomLong);
         }
         end = System.nanoTime();
         sum += end - start;
@@ -222,12 +242,12 @@ public class TranspositionTableTest {
 
   TranspositionTable tt = new TranspositionTable(1024);
 
-  private void test1() {
-    tt.ageEntries();
+  private int test1(long r) {
+    return (int) (r % 123456789);
   }
 
-  private void test2() {
-   //tt.ageEntries2();
+  private int test2(long r) {
+    return (int)(r ^ (r >>> 32));
   }
 
 }

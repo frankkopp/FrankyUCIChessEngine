@@ -52,6 +52,7 @@ public class TranspositionTable {
   private int  maxNumberOfEntries;
   private int  numberOfEntries = 0;
 
+  private long numberOfPuts       = 0L;
   private long numberOfCollisions = 0L;
   private long numberOfUpdates    = 0L;
   private long numberOfProbes     = 0L;
@@ -68,6 +69,13 @@ public class TranspositionTable {
    * @param size in MB (1024B^2)
    */
   public TranspositionTable(int size) {
+    if (size < 1) {
+      final String msg = "Hashtable must a least be 1 MB in size";
+      IllegalArgumentException e = new IllegalArgumentException(msg);
+      LOG.error(msg, e);
+      throw e;
+    }
+
     sizeInByte = (long) size * MB;
 
     // check available mem - add some head room
@@ -126,14 +134,15 @@ public class TranspositionTable {
    * @param bestMove
    * @param mateThreat
    */
-  public void put(long key, short value, byte type, byte depth, int bestMove,
-                  boolean mateThreat) {
+  public void put(long key, short value, byte type, byte depth, int bestMove, boolean mateThreat) {
 
     assert depth >= 0;
     assert type > 0;
     assert value > Evaluation.NOVALUE;
 
     final int hash = getHash(key);
+
+    numberOfPuts++;
 
     // New hash
     if (entries[hash].key == 0) {
@@ -152,9 +161,11 @@ public class TranspositionTable {
     // overwrite if
     // - the new entry's depth is higher or equal
     // - the previous entry has not been used (is aged)
+    // // @formatter:off
     else if (key != entries[hash].key
              && depth >= entries[hash].depth
-             && entries[hash].age > 0) {
+             && entries[hash].age > 0
+    ) { // @formatter:on
       numberOfCollisions++;
 
       entries[hash].key = key;
@@ -207,7 +218,7 @@ public class TranspositionTable {
 
         // overwrite bestNive only with a valid move
         if (bestMove != Move.NOMOVE) entries[hash].bestMove = bestMove;
-      } // overwrite bestMove if there wastn't any before
+      } // overwrite bestMove if there wasn't any before
       else if (entries[hash].bestMove == Move.NOMOVE) entries[hash].bestMove = bestMove;
     }
   }
@@ -325,11 +336,24 @@ public class TranspositionTable {
 
   @Override
   public String toString() {
-    return "TranspositionTable{" + "sizeInByte=" + sizeInByte + ", maxNumberOfEntries="
-           + maxNumberOfEntries + ", numberOfEntries=" + numberOfEntries + ", numberOfCollisions="
-           + numberOfCollisions + ", numberOfUpdates=" + numberOfUpdates + ", numberOfProbes="
-           + numberOfProbes + ", numberOfHits=" + numberOfHits + ", numberOfMisses="
-           + numberOfMisses + '}';
+    // @formatter:off
+    return String.format("TranspositionTable'{'"
+                                + "Size=%,d MB, max entries=%,d "
+                                + "numberOfEntries=%,d (%,d pct), "
+                                + "numberOfPuts=%,d, "
+                                + "numberOfCollisions=%,d (%,d pct), "
+                                + "numberOfUpdates=%,d (%,d pct), "
+                                + "numberOfProbes=%,d, "
+                                + "numberOfHits=%,d, numberOfMisses=%,d'}'",
+                                sizeInByte / MB, maxNumberOfEntries,
+                                numberOfEntries, (100*numberOfEntries/(maxNumberOfEntries+1)),
+                                numberOfPuts,
+                                numberOfCollisions, (100*numberOfCollisions/(numberOfPuts+1)),
+                                numberOfUpdates, (100*numberOfUpdates/(numberOfPuts+1)),
+                                numberOfProbes,
+                                numberOfHits,
+                                numberOfMisses);
+    // @formatter:on
   }
 
   /**
