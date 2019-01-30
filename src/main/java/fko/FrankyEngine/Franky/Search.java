@@ -492,15 +492,15 @@ public class Search implements Runnable {
           // set best move value from TT
           currentBestRootValue = (int) ttEntry.value;
 
-          // skip lower depths in next search
-          if (ttEntry.depth >= depth) {
-            depth = ttEntry.depth + 1;
-            LOG.debug("TT cached result of depth {}. Start depth is now {}", ttEntry.depth, depth);
-            // send info to UCI to let the user know that we have a result for the cached depth
-            engine.sendInfoToUCI(String.format("depth %d %s time %d pv %s", ttEntry.depth,
-                                               getScoreString(currentBestRootValue), elapsedTime(),
-                                               pv[ROOT_PLY].toNotationString()));
-          }
+//          // skip lower depths in next search
+//          if (ttEntry.depth >= depth) {
+//            depth = ttEntry.depth + 1;
+//            LOG.debug("TT cached result of depth {}. Start depth is now {}", ttEntry.depth, depth);
+//            // send info to UCI to let the user know that we have a result for the cached depth
+//            engine.sendInfoToUCI(String.format("depth %d %s time %d pv %s", ttEntry.depth,
+//                                               getScoreString(currentBestRootValue), elapsedTime(),
+//                                               pv[ROOT_PLY].toNotationString()));
+//          }
         }
       }
       else searchCounter.tt_Misses++;
@@ -1831,18 +1831,18 @@ public class Search implements Runnable {
    * @param position
    * @param value
    * @param ttType
-   * @param depthLeft
+   * @param depth
    * @param bestMove
    * @param mateThreat
    */
   private void storeTT(final Position position, final int value, final byte ttType,
-                       final int depthLeft, int bestMove, boolean mateThreat) {
+                       final int depth, int bestMove, boolean mateThreat) {
 
     if (!config.USE_TRANSPOSITION_TABLE || PERFT || stopSearch) return;
 
-    assert depthLeft >= 0 && depthLeft <= MAX_SEARCH_DEPTH;
+    assert depth >= 0 && depth <= MAX_SEARCH_DEPTH;
     assert (value >= Evaluation.MIN && value <= Evaluation.MAX);
-    transpositionTable.put(position.getZobristKey(), (short) value, ttType, (byte) depthLeft,
+    transpositionTable.put(position.getZobristKey(), (short) value, ttType, (byte) depth,
                            bestMove, mateThreat);
   }
 
@@ -2093,14 +2093,12 @@ public class Search implements Runnable {
   private void printSearchResultInfo() {
     if (LOG.isInfoEnabled()) {
       LOG.info(searchCounter.toString());
-      LOG.info(String.format("TT Stats: Nodes visited: %,d TT Entries %,d/%,d TT Updates %,d TT Collisions %,d "
-                             + "TT Hits %,d TT Misses %,d TT Cuts %,d TT Ignored %,d",
+      LOG.info(transpositionTable.toString());
+      LOG.info(String.format("TT Stats: Nodes visited: %,d TT Hits %,d TT Misses %,d TT Cuts %,d TT Ignored %,d",
                              searchCounter.nodesVisited,
-                             transpositionTable.getNumberOfEntries(),
-                             transpositionTable.getMaxEntries(),
-                             transpositionTable.getNumberOfUpdates(),
-                             transpositionTable.getNumberOfCollisions(), searchCounter.tt_Hits,
-                             searchCounter.tt_Misses, searchCounter.tt_Cuts,
+                             searchCounter.tt_Hits,
+                             searchCounter.tt_Misses,
+                             searchCounter.tt_Cuts,
                              searchCounter.tt_Ignored));
       LOG.info("{}", String.format(
         "Search complete. Nodes visited: %,d Boards Evaluated: %,d (+%,d) re-pvs-root=%d re-asp=%d betaCutOffs=%s",
@@ -2189,14 +2187,12 @@ public class Search implements Runnable {
       }
 
       LOG.debug(searchCounter.toString());
-      LOG.info(String.format("TT Stats: Nodes visited: %,d TT Entries %,d/%,d TT Updates %,d TT Collisions %,d "
-                             + "TT Hits %,d TT Misses %,d TT Cuts %,d TT Ignored %,d",
+      LOG.info(transpositionTable.toString());
+      LOG.info(String.format("TT Stats: Nodes visited: %,d TT Hits %,d TT Misses %,d TT Cuts %,d TT Ignored %,d",
                              searchCounter.nodesVisited,
-                             transpositionTable.getNumberOfEntries(),
-                             transpositionTable.getMaxEntries(),
-                             transpositionTable.getNumberOfUpdates(),
-                             transpositionTable.getNumberOfCollisions(), searchCounter.tt_Hits,
-                             searchCounter.tt_Misses, searchCounter.tt_Cuts,
+                             searchCounter.tt_Hits,
+                             searchCounter.tt_Misses,
+                             searchCounter.tt_Cuts,
                              searchCounter.tt_Ignored));
 
       uciUpdateTicker = System.currentTimeMillis();
