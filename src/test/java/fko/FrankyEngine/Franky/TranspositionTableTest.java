@@ -167,12 +167,12 @@ public class TranspositionTableTest {
   @Test
   public void testStats() {
 
-    TranspositionTable tt = new TranspositionTable(2);
+    TranspositionTable tt = new TranspositionTable(1024);
 
     Random r = new Random(System.currentTimeMillis());
 
     int i=0;
-    while (i++ < 1_000_000) {
+    while (i++ < 100_000_000) {
       tt.put(Math.abs(r.nextLong()), (short) 1, TT_EntryType.EXACT, (byte) 0);
     }
 
@@ -195,8 +195,8 @@ public class TranspositionTableTest {
     Random r = new Random();
 
     int ROUNDS = 5;
-    int ITERATIONS = 10;
-    int REPETITIONS = 20;
+    int ITERATIONS = 20;
+    int REPETITIONS = 10_000_000;
 
     for (int round = 0; round < ROUNDS; round++) {
       long start = 0, end = 0, sum = 0;
@@ -239,15 +239,10 @@ public class TranspositionTableTest {
     }
 
   }
+  int buckets = 123456789;
 
-  TranspositionTable tt = new TranspositionTable(1024);
+  private int test1(long r) { return (int) (r % buckets); }
 
-  private int test1(long r) {
-    return (int) (r % 123456789);
-  }
-
-  private int test2(long r) {
-    return (int)(r ^ (r >>> 32));
-  }
+  private int test2(long r) { return (int) ((r * buckets) >> 32); }
 
 }

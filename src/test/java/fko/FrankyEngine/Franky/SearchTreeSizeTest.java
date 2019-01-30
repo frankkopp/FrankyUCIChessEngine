@@ -75,10 +75,10 @@ public class SearchTreeSizeTest {
   @Disabled
   public void sizeOfSearchTreeTest() throws ExecutionException, InterruptedException {
 
-    final int NO_OF_TESTS = 10; //Integer.MAX_VALUE;
-    final int START_NO = 0;
-    final int DEPTH = 6;
-    HASH_SIZE = 2048;
+    final int NO_OF_TESTS = 5; //Integer.MAX_VALUE;
+    final int START_NO = 10;
+    final int DEPTH = 7;
+    HASH_SIZE = 1024;
     THREADS = 1;
 
     LOG.info("Start SIZE Test for depth {}", DEPTH);
