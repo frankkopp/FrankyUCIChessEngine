@@ -64,9 +64,7 @@ public class PERFT {
 
         resetCounters();
 
-        int depth = maxDepth;
-
-        System.out.format("Testing at depth %d%n", depth);
+      System.out.format("Testing at depth %d%n", maxDepth);
 
         MoveGenerator[] mg = new MoveGenerator[maxDepth];
         for (int i=0; i<maxDepth; i++) {
@@ -75,14 +73,15 @@ public class PERFT {
 
         Position position = new Position(_fen);
 
+      // direct move gen
         long result;
-
         long startTime = System.currentTimeMillis();
         mg[0].setPosition(position);
-        result = mg[0]
-                .streamLegalMoves()
-                .mapToLong((move) -> dividePerft(depth, mg, position, move))
-                .sum();
+      //        result = mg[0]
+      //                .streamLegalMoves()
+      //                .mapToLong((move) -> dividePerft(maxDepth, mg, position, move))
+      //                .sum();
+      result = miniMaxOD(maxDepth, position, mg, 0);
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
 
@@ -90,13 +89,6 @@ public class PERFT {
         printResult(result, duration);
     }
 
-    /**
-     * @param depth
-     * @param mg
-     * @param board
-     * @param move
-     * @return
-     */
     private long dividePerft(int depth, MoveGenerator[] mg, Position board, int move) {
         if (DIVIDE) System.out.print(Move.toSimpleString(move) + " ");
         board.makeMove(move);
@@ -106,34 +98,61 @@ public class PERFT {
         return r;
     }
 
-    private long miniMax(int depthleft, Position board, MoveGenerator[] mg, int ply) {
+  private long miniMax(int depth, Position board, MoveGenerator[] mg, int ply) {
 
-        // PERFT only looks at leaf nodes
-        if (depthleft == 0) {
-            updateCounter(board);
-            return 1;
-        }
-
-        // Iterate over moves
-        long totalNodes = 0L;
-
-        // moves to search recursively
-        // some convenience fields
-        final Color _activePlayer = board.getNextPlayer();
-        final Color _passivePlayer = board.getNextPlayer().getInverseColor();
-        mg[ply].setPosition(board);
-        MoveList moves = mg[ply].getPseudoLegalMoves();
-        for(int i = 0; i < moves.size(); i++) {
-            int move = moves.get(i);
-            board.makeMove(move);
-            if (!board.isAttacked(_passivePlayer, board.getKingSquares()[_activePlayer.ordinal()])) {
-                totalNodes += miniMax(depthleft-1, board, mg, ply+1);
-            }
-            board.undoMove();
-        }
-
-        return totalNodes;
+    // PERFT only looks at leaf nodes
+    if (depth == 0) {
+      updateCounter(board);
+      return 1;
     }
+
+    // Iterate over moves
+    long totalNodes = 0L;
+
+    // moves to search recursively
+    // some convenience fields
+    final Color _activePlayer = board.getNextPlayer();
+    final Color _passivePlayer = board.getNextPlayer().getInverseColor();
+    mg[ply].setPosition(board);
+    MoveList moves = mg[ply].getPseudoLegalMoves();
+    for(int i = 0; i < moves.size(); i++) {
+      int move = moves.get(i);
+      board.makeMove(move);
+      if (!board.isAttacked(_passivePlayer, board.getKingSquares()[_activePlayer.ordinal()])) {
+        totalNodes += miniMax(depth - 1, board, mg, ply + 1);
+      }
+      board.undoMove();
+    }
+
+    return totalNodes;
+  }
+
+  private long miniMaxOD(int depthleft, Position board, MoveGenerator[] mg, int ply) {
+
+    // PERFT only looks at leaf nodes
+    if (depthleft == 0) {
+      updateCounter(board);
+      return 1;
+    }
+
+    // Iterate over moves
+    long totalNodes = 0L;
+
+    // moves to search recursively
+    // some convenience fields
+    final Color _activePlayer = board.getNextPlayer();
+    final Color _passivePlayer = board.getNextPlayer().getInverseColor();
+    mg[ply].setPosition(board);
+    int move;
+    while ((move = mg[ply].getNextPseudoLegalMove(false)) != Move.NOMOVE) {
+      board.makeMove(move);
+      if (!board.isAttacked(_passivePlayer, board.getKingSquares()[_activePlayer.ordinal()])) {
+        totalNodes += miniMax(depthleft - 1, board, mg, ply + 1);
+      }
+      board.undoMove();
+    }
+    return totalNodes;
+  }
 
     /**
      * @param board
