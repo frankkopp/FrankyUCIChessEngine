@@ -1119,9 +1119,6 @@ public class MoveGenerator {
   private boolean findPawnMove() {
     int move;
 
-    // reverse direction of pawns for black
-    final int pawnDir = activePlayer.isBlack() ? -1 : 1;
-
     // iterate over all squares where we have a pawn
     final SquareList squareList = position.getPawnSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
@@ -1134,7 +1131,7 @@ public class MoveGenerator {
       int[] directions = Square.pawnDirections;
       for (int d : directions) {
         // calculate the to square
-        final int to = square.ordinal() + d * pawnDir;
+        final int to = square.ordinal() + d * activePlayer.direction;
         if ((to & 0x88) == 0) { // valid square
           final MoveType type = MoveType.NORMAL;
           final Square fromSquare = Square.getSquare(square.ordinal());
