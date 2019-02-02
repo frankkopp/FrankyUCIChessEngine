@@ -108,11 +108,11 @@ public class MoveGeneratorTest {
 
     for (int i = 1; i <= maxDepth; i++) {
       perftTest.testPerft(i);
-      assertEquals(perftTest.get_nodes(), results[i][1]);
-      assertEquals(perftTest.get_captureCounter(), results[i][2]);
-      assertEquals(perftTest.get_enpassantCounter(), results[i][3]);
-      assertEquals(perftTest.get_checkCounter(), results[i][4]);
-      assertEquals(perftTest.get_checkMateCounter(), results[i][5]);
+      assertEquals(results[i][1], perftTest.get_nodes());
+      assertEquals(results[i][2], perftTest.get_captureCounter());
+      assertEquals(results[i][3], perftTest.get_enpassantCounter());
+      assertEquals(results[i][4], perftTest.get_checkCounter());
+      assertEquals(results[i][5], perftTest.get_checkMateCounter());
     }
     System.out.println("==============================");
   }

@@ -70,22 +70,25 @@ public class MoveGenerator {
   private final MoveList nonCapturingMoves = new MoveList(); // only non capturing moves
 
   // These fields control the on demand generation of moves.
-  private OnDemandState generationCycleState = OnDemandState.NEW;
-  private static final int GEN_CAPTURES    = 1;
-  private static final int GEN_NONCAPTURES = 2;
-  private static final int GEN_ALL         = 3;
-  private              int genMode         = GEN_ALL;
-  private enum OnDemandState { NEW, CAPTURING, NON_CAPTURING, ALL }
+  private              OnDemandState generationCycleState = OnDemandState.NEW;
+  private static final int           GEN_CAPTURES         = 1;
+  private static final int           GEN_NONCAPTURES      = 2;
+  private static final int           GEN_ALL              = 3;
+  private              int           genMode              = GEN_ALL;
+
+  private enum OnDemandState {NEW, CAPTURING, NON_CAPTURING, ALL}
+
   private MoveList onDemandMoveList = new MoveList();
 
   // these field influence the move sorting as pv and killer moves are typically searched early
-  private MoveList      killerMoves          = new MoveList(0);
-  private int           pvMove               = Move.NOMOVE;
+  private MoveList killerMoves = new MoveList(0);
+  private int      pvMove      = Move.NOMOVE;
 
   // Comparator for move value victim least value attacker
   private static final Comparator<Integer> mvvlvaComparator = Comparator.comparingInt(
-    (Integer move) -> (Move.getPiece(move).getType().getValue() -
-                       Move.getTarget(move).getType().getValue()));
+    (Integer move) -> (Move.getPiece(move).getType().getValue() - Move.getTarget(move)
+                                                                      .getType()
+                                                                      .getValue()));
 
   /**
    * Creates a new {@link MoveGenerator}
@@ -109,8 +112,6 @@ public class MoveGenerator {
    * @param position
    */
   public void setPosition(Position position) {
-    // TODO: Optimize when the position given is already our position
-    //  this happens when PVS re-searches are done
     assert position != null : "parameter null not allowed";
     this.position = position;
     this.activePlayer = position.getNextPlayer();
@@ -354,7 +355,8 @@ public class MoveGenerator {
 
     if (capturingOnly) {
       genMode = GEN_CAPTURES;
-    } else {
+    }
+    else {
       genMode = GEN_ALL;
     }
     generatePseudoLegaMoves();
@@ -433,8 +435,9 @@ public class MoveGenerator {
         qSearchMoves.add(move);
       }
       // Lower value piece captures higher value piece (with a margin)
-      else if (Move.getPiece(move).getType().getValue() + 200 <
-               Move.getTarget(move).getType().getValue()) {
+      else if (Move.getPiece(move).getType().getValue() + 200 < Move.getTarget(move)
+                                                                    .getType()
+                                                                    .getValue()) {
         qSearchMoves.add(move);
       }
       // undefended pieces captures are good
@@ -492,7 +495,8 @@ public class MoveGenerator {
         pseudoLegalMoves.add(nonCapturingMoves);
         moveListSort(pseudoLegalMoves);
 
-      } else {
+      }
+      else {
         // sort only capturing moves mvvlva order
         // Most Valuable Victim - Least Valuable Aggressor
         if (SORT_CAPTURING_MOVES) {
@@ -684,7 +688,8 @@ public class MoveGenerator {
                   capturingMoves.add(
                     Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                     Piece.WHITE_BISHOP));
-                } else if (to < 8) { // rank 1
+                }
+                else if (to < 8) { // rank 1
                   assert activePlayer.isBlack(); // checking for  color is probably redundant
                   capturingMoves.add(
                     Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
@@ -698,11 +703,13 @@ public class MoveGenerator {
                   capturingMoves.add(
                     Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                     Piece.BLACK_BISHOP));
-                } else { // normal capture
+                }
+                else { // normal capture
                   capturingMoves.add(
                     Move.createMove(type, fromSquare, toSquare, piece, target, promotion));
                 }
-              } else { // empty but maybe en passant
+              }
+              else { // empty but maybe en passant
                 if (toSquare == position.getEnPassantSquare()) { //  en passant capture
                   // which target?
                   final int t = activePlayer.isWhite()
@@ -734,7 +741,8 @@ public class MoveGenerator {
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.WHITE_BISHOP));
-              } else if (to < 8) { // rank 1
+              }
+              else if (to < 8) { // rank 1
                 assert activePlayer.isBlack(); // checking for color is probably redundant
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
@@ -748,18 +756,20 @@ public class MoveGenerator {
                 nonCapturingMoves.add(
                   Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
                                   Piece.BLACK_BISHOP));
-              } else {
+              }
+              else {
                 // pawndouble
-                if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow() &&
-                    (position.getPiece(fromSquare.ordinal() + (2 * Square.N))) ==
-                    Piece.NOPIECE) {
+                if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow()
+                    && (position.getPiece(fromSquare.ordinal() + (2 * Square.N)))
+                       == Piece.NOPIECE) {
                   // on rank 2 && rank 4 is free(rank 3 already checked via target)
                   nonCapturingMoves.add(
                     Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getNorth(), piece,
                                     target, promotion));
-                } else if (activePlayer.isBlack() && fromSquare.isBlackPawnBaseRow() &&
-                           position.getPiece(fromSquare.ordinal() + (2 * Square.S)) ==
-                           Piece.NOPIECE) {
+                }
+                else if (activePlayer.isBlack() && fromSquare.isBlackPawnBaseRow()
+                         && position.getPiece(fromSquare.ordinal() + (2 * Square.S))
+                            == Piece.NOPIECE) {
                   // on rank 7 && rank 5 is free(rank 6 already checked via target)
                   nonCapturingMoves.add(
                     Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getSouth(), piece,
@@ -871,7 +881,8 @@ public class MoveGenerator {
         }
         if (type.isSliding()) {
           to += d; // next sliding field in this direction
-        } else {
+        }
+        else {
           break; // no sliding piece type
         }
       }
@@ -918,7 +929,8 @@ public class MoveGenerator {
                             Piece.NOPIECE, Piece.NOPIECE));
         }
       }
-    } else {
+    }
+    else {
       if (position.isCastlingBK()) {
         // f8 free, g8 free and f8 not attacked
         // we will not check if g8 is attacked as this is a pseudo legal move
@@ -987,8 +999,8 @@ public class MoveGenerator {
     /*
      * Find a move by finding at least one moves for a piece type
      */
-    return findKingMove() || findPawnMove() || findKnightMove() || findQueenMove() ||
-           findRookMove() || findBishopMove();
+    return findKingMove() || findPawnMove() || findKnightMove() || findQueenMove() || findRookMove()
+           || findBishopMove();
   }
 
   /**
@@ -1103,7 +1115,8 @@ public class MoveGenerator {
         }
         if (type.isSliding()) {
           to += d; // next sliding field in this direction
-        } else {
+        }
+        else {
           break; // no sliding piece type
         }
       }
@@ -1145,7 +1158,8 @@ public class MoveGenerator {
                 && (target.getColor() == activePlayer.getInverseColor())) { // opponents color
               move = Move.createMove(type, fromSquare, toSquare, piece, target, promotion);
               if (isLegalMove(move)) return true;
-            } else { // empty but maybe en passant
+            }
+            else { // empty but maybe en passant
               if (toSquare == position.getEnPassantSquare()) { //  en passant capture
                 // which target?
                 final int t = activePlayer.isWhite()

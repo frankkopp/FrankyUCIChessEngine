@@ -34,69 +34,69 @@ import java.util.concurrent.TimeUnit;
  */
 public class PERFT {
 
-    private static final boolean DIVIDE=false;
+  private static final boolean DIVIDE = false;
 
-    private long _nodes = 0;
-    private long _checkCounter = 0;
-    private long _checkMateCounter = 0;
-    private long _captureCounter = 0;
-    private long _enpassantCounter = 0;
-    private String _fen = "";
+  private long   _nodes            = 0;
+  private long   _checkCounter     = 0;
+  private long   _checkMateCounter = 0;
+  private long   _captureCounter   = 0;
+  private long   _enpassantCounter = 0;
+  private String _fen              = "";
 
-    /**
-     * @param fen
-     */
-    public PERFT(String fen) {
-        _fen = fen;
+  /**
+   * @param fen
+   */
+  public PERFT(String fen) {
+    _fen = fen;
+  }
+
+  /**
+   *
+   */
+  public PERFT() {
+    _fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+  }
+
+  /**
+   * @param maxDepth
+   */
+  public void testPerft(int maxDepth) {
+
+    resetCounters();
+
+    System.out.format("Testing at depth %d%n", maxDepth);
+
+    MoveGenerator[] mg = new MoveGenerator[maxDepth];
+    for (int i = 0; i < maxDepth; i++) {
+      mg[i] = new MoveGenerator();
     }
 
-    /**
-     *
-     */
-    public PERFT() {
-        _fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    }
+    Position position = new Position(_fen);
 
-    /**
-     * @param maxDepth
-     */
-    public void testPerft(int maxDepth) {
+    // direct move gen
+    long result;
+    long startTime = System.currentTimeMillis();
+    // mg[0].setPosition(position);
+    //        result = mg[0]
+    //                .streamLegalMoves()
+    //                .mapToLong((move) -> dividePerft(maxDepth, mg, position, move))
+    //                .sum();
+    result = miniMaxOD(maxDepth, position, mg, 0);
+    long endTime = System.currentTimeMillis();
+    long duration = endTime - startTime;
 
-        resetCounters();
+    _nodes = result;
+    printResult(result, duration);
+  }
 
-      System.out.format("Testing at depth %d%n", maxDepth);
-
-        MoveGenerator[] mg = new MoveGenerator[maxDepth];
-        for (int i=0; i<maxDepth; i++) {
-            mg[i] = new MoveGenerator();
-        }
-
-        Position position = new Position(_fen);
-
-      // direct move gen
-        long result;
-        long startTime = System.currentTimeMillis();
-        mg[0].setPosition(position);
-      //        result = mg[0]
-      //                .streamLegalMoves()
-      //                .mapToLong((move) -> dividePerft(maxDepth, mg, position, move))
-      //                .sum();
-      result = miniMaxOD(maxDepth, position, mg, 0);
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-
-        _nodes = result;
-        printResult(result, duration);
-    }
-
-    private long dividePerft(int depth, MoveGenerator[] mg, Position board, int move) {
-        if (DIVIDE) System.out.print(Move.toSimpleString(move) + " ");
-        board.makeMove(move);
-        long r = miniMax(depth - 1, board, mg, 1);
-        if (DIVIDE) System.out.println(r);
-        board.undoMove();
-        return r;
-    }
+  private long dividePerft(int depth, MoveGenerator[] mg, Position board, int move) {
+    if (DIVIDE) System.out.print(Move.toSimpleString(move) + " ");
+    board.makeMove(move);
+    long r = miniMax(depth - 1, board, mg, 1);
+    if (DIVIDE) System.out.println(r);
+    board.undoMove();
+    return r;
+  }
 
   private long miniMax(int depth, Position board, MoveGenerator[] mg, int ply) {
 
@@ -115,7 +115,7 @@ public class PERFT {
     final Color _passivePlayer = board.getNextPlayer().getInverseColor();
     mg[ply].setPosition(board);
     MoveList moves = mg[ply].getPseudoLegalMoves();
-    for(int i = 0; i < moves.size(); i++) {
+    for (int i = 0; i < moves.size(); i++) {
       int move = moves.get(i);
       board.makeMove(move);
       if (!board.isAttacked(_passivePlayer, board.getKingSquares()[_activePlayer.ordinal()])) {
@@ -127,11 +127,11 @@ public class PERFT {
     return totalNodes;
   }
 
-  private long miniMaxOD(int depthleft, Position board, MoveGenerator[] mg, int ply) {
+  private long miniMaxOD(int depthleft, Position position, MoveGenerator[] mg, int ply) {
 
     // PERFT only looks at leaf nodes
     if (depthleft == 0) {
-      updateCounter(board);
+      updateCounter(position);
       return 1;
     }
 
@@ -140,91 +140,88 @@ public class PERFT {
 
     // moves to search recursively
     // some convenience fields
-    final Color _activePlayer = board.getNextPlayer();
-    final Color _passivePlayer = board.getNextPlayer().getInverseColor();
-    mg[ply].setPosition(board);
+    final Color _activePlayer = position.getNextPlayer();
+    final Color _passivePlayer = position.getNextPlayer().getInverseColor();
+    mg[ply].setPosition(position);
     int move;
     while ((move = mg[ply].getNextPseudoLegalMove(false)) != Move.NOMOVE) {
-      board.makeMove(move);
-      if (!board.isAttacked(_passivePlayer, board.getKingSquares()[_activePlayer.ordinal()])) {
-        totalNodes += miniMax(depthleft - 1, board, mg, ply + 1);
+      position.makeMove(move);
+      if (!position.isAttacked(_passivePlayer,
+                               position.getKingSquares()[_activePlayer.ordinal()])) {
+        totalNodes += miniMaxOD(depthleft - 1, position, mg, ply + 1);
       }
-      board.undoMove();
+      position.undoMove();
     }
     return totalNodes;
   }
 
-    /**
-     * @param board
-     */
-    private void updateCounter(Position board) {
-        if (board.hasCheck()) {
-            _checkCounter++;
-            if (board.hasCheckMate()) {
-                _checkMateCounter++;
-            }
-        }
-        int lastMove = board.getLastMove();
-        if (Move.getTarget(lastMove) != Piece.NOPIECE) {
-            _captureCounter++;
-        }
-        if (Move.getMoveType(lastMove) == MoveType.ENPASSANT) {
-            _enpassantCounter++;
-        }
+  /**
+   * @param board
+   */
+  private void updateCounter(Position board) {
+    if (board.hasCheck()) {
+      _checkCounter++;
+      if (board.hasCheckMate()) {
+        _checkMateCounter++;
+      }
     }
-
-    /**
-     * Reset the counters
-     */
-    private void resetCounters() {
-        _nodes = 0;
-        _checkCounter = 0;
-        _checkMateCounter = 0;
-        _captureCounter = 0;
-        _enpassantCounter = 0;
+    int lastMove = board.getLastMove();
+    if (Move.getTarget(lastMove) != Piece.NOPIECE) {
+      _captureCounter++;
     }
-
-    /**
-     * @param result
-     * @param duration
-     */
-    private void printResult(final long result, final long duration) {
-        System.out.format("Leaf Nodes: %,d Captures: %,d EnPassant: %,d Checks: %,d Checkmates: %,d %n",
-                result, _captureCounter, _enpassantCounter, _checkCounter, _checkMateCounter);
-        System.out.format("Duration: %02d:%02d:%02d.%03d%n",
-                TimeUnit.MILLISECONDS.toHours(duration),
-                TimeUnit.MILLISECONDS.toMinutes(duration)
-                - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
-                        .toHours(duration)),
-                TimeUnit.MILLISECONDS.toSeconds(duration)
-                - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
-                        .toMinutes(duration)),
-                duration
-                - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS
-                        .toSeconds(duration)));
-
-        System.out.format("n/s: %,d%n", result*1000/(duration+1));
-        System.out.println();
+    if (Move.getMoveType(lastMove) == MoveType.ENPASSANT) {
+      _enpassantCounter++;
     }
+  }
 
-    public long get_nodes() {
-        return _nodes;
-    }
+  /**
+   * Reset the counters
+   */
+  private void resetCounters() {
+    _nodes = 0;
+    _checkCounter = 0;
+    _checkMateCounter = 0;
+    _captureCounter = 0;
+    _enpassantCounter = 0;
+  }
 
-    public long get_checkCounter() {
-        return _checkCounter;
-    }
+  /**
+   * @param result
+   * @param duration
+   */
+  private void printResult(final long result, final long duration) {
+    System.out.format("Leaf Nodes: %,d Captures: %,d EnPassant: %,d Checks: %,d Checkmates: %,d %n",
+                      result, _captureCounter, _enpassantCounter, _checkCounter, _checkMateCounter);
+    System.out.format("Duration: %02d:%02d:%02d.%03d%n", TimeUnit.MILLISECONDS.toHours(duration),
+                      TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(
+                        TimeUnit.MILLISECONDS.toHours(duration)),
+                      TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(
+                        TimeUnit.MILLISECONDS.toMinutes(duration)),
+                      duration - TimeUnit.SECONDS.toMillis(
+                        TimeUnit.MILLISECONDS.toSeconds(duration)));
 
-    public long get_checkMateCounter() {
-        return _checkMateCounter;
-    }
+    System.out.format("n/s: %,d%n", result * 1000 / (duration + 1));
+    System.out.println();
+  }
 
-    public long get_captureCounter() {
-        return _captureCounter;
-    }
+  public long get_nodes() {
+    return _nodes;
+  }
 
-    public long get_enpassantCounter() {
-        return _enpassantCounter;
-    }
+  public long get_checkCounter() {
+    return _checkCounter;
+  }
+
+  public long get_checkMateCounter() {
+    return _checkMateCounter;
+  }
+
+  public long get_captureCounter() {
+    return _captureCounter;
+  }
+
+  public long get_enpassantCounter() {
+    return _enpassantCounter;
+  }
 
 }
