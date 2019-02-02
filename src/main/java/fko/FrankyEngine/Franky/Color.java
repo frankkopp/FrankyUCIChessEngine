@@ -45,10 +45,10 @@ public enum Color {
     /**
      * This is 1 for white and -1 for black. Useful in evaluation and pawn directions
      */
-    public final int factor;
+    public final int direction;
 
     Color(int factor) {
-        this.factor = factor;
+        this.direction = factor;
     }
 
     public static final Color[] values = {
