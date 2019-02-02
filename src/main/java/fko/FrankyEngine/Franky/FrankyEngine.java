@@ -134,7 +134,6 @@ public class FrankyEngine implements IUCIEngine {
     option("Ponder", UCIOptionType.check, Boolean.toString(config.PONDER), "", "", "");
     option("OwnBook", UCIOptionType.check, Boolean.toString(config.USE_BOOK), "", "", "");
     option("UCI_ShowCurrLine", UCIOptionType.check, Boolean.toString(config.UCI_ShowCurrLine), "", "", "");
-
     option("Use_TranspositionTable", UCIOptionType.check, Boolean.toString(config.USE_TRANSPOSITION_TABLE), "", "", "");
     option("Use_QSearch", UCIOptionType.check, Boolean.toString(config.USE_QUIESCENCE), "", "", "");
     option("Use_AlphaBeta_Pruning", UCIOptionType.check, Boolean.toString(config.USE_ALPHABETA_PRUNING), "", "", "");
@@ -146,7 +145,6 @@ public class FrankyEngine implements IUCIEngine {
     option("Aspiration_Start_Depth", UCIOptionType.spin, Integer.toString(config.ASPIRATION_START_DEPTH), "2", "2", "8");
     option("Use_Mate_Distance_Pruning", UCIOptionType.check, Boolean.toString(config.USE_MDP), "", "", "");
     option("Use_Minor_Promotion_Pruning", UCIOptionType.check, Boolean.toString(config.USE_MPP), "", "", "");
-
     option("Use_Reverse_Futility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_RFP), "", "", "");
     option("RFP_Margin", UCIOptionType.spin, Integer.toString(config.RFP_MARGIN), "0", "1800", "");
     option("Use_Null_Move_Pruning", UCIOptionType.check, Boolean.toString(config.USE_NMP), "", "", "");
@@ -156,10 +154,12 @@ public class FrankyEngine implements IUCIEngine {
     option("Use_Razor_Pruning", UCIOptionType.check, Boolean.toString(config.USE_RAZOR_PRUNING), "", "", "");
     option("Razor_Depth", UCIOptionType.spin, Integer.toString(config.RAZOR_DEPTH), "1", "5", "");
     option("Razor_Margin", UCIOptionType.spin, Integer.toString(config.RAZOR_MARGIN), "0", "1800", "");
+    option("Use_IID", UCIOptionType.check, Boolean.toString(config.USE_IID), "", "", "");
     option("Use_Extensions", UCIOptionType.check, Boolean.toString(config.USE_EXTENSIONS), "", "", "");
     option("Use_Limited_Razoring", UCIOptionType.check, Boolean.toString(config.USE_LIMITED_RAZORING), "", "", "");
     option("Use_Extended_Futility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_EXTENDED_FUTILITY_PRUNING), "", "", "");
     option("Use_Futility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_FUTILITY_PRUNING), "", "", "");
+    option("Use_QFutility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_QFUTILITY_PRUNING), "", "", "");
     option("Use_Late_Move_Pruning", UCIOptionType.check, Boolean.toString(config.USE_LMP), "", "", "");
     option("LMP_Min_Depth", UCIOptionType.spin, Integer.toString(config.LMP_MIN_DEPTH), "2", "10", "");
     option("LMP_Min_Moves", UCIOptionType.spin, Integer.toString(config.LMP_MIN_MOVES), "1", "15", "");
@@ -342,6 +342,12 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
+      case "Use_IID":
+        config.USE_IID = Boolean.valueOf(value);
+        msg = "Use_IID set to " + (config.USE_IID ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
       case "Use_Extensions":
         config.USE_EXTENSIONS = Boolean.valueOf(value);
         msg = "Use Search Extensions set to " + (config.USE_EXTENSIONS ? "On" : "Off");
@@ -350,20 +356,27 @@ public class FrankyEngine implements IUCIEngine {
         break;
       case "Use_Limited_Razoring":
         config.USE_LIMITED_RAZORING = Boolean.valueOf(value);
-        msg = "Use Late Move Reduction set to " + (config.USE_LIMITED_RAZORING ? "On" : "Off");
+        msg = "Use_Limited_Razoring set to " + (config.USE_LIMITED_RAZORING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Extended_Futility_Pruning":
         config.USE_EXTENDED_FUTILITY_PRUNING = Boolean.valueOf(value);
-        msg =
-          "Use Late Move Reduction set to " + (config.USE_EXTENDED_FUTILITY_PRUNING ? "On" : "Off");
+        msg = "Use_Extended_Futility_Pruning set to " + (config.USE_EXTENDED_FUTILITY_PRUNING
+                                                         ? "On"
+                                                         : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Futility_Pruning":
         config.USE_FUTILITY_PRUNING = Boolean.valueOf(value);
-        msg = "Use Late Move Reduction set to " + (config.USE_FUTILITY_PRUNING ? "On" : "Off");
+        msg = "Use_Futility_Pruning set to " + (config.USE_FUTILITY_PRUNING ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_QFutility_Pruning":
+        config.USE_QFUTILITY_PRUNING = Boolean.valueOf(value);
+        msg = "Use_QFutility_Pruning set to " + (config.USE_QFUTILITY_PRUNING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;

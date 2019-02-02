@@ -137,8 +137,8 @@ public class SuiteTestsTest {
     Successful: 172 (49 Prozent)
     Failed:     174 (50 Prozent)
     Franky-0.11 - 10sec
-    Successful: 150 (43 Prozent)
-    Failed:     196 (56 Prozent)
+    Successful: 155 (44 Prozent)
+    Failed:     191 (55 Prozent)
     */
     // ./testsets/crafty_test.epd
     testSuite.setSearchTime(5000);

@@ -117,7 +117,7 @@ public class Configuration {
    * for Debugging
    * https://www.chessprogramming.org/Debugging
    */
-  public boolean USE_MTDf = false;
+  public boolean USE_MTDf         = false;
   public int     MTDf_START_DEPTH = 5;
 
   /**
@@ -148,7 +148,6 @@ public class Configuration {
    */
   public boolean USE_MPP = true;
 
-
   /**
    * Eval Pruning - early cut for low static evals
    * Reverse Futility Pruning
@@ -174,17 +173,25 @@ public class Configuration {
   public int     RAZOR_MARGIN      = 600;
 
   /**
+   * Internatl Iterative Deepening
+   */
+  public boolean USE_IID       = true;
+  public int     IID_DEPTH     = 2;
+  public int     IID_REDUCTION = 2;
+
+  /**
    * Use search depth extensions
    */
   public boolean USE_EXTENSIONS = true;
 
   /**
-   * Limited Razoring
+   * Futility Prunings
    * http://people.csail.mit.edu/heinz/dt/node18.html
    */
-  public boolean USE_LIMITED_RAZORING = true;
+  public boolean USE_LIMITED_RAZORING          = true;
   public boolean USE_EXTENDED_FUTILITY_PRUNING = true;
-  public boolean USE_FUTILITY_PRUNING = true;
+  public boolean USE_FUTILITY_PRUNING          = true;
+  public boolean USE_QFUTILITY_PRUNING         = true;
 
   /**
    * Late Move Pruning
@@ -192,6 +199,7 @@ public class Configuration {
   public boolean USE_LMP       = false;
   public int     LMP_MIN_DEPTH = 3;
   public int     LMP_MIN_MOVES = 6;
+
   /**
    * Late Move Reduction
    */
@@ -200,7 +208,6 @@ public class Configuration {
   public int     LMR_MIN_MOVES = 3;
   public int     LMR_REDUCTION = 1;
 
-
   /**
    * Use LAZY SMP - not sofisticated multithreading to fill up the TT quicker
    */
@@ -208,7 +215,7 @@ public class Configuration {
   //  public int SMP_CPUS = 4;
 
   /**
-   * Experimental sorting of moves in move generation.
+   * Experimental extra sorting of moves in move generation.
    * Generating moves already has good ordering - extra sorting is expensive
    * and extra sorting can be worse than standard sorting
    * <p>
@@ -230,22 +237,24 @@ public class Configuration {
     return "Configuration{" + "PERFT=" + PERFT + ", HASH_SIZE=" + HASH_SIZE + ", PONDER=" + PONDER
            + ", DEBUG=" + DEBUG + ", UCI_ShowCurrLine=" + UCI_ShowCurrLine + ", USE_BOOK="
            + USE_BOOK + ", OB_FolderPath='" + OB_FolderPath + '\'' + ", OB_fileNamePlain='"
-           + OB_fileNamePlain + '\'' + ", OB_Mode=" + OB_Mode + ", USE_QUIESCENCE=" + USE_QUIESCENCE
-           + ", USE_ALPHABETA_PRUNING=" + USE_ALPHABETA_PRUNING + ", USE_KILLER_MOVES="
-           + USE_KILLER_MOVES + ", NO_KILLER_MOVES=" + NO_KILLER_MOVES + ", USE_PVS=" + USE_PVS
-           + ", USE_PVS_ORDERING=" + USE_PVS_ORDERING + ", USE_TRANSPOSITION_TABLE="
-           + USE_TRANSPOSITION_TABLE + ", USE_TT_ROOT=" + USE_TT_ROOT + ", USE_ASPIRATION_WINDOW="
+           + OB_fileNamePlain + '\'' + ", OB_Mode=" + OB_Mode + ", USE_TRANSPOSITION_TABLE="
+           + USE_TRANSPOSITION_TABLE + ", USE_TT_ROOT=" + USE_TT_ROOT + ", USE_QUIESCENCE="
+           + USE_QUIESCENCE + ", USE_ALPHABETA_PRUNING=" + USE_ALPHABETA_PRUNING
+           + ", USE_KILLER_MOVES=" + USE_KILLER_MOVES + ", NO_KILLER_MOVES=" + NO_KILLER_MOVES
+           + ", USE_MTDf=" + USE_MTDf + ", MTDf_START_DEPTH=" + MTDf_START_DEPTH + ", USE_PVS="
+           + USE_PVS + ", USE_PVS_ORDERING=" + USE_PVS_ORDERING + ", USE_ASPIRATION_WINDOW="
            + USE_ASPIRATION_WINDOW + ", ASPIRATION_START_DEPTH=" + ASPIRATION_START_DEPTH
            + ", USE_MDP=" + USE_MDP + ", USE_MPP=" + USE_MPP + ", USE_RFP=" + USE_RFP
            + ", RFP_MARGIN=" + RFP_MARGIN + ", USE_NMP=" + USE_NMP + ", NMP_DEPTH=" + NMP_DEPTH
            + ", USE_VERIFY_NMP=" + USE_VERIFY_NMP + ", NMP_VERIFICATION_DEPTH="
            + NMP_VERIFICATION_DEPTH + ", USE_RAZOR_PRUNING=" + USE_RAZOR_PRUNING + ", RAZOR_DEPTH="
-           + RAZOR_DEPTH + ", RAZOR_MARGIN=" + RAZOR_MARGIN + ", USE_LIMITED_RAZORING="
-           + USE_LIMITED_RAZORING + ", USE_EXTENDED_FUTILITY_PRUNING="
-           + USE_EXTENDED_FUTILITY_PRUNING + ", USE_FUTILITY_PRUNING=" + USE_FUTILITY_PRUNING
-           + ", USE_LMP=" + USE_LMP + ", LMP_MIN_DEPTH=" + LMP_MIN_DEPTH + ", LMP_MIN_MOVES="
-           + LMP_MIN_MOVES + ", USE_LMR=" + USE_LMR + ", LMR_MIN_DEPTH=" + LMR_MIN_DEPTH
-           + ", LMR_MIN_MOVES=" + LMR_MIN_MOVES + ", LMR_REDUCTION=" + LMR_REDUCTION
+           + RAZOR_DEPTH + ", RAZOR_MARGIN=" + RAZOR_MARGIN + ", USE_IID=" + USE_IID
+           + ", USE_EXTENSIONS=" + USE_EXTENSIONS + ", USE_LIMITED_RAZORING=" + USE_LIMITED_RAZORING
+           + ", USE_EXTENDED_FUTILITY_PRUNING=" + USE_EXTENDED_FUTILITY_PRUNING
+           + ", USE_FUTILITY_PRUNING=" + USE_FUTILITY_PRUNING + ", USE_QFUTILITY_PRUNING="
+           + USE_QFUTILITY_PRUNING + ", USE_LMP=" + USE_LMP + ", LMP_MIN_DEPTH=" + LMP_MIN_DEPTH
+           + ", LMP_MIN_MOVES=" + LMP_MIN_MOVES + ", USE_LMR=" + USE_LMR + ", LMR_MIN_DEPTH="
+           + LMR_MIN_DEPTH + ", LMR_MIN_MOVES=" + LMR_MIN_MOVES + ", LMR_REDUCTION=" + LMR_REDUCTION
            + ", USE_SORT_ALL_MOVES=" + USE_SORT_ALL_MOVES + '}';
   }
 }

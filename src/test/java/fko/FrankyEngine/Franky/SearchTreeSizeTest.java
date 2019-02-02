@@ -75,9 +75,9 @@ public class SearchTreeSizeTest {
   @Disabled
   public void sizeOfSearchTreeTest() throws ExecutionException, InterruptedException {
 
-    final int NO_OF_TESTS = 5; //Integer.MAX_VALUE;
-    final int START_NO = 10;
-    final int DEPTH = 7;
+    final int NO_OF_TESTS = 5; //  Integer.MAX_VALUE;
+    final int START_NO = 5;
+    final int DEPTH = 6;
     HASH_SIZE = 1024;
     THREADS = 1;
 
@@ -204,6 +204,8 @@ public class SearchTreeSizeTest {
     search.config.USE_NMP = false;
     search.config.USE_RAZOR_PRUNING = false;
 
+    search.config.USE_IID = false;
+
     search.config.USE_EXTENSIONS = false;
 
     search.config.USE_LIMITED_RAZORING = false;
@@ -213,6 +215,7 @@ public class SearchTreeSizeTest {
     search.config.USE_LMR = false;
 
     search.config.USE_QUIESCENCE = false;
+    search.config.USE_QFUTILITY_PRUNING = false;
 
     // pure MiniMax
     search.config.USE_QUIESCENCE = true;
@@ -249,10 +252,6 @@ public class SearchTreeSizeTest {
     search.config.USE_MPP = true;
     result.tests.add(measureTreeSize(search, position, searchMode, "MDP_MPP", true));
 
-    // Search extensions
-    search.config.USE_EXTENSIONS = true;
-    result.tests.add(measureTreeSize(search, position, searchMode, "EXTENSION", true));
-
     // Reverse Futility Pruning
     search.config.USE_RFP = true;
     search.config.RFP_MARGIN = 300;
@@ -271,13 +270,23 @@ public class SearchTreeSizeTest {
     search.config.RAZOR_MARGIN = 600;
     result.tests.add(measureTreeSize(search, position, searchMode, "RAZOR", true));
 
+    // Internal Iterative Deepening
+    search.config.USE_IID = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "IID", true));
+
+    // Search extensions
+    search.config.USE_EXTENSIONS = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "EXTENSION", true));
+
     // Futility Pruning
+    search.config.USE_FUTILITY_PRUNING = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "FP", true));
+    search.config.USE_QFUTILITY_PRUNING = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "QFP", true));
     search.config.USE_LIMITED_RAZORING = true;
     result.tests.add(measureTreeSize(search, position, searchMode, "LR", true));
     search.config.USE_EXTENDED_FUTILITY_PRUNING = true;
-    result.tests.add(measureTreeSize(search, position, searchMode, "LR_EFP", true));
-    search.config.USE_FUTILITY_PRUNING = true;
-    result.tests.add(measureTreeSize(search, position, searchMode, "LR_EFP_FP", true));
+    result.tests.add(measureTreeSize(search, position, searchMode, "EFP", true));
 
     // Late Move Pruning
     search.config.USE_LMP = true;
