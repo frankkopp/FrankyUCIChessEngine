@@ -83,8 +83,7 @@ public class Position {
   private Piece[] x88Board = new Piece[BOARDSIZE];
 
   // hash for pieces - piece, board
-  private static final long[][] pieceZobrist =
-    new long[Piece.values.length][Square.values.length];
+  private static final long[][] pieceZobrist = new long[Piece.values.length][Square.values.length];
 
   // Castling rights
   private              boolean   castlingWK         = true;
@@ -160,6 +159,7 @@ public class Position {
   // For testing purposes these fields are not final and also
   // accessible from external.
   public static int SEED = 0;
+
   static {
     Random random = new Random(SEED);
 
@@ -329,9 +329,11 @@ public class Position {
         if (target != Piece.NOPIECE) {
           removePiece(toSquare, target);
           halfMoveClock = 0; // reset half move clock because of capture
-        } else if (piece.getType() == PieceType.PAWN) {
+        }
+        else if (piece.getType() == PieceType.PAWN) {
           halfMoveClock = 0; // reset half move clock because of pawn move
-        } else {
+        }
+        else {
           halfMoveClock++;
         }
         movePiece(fromSquare, toSquare, piece);
@@ -792,6 +794,216 @@ public class Position {
   }
 
   /**
+   * Checks if move is giving check to the opponent.
+   * This method is faster than makeing the move and checking for legallity and giving check.
+   * Needs to be a valid wfor the position otherwise will crash.
+   * For performance reason we do not want to check validity here.
+   * Does NOT check if the move itself is legal (leaves the own king in check)
+   *
+   * @param move
+   * @return true if move is giving check to opponent
+   */
+  public boolean givesCheck(final int move) {
+    // oppnents king square
+    final Square kingSquare = getKingSquares()[getOpponent().ordinal()];
+    // fromSquare
+    final Square fromSquare = Move.getStart(move);
+    // target square
+    Square targetSquare = Move.getEnd(move);
+    // the moving piece
+    PieceType pieceType = Move.getPiece(move).getType();
+    // the square captured by en passant capture
+    Square epTargetSquare = Square.NOSQUARE;
+
+    // promotion moves - use new piece type
+    if (Move.getMoveType(move) == MoveType.PROMOTION) {
+      pieceType = Move.getPromotion(move).getType();
+    }
+    // Castling
+    else if (Move.getMoveType(move) == MoveType.CASTLING) {
+      // set the target square to the rook square and
+      // piece type to ROOK. King can't give check
+      // also no revealed check possible
+      switch (targetSquare) {
+        case g1: // white king side castle
+          targetSquare = Square.f1;
+          pieceType = PieceType.ROOK;
+          break;
+        case c1: // white queen side castle
+          targetSquare = Square.d1;
+          pieceType = PieceType.ROOK;
+          break;
+        case g8: // black king side castle
+          targetSquare = Square.f8;
+          pieceType = PieceType.ROOK;
+          break;
+        case c8: // black queen side castle
+          targetSquare = Square.d8;
+          pieceType = PieceType.ROOK;
+          break;
+      }
+    }
+    // en passant
+    else if (Move.getMoveType(move) == MoveType.ENPASSANT) {
+      epTargetSquare = Move.getTarget(move).getColor().isWhite()
+                       ? targetSquare.getNorth()
+                       : targetSquare.getSouth();
+    }
+
+    // queen can be rook or bishop
+    if (pieceType == PieceType.QUEEN) {
+      // if queen on same rank or same file then she acts like rook
+      // otherwise like bishop
+      if (targetSquare.getRank() == kingSquare.getRank()
+          || targetSquare.getFile() == kingSquare.getFile()) {
+        pieceType = PieceType.ROOK;
+      }
+      else {
+        pieceType = PieceType.BISHOP;
+      }
+    }
+
+    // #########################################################################
+    // Direct checks
+    // #########################################################################
+    switch (pieceType) {
+      case NOTYPE:
+        break;
+      case PAWN:
+        // normal pawn direct chess include en passant captures
+        int[] directions = Square.pawnAttackDirections;
+        for (int d : directions) {
+          if (Square.getSquare(targetSquare.ordinal() + d * nextPlayer.direction) == kingSquare)
+            return true;
+        }
+        break;
+      case KNIGHT:
+        directions = Square.knightDirections;
+        for (int d : directions) {
+          // calculate the to square
+          if (Square.getSquare(targetSquare.ordinal() + d) == kingSquare) return true;
+        }
+        break;
+      case ROOK:
+        // rook not on same rank or file as opponent king - no check possible
+        if (targetSquare.getRank() != kingSquare.getRank()
+            && targetSquare.getFile() != kingSquare.getFile()) {
+          break;
+        }
+        // check all directions and slide until invalid
+        directions = Square.rookDirections;
+        for (int d : directions) {
+          int to = targetSquare.ordinal() + d;
+          while ((to & 0x88) == 0) { // slide while valid square
+            // skip from square
+            if (Square.getSquare(to) != fromSquare) {
+              // square direction cannot reach king any more - stop sliding
+              if (Square.getSquare(to).getRank() != kingSquare.getRank()
+                  && Square.getSquare(to).getFile() != kingSquare.getFile()) break;
+              // square occupied - stop sliding
+              if (getPiece(to) != Piece.NOPIECE) {
+                // captures king -> check
+                if (Square.getSquare(to) == kingSquare) return true;
+                else break;
+              }
+            }
+            to += d; // next sliding field in this direction
+          }
+        }
+        break;
+      case BISHOP:
+        // bishop not on same diagonal as opponent king - no check possible
+        if ((targetSquare.getUpDiag() & kingSquare.bitBoard) > 0
+            && (targetSquare.getDownDiag() & kingSquare.bitBoard) > 0) {
+          break;
+        }
+        // check all directions and slide until invalid
+        directions = Square.bishopDirections;
+        for (int d : directions) {
+          int to = targetSquare.ordinal() + d;
+          while ((to & 0x88) == 0) { // slide while valid square
+            // skip from square
+            if (Square.getSquare(to) != fromSquare) {
+              // square direction cannot reach king any more - stop sliding
+              if ((targetSquare.getUpDiag() & kingSquare.bitBoard) > 0
+                  && (targetSquare.getDownDiag() & kingSquare.bitBoard) > 0) break;
+              // square occupied - stop sliding
+              if (getPiece(to) != Piece.NOPIECE) {
+                // captures king -> check
+                if (Square.getSquare(to) == kingSquare) return true;
+                else break;
+              }
+            }
+            to += d; // next sliding field in this direction
+          }
+        }
+        break;
+    }
+
+    // #########################################################################
+    // Revealed checks
+    // #########################################################################
+
+    // we only need to check for rook, bishop and queens
+    // knight and pawn attacks can't be revealed
+    // exeption is en passant where the captured piece can reveal check
+    // check all directions and slide until invalid
+    final boolean isEnPassant = Move.getMoveType(move) == MoveType.ENPASSANT;
+
+    int[] directions = Square.rookDirections;
+    for (int d : directions) {
+      int to = kingSquare.ordinal() + d;
+      while ((to & 0x88) == 0) { // slide while valid square
+        // we hit the target square which means the piece moved into the direction
+        // of a possible attack.
+        if (Square.getSquare(to) == targetSquare) break;
+        // ignore the square just emptied by move
+        // if en passant ignore also the square captured by en passant
+        // @formatter:off
+        if (Square.getSquare(to) != fromSquare
+            && (!isEnPassant || Square.getSquare(to) != epTargetSquare)) {
+          // squares occupied by rook or queen from moving player give check
+            if (getPiece(to) != Piece.NOPIECE) {
+              if (getPiece(to).getColor() == nextPlayer
+                  && (getPiece(to).getType() == PieceType.ROOK
+                      || getPiece(to).getType() == PieceType.QUEEN)) {
+                return true;
+              }
+              break;
+            } // @formatter:on
+        }
+        to += d; // next sliding field in this direction
+      }
+    }
+    directions = Square.bishopDirections;
+    for (int d : directions) {
+      int to = kingSquare.ordinal() + d;
+      while ((to & 0x88) == 0) { // slide while valid square
+        // we hit the target square which means the piece moved into the direction
+        // of a possible attack.
+        if (Square.getSquare(to) == targetSquare) break;
+        // if en passant ignore also the square captured by en passant
+        // @formatter:off
+        if (Square.getSquare(to) != fromSquare
+            && (!isEnPassant || Square.getSquare(to) != epTargetSquare)) {
+          // squares occupied by bishop or queen from moving player give check
+          if (getPiece(to) != Piece.NOPIECE) {
+            if (getPiece(to).getColor() == nextPlayer
+                && (getPiece(to).getType() == PieceType.BISHOP
+                    || getPiece(to).getType() == PieceType.QUEEN)) {
+              return true;
+            }
+            break;
+          } // @formatter:on
+        }
+        to += d; // next sliding field in this direction
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * This checks if a certain square is currently under attack by the player of the given color. It
    * does not matter who has the next move on this position. It also is not checking if the actual
    * attack can be done as a legal move. E.g. a pinned piece could not actually make a capture on
@@ -900,11 +1112,12 @@ public class Position {
         // right
         i = squareIndex + Square.E;
         return (i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN;
-      } else if (!isWhite // black is attacker (assume not noColor)
-                 && x88Board[enPassantSquare.getNorth().ordinal()] == Piece.WHITE_PAWN
-                 // white is target
-                 && this.enPassantSquare.getNorth()
-                    == square) { // this is indeed the en passant attacked square
+      }
+      else if (!isWhite // black is attacker (assume not noColor)
+               && x88Board[enPassantSquare.getNorth().ordinal()] == Piece.WHITE_PAWN
+               // white is target
+               && this.enPassantSquare.getNorth()
+                  == square) { // this is indeed the en passant attacked square
         // attack from left
         int i = squareIndex + Square.W;
         if ((i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN) return true;
@@ -987,7 +1200,8 @@ public class Position {
       // can't be any more repetition of positions before this position
       if (halfMoveClockHistory[i] >= lastHalfMove) {
         break;
-      } else {
+      }
+      else {
         lastHalfMove = halfMoveClockHistory[i];
       }
       if (zobristKey == zobristKeyHistory[i]) counter++;
@@ -1011,7 +1225,8 @@ public class Position {
       // can't be any more repetition of positions before this position
       if (halfMoveClockHistory[i] >= lastHalfMove) {
         break;
-      } else {
+      }
+      else {
         lastHalfMove = halfMoveClockHistory[i];
       }
       if (zobristKey == zobristKeyHistory[i]) counter++;
@@ -1226,7 +1441,8 @@ public class Position {
             default:
               throw new IllegalArgumentException("FEN Syntax not valid - expected a-hA-H");
           }
-        } else if (s.toUpperCase().equals(s)) { // white
+        }
+        else if (s.toUpperCase().equals(s)) { // white
           switch (s) {
             case "P":
               putPiece(Square.getSquare(file, rank), Piece.WHITE_PAWN);
@@ -1249,17 +1465,21 @@ public class Position {
             default:
               throw new IllegalArgumentException("FEN Syntax not valid - expected a-hA-H");
           }
-        } else {
+        }
+        else {
           throw new IllegalArgumentException("FEN Syntax not valid - expected a-hA-H");
         }
         file++;
-      } else if (s.matches("[1-8]")) {
+      }
+      else if (s.matches("[1-8]")) {
         int e = Integer.parseInt(s);
         file += e;
-      } else if (s.equals("/")) {
+      }
+      else if (s.equals("/")) {
         rank--;
         file = 1;
-      } else {
+      }
+      else {
         throw new IllegalArgumentException("FEN Syntax not valid - expected (1-9a-hA-H/)");
       }
 
@@ -1274,14 +1494,17 @@ public class Position {
       s = parts[1];
       if (s.equals("w")) {
         nextPlayer = Color.WHITE;
-      } else if (s.equals("b")) {
+      }
+      else if (s.equals("b")) {
         nextPlayer = Color.BLACK;
         // only when black to have the right in/out rhythm
         zobristKey = this.zobristKey ^ nextPlayer_Zobrist;
-      } else {
+      }
+      else {
         throw new IllegalArgumentException("FEN Syntax not valid - expected w or b");
       }
-    } else { // default "w"
+    }
+    else { // default "w"
       nextPlayer = Color.WHITE;
     }
 
@@ -1334,7 +1557,8 @@ public class Position {
     if (parts.length >= 5) { // default "0"
       s = parts[4];
       halfMoveClock = Integer.parseInt(s);
-    } else {
+    }
+    else {
       halfMoveClock = 0;
     }
 
@@ -1343,7 +1567,8 @@ public class Position {
       s = parts[5];
       nextHalfMoveNumber = (2 * Integer.parseInt(s));
       if (nextHalfMoveNumber == 0) nextHalfMoveNumber = 2;
-    } else {
+    }
+    else {
       nextHalfMoveNumber = 2;
     }
     if (nextPlayer.isWhite()) nextHalfMoveNumber--;
@@ -1376,14 +1601,16 @@ public class Position {
 
         if (piece == Piece.NOPIECE) {
           emptySquares++;
-        } else {
+        }
+        else {
           if (emptySquares > 0) {
             fen.append(emptySquares);
             emptySquares = 0;
           }
           if (piece.getColor().isWhite()) {
             fen.append(piece.toString());
-          } else {
+          }
+          else {
             fen.append(piece.toString());
           }
         }
@@ -1427,7 +1654,8 @@ public class Position {
     // En passant
     if (enPassantSquare != Square.NOSQUARE) {
       fen.append(enPassantSquare.toString());
-    } else {
+    }
+    else {
       fen.append('-');
     }
     fen.append(' ');
@@ -1460,7 +1688,8 @@ public class Position {
         Piece p = x88Board[Square.getSquare(file, rank).ordinal()];
         if (p == Piece.NOPIECE) {
           boardString.append("   |");
-        } else {
+        }
+        else {
           boardString.append(" ").append(p.toString()).append(" |");
         }
       }
