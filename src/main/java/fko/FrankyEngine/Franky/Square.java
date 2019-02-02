@@ -69,10 +69,17 @@ public enum Square {
   public final int index64;
 
   /**
+   * pre-computed bitBoard representation
+   */
+  public final long bitBoard;
+
+  private long upDiag;
+  private long downDiag;
+
+  /**
    * pre-filled list with all valid squares
    */
   public static final List<Square> validSquares;
-
   // Move deltas north, south, east, west and combinations
   static final int N = 16;
   static final int E = 1;
@@ -81,8 +88,8 @@ public enum Square {
   static final int NE = N + E;
   static final int SE = S + E;
   static final int SW = S + W;
-  static final int NW = N + W;
 
+  static final int NW = N + W;
   static final int[] pawnDirections = {N, NW, NE};
   static final int[] pawnAttackDirections = {NW, NE};
   static final int[] knightDirections = {
@@ -109,22 +116,112 @@ public enum Square {
       N, NE, E, SE,
       S, SW, W, NW
   };
-  // @formatter:on
+
+  // upward diagonal bitboards
+  static final long a8UpDiag = a8.bitBoard;
+  static final long a7UpDiag = a7.bitBoard | b8.bitBoard;
+  static final long a6UpDiag = a6.bitBoard | b7.bitBoard | c8.bitBoard;
+  static final long a5UpDiag = a5.bitBoard | b6.bitBoard | c7.bitBoard | d8.bitBoard;
+  static final long a4UpDiag = a4.bitBoard | b5.bitBoard | c6.bitBoard | d7.bitBoard | e8.bitBoard;
+  static final long a3UpDiag =
+    a3.bitBoard | b4.bitBoard | c5.bitBoard | d6.bitBoard | e7.bitBoard | f8.bitBoard;
+  static final long a2UpDiag =
+    a2.bitBoard | b3.bitBoard | c4.bitBoard | d5.bitBoard | e6.bitBoard | f7.bitBoard | g8.bitBoard;
+  static final long a1UpDiag =
+    a1.bitBoard | b2.bitBoard | c3.bitBoard | d4.bitBoard | e5.bitBoard | f6.bitBoard | g7.bitBoard
+    | h8.bitBoard;
+  static final long b1UpDiag =
+    b1.bitBoard | c2.bitBoard | d3.bitBoard | e4.bitBoard | f5.bitBoard | g6.bitBoard | h7.bitBoard;
+  static final long c1UpDiag =
+    c1.bitBoard | d2.bitBoard | e3.bitBoard | f4.bitBoard | g5.bitBoard | h6.bitBoard;
+  static final long d1UpDiag = d1.bitBoard | e2.bitBoard | f3.bitBoard | g4.bitBoard | h5.bitBoard;
+  static final long e1UpDiag = e1.bitBoard | f2.bitBoard | g3.bitBoard | h4.bitBoard;
+  static final long f1UpDiag = f1.bitBoard | g2.bitBoard | h3.bitBoard;
+  static final long g1UpDiag = g1.bitBoard | h2.bitBoard;
+  static final long h1UpDiag = h1.bitBoard;
+
+  // downward diagonal bitboards
+  static final long a1DownDiag = a1.bitBoard;
+  static final long a2DownDiag = a2.bitBoard | b1.bitBoard;
+  static final long a3DownDiag = a3.bitBoard | b2.bitBoard | c1.bitBoard;
+  static final long a4DownDiag = a4.bitBoard | b3.bitBoard | c2.bitBoard | d1.bitBoard;
+  static final long a5DownDiag =
+    a5.bitBoard | b4.bitBoard | c3.bitBoard | d2.bitBoard | e1.bitBoard;
+  static final long a6DownDiag =
+    a6.bitBoard | b5.bitBoard | c4.bitBoard | d3.bitBoard | e2.bitBoard | f1.bitBoard;
+  static final long a7DownDiag =
+    a7.bitBoard | b6.bitBoard | c5.bitBoard | d4.bitBoard | e3.bitBoard | f2.bitBoard | g1.bitBoard;
+  static final long a8DownDiag =
+    a8.bitBoard | b7.bitBoard | c6.bitBoard | d5.bitBoard | e4.bitBoard | f3.bitBoard | g2.bitBoard
+    | h1.bitBoard;
+  static final long b8DownDiag =
+    b8.bitBoard | c7.bitBoard | d6.bitBoard | e5.bitBoard | f4.bitBoard | g3.bitBoard | h2.bitBoard;
+  static final long c8DownDiag =
+    c8.bitBoard | d7.bitBoard | e6.bitBoard | f5.bitBoard | g4.bitBoard | h3.bitBoard;
+  static final long d8DownDiag =
+    d8.bitBoard | e7.bitBoard | f6.bitBoard | g5.bitBoard | h4.bitBoard;
+  static final long e8DownDiag = e8.bitBoard | f7.bitBoard | g6.bitBoard | h5.bitBoard;
+  static final long f8DownDiag = f8.bitBoard | g7.bitBoard | h6.bitBoard;
+  static final long g8DownDiag = g8.bitBoard | h7.bitBoard;
+  static final long h8DownDiag = h8.bitBoard;
 
   static {
     values = Square.values();
     validSquares = Collections.unmodifiableList(
       Arrays.stream(values()).filter(Square::isValidSquare).collect(Collectors.toList()));
-  }
 
+    // precompute diagonals for squares
+    for (Square sq : values()) {
+      if ((sq.bitBoard & a8UpDiag) > 0) sq.upDiag = a8UpDiag;
+      else if ((sq.bitBoard & a7UpDiag) > 0) sq.upDiag = a7UpDiag;
+      else if ((sq.bitBoard & a6UpDiag) > 0) sq.upDiag = a6UpDiag;
+      else if ((sq.bitBoard & a5UpDiag) > 0) sq.upDiag = a5UpDiag;
+      else if ((sq.bitBoard & a4UpDiag) > 0) sq.upDiag = a4UpDiag;
+      else if ((sq.bitBoard & a3UpDiag) > 0) sq.upDiag = a3UpDiag;
+      else if ((sq.bitBoard & a2UpDiag) > 0) sq.upDiag = a2UpDiag;
+      else if ((sq.bitBoard & a1UpDiag) > 0) sq.upDiag = a1UpDiag;
+      else if ((sq.bitBoard & b1UpDiag) > 0) sq.upDiag = b1UpDiag;
+      else if ((sq.bitBoard & c1UpDiag) > 0) sq.upDiag = c1UpDiag;
+      else if ((sq.bitBoard & d1UpDiag) > 0) sq.upDiag = d1UpDiag;
+      else if ((sq.bitBoard & e1UpDiag) > 0) sq.upDiag = e1UpDiag;
+      else if ((sq.bitBoard & f1UpDiag) > 0) sq.upDiag = f1UpDiag;
+      else if ((sq.bitBoard & g1UpDiag) > 0) sq.upDiag = g1UpDiag;
+      else if ((sq.bitBoard & h1UpDiag) > 0) sq.upDiag = h1UpDiag;
+
+      if ((sq.bitBoard & a1DownDiag) > 0) sq.downDiag = a1DownDiag;
+      else if ((sq.bitBoard & a2DownDiag) > 0) sq.downDiag = a2DownDiag;
+      else if ((sq.bitBoard & a3DownDiag) > 0) sq.downDiag = a3DownDiag;
+      else if ((sq.bitBoard & a4DownDiag) > 0) sq.downDiag = a4DownDiag;
+      else if ((sq.bitBoard & a5DownDiag) > 0) sq.downDiag = a5DownDiag;
+      else if ((sq.bitBoard & a6DownDiag) > 0) sq.downDiag = a6DownDiag;
+      else if ((sq.bitBoard & a7DownDiag) > 0) sq.downDiag = a7DownDiag;
+      else if ((sq.bitBoard & a8DownDiag) > 0) sq.downDiag = a8DownDiag;
+      else if ((sq.bitBoard & b8DownDiag) > 0) sq.downDiag = b8DownDiag;
+      else if ((sq.bitBoard & c8DownDiag) > 0) sq.downDiag = c8DownDiag;
+      else if ((sq.bitBoard & d8DownDiag) > 0) sq.downDiag = d8DownDiag;
+      else if ((sq.bitBoard & e8DownDiag) > 0) sq.downDiag = e8DownDiag;
+      else if ((sq.bitBoard & f8DownDiag) > 0) sq.downDiag = f8DownDiag;
+      else if ((sq.bitBoard & g8DownDiag) > 0) sq.downDiag = g8DownDiag;
+      else if ((sq.bitBoard & h8DownDiag) > 0) sq.downDiag = h8DownDiag;
+    }
+
+  } // @formatter:on
+
+  /**
+   * Contructor
+   * Computes all relevant precompeted indexes and bitboards
+   */
   Square() {
     if ((this.ordinal() & 0x88) == 0) {
       validSquare = true;
       index64 = this.ordinal() / 16 * 8 + this.ordinal() % 16;
+      // set bit for bitboard
+      bitBoard = 1L << index64;
     }
     else {
       validSquare = false;
       index64 = -1;
+      bitBoard = 0L;
     }
 
   }
@@ -221,7 +318,7 @@ public enum Square {
   }
 
   /**
-   * @return Square.File for this QmegaSquare
+   * @return Square.File for this Square
    */
   public File getFile() {
     if (!this.validSquare) return File.NOFILE;
@@ -229,7 +326,7 @@ public enum Square {
   }
 
   /**
-   * @return Square.Rank for this QmegaSquare
+   * @return Square.Rank for this Square
    */
   public Rank getRank() {
     if (!this.validSquare) return Rank.NORANK;
@@ -241,6 +338,20 @@ public enum Square {
    */
   public static List<Square> getValueList() {
     return validSquares;
+  }
+
+  /**
+   * pre-computed on which upwards diagonal this square is
+   */
+  public long getUpDiag() {
+    return upDiag;
+  }
+
+  /**
+   * pre-computed on which downwards diagonal this square is
+   */
+  public long getDownDiag() {
+    return downDiag;
   }
 
   /**
@@ -347,4 +458,17 @@ public enum Square {
       default:
         throw new RuntimeException("Invalid Color");
     }
+  }
+
+  /**
+   * @param bitboard
+   * @return String of 64 bits of given long
+   */
+  public static String getBitboardString(long bitboard) {
+    StringBuilder stringBuilder = new StringBuilder();
+    for (int i = 0; i < Long.numberOfLeadingZeros((long) bitboard); i++) {
+      stringBuilder.append('0');
+    }
+    stringBuilder.append(Long.toBinaryString(bitboard));
+    return stringBuilder.toString();
   }}

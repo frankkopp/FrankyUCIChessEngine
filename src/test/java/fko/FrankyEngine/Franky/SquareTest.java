@@ -25,13 +25,12 @@
 
 package fko.FrankyEngine.Franky;
 
-
-import fko.FrankyEngine.Franky.Square.File;
-import fko.FrankyEngine.Franky.Square.Rank;
+import fko.FrankyEngine.Franky.Square.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static fko.FrankyEngine.Franky.Square.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -40,111 +39,144 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class SquareTest {
 
-    /**
-     * Tests basic Square operations
-     */
-    @Test
-    public void test() {
-        // Square addressing
-        assertEquals(Square.getSquare(0), Square.a1);
-        assertEquals(Square.getSquare(119), Square.h8);
-        assertEquals(Square.getSquare(8), Square.NOSQUARE);
-        assertEquals(Square.getSquare(-1), Square.NOSQUARE);
-        assertEquals(Square.getSquare(128), Square.NOSQUARE);
-        assertTrue(Square.h8.isValidSquare());
-        assertFalse(Square.i8.isValidSquare());
-        assertFalse(Square.NOSQUARE.isValidSquare());
+  /**
+   * Tests basic Square operations
+   */
+  @Test
+  public void test() {
+    // Square addressing
+    assertEquals(getSquare(0), a1);
+    assertEquals(getSquare(119), h8);
+    assertEquals(getSquare(8), NOSQUARE);
+    assertEquals(getSquare(-1), NOSQUARE);
+    assertEquals(getSquare(128), NOSQUARE);
+    assertTrue(h8.isValidSquare());
+    assertFalse(i8.isValidSquare());
+    assertFalse(NOSQUARE.isValidSquare());
 
-        // addressing with file and rank
-        assertEquals(Square.getSquare(1, 1), Square.a1);
-        assertEquals(Square.getSquare(8, 8), Square.h8);
-        assertEquals(Square.getSquare(1, 9), Square.NOSQUARE);
-        assertEquals(Square.getSquare(0, 8), Square.NOSQUARE);
-        assertEquals(Square.getSquare(9, 9), Square.NOSQUARE);
+    // addressing with file and rank
+    assertEquals(getSquare(1, 1), a1);
+    assertEquals(getSquare(8, 8), h8);
+    assertEquals(getSquare(1, 9), NOSQUARE);
+    assertEquals(getSquare(0, 8), NOSQUARE);
+    assertEquals(getSquare(9, 9), NOSQUARE);
 
-        // getFile
-        assertEquals(Square.a1.getFile(), File.a);
-        assertEquals(Square.h8.getFile(), File.h);
-        assertEquals(Square.j1.getFile(), File.NOFILE);
-        assertEquals(Square.getSquare(0).getFile(), File.a);
-        assertEquals(Square.getSquare(8).getFile(), File.NOFILE);
-        assertEquals(Square.getSquare(128).getFile(), File.NOFILE);
+    // getFile
+    assertEquals(a1.getFile(), File.a);
+    assertEquals(h8.getFile(), File.h);
+    assertEquals(j1.getFile(), File.NOFILE);
+    assertEquals(getSquare(0).getFile(), File.a);
+    assertEquals(getSquare(8).getFile(), File.NOFILE);
+    assertEquals(getSquare(128).getFile(), File.NOFILE);
 
-        // getRank
-        assertEquals(Square.a1.getRank(), Rank.r1);
-        assertEquals(Square.h8.getRank(), Rank.r8);
-        assertEquals(Square.j1.getRank(), Rank.NORANK);
-        assertEquals(Square.getSquare(0).getRank(), Rank.r1);
-        assertEquals(Square.getSquare(8).getRank(), Rank.NORANK);
-        assertEquals(Square.getSquare(128).getRank(), Rank.NORANK);
+    // getRank
+    assertEquals(a1.getRank(), Rank.r1);
+    assertEquals(h8.getRank(), Rank.r8);
+    assertEquals(j1.getRank(), Rank.NORANK);
+    assertEquals(getSquare(0).getRank(), Rank.r1);
+    assertEquals(getSquare(8).getRank(), Rank.NORANK);
+    assertEquals(getSquare(128).getRank(), Rank.NORANK);
 
-        // base rows
-        Square square = Square.a2;
-        assertTrue(square.isWhitePawnBaseRow());
-        assertFalse(square.isBlackPawnBaseRow());
-        assertTrue(square.isPawnBaseRow(Color.WHITE));
-        assertFalse(square.isPawnBaseRow(Color.BLACK));
-        square = Square.e7;
-        assertFalse(square.isWhitePawnBaseRow());
-        assertTrue(square.isBlackPawnBaseRow());
-        assertFalse(square.isPawnBaseRow(Color.WHITE));
-        assertTrue(square.isPawnBaseRow(Color.BLACK));
+    // base rows
+    Square square = a2;
+    assertTrue(square.isWhitePawnBaseRow());
+    assertFalse(square.isBlackPawnBaseRow());
+    assertTrue(square.isPawnBaseRow(Color.WHITE));
+    assertFalse(square.isPawnBaseRow(Color.BLACK));
+    square = e7;
+    assertFalse(square.isWhitePawnBaseRow());
+    assertTrue(square.isBlackPawnBaseRow());
+    assertFalse(square.isPawnBaseRow(Color.WHITE));
+    assertTrue(square.isPawnBaseRow(Color.BLACK));
 
-        // iteration
-        int counter = 0;
-        for (Square sq : Square.values) {
-            if (!sq.isValidSquare()) continue;
-            counter++;
-        }
-        assertEquals(64, counter);
-
-        // access through getValueList()
-        List<Square> list = Square.getValueList();
-        assertEquals(64, list.size());
-        assertEquals(list.get(0), Square.a1);
-        assertEquals(list.get(63), Square.h8);
-
-        // check order by creating string
-        StringBuilder sb = new StringBuilder();
-        list.forEach(sb::append);
-        assertEquals(
-          "a1b1c1d1e1f1g1h1a2b2c2d2e2f2g2h2a3b3c3d3e3f3g3h3a4b4c4d4e4f4g4h4a5b5c5d5e5f5g5h5a6b6c6d6e6f6g6h6a7b7c7d7e7f7g7h7a8b8c8d8e8f8g8h8",
-          sb.toString());
-
-        counter = 0;
-        for (Square.File f : Square.File.values()) {
-            if (f == File.NOFILE) continue;
-            counter++;
-        }
-        assertEquals(8, counter);
-
-        counter = 0;
-        for (Square.Rank r : Square.Rank.values()) {
-            if (r == Rank.NORANK) continue;
-            counter++;
-        }
-        assertEquals(8, counter);
-
+    // iteration
+    int counter = 0;
+    for (Square sq : values) {
+      if (!sq.isValidSquare()) continue;
+      counter++;
     }
+    assertEquals(64, counter);
 
-    @Test
-    public void testDirections() {
-        Square e4 = Square.e4;
-        assertSame(e4.getNorth(), Square.e5);
-        assertSame(e4.getSouth(), Square.e3);
-        assertSame(e4.getEast(), Square.f4);
-        assertSame(e4.getWest(), Square.d4);
-    }
+    // access through getValueList()
+    List<Square> list = getValueList();
+    assertEquals(64, list.size());
+    assertEquals(list.get(0), a1);
+    assertEquals(list.get(63), h8);
 
-    @Test
-    public void index64Test() {
-        assertEquals(0, Square.a1.index64);
-        assertEquals(7, Square.h1.index64);
-        assertEquals(8, Square.a2.index64);
-        assertEquals(56, Square.a8.index64);
-        assertEquals(63, Square.h8.index64);
-        assertEquals(-1, Square.i1.index64);
-        assertEquals(-1, Square.p8.index64);
+    // check order by creating string
+    StringBuilder sb = new StringBuilder();
+    list.forEach(sb::append);
+    assertEquals(
+      "a1b1c1d1e1f1g1h1a2b2c2d2e2f2g2h2a3b3c3d3e3f3g3h3a4b4c4d4e4f4g4h4a5b5c5d5e5f5g5h5a6b6c6d6e6f6g6h6a7b7c7d7e7f7g7h7a8b8c8d8e8f8g8h8",
+      sb.toString());
+
+    counter = 0;
+    for (File f : File.values()) {
+      if (f == File.NOFILE) continue;
+      counter++;
     }
+    assertEquals(8, counter);
+
+    counter = 0;
+    for (Rank r : Rank.values()) {
+      if (r == Rank.NORANK) continue;
+      counter++;
+    }
+    assertEquals(8, counter);
+
+  }
+
+  @Test
+  public void testDirections() {
+    Square e4 = Square.e4;
+    assertSame(e4.getNorth(), e5);
+    assertSame(e4.getSouth(), e3);
+    assertSame(e4.getEast(), f4);
+    assertSame(e4.getWest(), d4);
+  }
+
+  @Test
+  public void index64Test() {
+    assertEquals(0, a1.index64);
+    assertEquals(7, h1.index64);
+    assertEquals(8, a2.index64);
+    assertEquals(56, a8.index64);
+    assertEquals(63, h8.index64);
+    assertEquals(-1, i1.index64);
+    assertEquals(-1, p8.index64);
+  }
+
+  @Test
+  public void bitBoardTest() {
+    for (Square sq : validSquares) {
+      System.out.printf("%s: %s  on up diagonal: %s down diagonal: %s%n", sq,
+                        getBitboardString(sq.bitBoard), getBitboardString(sq.getUpDiag()),
+                        getBitboardString(sq.getDownDiag()));
+    }
+    System.out.println();
+
+    System.out.printf("%s: %s %n", a6UpDiag, getBitboardString(a6UpDiag));
+    System.out.println();
+
+    System.out.printf("Is %s on %s: %s %n", a7, a6.name() + "upDiag",
+                      a7.getUpDiag() == a6UpDiag ? "TRUE" : "FALSE");
+    System.out.printf("Is %s on %s: %s %n", b7, a6.name() + "upDiag",
+                      b7.getUpDiag() == a6UpDiag ? "TRUE" : "FALSE");
+
+    System.out.printf("Is %s on %s: %s %n", a7, a6.name() + "downDiag",
+                      a7.getDownDiag() == a6UpDiag ? "TRUE" : "FALSE");
+    System.out.printf("Is %s on %s: %s %n", b7, a6.name() + "downDiag",
+                      b7.getDownDiag() == a6UpDiag ? "TRUE" : "FALSE");
+
+  }
+
+  String getBitboardString(long bitboard) {
+    StringBuilder stringBuilder = new StringBuilder();
+    for (int i = 0; i < Long.numberOfLeadingZeros((long) bitboard); i++) {
+      stringBuilder.append('0');
+    }
+    stringBuilder.append(Long.toBinaryString(bitboard));
+    return stringBuilder.toString();
+  }
 
 }
