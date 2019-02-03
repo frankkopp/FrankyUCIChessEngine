@@ -1054,21 +1054,20 @@ public class Search implements Runnable {
     // INTERNAL ITERATIVE DEEPENING
     // If we didn't get a best move from the TT to play
     // first (PV) then do a shallow search to find
-    // one.
-    // This is most effective with bad move ordering.
+    // one. This is most effective with bad move ordering.
     // Our move orderung is quite good so this might be
     // a waste of search time.
     // @formatter:off
     if (config.USE_IID && !PERFT
         && pvNode
         && bestNodeMove == Move.NOMOVE
-        && depth > config.IID_DEPTH
+        //&& depth > config.IID_DEPTH
     ) { // @formatter:on
       searchCounter.iidSearches++;
       int iidDepth = depth - config.IID_REDUCTION;
-      int i = 1;
-      // do the iterative search which will eventually fill the pv list
-      do search(position, i, ply, alpha, beta, PV_NODE, DO_NULL); while (++i <= iidDepth);
+      // do the iterative search which will eventually
+      // fill the pv list and the TT
+      search(position, iidDepth, ply, alpha, beta, PV_NODE, DO_NULL);
       // no we look in the pv list if we have a best move
       bestNodeMove = pv[ply].empty() ? Move.NOMOVE : pv[ply].getFirst();
     }
