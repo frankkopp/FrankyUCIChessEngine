@@ -30,8 +30,8 @@ package fko.FrankyEngine.Franky;
  */
 public class RootMoveEntry {
 
-  final int move;
-  final int value;
+  int move;
+  int value;
 
   /**
    * @param move

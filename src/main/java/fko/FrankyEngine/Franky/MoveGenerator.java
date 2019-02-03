@@ -69,6 +69,8 @@ public class MoveGenerator {
   private final MoveList pseudoLegalMoves  = new MoveList(); // all moves
   private final MoveList capturingMoves    = new MoveList(); // only capturing moves
   private final MoveList nonCapturingMoves = new MoveList(); // only non capturing moves
+  // special list for qsearch
+  private       MoveList qSearchMoves      = new MoveList();
 
   // These fields control the on demand generation of moves.
   private              OnDemandState generationCycleState = OnDemandState.NEW;
@@ -117,9 +119,9 @@ public class MoveGenerator {
     this.position = position;
     this.activePlayer = position.getNextPlayer();
     this.generationCycleState = OnDemandState.NEW;
-    this.killerMoves = new MoveList(0);
     this.pvMove = Move.NOMOVE;
     this.genMode = GEN_ALL;
+    this.killerMoves.clear();
     clearLists();
   }
 
@@ -144,7 +146,10 @@ public class MoveGenerator {
    */
   public void setKillerMoves(MoveList killerMoves) {
     assert killerMoves != null : "parameter null not allowed";
-    this.killerMoves = killerMoves.clone();
+    this.killerMoves.clear();
+    for (int m = 0; m < killerMoves.size(); m++) {
+      this.killerMoves.add(killerMoves.get(m));
+    }
   }
 
   /**
@@ -429,8 +434,9 @@ public class MoveGenerator {
     }
 
     // lower amount of captures searched in quiescence search by only looking at "good" captures
-    MoveList qSearchMoves = new MoveList();
-    for (int move : capturingMoves) {
+    qSearchMoves.clear();
+    for (int m = 0; m < capturingMoves.size(); m++) {
+      int move = capturingMoves.get(m);
       // all pawn captures - they never loose material
       if (Move.getPiece(move).getType() == PieceType.PAWN) {
         qSearchMoves.add(move);

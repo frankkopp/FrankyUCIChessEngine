@@ -322,7 +322,7 @@ public enum Square {
    */
   public File getFile() {
     if (!this.validSquare) return File.NOFILE;
-    return File.values()[this.ordinal() % 16];
+    return File.values[this.ordinal() % 16];
   }
 
   /**
@@ -330,7 +330,7 @@ public enum Square {
    */
   public Rank getRank() {
     if (!this.validSquare) return Rank.NORANK;
-    return Rank.values()[this.ordinal() >>> 4];
+    return Rank.values[this.ordinal() >>> 4];
   }
 
   /**
