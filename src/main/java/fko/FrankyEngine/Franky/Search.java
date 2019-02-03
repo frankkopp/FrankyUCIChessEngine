@@ -1077,7 +1077,6 @@ public class Search implements Runnable {
     if (config.USE_IID && !PERFT
         && pvNode
         && bestNodeMove == Move.NOMOVE
-        //&& depth > config.IID_DEPTH
     ) { // @formatter:on
       searchCounter.iidSearches++;
       int iidDepth = depth - config.IID_REDUCTION;
@@ -1206,8 +1205,8 @@ public class Search implements Runnable {
           && !position.hasCheck()
       ) {
 
-        final int materialEval = position.getMaterial(myColor)
-                                   - position.getMaterial(myColor.getInverseColor());
+        final int materialEval
+          = position.getMaterial(myColor) - position.getMaterial(myColor.getInverseColor());
         final int moveGain = Move.getTarget(move).getType().getValue();
 
         // ###############################################
