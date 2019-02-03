@@ -196,6 +196,30 @@ public class PositionTest {
     assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq - 1 114", f1null);
   }
 
+  /** Test Null Move */
+  @Test
+  public void testNullMoveEnPassant() {
+    String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
+    Position position = new Position(fen);
+
+    String f1 = position.toFENString();
+    long zobrist1 = position.getZobristKey();
+    position.makeNullMove();
+    String f1null = position.toFENString();
+    long zobristNull = position.getZobristKey();
+    position.undoNullMove();
+    String f2 = position.toFENString();
+    long zobrist2 = position.getZobristKey();
+
+    System.out.println(String.format("f1    : %-65s  zobrist1   : %d ", f1, zobrist1));
+    System.out.println(String.format("f1null: %-65s  zobristNull: %d ", f1null, zobristNull));
+    System.out.println(String.format("f2    : %-65s  zobrist2   : %d ", f2, zobrist2));
+
+    assertEquals(f1, f2);
+    assertEquals(zobrist1, zobrist2);
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq - 1 114", f1null);
+  }
+
   /** Test Null Move MoveGeneration */
   @Test
   public void testNullMove_moveGen() {
@@ -611,6 +635,150 @@ public class PositionTest {
     assertFalse(omegaBoard.isAttacked(Color.WHITE, Square.e8));
   }
 
+  @Test
+  void givesCheckTest() {
+    Position position;
+    int move;
+
+    // DIRECT CHECKS
+
+    // Pawns
+    position = new Position("4r3/1pn3k1/4p1b1/p1Pp1P1r/3P2NR/1P3B2/3K2P1/4R3 w - -");
+    move = Move.fromUCINotation(position, "f5f6");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("5k2/4pp2/1N2n1p1/r3P2p/P5PP/2rR1K2/P7/3R4 b - -");
+    move = Move.fromUCINotation(position, "h5g4");
+    assertTrue(position.givesCheck(move));
+
+    // Knights
+    position = new Position("5k2/4pp2/1N2n1p1/r3P2p/P5PP/2rR1K2/P7/3R4 w - -");
+    move = Move.fromUCINotation(position, "b6d7");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("5k2/4pp2/1N2n1p1/r3P2p/P5PP/2rR1K2/P7/3R4 b - -");
+    move = Move.fromUCINotation(position, "e6d4");
+    assertTrue(position.givesCheck(move));
+
+    // Rooks
+    position = new Position("5k2/4pp2/1N2n1pp/r3P3/P5PP/2rR4/P3K3/3R4 w - -");
+    move = Move.fromUCINotation(position, "d3d8");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("5k2/4pp2/1N2n1pp/r3P3/P5PP/2rR4/P3K3/3R4 b - -");
+    move = Move.fromUCINotation(position, "c3c2");
+    assertTrue(position.givesCheck(move));
+
+    // blocked opponent piece - no check
+    position = new Position("5k2/4pp2/1N2n1pp/r3P3/P5PP/2rR4/P2RK3/8 b - -");
+    move = Move.fromUCINotation(position, "c3c2");
+    assertFalse(position.givesCheck(move));
+    // blocked own piece - no check
+    position = new Position("5k2/4pp2/1N2n1pp/r3P3/P5PP/2rR4/P2nK3/3R4 b - -");
+    move = Move.fromUCINotation(position, "c3c2");
+    assertFalse(position.givesCheck(move));
+
+    // Bishop
+    position = new Position("6k1/3q2b1/p1rrnpp1/P3p3/2B1P3/1p1R3Q/1P4PP/1B1R3K w - -");
+    move = Move.fromUCINotation(position, "c4e6");
+    assertTrue(position.givesCheck(move));
+
+    // Queen
+    position = new Position("5k2/4pp2/1N2n1pp/r3P3/P5PP/2qR4/P3K3/3R4 b - -");
+    move = Move.fromUCINotation(position, "c3c2");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("6k1/3q2b1/p1rrnpp1/P3p3/2B1P3/1p1R3Q/1P4PP/1B1R3K w - -");
+    move = Move.fromUCINotation(position, "h3e6");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -");
+    move = Move.fromUCINotation(position, "e7e3");
+    assertTrue(position.givesCheck(move));
+
+    // no check
+    position = new Position("6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -");
+    move = Move.fromUCINotation(position, "e7e4");
+    assertFalse(position.givesCheck(move));
+
+    // promotion
+    position = new Position("1k3r2/1p1bP3/2p2p1Q/Ppb5/4Rp1P/2q2N1P/5PB1/6K1 w - -");
+    move = Move.fromUCINotation(position, "e7f8q");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("1r3r2/1p1bP2k/2p2n2/p1Pp4/P2N1PpP/1R2p3/1P2P1BP/3R2K1 w - -");
+    move = Move.fromUCINotation(position, "e7f8n");
+    assertTrue(position.givesCheck(move));
+
+    // Castling checks
+    position = new Position("r4k1r/8/8/8/8/8/8/R3K2R w KQ -");
+    move = Move.fromUCINotation(position, "e1g1");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("r2k3r/8/8/8/8/8/8/R3K2R w KQ -");
+    move = Move.fromUCINotation(position, "e1c1");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("r3k2r/8/8/8/8/8/8/R4K1R b kq -");
+    move = Move.fromUCINotation(position, "e8g8");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("r3k2r/8/8/8/8/8/8/R2K3R b kq -");
+    move = Move.fromUCINotation(position, "e8c8");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("r6r/8/8/8/8/8/8/2k1K2R w K -");
+    move = Move.fromUCINotation(position, "e1g1");
+    assertTrue(position.givesCheck(move));
+
+    // en passant checks
+    position = new Position("8/3r1pk1/p1R2p2/1p5p/r2Pp3/PRP3P1/4KP1P/8 b - d3");
+    move = Move.fromUCINotation(position, "e4d3");
+    assertTrue(position.givesCheck(move));
+
+    // REVEALED CHECKS
+    position = new Position("6k1/8/3P1bp1/2BNp3/8/1Q3P1q/7r/1K2R3 w - -");
+    move = Move.fromUCINotation(position, "d5e7");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("6k1/8/3P1bp1/2BNp3/8/1Q3P1q/7r/1K2R3 w - -");
+    move = Move.fromUCINotation(position, "d5c7");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("6k1/8/3P1bp1/2BNp3/8/1B3P1q/7r/1K2R3 w - -");
+    move = Move.fromUCINotation(position, "d5c7");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("6k1/8/3P1bp1/2BNp3/8/1Q3P1q/7r/1K2R3 w - -");
+    move = Move.fromUCINotation(position, "d5e7");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("1Q1N2k1/8/3P1bp1/2B1p3/8/5P1q/7r/1K2R3 w - -");
+    move = Move.fromUCINotation(position, "d8e6");
+    assertTrue(position.givesCheck(move));
+
+    position = new Position("1R1N2k1/8/3P1bp1/2B1p3/8/5P1q/7r/1K2R3 w - -");
+    move = Move.fromUCINotation(position, "d8e6");
+    assertTrue(position.givesCheck(move));
+
+    // revealed by en passant capture
+    position = new Position("8/b2r1pk1/p1R2p2/1p5p/r2Pp3/PRP3P1/5K1P/8 b - d3");
+    move = Move.fromUCINotation(position, "e4d3");
+    assertTrue(position.givesCheck(move));
+
+    // test where we had bugs
+    position = new Position("2r1r3/pb1n1kpn/1p1qp3/6p1/2PP4/8/P2Q1PPP/3R1RK1 w - -");
+    move = Move.fromUCINotation(position, "f2f4");
+    assertFalse(position.givesCheck(move));
+    position = new Position("2r1r1k1/pb3pp1/1p1qpn2/4n1p1/2PP4/6KP/P2Q1PP1/3RR3 b - -");
+    move = Move.fromUCINotation(position, "e5d3");
+    assertTrue(position.givesCheck(move));
+    position = new Position("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q1NNQQ2/1p6/qk3KB1 b - -");
+    move = Move.fromUCINotation(position, "b1c2");
+    assertTrue(position.givesCheck(move));
+
+  }
+
   /** Tests the timing */
   @Test
   @Disabled
@@ -629,13 +797,10 @@ public class PositionTest {
 
       boolean test = false;
       Instant start = Instant.now();
-      while (true) {
+      do {
         ITERATIONS++;
         test = board.isAttacked(Color.WHITE, Square.d4);
-        if (Duration.between(start, Instant.now()).getSeconds() == DURATION) {
-          break;
-        }
-      }
+      } while (Duration.between(start, Instant.now()).getSeconds() != DURATION);
 
       //            System.out.println(board);
       //            System.out.println(moves);
@@ -671,8 +836,11 @@ public class PositionTest {
     ArrayList<String> result = new ArrayList<>();
 
     int ROUNDS = 5;
-    int ITERATIONS = 25;
-    int REPETITIONS = 100;
+    int ITERATIONS = 10;
+    int REPETITIONS = 2_000_000;
+
+    final Position position = new Position("8/b2r1pk1/p1R2p2/1p5p/r2Pp3/PRP3P1/5K1P/8 b - d3");
+    final int move = Move.fromUCINotation(position, "e4d3");
 
     for (int round = 0; round < ROUNDS; round++) {
       long start = 0, end = 0, sum = 0;
@@ -681,11 +849,10 @@ public class PositionTest {
       System.gc();
 
       int i = 0;
-      final Position position = new Position("6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -");
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
         for (int j = 0; j < REPETITIONS; j++) {
-          test1(position);
+          test1(position, move);
         }
         end = System.nanoTime();
         sum += end - start;
@@ -694,19 +861,20 @@ public class PositionTest {
 
       i = 0;
       sum = 0;
-      final Position positionNew = new Position("6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -");
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
         for (int j = 0; j < REPETITIONS; j++) {
-          test2(positionNew);
+          test2(position, move);
         }
         end = System.nanoTime();
         sum += end - start;
       }
       float avg2 = ((float) sum / ITERATIONS) / 1e9f;
 
-      result.add(String.format("Round %d Test 1 avg: %,.3f sec", round, avg1));
-      result.add(String.format("Round %d Test 2 avg: %,.3f sec", round, avg2));
+      result.add(String.format("Round %d Test 1 avg: %,.3f sec for %,d repetitions", round, avg1,
+                               REPETITIONS));
+      result.add(String.format("Round %d Test 2 avg: %,.3f sec for %,d repetitions", round, avg2,
+                               REPETITIONS));
     }
 
     System.out.println();
@@ -716,26 +884,19 @@ public class PositionTest {
 
   }
 
-  private void test1(final Position position) {
-
-    // takes 2 loops to get to repetition
-    for (int i = 0; i < 500; i++) {
-      position.makeMove(Move.fromSANNotation(position, "Qe3"));
-      position.countRepetitions();
+  private void test1(final Position position, int move) {
+    // slow version
+    position.makeMove(move);
+    if (position.isAttacked(position.getOpponent(),
+                            position.getKingSquares()[position.getNextPlayer().ordinal()])) {
       position.undoMove();
+      return;
     }
-
+    // undo move
+    position.undoMove();
   }
 
-  private void test2(final Position position) {
-
-    // takes 2 loops to get to repetition
-    for (int i = 0; i < 500; i++) {
-      position.makeMove(Move.fromSANNotation(position, "Qe3"));
-      position.countRepetitions();
-      position.undoMove();
-    }
-
-
+  private void test2(final Position position, int move) {
+    position.givesCheck(move);
   }
 }

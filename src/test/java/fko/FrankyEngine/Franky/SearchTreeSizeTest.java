@@ -25,8 +25,6 @@
 
 package fko.FrankyEngine.Franky;
 
-import fko.UCI.IUCIEngine;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -34,7 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * SearchTreeSizeTest
@@ -42,123 +44,288 @@ import java.util.List;
 public class SearchTreeSizeTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(SearchTreeSizeTest.class);
+  private              int    HASH_SIZE;
+  private              int    THREADS;
 
-  private IUCIEngine engine;
-  private Search     search;
+  class SingleTest {
+    String name  = "";
+    long   nodes = 0;
+    int    nps   = 0;
+    long   time  = 0;
+    int    move  = Move.NOMOVE;
+    int    value = Evaluation.NOVALUE;
+    String pv    = "";
+  }
+
+  class Result {
+    String           fen;
+    List<SingleTest> tests = new ArrayList<>();
+
+    public Result(String fen) {
+      this.fen = fen;
+    }
+  }
 
   @BeforeEach
   void setUp() {
-
-    engine = new FrankyEngine();
-    search = ((FrankyEngine) engine).getSearch();
-    search.config.USE_BOOK = false;
 
   }
 
   @Test
   @Disabled
-  public void sizeOfSearchTreeTest() {
+  public void sizeOfSearchTreeTest() throws ExecutionException, InterruptedException {
 
-    int depth = 6;
-    List<String> resultStrings = new ArrayList<>();
+    final int NO_OF_TESTS = 5; //  Integer.MAX_VALUE;
+    final int START_NO = 0;
+    final int DEPTH = 6;
+    HASH_SIZE = 1024;
+    THREADS = 1;
+
+    LOG.info("Start SIZE Test for depth {}", DEPTH);
     List<String> fens = getFENs();
+    List<Result> results = new ArrayList<>();
 
-    search.config.USE_BOOK = false;
+    // ForkJoinPool allows to limit the number of threads for lambda .parallel
+    // to individual values.
+    ForkJoinPool forkJoinPool = new ForkJoinPool(THREADS);
+    forkJoinPool.submit(() -> fens.parallelStream().skip(START_NO)
+                                  .limit(NO_OF_TESTS)
+                                  .forEach(fen -> results.add(featureMeasurements(DEPTH, fen))))
+                .get();
 
-    LOG.info("Start SIZE Test for depth {}", depth);
+    // Print result
+    System.out.println();
+    System.out.printf("################## RESULTS for depth %d ##########################%n",
+                      DEPTH);
+    System.out.println();
+    System.out.printf("%-12s | %6s | %8s | %15s | %12s | %12s | %s | %s %n", "Test Name", "Move",
+                      "Value", "Nodes", "Nps", "Time", "PV", "Fen");
+    System.out.println("-----------------------------------------------------------------------"
+                       + "-----------------------------------------------------------------------");
 
-    //    measureTreeSize(new Position(),
-    //                    new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false),
-    //                    resultStrings, "WARM UP", true);
+    Map<String, Long> sumNodes = new LinkedHashMap<>();
+    Map<String, Long> sumNps = new LinkedHashMap<>();
+    Map<String, Long> sumTime = new LinkedHashMap<>();
 
-    search.clearHashTables();
+    for (Result result : results) {
+      int lastMove = Move.NOMOVE;
+      long lastNodes = 0;
+      for (SingleTest test : result.tests) {
+        long oldNodes = sumNodes.get(test.name) == null ? 0 : sumNodes.get(test.name);
+        long oldNps = sumNps.get(test.name) == null ? 0 : sumNps.get(test.name);
+        long oldTime = sumTime.get(test.name) == null ? 0 : sumTime.get(test.name);
+        sumNodes.put(test.name, oldNodes + test.nodes);
+        sumNps.put(test.name, oldNps + test.nps);
+        sumTime.put(test.name, oldTime + test.time);
 
-    fens.stream().limit(10000).forEach(fen -> {
-      resultStrings.add("");
-      resultStrings.add(fen);
-      featureMeasurements(depth, resultStrings, fen);
-      resultStrings.add("");
-    });
+        String changeFlagMove = "";
+        if (lastMove != Move.NOMOVE && test.move != lastMove) changeFlagMove = ">";
+        lastMove = test.move;
 
-    LOG.info("");
-    LOG.info("################## RESULTS ####################");
-    for (String value : resultStrings) {
-      LOG.info(value);
+        String changeFlagNodes = "";
+        if (lastNodes != 0) {
+          if (test.nodes > lastNodes) changeFlagNodes = "^";
+          if (test.nodes == lastNodes) changeFlagNodes = "=";
+        }
+        lastNodes = test.nodes;
+
+        // @formatter:off
+        System.out.printf("%-12s | %1s%5s | %8s | %1s%,14d | %,12d | %,12d | %s | %s %n",
+                          test.name,
+                          changeFlagMove,
+                          Move.toSimpleString(test.move),
+                          test.value,
+                          changeFlagNodes,
+                          test.nodes,
+                          test.nps,
+                          test.time,
+                          test.pv,
+                          result.fen);
+        // @formatter:on
+      }
+      System.out.println();
     }
+    System.out.println("-----------------------------------------------------------------------"
+                       + "-----------------------------------------------------------------------");
+    System.out.println();
+    long lastNodes = 0;
+    long lastTime = 0;
+    for (String key : sumNodes.keySet()) {
+
+      String changeFlagNodes = "";
+      if (lastNodes != 0) {
+        if (sumNodes.get(key) > lastNodes) changeFlagNodes = "^";
+        else if (sumNodes.get(key) == lastNodes) changeFlagNodes = "=";
+      }
+      lastNodes = sumNodes.get(key);
+
+      String changeFlagTime = "";
+      if (lastTime != 0) {
+        if (sumTime.get(key) > lastTime) changeFlagTime = "^";
+        else if (sumTime.get(key) == lastTime) changeFlagTime = "=";
+      }
+      lastTime = sumTime.get(key);
+
+      System.out.printf("Test: %-12s  Nodes: %1s%,15d  Nps: %,15d  Time: %1s%,15d %n", key,
+                        changeFlagNodes, sumNodes.get(key), sumNps.get(key), changeFlagTime,
+                        sumTime.get(key));
+    }
+    System.out.println();
+
   }
 
-  private void featureMeasurements(final int depth, final List<String> values, final String fen) {
+  private Result featureMeasurements(final int depth, final String fen) {
+
+    FrankyEngine engine = new FrankyEngine();
+    Search search = engine.getSearch();
+    search.config.USE_BOOK = false;
+    search.setHashSize(HASH_SIZE);
+
+    Result result = new Result(fen);
+
     Position position = new Position(fen);
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false);
 
     // turn off all optimizations to get a reference value of the search tree size
     search.config.USE_ALPHABETA_PRUNING = false;
     search.config.USE_PVS = false;
-    search.config.USE_PVS_MOVE_ORDERING = false;
+    search.config.USE_PVS_ORDERING = false;
+    search.config.USE_KILLER_MOVES = false;
     search.config.USE_ASPIRATION_WINDOW = false;
+    search.config.USE_MTDf = false;
 
     search.config.USE_TRANSPOSITION_TABLE = false;
     search.config.USE_TT_ROOT = false;
 
-    search.config.USE_MATE_DISTANCE_PRUNING = false;
-    search.config.USE_MINOR_PROMOTION_PRUNING = false;
+    search.config.USE_MDP = false;
+    search.config.USE_MPP = false;
 
-    search.config.USE_NULL_MOVE_PRUNING = false;
-    search.config.USE_KILLER_MOVES = false;
-    search.config.USE_STATIC_NULL_PRUNING = false;
+    search.config.USE_RFP = false;
+    search.config.USE_NMP = false;
     search.config.USE_RAZOR_PRUNING = false;
+
+    search.config.USE_IID = false;
+
+    search.config.USE_EXTENSIONS = false;
+
+    search.config.USE_LIMITED_RAZORING = false;
+    search.config.USE_EXTENDED_FUTILITY_PRUNING = false;
+    search.config.USE_FUTILITY_PRUNING = false;
+    search.config.USE_LMP = false;
     search.config.USE_LMR = false;
 
     search.config.USE_QUIESCENCE = false;
+    search.config.USE_QFUTILITY_PRUNING = false;
 
-    // measureTreeSize(position, searchMode, values, "REFERENCE", true);
+    // pure MiniMax
+    search.config.USE_QUIESCENCE = true;
+    //result.tests.add(measureTreeSize(position, searchMode, "MINIMAX+QS", true));
 
+    // AlphaBeta with TT and SORT
     search.config.USE_ALPHABETA_PRUNING = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "ALPHABETA", true));
+
+    // MTDf - just for debugging for now
+    //    search.config.USE_MTDf = true;
+    //    search.config.MTDf_START_DEPTH = 2;
+    //    result.tests.add(measureTreeSize(search, position, searchMode, "MTDf", true));
+    //    search.config.USE_MTDf = false;
+
+    // PVS
+    search.config.USE_PVS = true;
+    search.config.USE_PVS_ORDERING = true;
+    search.config.USE_KILLER_MOVES = true;
+    search.config.NO_KILLER_MOVES = 2;
+    result.tests.add(measureTreeSize(search, position, searchMode, "PVS", true));
+
     search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_TT_ROOT = true;
-    measureTreeSize(position, searchMode, values, "BASE", true);
+    result.tests.add(measureTreeSize(search, position, searchMode, "TT", true));
 
-    search.config.USE_PVS = true;
-    search.config.USE_PVS_MOVE_ORDERING = true;
-    search.config.USE_KILLER_MOVES = true;
-    search.config.USE_MATE_DISTANCE_PRUNING = true;
-    search.config.USE_MINOR_PROMOTION_PRUNING = true;
-    search.config.USE_STATIC_NULL_PRUNING = true;
-    search.config.USE_RAZOR_PRUNING = true;
-    search.config.USE_LMR = true;
-    search.config.USE_NULL_MOVE_PRUNING = true;
-    // search.config.NULL_MOVE_DEPTH = 3;
-    // search.config.USE_VERIFY_NMP = true;
-    // search.config.NULL_MOVE_REDUCTION_VERIFICATION = 4;
-    // measureTreeSize(position, searchMode, values, "NMP", true);
-    search.config.USE_QUIESCENCE = true;
-
-    measureTreeSize(position, searchMode, values, "ALL", true);
-
+    // Aspiration
     search.config.USE_ASPIRATION_WINDOW = true;
-    measureTreeSize(position, searchMode, values, "ASPIRATION", true);
+    search.config.ASPIRATION_START_DEPTH = 2;
+    result.tests.add(measureTreeSize(search, position, searchMode, "ASPIRATION", true));
+
+    // Minor Pruning
+    search.config.USE_MDP = true;
+    search.config.USE_MPP = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "MDP_MPP", true));
+
+    // Reverse Futility Pruning
+    search.config.USE_RFP = true;
+    search.config.RFP_MARGIN = 300;
+    result.tests.add(measureTreeSize(search, position, searchMode, "RFP", true));
+
+    // Null move pruning
+    search.config.USE_NMP = true;
+    search.config.NMP_DEPTH = 3;
+    search.config.USE_VERIFY_NMP = true;
+    search.config.NMP_VERIFICATION_DEPTH = 3;
+    result.tests.add(measureTreeSize(search, position, searchMode, "NMP", true));
+
+    // Razor reduction
+    search.config.USE_RAZOR_PRUNING = true;
+    search.config.RAZOR_DEPTH = 3;
+    search.config.RAZOR_MARGIN = 600;
+    result.tests.add(measureTreeSize(search, position, searchMode, "RAZOR", true));
+
+    // Internal Iterative Deepening
+    search.config.USE_IID = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "IID", true));
+
+    // Search extensions
+    search.config.USE_EXTENSIONS = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "EXTENSION", true));
+
+    // Futility Pruning
+    search.config.USE_FUTILITY_PRUNING = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "FP", true));
+    search.config.USE_QFUTILITY_PRUNING = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "QFP", true));
+    search.config.USE_LIMITED_RAZORING = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "LR", true));
+    search.config.USE_EXTENDED_FUTILITY_PRUNING = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "EFP", true));
+
+    // Late Move Pruning
+    search.config.USE_LMP = true;
+    search.config.LMP_MIN_DEPTH = 3;
+    search.config.LMP_MIN_MOVES = 6;
+    result.tests.add(measureTreeSize(search, position, searchMode, "LMP", true));
+
+    // Late Move Reduction
+    search.config.USE_LMR = true;
+    search.config.LMR_MIN_DEPTH = 2;
+    search.config.LMR_MIN_MOVES = 3;
+    search.config.LMR_REDUCTION = 1;
+    result.tests.add(measureTreeSize(search, position, searchMode, "LMR", true));
+
+    return result;
 
   }
 
-  private void measureTreeSize(final Position position, final SearchMode searchMode,
-                               final List<String> values, final String feature,
-                               final boolean clearTT) {
+  private SingleTest measureTreeSize(Search search, final Position position,
+                                     final SearchMode searchMode, final String feature,
+                                     final boolean clearTT) {
 
     System.out.println("Testing. " + feature);
-    if (clearTT) {
-      search.clearHashTables();
-    }
+    if (clearTT) search.clearHashTables();
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
-    values.add(
-      String.format("SIZE %-12s : %,14d >> %-18s (%4d) >> nps %,.0f >> time %s >> %s ", feature,
-                    search.getSearchCounter().nodesVisited,
-                    Move.toString(search.getLastSearchResult().bestMove),
-                    search.getLastSearchResult().resultValue,
-                    (1e3 * search.getSearchCounter().nodesVisited)
-                    / search.getSearchCounter().lastSearchTime,
-                    DurationFormatUtils.formatDurationHMS(search.getSearchCounter().lastSearchTime),
-                    search.getSearchCounter().toString()));
+
+    SingleTest test = new SingleTest();
+    test.name = feature;
+    test.nodes = search.getSearchCounter().nodesVisited;
+    test.move = search.getLastSearchResult().bestMove;
+    test.value = search.getLastSearchResult().resultValue;
+    test.nps = (int) ((1e3 * search.getSearchCounter().nodesVisited) / (
+      search.getSearchCounter().lastSearchTime + 1));
+    test.time = search.getSearchCounter().lastSearchTime;
+    test.pv = search.getPrincipalVariationString(0);
+
+    return test;
+
   }
 
   ArrayList<String> getFENs() {
@@ -166,7 +333,6 @@ public class SearchTreeSizeTest {
     ArrayList<String> fen = new ArrayList<>();
 
     fen.add(Position.STANDARD_BOARD_FEN);
-    fen.add("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"); // 218 moves to make
     fen.add("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
     fen.add("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -");
     fen.add("r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -");
@@ -180,6 +346,7 @@ public class SearchTreeSizeTest {
     fen.add("8/8/8/4N3/2R5/4k3/8/5K2 w - -");
     fen.add("2r1r1k1/pb1n1pp1/1p1qpn1p/4N1B1/2PP4/3B4/P2Q1PPP/3RR1K1 w - - ");
     fen.add("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3");
+    fen.add("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"); // 218 moves to make
 
     fen.add("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 b kq e3");
     fen.add("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq -");

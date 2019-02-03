@@ -94,7 +94,7 @@ public class SimpleIntListTest {
     SimpleIntList listSort = new SimpleIntList();
     listSort.add(Integer.MIN_VALUE);
     listSort.add(Integer.MAX_VALUE);
-    listSort.sort(null);
+    listSort.sort((Comparator<Integer>) null);
   }
 
 

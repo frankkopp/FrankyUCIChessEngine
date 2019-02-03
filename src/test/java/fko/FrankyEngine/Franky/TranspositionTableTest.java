@@ -34,6 +34,9 @@ import org.openjdk.jol.info.ClassLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -56,11 +59,11 @@ public class TranspositionTableTest {
     TranspositionTable cache = new TranspositionTable(32);
     Position position = new Position();
     assertEquals(32 * 1024 * 1024, cache.getSize());
-    cache.put(position, (short) 999, TT_EntryType.EXACT, (byte) 5);
+    cache.put(position.getZobristKey(), (short) 999, TT_EntryType.EXACT, (byte) 5);
     assertEquals(1, cache.getNumberOfEntries());
-    assertEquals(999, cache.get(position).value);
-    cache.put(position, (short) 1111, TT_EntryType.EXACT, (byte) 15);
-    assertEquals(1111, cache.get(position).value);
+    assertEquals(999, cache.get(position.getZobristKey()).value);
+    cache.put(position.getZobristKey(), (short) 1111, TT_EntryType.EXACT, (byte) 15);
+    assertEquals(1111, cache.get(position.getZobristKey()).value);
     assertEquals(1, cache.getNumberOfEntries());
     cache.clear();
     assertEquals(0, cache.getNumberOfEntries());
@@ -138,15 +141,15 @@ public class TranspositionTableTest {
     assertTrue(search.getTranspositionTable().getNumberOfEntries() > 0);
     assertTrue(search.getTranspositionTable().getNumberOfUpdates() > 0);
     //    assertEquals(0, search.getTranspositionTable().getNumberOfCollisions());
-    assertTrue(search.getSearchCounter().nodeCache_Hits > 0);
-    assertTrue(search.getSearchCounter().nodeCache_Misses > 0);
+    assertTrue(search.getSearchCounter().tt_Hits > 0);
+    assertTrue(search.getSearchCounter().tt_Misses > 0);
   }
 
   @Test
   public void testSize() {
 
     System.out.println("Testing Transposition Table size:");
-    int[] megabytes = {0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 2048};
+    int[] megabytes = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 2048};
     for (int i : megabytes) {
       System.gc();
       long usedMemoryBefore =
@@ -162,10 +165,84 @@ public class TranspositionTableTest {
   }
 
   @Test
+  public void testStats() {
+
+    TranspositionTable tt = new TranspositionTable(1024);
+
+    Random r = new Random(System.currentTimeMillis());
+
+    int i=0;
+    while (i++ < 100_000_000) {
+      tt.put(Math.abs(r.nextLong()), (short) 1, TT_EntryType.EXACT, (byte) 0);
+    }
+
+    System.out.println(tt.toString());
+
+  }
+
+  @Test
   @Disabled
   public void showSize() {
     //System.out.println(VM.current().details());
     System.out.println(ClassLayout.parseClass(TranspositionTable.TT_Entry.class).toPrintable());
   }
+
+  @Test
+  @Disabled
+  public void testTiming() {
+
+    ArrayList<String> result = new ArrayList<>();
+    Random r = new Random();
+
+    int ROUNDS = 5;
+    int ITERATIONS = 20;
+    int REPETITIONS = 10_000_000;
+
+    for (int round = 0; round < ROUNDS; round++) {
+      long start = 0, end = 0, sum = 0;
+
+      System.out.printf("Running round %d of Timing Test Test 1 vs. Test 2%n", round);
+      System.gc();
+
+      long randomLong = r.nextLong();
+
+      int i = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          test1(randomLong);
+        }
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg1 = ((float) sum / ITERATIONS) / 1e9f;
+
+      i = 0;
+      sum = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          test2(randomLong);
+        }
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg2 = ((float) sum / ITERATIONS) / 1e9f;
+
+      result.add(String.format("Round %d Test 1 avg: %,.3f sec", round, avg1));
+      result.add(String.format("Round %d Test 2 avg: %,.3f sec", round, avg2));
+    }
+
+    System.out.println();
+    for (String s : result) {
+      System.out.println(s);
+    }
+
+  }
+  int buckets = 123456789;
+
+  private int test1(long r) { return (int) (r % buckets); }
+
+  private int test2(long r) { return (int) ((r * buckets) >> 32); }
 
 }

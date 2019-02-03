@@ -53,8 +53,8 @@ public class RootMoveList extends ArrayList<RootMoveEntry> {
    * @param value
    */
   public void set(int i, int move, int value) {
-    final RootMoveEntry e = new RootMoveEntry(move, value);
-    this.set(i, e);
+    this.get(i).move = move;
+    this.get(i).value = value;
   }
 
   /**

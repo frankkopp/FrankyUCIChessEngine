@@ -418,6 +418,23 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
+   * A primitve int type comperator. Avoids boxing and unboxing of int to Integer
+   */
+  public interface IntComparator {
+    int compare(int a1, int a2);
+  }
+
+  /**
+   * fast sort of list
+   *
+   * @param comparator
+   */
+  public void sort(IntComparator comparator) {
+    if (this.empty()) return;
+    sort(_head, _tail, comparator);
+  }
+
+  /**
    * fast sort of list
    *
    * @param comparator
@@ -452,17 +469,19 @@ public class SimpleIntList implements Iterable<Integer> {
   public SimpleIntList clone() {
     return new SimpleIntList(this);
   }
+
   @Override
   public String toString() {
-    String s = "List size=" + size() + " available capacity=" + getAvailableCapacity() + " [";
+    StringBuilder s = new StringBuilder(
+      "List size=" + size() + " available capacity=" + getAvailableCapacity() + " [");
     for (int i = _head; i < _tail; i++) {
-      s += _list[i];
+      s.append(_list[i]);
       if (i < _tail - 1) {
-        s += ",";
+        s.append(",");
       }
     }
-    s += "]";
-    return s;
+    s.append("]");
+    return s.toString();
   }
 
   /* (non-Javadoc)
@@ -506,6 +525,38 @@ public class SimpleIntList implements Iterable<Integer> {
     _list = Arrays.copyOfRange(_list, _head, _arraySize);
     this._tail = _tail - _head;
     this._head = 0;
+  }
+
+  /**
+   * Sort implementation to order the list according to the given int comparator.<br>
+   * Using the IntComperator avoids boxing/unboxing if int to Integer
+   *
+   * @param head       (including)
+   * @param tail       (excluding)
+   * @param comparator
+   */
+  private void sort(int head, int tail, IntComparator comparator) {
+    insertionSort(head, tail, comparator);
+  }
+
+  /**
+   * Insertionsort algorithm for smaller arrays.
+   * Using the IntComperator avoids boxing/unboxing if int to Integer
+   * @param head
+   * @param tail
+   * @param comparator
+   */
+  private void insertionSort(int head, int tail, IntComparator comparator) {
+    int temp;
+    for (int i = head + 1; i < tail; i++) {
+      for (int j = i; j > head; j--) {
+        if (comparator.compare(_list[j], _list[j - 1]) < 0) {
+          temp = _list[j];
+          _list[j] = _list[j - 1];
+          _list[j - 1] = temp;
+        }
+      }
+    }
   }
 
   /**
@@ -567,14 +618,14 @@ public class SimpleIntList implements Iterable<Integer> {
    * Using a for loop instead the iterator is about 15% faster
    * See units tests
    * <p>
-   * <pre>
-   * for (int i=0; i<_squareList.size(); i++) {
-   *  for (int j=0; j<_squareList.size(); j++) {
+   * <pre><code>
+   * for (int i=0; i < _squareList.size(); i++) {
+   *  for (int j=0; j < _squareList.size(); j++) {
    *    tempa = _squareList.get(i);
    *    tempb = _squareList.get(j);
    *  }
    * }
-   * </pre>
+   * </code></pre>
    *
    * @return an iterator over the elements contained in this list
    */
@@ -600,6 +651,17 @@ public class SimpleIntList implements Iterable<Integer> {
         throw new ConcurrentModificationException();
       }
       return cursor < _tail;
+    }
+
+    /**
+     * @see Iterator#next()
+     */
+    public int nextInt() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+      return _list[cursor++];
+
     }
 
     /**

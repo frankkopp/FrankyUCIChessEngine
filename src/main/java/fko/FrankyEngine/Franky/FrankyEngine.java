@@ -41,20 +41,8 @@ import java.util.Properties;
 /**
  * Franky Engine for UCI GUIs
  * <p>
- * TODO:
- *  Testing / Bug fixing
- *  --------------------------------
- *  3-fold repetition too often - pot. bug - more testing
- *
- * <p>
- * TODO
- *  Performance
- *  --------------------------------
- *
- * <p>
- * TODO
- *  Features
- *  --------------------------------
+
+
  */
 public class FrankyEngine implements IUCIEngine {
 
@@ -141,175 +129,51 @@ public class FrankyEngine implements IUCIEngine {
   private void initOptions() {
     iUciOptions = new ArrayList<>();
     // @formatter:off
-    iUciOptions.add(
-        new UCIOption("Hash",
-                UCIOptionType.spin,
-                "" + config.HASH_SIZE,
-                "1",
-                "4096",
-                ""));
-    iUciOptions.add(
-        new UCIOption("Clear Hash",
-                UCIOptionType.button,
-                "",
-                "",
-                "",
-                ""));
-    iUciOptions.add(
-        new UCIOption("Ponder",
-                UCIOptionType.check,
-                Boolean.toString(config.PONDER),
-                "",
-                "",
-                ""));
-    iUciOptions.add(
-        new UCIOption("OwnBook",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_BOOK),
-                "",
-                "",
-                ""));
-    iUciOptions.add(
-        new UCIOption("UCI_ShowCurrLine",
-                UCIOptionType.check,
-                Boolean.toString(config.UCI_ShowCurrLine),
-                "",
-                "",
-                ""));
-    iUciOptions.add(
-        new UCIOption("Use_QSearch",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_QUIESCENCE),
-                "",
-                "",
-                ""));
-    iUciOptions.add(
-        new UCIOption("Use_AlphaBeta_Pruning",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_ALPHABETA_PRUNING),
-                "",
-                "",
-                ""));
-    iUciOptions.add(
-        new UCIOption("Use_Aspiration_Window_Search",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_ASPIRATION_WINDOW),
-                "",
-                "",
-                ""));
-    iUciOptions.add(
-        new UCIOption("Aspiration_Start_Depth",
-                UCIOptionType.spin,
-                Integer.toString(config.ASPIRATION_START_DEPTH),
-                "2",
-                "2",
-                "8"));
-    iUciOptions.add(
-        new UCIOption("Use_PVS",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_PVS),
-                "",
-                "",
-                ""));
-     iUciOptions.add(
-        new UCIOption("Use_PVS_Move_Ordering",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_PVS_MOVE_ORDERING),
-                "",
-                "",
-                ""));
-    iUciOptions.add(
-        new UCIOption("Use_TranspositionTable",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_TRANSPOSITION_TABLE),
-                "",
-                "",
-                ""));
-    iUciOptions.add(
-        new UCIOption("Use_Mate_Distance_Pruning",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_MATE_DISTANCE_PRUNING),
-                "",
-                "",
-                ""));
-    iUciOptions.add(
-        new UCIOption("Use_Minor_Promotion_Pruning",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_MINOR_PROMOTION_PRUNING),
-                "",
-                "",
-                ""));
-     iUciOptions.add(
-        new UCIOption("Use_Null_Move_Pruning",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_NULL_MOVE_PRUNING),
-                "",
-                "",
-                ""));
-     iUciOptions.add(
-        new UCIOption("Null_Move_Depth",
-                UCIOptionType.spin,
-                Integer.toString(config.NULL_MOVE_DEPTH),
-                "1",
-                "3",
-                ""));
-     iUciOptions.add(
-        new UCIOption("Use_Eval_Pruning",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_STATIC_NULL_PRUNING),
-                "",
-                "",
-                ""));
-     iUciOptions.add(
-        new UCIOption("Use_Razor_Pruning",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_RAZOR_PRUNING),
-                "",
-                "",
-                ""));
-     iUciOptions.add(
-        new UCIOption("Use_Killer_Moves",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_KILLER_MOVES),
-                "",
-                "",
-                ""));
-     iUciOptions.add(
-        new UCIOption("Number_Killer_Moves",
-                UCIOptionType.spin,
-                Integer.toString(config.NO_KILLER_MOVES),
-                "0",
-                "10",
-                ""));
-//     iUciOptions.add(
-//        new UCIOption("Use_Full_Move_Ordering",
-//                UCIOptionType.check,
-//                Boolean.toString(config.USE_SORT_ALL_MOVES),
-//                "",
-//                "",
-//                ""));
-    iUciOptions.add(
-        new UCIOption("Use_Late_Move_Reduction",
-                UCIOptionType.check,
-                Boolean.toString(config.USE_LMR),
-                "",
-                "",
-                ""));
-    iUciOptions.add(
-        new UCIOption("Late_Move_Reduction_Min_Depth",
-                UCIOptionType.spin,
-                Integer.toString(config.LMR_MIN_DEPTH),
-                "2",
-                "10",
-                ""));
-    iUciOptions.add(
-        new UCIOption("Late_Move_Reduction",
-                UCIOptionType.spin,
-                Integer.toString(config.LMR_REDUCTION),
-                "0",
-                "5",
-                ""));
-   // @formatter:on
+    option("Hash", UCIOptionType.spin, "" + config.HASH_SIZE, "1", "4096", "");
+    option("Clear Hash", UCIOptionType.button, "", "", "", "");
+    option("Ponder", UCIOptionType.check, Boolean.toString(config.PONDER), "", "", "");
+    option("OwnBook", UCIOptionType.check, Boolean.toString(config.USE_BOOK), "", "", "");
+    option("UCI_ShowCurrLine", UCIOptionType.check, Boolean.toString(config.UCI_ShowCurrLine), "", "", "");
+    option("Use_TranspositionTable", UCIOptionType.check, Boolean.toString(config.USE_TRANSPOSITION_TABLE), "", "", "");
+    option("Use_QSearch", UCIOptionType.check, Boolean.toString(config.USE_QUIESCENCE), "", "", "");
+    option("Use_AlphaBeta_Pruning", UCIOptionType.check, Boolean.toString(config.USE_ALPHABETA_PRUNING), "", "", "");
+    option("Use_Killer_Moves", UCIOptionType.check, Boolean.toString(config.USE_KILLER_MOVES), "", "", "");
+    option("Number_Killer_Moves", UCIOptionType.spin, Integer.toString(config.NO_KILLER_MOVES), "0", "10", "");
+    option("Use_PVS", UCIOptionType.check, Boolean.toString(config.USE_PVS), "", "", "");
+    option("Use_PVS_Move_Ordering", UCIOptionType.check, Boolean.toString(config.USE_PVS_ORDERING), "", "", "");
+    option("Use_Aspiration_Window_Search", UCIOptionType.check, Boolean.toString(config.USE_ASPIRATION_WINDOW), "", "", "");
+    option("Aspiration_Start_Depth", UCIOptionType.spin, Integer.toString(config.ASPIRATION_START_DEPTH), "2", "2", "8");
+    option("Use_Mate_Distance_Pruning", UCIOptionType.check, Boolean.toString(config.USE_MDP), "", "", "");
+    option("Use_Minor_Promotion_Pruning", UCIOptionType.check, Boolean.toString(config.USE_MPP), "", "", "");
+    option("Use_Reverse_Futility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_RFP), "", "", "");
+    option("RFP_Margin", UCIOptionType.spin, Integer.toString(config.RFP_MARGIN), "0", "1800", "");
+    option("Use_Null_Move_Pruning", UCIOptionType.check, Boolean.toString(config.USE_NMP), "", "", "");
+    option("Null_Move_Depth", UCIOptionType.spin, Integer.toString(config.NMP_DEPTH), "1", "3", "");
+    option("Null_Move_Verification", UCIOptionType.check, Boolean.toString(config.USE_VERIFY_NMP), "", "", "");
+    option("Null_Move_Verification_Depth", UCIOptionType.spin, Integer.toString(config.NMP_VERIFICATION_DEPTH), "1", "5", "");
+    option("Use_Razor_Pruning", UCIOptionType.check, Boolean.toString(config.USE_RAZOR_PRUNING), "", "", "");
+    option("Razor_Depth", UCIOptionType.spin, Integer.toString(config.RAZOR_DEPTH), "1", "5", "");
+    option("Razor_Margin", UCIOptionType.spin, Integer.toString(config.RAZOR_MARGIN), "0", "1800", "");
+    option("Use_IID", UCIOptionType.check, Boolean.toString(config.USE_IID), "", "", "");
+    option("IID_Reduction", UCIOptionType.spin, Integer.toString(config.IID_REDUCTION), "0", "10", "");
+    option("Use_Extensions", UCIOptionType.check, Boolean.toString(config.USE_EXTENSIONS), "", "", "");
+    option("Use_Limited_Razoring", UCIOptionType.check, Boolean.toString(config.USE_LIMITED_RAZORING), "", "", "");
+    option("Use_Extended_Futility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_EXTENDED_FUTILITY_PRUNING), "", "", "");
+    option("Use_Futility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_FUTILITY_PRUNING), "", "", "");
+    option("Use_QFutility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_QFUTILITY_PRUNING), "", "", "");
+    option("Use_Late_Move_Pruning", UCIOptionType.check, Boolean.toString(config.USE_LMP), "", "", "");
+    option("LMP_Min_Depth", UCIOptionType.spin, Integer.toString(config.LMP_MIN_DEPTH), "2", "10", "");
+    option("LMP_Min_Moves", UCIOptionType.spin, Integer.toString(config.LMP_MIN_MOVES), "1", "15", "");
+    option("Use_Late_Move_Reduction", UCIOptionType.check, Boolean.toString(config.USE_LMR), "", "", "");
+    option("LMR_Depth", UCIOptionType.spin, Integer.toString(config.LMR_MIN_DEPTH), "2", "10", "");
+    option("LMR_Min_Moves", UCIOptionType.spin, Integer.toString(config.LMR_MIN_MOVES), "1", "15", "");
+    option("LMR_Reduction", UCIOptionType.spin, Integer.toString(config.LMR_REDUCTION), "0", "5", "");
+    // @formatter:on
+  }
+
+  private void option(String hash, UCIOptionType spin, String def, String min, String max,
+                      String val) {
+    iUciOptions.add(new UCIOption(hash, spin, def, min, max, val));
   }
 
   @Override
@@ -354,7 +218,13 @@ public class FrankyEngine implements IUCIEngine {
         break;
       case "OwnBook":
         config.USE_BOOK = Boolean.valueOf(value);
-        msg = "Engine Book set to " + (config.PONDER ? "On" : "Off");
+        msg = "Engine Book set to " + (config.USE_BOOK ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_TranspositionTable":
+        config.USE_TRANSPOSITION_TABLE = Boolean.valueOf(value);
+        msg = "Use Hashtable set to " + (config.USE_TRANSPOSITION_TABLE ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
@@ -370,63 +240,6 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      case "Use_PVS":
-        config.USE_PVS = Boolean.valueOf(value);
-        msg = "Use PVSearch set to " + (config.USE_PVS ? "On" : "Off");
-        LOG.info(msg);
-        uciProtocolHandler.sendInfoStringToUCI(msg);
-        break;
-      case "Use_PVS_Move_Ordering":
-        config.USE_PVS_MOVE_ORDERING = Boolean.valueOf(value);
-        msg = "Use PVS Ordering set to " + (config.USE_PVS_MOVE_ORDERING ? "On" : "Off");
-        LOG.info(msg);
-        uciProtocolHandler.sendInfoStringToUCI(msg);
-        break;
-      case "Use_TranspositionTable":
-        config.USE_TRANSPOSITION_TABLE = Boolean.valueOf(value);
-        msg = "Use Hashtable set to " + (config.USE_TRANSPOSITION_TABLE ? "On" : "Off");
-        LOG.info(msg);
-        uciProtocolHandler.sendInfoStringToUCI(msg);
-        break;
-      case "Use_Mate_Distance_Pruning":
-        config.USE_MATE_DISTANCE_PRUNING = Boolean.valueOf(value);
-        msg =
-          "Use Mate Distance Pruning set to " + (config.USE_MATE_DISTANCE_PRUNING ? "On" : "Off");
-        LOG.info(msg);
-        uciProtocolHandler.sendInfoStringToUCI(msg);
-        break;
-      case "Use_Minor_Promotion_Pruning":
-        config.USE_MINOR_PROMOTION_PRUNING = Boolean.valueOf(value);
-        msg = "Use Minor Promotion Pruning set to " + (config.USE_MINOR_PROMOTION_PRUNING
-                                                       ? "On"
-                                                       : "Off");
-        LOG.info(msg);
-        uciProtocolHandler.sendInfoStringToUCI(msg);
-        break;
-      case "Use_Null_Move_Pruning":
-        config.USE_NULL_MOVE_PRUNING = Boolean.valueOf(value);
-        msg = "Use Null Move Pruning set to " + (config.USE_NULL_MOVE_PRUNING ? "On" : "Off");
-        LOG.info(msg);
-        uciProtocolHandler.sendInfoStringToUCI(msg);
-        break;
-      case "Null_Move_Depth":
-        config.NULL_MOVE_DEPTH = Integer.valueOf(value);
-        msg = "Null Move Depth set to " + (config.NULL_MOVE_DEPTH);
-        LOG.info(msg);
-        uciProtocolHandler.sendInfoStringToUCI(msg);
-        break;
-      case "Use_Razor_Pruning":
-        config.USE_RAZOR_PRUNING = Boolean.valueOf(value);
-        msg = "Use Razor Pruning set to " + (config.USE_RAZOR_PRUNING ? "On" : "Off");
-        LOG.info(msg);
-        uciProtocolHandler.sendInfoStringToUCI(msg);
-        break;
-      case "Use_Eval_Pruning":
-        config.USE_STATIC_NULL_PRUNING = Boolean.valueOf(value);
-        msg = "Use Eval Pruning set to " + (config.USE_STATIC_NULL_PRUNING ? "On" : "Off");
-        LOG.info(msg);
-        uciProtocolHandler.sendInfoStringToUCI(msg);
-        break;
       case "Use_Killer_Moves":
         config.USE_KILLER_MOVES = Boolean.valueOf(value);
         msg = "Use Killer Moves set to " + (config.USE_KILLER_MOVES ? "On" : "Off");
@@ -439,21 +252,15 @@ public class FrankyEngine implements IUCIEngine {
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      case "Use_Late_Move_Reduction":
-        config.USE_LMR = Boolean.valueOf(value);
-        msg = "Use Late Move Reduction set to " + (config.USE_LMR ? "On" : "Off");
+      case "Use_PVS":
+        config.USE_PVS = Boolean.valueOf(value);
+        msg = "Use PVSearch set to " + (config.USE_PVS ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
-      case "Late_Move_Reduction_Min_Depth":
-        config.LMR_MIN_DEPTH = Integer.valueOf(value);
-        msg = "Late Move Reduction Min Depth set to " + config.LMR_MIN_DEPTH;
-        LOG.info(msg);
-        uciProtocolHandler.sendInfoStringToUCI(msg);
-        break;
-      case "Late_Move_Reduction":
-        config.LMR_REDUCTION = Integer.valueOf(value);
-        msg = "Late Move Reduction amount set to " + config.LMR_REDUCTION;
+      case "Use_PVS_Move_Ordering":
+        config.USE_PVS_ORDERING = Boolean.valueOf(value);
+        msg = "Use PVS Ordering set to " + (config.USE_PVS_ORDERING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
@@ -467,6 +274,158 @@ public class FrankyEngine implements IUCIEngine {
       case "Aspiration_Start_Depth":
         config.ASPIRATION_START_DEPTH = Integer.valueOf(value);
         msg = "Aspiration Start Depth set to " + config.ASPIRATION_START_DEPTH;
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Mate_Distance_Pruning":
+        config.USE_MDP = Boolean.valueOf(value);
+        msg = "Use Mate Distance Pruning set to " + (config.USE_MDP ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Minor_Promotion_Pruning":
+        config.USE_MPP = Boolean.valueOf(value);
+        msg = "Use Minor Promotion Pruning set to " + (config.USE_MPP ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Reverse_Futility_Pruning":
+        config.USE_RFP = Boolean.valueOf(value);
+        msg = "Use Reverse Futility Pruning set to " + (config.USE_RFP ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "RFP_Margin":
+        config.RFP_MARGIN = Integer.valueOf(value);
+        msg = "RFP Margin set to " + (config.RFP_MARGIN);
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Null_Move_Pruning":
+        config.USE_NMP = Boolean.valueOf(value);
+        msg = "Use Null Move Pruning set to " + (config.USE_NMP ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Null_Move_Depth":
+        config.NMP_DEPTH = Integer.valueOf(value);
+        msg = "Null Move Depth set to " + (config.NMP_DEPTH);
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Null_Move_Verification":
+        config.USE_VERIFY_NMP = Boolean.valueOf(value);
+        msg = "Null Move Verification set to " + (config.USE_VERIFY_NMP);
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Null_Move_Verification_Depth":
+        config.NMP_VERIFICATION_DEPTH = Integer.valueOf(value);
+        msg = "Null Move Verification Depth set to " + (config.NMP_VERIFICATION_DEPTH);
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Razor_Pruning":
+        config.USE_RAZOR_PRUNING = Boolean.valueOf(value);
+        msg = "Use Razor Pruning set to " + (config.USE_RAZOR_PRUNING ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Razor_Depth":
+        config.RAZOR_DEPTH = Integer.valueOf(value);
+        msg = "RFP Margin set to " + (config.RAZOR_DEPTH);
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Razor_Margin":
+        config.RFP_MARGIN = Integer.valueOf(value);
+        msg = "Razor Margin set to " + (config.RAZOR_MARGIN);
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_IID":
+        config.USE_IID = Boolean.valueOf(value);
+        msg = "Use_IID set to " + (config.USE_IID ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "IID_Reduction":
+        config.IID_REDUCTION = Integer.valueOf(value);
+        msg = "IID_Reduction set to " + (config.IID_REDUCTION);
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Extensions":
+        config.USE_EXTENSIONS = Boolean.valueOf(value);
+        msg = "Use Search Extensions set to " + (config.USE_EXTENSIONS ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Limited_Razoring":
+        config.USE_LIMITED_RAZORING = Boolean.valueOf(value);
+        msg = "Use_Limited_Razoring set to " + (config.USE_LIMITED_RAZORING ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Extended_Futility_Pruning":
+        config.USE_EXTENDED_FUTILITY_PRUNING = Boolean.valueOf(value);
+        msg = "Use_Extended_Futility_Pruning set to " + (config.USE_EXTENDED_FUTILITY_PRUNING
+                                                         ? "On"
+                                                         : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Futility_Pruning":
+        config.USE_FUTILITY_PRUNING = Boolean.valueOf(value);
+        msg = "Use_Futility_Pruning set to " + (config.USE_FUTILITY_PRUNING ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_QFutility_Pruning":
+        config.USE_QFUTILITY_PRUNING = Boolean.valueOf(value);
+        msg = "Use_QFutility_Pruning set to " + (config.USE_QFUTILITY_PRUNING ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Late_Move_Pruning":
+        config.USE_LMP = Boolean.valueOf(value);
+        msg = "Use Late Move Pruning set to " + (config.USE_LMP ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "LMP_Min_Depth":
+        config.LMP_MIN_DEPTH = Integer.valueOf(value);
+        msg = "Late Move Pruning Min Depth set to " + config.LMP_MIN_DEPTH;
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "LMP_Min_Moves":
+        config.LMP_MIN_MOVES = Integer.valueOf(value);
+        msg = "Late Move Pruning Min Moves set to " + config.LMP_MIN_MOVES;
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_Late_Move_Reduction":
+        config.USE_LMR = Boolean.valueOf(value);
+        msg = "Use Late Move Reduction set to " + (config.USE_LMR ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "LMR_Depth":
+        config.LMR_MIN_DEPTH = Integer.valueOf(value);
+        msg = "Late Move Reduction Min Depth set to " + config.LMR_MIN_DEPTH;
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "LMR_Min_Moves":
+        config.LMR_MIN_MOVES = Integer.valueOf(value);
+        msg = "Late Move Reduction Min Moves set to " + config.LMR_MIN_MOVES;
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "LMR_Reduction":
+        config.LMR_REDUCTION = Integer.valueOf(value);
+        msg = "Late Move Reduction amount set to " + config.LMR_REDUCTION;
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
@@ -582,7 +541,8 @@ public class FrankyEngine implements IUCIEngine {
       if (uciProtocolHandler != null) {
         uciProtocolHandler.sendResultToUCI(Move.toUCINotation(position, bestMove));
       }
-    } else {
+    }
+    else {
       if (uciProtocolHandler != null) {
         uciProtocolHandler.sendResultToUCI(Move.toUCINotation(position, bestMove),
                                            Move.toUCINotation(position, ponderMove));
@@ -594,7 +554,8 @@ public class FrankyEngine implements IUCIEngine {
   public void sendInfoToUCI(String s) {
     if (uciProtocolHandler != null) {
       uciProtocolHandler.sendInfoToUCI(s);
-    } else {
+    }
+    else {
       LOG.info("Engine >>>> " + s);
     }
   }
@@ -634,6 +595,5 @@ public class FrankyEngine implements IUCIEngine {
   public Configuration getConfig() {
     return config;
   }
-
 
 }

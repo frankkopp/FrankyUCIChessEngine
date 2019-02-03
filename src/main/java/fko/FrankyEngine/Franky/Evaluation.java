@@ -140,8 +140,7 @@ public class Evaluation {
    * Sets the reference to the position this evaluation operates on.
    * <p>
    * Attention: This does not create a deep copy. If the position changes after
-   * setting the reference the change will be reflected here. This does not
-   * create a deep copy.
+   * setting the reference the change will be reflected here.
    *
    * @param position
    * @return value of the position from active player's view.
@@ -189,8 +188,6 @@ public class Evaluation {
     material = midGameMaterial * (gamePhaseFactor / GAME_PHASE_MAX) +
                endGameMaterial * (1 - gamePhaseFactor / GAME_PHASE_MAX);
 
-    // TODO: LAZY EVALUATION
-
     // Stage 2
     iterateOverPieces();
 
@@ -202,8 +199,6 @@ public class Evaluation {
 
     kingSafety = midGameKingSafety * (gamePhaseFactor / GAME_PHASE_MAX) +
                  endGameKingSafety * (1 - gamePhaseFactor / GAME_PHASE_MAX);
-
-    // TODO: LAZY EVALUATION
 
     // Stage 3
     iterateOverSquares();
@@ -223,8 +218,10 @@ public class Evaluation {
     // In very rare cases evaluation can be below or above the MIN or MAX.
     // Mostly in artificial cases with many queens - some test cases do this.
     // Therefore we limit the value to MIN+1 or MAX-1.
-    if (value <= Evaluation.MIN) value = Evaluation.MIN+1;
-    else if (value >= Evaluation.MAX) value = Evaluation.MAX-1;
+    if (value <= -Evaluation.CHECKMATE_THRESHOLD)
+      value = -Evaluation.CHECKMATE_THRESHOLD+1;
+    else if (value >= Evaluation.CHECKMATE_THRESHOLD)
+      value = Evaluation.CHECKMATE_THRESHOLD-1;
 
     return value;
   }
@@ -272,32 +269,20 @@ public class Evaluation {
   private void materialEvaluation() {
 
     // midGameMaterial is incrementally counted in Position
-    midGameMaterial = position.getNextPlayer().factor *
+    midGameMaterial = position.getNextPlayer().direction *
                       (position.getMaterial(Color.WHITE) - position.getMaterial(Color.BLACK));
 
     // bonus/malus for bishop pair
-    if (bishopSquares[nextToMove].size() >= 2) {
-      midGameMaterial += BISHOP_PAIR;
-    }
-    if (bishopSquares[opponent].size() >= 2) {
-      midGameMaterial -= BISHOP_PAIR;
-    }
+    if (bishopSquares[nextToMove].size() >= 2) midGameMaterial += BISHOP_PAIR;
+    if (bishopSquares[opponent].size() >= 2) midGameMaterial -= BISHOP_PAIR;
 
     // bonus/malus for knight pair
-    if (knightSquares[nextToMove].size() >= 2) {
-      midGameMaterial += KNIGHT_PAIR;
-    }
-    if (knightSquares[opponent].size() >= 2) {
-      midGameMaterial -= KNIGHT_PAIR;
-    }
+    if (knightSquares[nextToMove].size() >= 2) midGameMaterial += KNIGHT_PAIR;
+    if (knightSquares[opponent].size() >= 2) midGameMaterial -= KNIGHT_PAIR;
 
     // bonus/malus for rook pair
-    if (rookSquares[nextToMove].size() >= 2) {
-      midGameMaterial += ROOK_PAIR;
-    }
-    if (rookSquares[opponent].size() >= 2) {
-      midGameMaterial -= ROOK_PAIR;
-    }
+    if (rookSquares[nextToMove].size() >= 2) midGameMaterial += ROOK_PAIR;
+    if (rookSquares[opponent].size() >= 2) midGameMaterial -= ROOK_PAIR;
 
     // for now they are always the same
     // TODO: e.g. should reflect that in endgames certain combinations are
@@ -311,22 +296,11 @@ public class Evaluation {
    */
   private void iterateOverPieces() {
 
-    // Pawns
     evalPawns();
-
-    // Knights
     evalKnights();
-
-    // Bishops
     evalBishops();
-
-    // Rooks
     evalRooks();
-
-    // Queens
     evalQueens();
-
-    // Kings
     evalKings();
 
     // for now they are always the same
@@ -354,9 +328,8 @@ public class Evaluation {
         // king safety WHITE
         if (nextToMove == WHITE && kingSquares[nextToMove].getRank() == r1) {
 
+          // king side castle
           if (kingSquares[nextToMove].getFile().get() > f.get()) {
-            // king side castle
-
             // rook in the corner penalty
             if (position.getPiece(h1) == WHITE_ROOK) {
               midGamePiecePosition += CORNERED_ROOK_PENALTY;
@@ -371,12 +344,11 @@ public class Evaluation {
             if (position.getPiece(h2) == WHITE_PAWN || position.getPiece(h3) == WHITE_PAWN) {
               midGameKingSafety += KING_SAFETY_PAWNSHIELD;
             }
-          } else if (kingSquares[nextToMove].getFile().get() < d.get()) {
-            // queen side castle
-
+          }
+          // queen side castle
+          else if (kingSquares[nextToMove].getFile().get() < d.get()) {
             // queen side castle is weaker as king is more exposed
             this.midGameKingSafety += -KING_SAFETY_PAWNSHIELD;
-
             // rook in the corner penalty
             if (position.getPiece(a1) == WHITE_ROOK || position.getPiece(b1) == WHITE_ROOK) {
               midGamePiecePosition += EvaluationConfig.CORNERED_ROOK_PENALTY;
@@ -401,10 +373,8 @@ public class Evaluation {
         }
         // king safety BLACK
         else if (nextToMove == BLACK && kingSquares[nextToMove].getRank() == r8) {
-
+          // king side castle
           if (kingSquares[nextToMove].getFile().get() > e.get()) {
-            // king side castle
-
             // rook in the corner penalty
             if (position.getPiece(h8) == BLACK_ROOK) {
               midGamePiecePosition += CORNERED_ROOK_PENALTY;
@@ -419,12 +389,11 @@ public class Evaluation {
             if (position.getPiece(h7) == BLACK_PAWN || position.getPiece(h6) == BLACK_PAWN) {
               midGameKingSafety += KING_SAFETY_PAWNSHIELD;
             }
-          } else if (kingSquares[nextToMove].getFile().get() < d.get()) {
-            // queen side castle
-
+          }
+          // queen side castle
+          else if (kingSquares[nextToMove].getFile().get() < d.get()) {
             // queen side castle is weaker as king is more exposed
             this.midGameKingSafety += -KING_SAFETY_PAWNSHIELD;
-
             // rook in the corner penalty
             if (position.getPiece(a8) == BLACK_ROOK || position.getPiece(b8) == BLACK_ROOK) {
               midGamePiecePosition += EvaluationConfig.CORNERED_ROOK_PENALTY;
@@ -466,9 +435,8 @@ public class Evaluation {
         // king safety WHITE
         if (opponent == WHITE && kingSquares[opponent].getRank() == r1) {
 
+          // king side castle
           if (kingSquares[opponent].getFile().get() > e.get()) {
-            // king side castle
-
             // rook in the corner penalty
             if (position.getPiece(h1) == WHITE_ROOK) {
               midGamePiecePosition -= CORNERED_ROOK_PENALTY;
@@ -483,12 +451,11 @@ public class Evaluation {
             if (position.getPiece(h2) == WHITE_PAWN || position.getPiece(h3) == WHITE_PAWN) {
               midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
             }
-          } else if (kingSquares[opponent].getFile().get() < e.get()) {
-            // queen side castle
-
+          }
+          // queen side castle
+          else if (kingSquares[opponent].getFile().get() < e.get()) {
             // queen side castle is weaker as king is more exposed
             this.midGameKingSafety += -KING_SAFETY_PAWNSHIELD;
-
             // rook in the corner penalty
             if (position.getPiece(a1) == WHITE_ROOK || position.getPiece(b1) == WHITE_ROOK) {
               midGamePiecePosition -= EvaluationConfig.CORNERED_ROOK_PENALTY;
@@ -514,9 +481,8 @@ public class Evaluation {
         // king safety BLACK
         else if (opponent == BLACK && kingSquares[opponent].getRank() == r8) {
 
+          // king side castle
           if (kingSquares[opponent].getFile().get() > e.get()) {
-            // king side castle
-
             // rook in the corner penalty
             if (position.getPiece(h8) == BLACK_ROOK) {
               midGamePiecePosition -= CORNERED_ROOK_PENALTY;
@@ -531,12 +497,11 @@ public class Evaluation {
             if (position.getPiece(h7) == BLACK_PAWN || position.getPiece(h6) == BLACK_PAWN) {
               midGameKingSafety -= KING_SAFETY_PAWNSHIELD;
             }
-          } else if (kingSquares[opponent].getFile().get() < d.get()) {
-            // queen side castle
-
+          }
+          // queen side castle
+          else if (kingSquares[opponent].getFile().get() < d.get()) {
             // queen side castle is weaker as king is more exposed
             this.midGameKingSafety -= -KING_SAFETY_PAWNSHIELD;
-
             // rook in the corner penalty
             if (position.getPiece(a8) == BLACK_ROOK || position.getPiece(b8) == BLACK_ROOK) {
               midGamePiecePosition -= EvaluationConfig.CORNERED_ROOK_PENALTY;

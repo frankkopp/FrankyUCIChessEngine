@@ -53,15 +53,15 @@ public class Move {
   /*
   BITMAP
   3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
-  1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 Info          Mask        Values
+  1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 Info          Mask    Values
   ------------------------------------------------------------------------------------------------
-   																									1	1	1	1	1	1	1	Start Square	7F	1111111	127
-  																		1	1	1	1	1	1	1								End Square	  7F	1111111	127
-  														1	1	1	1															Piece	        f	  1111	  15
-  										1	1	1	1																			Target	      f 	1111	  15
-  						1	1	1	1																							Promotion	    f	  1111	  15
-  			1	1	1																											MoveType	    7	  111	    7
-  1	1	1																														Castling	    7	  111	    7
+   																									1	1	1	1	1	1	1	Start Square	7F	1111111	  127
+  																		1	1	1	1	1	1	1								End Square	  7F	1111111	  127
+  														1	1	1	1															Piece	        f	  1111	    15
+  										1	1	1	1																			Target	      f 	1111	    15
+  						1	1	1	1																							Promotion	    f	  1111	    15
+  			1	1	1																											MoveType	    7	  111	      7
+  1	1	1																														Castling	    7	  111	      7
   */
   // @formatter:on
 
@@ -341,7 +341,7 @@ public class Move {
 
       // same end square
       if (Move.getEnd(move).name().equals(targetSquare)) {
-        if (piece != null && Move.getPiece(move).getType().getShortName().equals(piece)) {
+        if (Move.getPiece(move).getType().getShortName().equals(piece)) {
           LOG.trace("Piece MATCH " + Move.getPiece(move).getType().toString());
         } else if (piece == null && Move.getPiece(move).getType().equals(PieceType.PAWN)) {
           LOG.trace("Piece MATCH PAWN");
