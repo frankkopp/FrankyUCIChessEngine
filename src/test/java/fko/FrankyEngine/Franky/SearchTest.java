@@ -275,7 +275,7 @@ public class SearchTest {
     Position position = new Position(fen);
 
     // Test start and stop search
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 10; i++) {
       SearchMode searchMode =
         new SearchMode(0, 0, 0, 0, 0, 5000, 0, 0, 0, null, false, false, false);
 
@@ -613,7 +613,7 @@ public class SearchTest {
 
   @Test
   @Disabled
-  public void testInfiniteSearch() {
+  public void testInfiniteSearch() throws InterruptedException {
     Position position = new Position();
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 0, null, false, true, false);
     search.startSearch(position, searchMode);
