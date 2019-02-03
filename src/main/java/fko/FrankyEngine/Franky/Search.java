@@ -60,7 +60,6 @@ import java.util.concurrent.CountDownLatch;
  *  --------------------------------
  * TODO: History Heuristic / http://www.frayn.net/beowulf/theory.html#history
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
- * TODO: More extensions and reductions
  * TODO: Lazy SMP
  *
  * 1: Franky-0.11    14.5/80 ······
