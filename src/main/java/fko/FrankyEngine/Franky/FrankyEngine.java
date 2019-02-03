@@ -155,6 +155,7 @@ public class FrankyEngine implements IUCIEngine {
     option("Razor_Depth", UCIOptionType.spin, Integer.toString(config.RAZOR_DEPTH), "1", "5", "");
     option("Razor_Margin", UCIOptionType.spin, Integer.toString(config.RAZOR_MARGIN), "0", "1800", "");
     option("Use_IID", UCIOptionType.check, Boolean.toString(config.USE_IID), "", "", "");
+    option("IID_Reduction", UCIOptionType.spin, Integer.toString(config.IID_REDUCTION), "0", "10", "");
     option("Use_Extensions", UCIOptionType.check, Boolean.toString(config.USE_EXTENSIONS), "", "", "");
     option("Use_Limited_Razoring", UCIOptionType.check, Boolean.toString(config.USE_LIMITED_RAZORING), "", "", "");
     option("Use_Extended_Futility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_EXTENDED_FUTILITY_PRUNING), "", "", "");
@@ -345,6 +346,12 @@ public class FrankyEngine implements IUCIEngine {
       case "Use_IID":
         config.USE_IID = Boolean.valueOf(value);
         msg = "Use_IID set to " + (config.USE_IID ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "IID_Reduction":
+        config.IID_REDUCTION = Integer.valueOf(value);
+        msg = "IID_Reduction set to " + (config.IID_REDUCTION);
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
