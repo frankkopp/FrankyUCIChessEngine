@@ -1183,8 +1183,8 @@ public class Search implements Runnable {
           && !position.hasCheck()
       ) {
 
-        final int materialEval = position.getMaterial(myColor)
-                                   - position.getMaterial(myColor.getInverseColor());
+        final int materialEval
+          = position.getMaterial(myColor) - position.getMaterial(myColor.getInverseColor());
         final int moveGain = Move.getTarget(move).getType().getValue();
 
         // ###############################################
