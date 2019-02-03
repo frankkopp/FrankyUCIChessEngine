@@ -818,7 +818,7 @@ public class Search implements Runnable {
             getSpaces(ply), ply, depth, alpha, beta, pvNode, currentVariation.toNotationString());
     }
 
-    assert depth >= 0 && depth <= MAX_SEARCH_DEPTH;
+    assert depth <= MAX_SEARCH_DEPTH;
     assert alpha >= Evaluation.MIN && beta <= Evaluation.MAX;
     assert pvNode || alpha == beta - 1;
 
