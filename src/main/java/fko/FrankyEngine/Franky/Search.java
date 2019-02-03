@@ -34,6 +34,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
@@ -565,9 +566,9 @@ public class Search implements Runnable {
 
       Searcher[] smpSearcher;
       if (config.USE_LAZY_SMP && config.SMP_CPUS > 1 && depth > 6) {
-        smpSearcher = new Searcher[config.SMP_CPUS-1];
-        for (int i = 0; i < config.SMP_CPUS-1; i++) {
-          smpSearcher[i] = new Searcher(this, position, depth, alpha, beta, i+1);
+        smpSearcher = new Searcher[config.SMP_CPUS - 1];
+        for (int i = 0; i < config.SMP_CPUS - 1; i++) {
+          smpSearcher[i] = new Searcher(this, position, depth, alpha, beta, i + 1);
           smpSearcher[i].start();
         }
       }
@@ -633,7 +634,6 @@ public class Search implements Runnable {
       if (stopSearch || softTimeLimitReached() || hardTimeLimitReached()) break;
 
       if (TRACE) trace("Depth %d end", depth);
-
 
     } while (++depth <= searchMode.getMaxDepth());
     // ### ENDOF Iterative Deepening
@@ -1129,7 +1129,7 @@ public class Search implements Runnable {
     int move;
     int i = 0;
     int movesSize = ROOT ? rootMoves.size() : legalMovesSize;
-    move = getNextMove(moveGenerator,ply, i++);
+    move = getNextMove(moveGenerator, ply, i++);
     while (move != Move.NOMOVE) {
       if (TRACE) {
         trace("%sSearch in ply %d for depth %d: MOVE %s (%d/%d) ", getSpaces(ply), ply, depth,
@@ -1309,9 +1309,11 @@ public class Search implements Runnable {
         move = getNextMove(moveGenerator, ply, i++);
         continue;
       }
-      searchCounter.nodesVisited++;
-      if (MAIN) currentVariation.add(move);
-      if (MAIN) sendUCIUpdate(position);
+      if (MAIN) {
+        searchCounter.nodesVisited++;
+        currentVariation.add(move);
+        sendUCIUpdate(position);
+      }
       // ###############################################
 
       // Check if our givesCheck(move) works correctly
@@ -1745,12 +1747,14 @@ public class Search implements Runnable {
         position.undoMove();
         continue;
       }
-      // update nodes visited and count as non quiet board
-      searchCounter.nodesVisited++;
-      searchCounter.positionsNonQuiet++;
       // keep track of current variation
-      if (MAIN) currentVariation.add(move);
-      if (MAIN) sendUCIUpdate(position);
+      if (MAIN) {
+        // update nodes visited and count as non quiet board
+        searchCounter.nodesVisited++;
+        searchCounter.positionsNonQuiet++;
+        currentVariation.add(move);
+        sendUCIUpdate(position);
+      }
       // ###############################################
 
       if (TRACE) {
@@ -2604,12 +2608,12 @@ public class Search implements Runnable {
 
     private Thread myThread;
 
-    private final Search search;
+    private final Search   search;
     private final Position position;
-    private final int depth;
-    private final int alpha;
-    private final int beta;
-    private final int number;
+    private final int      depth;
+    private final int      alpha;
+    private final int      beta;
+    private final int      number;
 
     public Searcher(Search search, Position position, int depth, int alpha, int beta, int number) {
       this.search = search;

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fko.FrankyEngine</groupId>
   <artifactId>Franky</artifactId>
-    <version>0.11.smp</version>
+  <version>0.11.smp</version>
   <profiles>
     <profile>
       <id>Franky</id>
@@ -115,9 +115,9 @@
                 <configuration>
                   <executable>"C:\Program Files (x86)\Jar2Exe Wizard\j2ewiz.exe"</executable>
                   <commandlineArgs>/jar
-                      C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-0.11.smp.jar
+                    C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-0.11.smp.jar
                                         /o
-                      C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-0.11.smp.exe
+                    C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-0.11.smp.exe
                                         /m
                                         fko.FrankyEngine.Main
                                         /type
@@ -129,9 +129,9 @@
                                         /checksum
                                         /amd64
                                         /pv
-                      0.11.smp
+                    0.11.smp
                                         /ve
-                      "ProductVersion=0.11.smp"
+                    "ProductVersion=0.11.smp"
                                         /ve
                                         "ProductName=Franky Chess Engine"
                                         /ve
@@ -154,7 +154,7 @@
                   <executable>cmd.exe</executable>
                   <commandlineArgs>/C
                                         COPY
-                      C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-0.11.smp*
+                    C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-0.11.smp*
                                         C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\Releases</commandlineArgs>
                   <workingDirectory>C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine</workingDirectory>
                 </configuration>
