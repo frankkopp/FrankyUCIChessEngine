@@ -1085,7 +1085,7 @@ public class Search implements Runnable {
       // fill the pv list and the TT
       search(position, iidDepth, ply, alpha, beta, PV_NODE, DO_NULL);
       // no we look in the pv list if we have a best move
-      bestNodeMove = pv[ply].empty() ? Move.NOMOVE : pv[ply].getFirst();
+      if (MAIN) bestNodeMove = pv[ply].empty() ? Move.NOMOVE : pv[ply].getFirst();
     }
     // ###############################################
 
@@ -2629,9 +2629,9 @@ public class Search implements Runnable {
     }
 
     public void run() {
-      LOG.debug("SMP Thread START: {}", number);
+      //      LOG.debug("SMP Thread START depth {}: {}", depth, number);
       search.search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL);
-      LOG.debug("SMP Thread END: {}", number);
+      //      LOG.debug("SMP Thread END depth {}: {}", depth, number);
     }
   }
 }

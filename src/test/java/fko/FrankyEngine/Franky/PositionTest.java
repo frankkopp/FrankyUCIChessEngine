@@ -571,6 +571,12 @@ public class PositionTest {
     assertEquals(position, positionCopy);
     assertEquals(position.toFENString(), positionCopy.toFENString());
     assertEquals(position.getZobristKey(), positionCopy.getZobristKey());
+
+    Position positionCopy1 = new Position(position);
+    Position positionCopy2 = new Position(position);
+    Position positionCopy3 = new Position(position);
+    Position positionCopy4 = new Position(position);
+    System.out.println();
   }
 
   /** Test Zobrist Key generation */

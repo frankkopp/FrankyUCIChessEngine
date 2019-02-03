@@ -145,79 +145,82 @@ public class TranspositionTable {
 
     numberOfPuts++;
 
-    // New hash
-    if (ttEntry.key == 0) {
-      numberOfEntries++;
+    synchronized (ttEntry) {
 
-      ttEntry.key = key;
-      //ttEntry.fen = position.toFENString();
-      ttEntry.age = 1;
-      ttEntry.mateThreat = mateThreat;
-      ttEntry.value = value;
-      ttEntry.type = type;
-      ttEntry.depth = depth;
-      ttEntry.bestMove = bestMove;
-    }
-    // Same hash but different position
-    // overwrite if
-    // - the new entry's depth is higher or equal
-    // - the previous entry has not been used (is aged)
-    // @formatter:off
-    else if (key != ttEntry.key
-             && depth >= ttEntry.depth
-             && ttEntry.age > 0
-    ) { // @formatter:on
-      numberOfCollisions++;
+      // New hash
+      if (ttEntry.key == 0) {
+        numberOfEntries++;
 
-      ttEntry.key = key;
-      //ttEntry.fen = position.toFENString();
-      ttEntry.age = 1;
-      ttEntry.mateThreat = mateThreat;
-
-      ttEntry.value = value;
-      ttEntry.type = type;
-      ttEntry.depth = depth;
-      ttEntry.bestMove = bestMove;
-    }
-    // Same hash and same position -> update entry?
-    else if (key == ttEntry.key) {
-
-      // if from same depth only update when quality of new entry is better
-      // e.g. don't replace EXACT with ALPHA or BETA
-      if (depth == ttEntry.depth) {
-        numberOfUpdates++;
-
-        // ttEntry.fen = position.toFENString();
-        ttEntry.age = 1;
-        ttEntry.mateThreat = mateThreat;
-
-        // old was not EXACT - update
-        if (ttEntry.type != TT_EntryType.EXACT) {
-          ttEntry.value = value;
-          ttEntry.type = type;
-          ttEntry.depth = depth;
-        }
-        // old entry was exact, the new entry is also EXACT -> assert that they are identical
-        else assert type != TT_EntryType.EXACT || ttEntry.value == value;
-
-        // overwrite bestMove only with a valid move
-        if (bestMove != Move.NOMOVE) ttEntry.bestMove = bestMove;
-      }
-      // if depth is greater then update in any case
-      else if (depth > ttEntry.depth) {
-        numberOfUpdates++;
-
-        // ttEntry.fen = position.toFENString();
+        ttEntry.key = key;
+        //ttEntry.fen = position.toFENString();
         ttEntry.age = 1;
         ttEntry.mateThreat = mateThreat;
         ttEntry.value = value;
         ttEntry.type = type;
         ttEntry.depth = depth;
+        ttEntry.bestMove = bestMove;
+      }
+      // Same hash but different position
+      // overwrite if
+      // - the new entry's depth is higher or equal
+      // - the previous entry has not been used (is aged)
+      // @formatter:off
+    else if (key != ttEntry.key
+             && depth >= ttEntry.depth
+             && ttEntry.age > 0
+    ) { // @formatter:on
+        numberOfCollisions++;
 
-        // overwrite bestNive only with a valid move
-        if (bestMove != Move.NOMOVE) ttEntry.bestMove = bestMove;
-      } // overwrite bestMove if there wasn't any before
-      else if (ttEntry.bestMove == Move.NOMOVE) ttEntry.bestMove = bestMove;
+        ttEntry.key = key;
+        //ttEntry.fen = position.toFENString();
+        ttEntry.age = 1;
+        ttEntry.mateThreat = mateThreat;
+
+        ttEntry.value = value;
+        ttEntry.type = type;
+        ttEntry.depth = depth;
+        ttEntry.bestMove = bestMove;
+      }
+      // Same hash and same position -> update entry?
+      else if (key == ttEntry.key) {
+
+        // if from same depth only update when quality of new entry is better
+        // e.g. don't replace EXACT with ALPHA or BETA
+        if (depth == ttEntry.depth) {
+          numberOfUpdates++;
+
+          // ttEntry.fen = position.toFENString();
+          ttEntry.age = 1;
+          ttEntry.mateThreat = mateThreat;
+
+          // old was not EXACT - update
+          if (ttEntry.type != TT_EntryType.EXACT) {
+            ttEntry.value = value;
+            ttEntry.type = type;
+            ttEntry.depth = depth;
+          }
+          // old entry was exact, the new entry is also EXACT -> assert that they are identical
+          //else assert type != TT_EntryType.EXACT || ttEntry.value == value;
+
+          // overwrite bestMove only with a valid move
+          if (bestMove != Move.NOMOVE) ttEntry.bestMove = bestMove;
+        }
+        // if depth is greater then update in any case
+        else if (depth > ttEntry.depth) {
+          numberOfUpdates++;
+
+          // ttEntry.fen = position.toFENString();
+          ttEntry.age = 1;
+          ttEntry.mateThreat = mateThreat;
+          ttEntry.value = value;
+          ttEntry.type = type;
+          ttEntry.depth = depth;
+
+          // overwrite bestNive only with a valid move
+          if (bestMove != Move.NOMOVE) ttEntry.bestMove = bestMove;
+        } // overwrite bestMove if there wasn't any before
+        else if (ttEntry.bestMove == Move.NOMOVE) ttEntry.bestMove = bestMove;
+      }
     }
   }
 
@@ -232,13 +235,15 @@ public class TranspositionTable {
   public TT_Entry get(final long key) {
     numberOfProbes++;
     final TT_Entry ttEntry = entries[getHash(key)];
-    if (ttEntry.key == key) { // hash hit
-      numberOfHits++;
-      // decrease age of entry until 0
-      ttEntry.age = (byte) Math.max(ttEntry.age - 1, 0);
-      return ttEntry;
+    synchronized (ttEntry) {
+      if (ttEntry.key == key) { // hash hit
+        numberOfHits++;
+        // decrease age of entry until 0
+        ttEntry.age = (byte) Math.max(ttEntry.age - 1, 0);
+        return ttEntry;
+      }
+      else numberOfMisses++;
     }
-    else numberOfMisses++;
     // cache miss or collision
     return null;
   }
