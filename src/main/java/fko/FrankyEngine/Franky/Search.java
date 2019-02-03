@@ -567,9 +567,7 @@ public class Search implements Runnable {
       // ###########################################
       // ### CALL SEARCH for depth    @formatter:off
       // ###
-
-      // MTDf
-      // just for debugging for now
+      // MTDf - just for debugging for now
       // https://www.chessprogramming.org/Debugging
       if (config.USE_MTDf
           && depth >= config.MTDf_START_DEPTH
@@ -579,9 +577,7 @@ public class Search implements Runnable {
         assert !config.USE_PVS : "If using MTDf PVS should turned off";
         value = mtdf_search(position, depth, currentBestRootValue );
       }
-
-      // ASPIRATION
-      // yet not efficient
+      // ASPIRATION - yet not efficient
       else if (config.USE_ASPIRATION_WINDOW
           && depth >= config.ASPIRATION_START_DEPTH
           && !PERFT
@@ -590,7 +586,6 @@ public class Search implements Runnable {
         assert !config.USE_MTDf : "If using Aspiration MTDF should be turned off";
         value = aspiration_search(position, depth, currentBestRootValue);
       }
-
       // ALPHA_BETA
       else {
         value = search(position, depth, ROOT_PLY,alpha, beta, PV_NODE, DO_NULL);
@@ -1061,7 +1056,6 @@ public class Search implements Runnable {
     if (config.USE_IID && !PERFT
         && pvNode
         && bestNodeMove == Move.NOMOVE
-        //&& depth > config.IID_DEPTH
     ) { // @formatter:on
       searchCounter.iidSearches++;
       int iidDepth = depth - config.IID_REDUCTION;

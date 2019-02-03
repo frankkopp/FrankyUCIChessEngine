@@ -135,8 +135,8 @@ public class Configuration {
    * TODO: Make evaluation more stable between different depths - otherwise
    * Aspiration will not be efficient.
    */
-  public boolean USE_ASPIRATION_WINDOW  = false;
-  public int     ASPIRATION_START_DEPTH = 5;
+  public boolean USE_ASPIRATION_WINDOW  = true;
+  public int     ASPIRATION_START_DEPTH = 4;
 
   /**
    * Mate Distance Pruning
@@ -176,7 +176,6 @@ public class Configuration {
    * Internatl Iterative Deepening
    */
   public boolean USE_IID       = true;
-  public int     IID_DEPTH     = 2;
   public int     IID_REDUCTION = 2;
 
   /**
