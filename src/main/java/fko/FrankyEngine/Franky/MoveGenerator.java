@@ -29,7 +29,6 @@ import fko.FrankyEngine.util.SimpleIntList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
 import java.util.stream.IntStream;
 
 /**
@@ -88,10 +87,15 @@ public class MoveGenerator {
   private int      pvMove      = Move.NOMOVE;
 
   // Comparator for move value victim least value attacker
-  private static final SimpleIntList.IntComparator mvvlvaComparator =
-    (move1, move2) -> Move.getPiece(move1).getType().getValue() - Move.getTarget(move2)
-                                                                      .getType()
-                                                                      .getValue();
+  // @formatter:off
+  private static final SimpleIntList.IntComparator mvvlvaComparator = (move1, move2) ->
+    (Move.getPiece(move1).getType().getValue()
+     - Move.getPromotion(move1).getType().getValue()
+     - Move.getTarget(move1).getType().getValue())
+    - (Move.getPiece(move2).getType().getValue()
+       - Move.getPromotion(move2).getType().getValue()
+       - Move.getTarget(move2).getType().getValue());
+  // @formatter:on
 
   /**
    * Creates a new {@link MoveGenerator}
@@ -570,7 +574,8 @@ public class MoveGenerator {
 
     // capturing moves
     if (Move.getTarget(move) != Piece.NOPIECE) {
-      return Move.getPiece(move).getType().getValue() - Move.getTarget(move).getType().getValue();
+      return Move.getPiece(move).getType().getValue() - Move.getPromotion(move).getType().getValue()
+             - Move.getTarget(move).getType().getValue();
     }
     // non capturing
     else {
@@ -627,6 +632,11 @@ public class MoveGenerator {
         }
       }
     }
+    // DEBUG
+    //    for (int i = 0; i < moveList.size(); i++) {
+    //      System.out.printf("%-20s (%d)%n", Move.toString(moveList.get(i)), sortIdx[i]);
+    //    }
+    //    System.out.println();
   }
 
   /**
