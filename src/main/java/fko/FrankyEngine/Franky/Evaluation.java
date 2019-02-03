@@ -140,8 +140,7 @@ public class Evaluation {
    * Sets the reference to the position this evaluation operates on.
    * <p>
    * Attention: This does not create a deep copy. If the position changes after
-   * setting the reference the change will be reflected here. This does not
-   * create a deep copy.
+   * setting the reference the change will be reflected here.
    *
    * @param position
    * @return value of the position from active player's view.
