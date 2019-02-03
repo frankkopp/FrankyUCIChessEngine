@@ -88,6 +88,7 @@ public class Search implements Runnable {
 
   /** Maximum depth this search can go. */
   public static final int MAX_SEARCH_DEPTH = Byte.MAX_VALUE;
+  public static final int MAIN_THREAD      = 0;
 
   /** Configuration object for direct manipulation */
   public final Configuration config;
@@ -124,17 +125,20 @@ public class Search implements Runnable {
   // opening book
   private final OpeningBook book;
 
-  // Position Evaluator
-  private final Evaluation evaluator;
-
   // running search global variables
-  private final RootMoveList rootMoves;
-
-  // current variation of the search
   private final MoveList currentVariation;
 
+  // current variation of the search
+  private final RootMoveList rootMoves;
+
+  // SMP threads
+  private ThreadGroup threads;
+
+  // Position Evaluator - one for each thread
+  private final Evaluation[] evaluator;
+
   // Move Generators - each depth in search gets it own to avoid object creation during search
-  private final MoveGenerator[] moveGenerators;
+  private final MoveGenerator[][] moveGenerators;
 
   // to store the best move or principal variation we need to generate the move sequence backwards
   // in the recursion. This field stores the pv for each ply so far
@@ -182,9 +186,22 @@ public class Search implements Runnable {
 
     waitForInitializationLatch = new CountDownLatch(1);
 
+    // Each threa needs one of these exclusivly
+    if (config.USE_LAZY_SMP && config.SMP_CPUS > 1) {
+      moveGenerators = new MoveGenerator[config.SMP_CPUS][];
+      evaluator = new Evaluation[config.SMP_CPUS];
+      for (int threadNUmber = 0; threadNUmber < config.SMP_CPUS; threadNUmber++) {
+        moveGenerators[threadNUmber] = new MoveGenerator[MAX_SEARCH_DEPTH];
+        evaluator[threadNUmber] = new Evaluation();
+      }
+    }
+    else {
+      moveGenerators = new MoveGenerator[1][];
+      evaluator = new Evaluation[1];
+    }
+
     // initialize ply variables
     currentVariation = new MoveList(MAX_SEARCH_DEPTH);
-    moveGenerators = new MoveGenerator[MAX_SEARCH_DEPTH];
     pv = new MoveList[MAX_SEARCH_DEPTH];
     semiPv = new MoveList[MAX_SEARCH_DEPTH];
     killerMoves = new MoveList[MAX_SEARCH_DEPTH];
@@ -194,7 +211,6 @@ public class Search implements Runnable {
     // initialize search variables
     rootMoves = new RootMoveList();
     searchCounter = new SearchCounter();
-    evaluator = new Evaluation();
 
     // set opening book - will be initialized in each search
     this.book = new OpeningBookImpl(config.OB_FolderPath + config.OB_fileNamePlain, config.OB_Mode);
@@ -333,9 +349,23 @@ public class Search implements Runnable {
     // Initialize ply based data
     // Each depth in search gets it own global field to avoid object creation
     // during search.
+    // Each threa needs one of these exclusivly
+    if (config.USE_LAZY_SMP && config.SMP_CPUS > 1) {
+      for (int threadNumber = 0; threadNumber < config.SMP_CPUS; threadNumber++) {
+        for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
+          moveGenerators[threadNumber][i] = new MoveGenerator();
+        }
+        evaluator[threadNumber] = new Evaluation();
+      }
+    }
+    else {
+      for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
+        moveGenerators[MAIN_THREAD][i] = new MoveGenerator();
+        moveGenerators[MAIN_THREAD][i].SORT_MOVES = config.USE_SORT_ALL_MOVES;
+      }
+      evaluator[MAIN_THREAD] = new Evaluation();
+    }
     for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
-      moveGenerators[i] = new MoveGenerator();
-      moveGenerators[i].SORT_MOVES = config.USE_SORT_ALL_MOVES;
       // prepare principal variation lists
       pv[i] = new MoveList(MAX_SEARCH_DEPTH);
       semiPv[i] = new MoveList(MAX_SEARCH_DEPTH);
@@ -442,7 +472,7 @@ public class Search implements Runnable {
     SearchResult searchResult = new SearchResult();
 
     // no legal root moves - game already ended!
-    if (!moveGenerators[ROOT_PLY].hasLegalMove(position)) {
+    if (!moveGenerators[MAIN_THREAD][ROOT_PLY].hasLegalMove(position)) {
       if (position.hasCheck()) searchResult.resultValue = -Evaluation.CHECKMATE;
       else searchResult.resultValue = Evaluation.DRAW;
       return searchResult;
@@ -566,6 +596,7 @@ public class Search implements Runnable {
 
       Searcher[] smpSearcher;
       if (config.USE_LAZY_SMP && config.SMP_CPUS > 1 && depth > 6) {
+        threads = new ThreadGroup("Engine SMP Worker");
         smpSearcher = new Searcher[config.SMP_CPUS - 1];
         for (int i = 0; i < config.SMP_CPUS - 1; i++) {
           smpSearcher[i] = new Searcher(this, position, depth, alpha, beta, i + 1);
@@ -598,7 +629,7 @@ public class Search implements Runnable {
       }
       // ALPHA_BETA
       else { // @formatter:on
-        value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL);
+        value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL, MAIN_THREAD);
       }
       // ### @formatter:on
       // ###########################################
@@ -663,11 +694,11 @@ public class Search implements Runnable {
   }
 
   private void generateRootMoves(Position position) {
-    moveGenerators[ROOT_PLY].setPosition(position);
+    moveGenerators[MAIN_THREAD][ROOT_PLY].setPosition(position);
     if (config.USE_PVS_ORDERING) {
-      moveGenerators[ROOT_PLY].setPVMove(currentBestRootMove);
+      moveGenerators[MAIN_THREAD][ROOT_PLY].setPVMove(currentBestRootMove);
     }
-    MoveList legalMoves = moveGenerators[ROOT_PLY].getLegalMoves(true);
+    MoveList legalMoves = moveGenerators[MAIN_THREAD][ROOT_PLY].getLegalMoves(true);
 
     // filter the root move list according to the given UCI moves
     rootMoves.clear();
@@ -703,7 +734,7 @@ public class Search implements Runnable {
     do {
       if (g == lowerbound) beta = g + 1;
       else beta = g;
-      g = search(position, depth, ROOT_PLY, beta - 1, beta, PV_NODE, DO_NULL);
+      g = search(position, depth, ROOT_PLY, beta - 1, beta, PV_NODE, DO_NULL, MAIN_THREAD);
       if (g < beta) upperbound = g;
       else lowerbound = g;
       mtdf_searches++;
@@ -737,7 +768,7 @@ public class Search implements Runnable {
       trace("Aspiration for depth %d: START 1st window %d/%d (bestValue=%d)", depth, alpha, beta,
             bestValue);
     }
-    int value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL);
+    int value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL, MAIN_THREAD);
     // ##########################################################
 
     // if search has been stopped and value has missed window return current best value
@@ -757,7 +788,7 @@ public class Search implements Runnable {
       addExtraTime(1.3);
       alpha = Math.max(Evaluation.MIN, bestValue - 200);
       if (TRACE) trace("Aspiration for depth %d: START 2nd window %d/%d", depth, alpha, beta);
-      value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL);
+      value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL, MAIN_THREAD);
     }
     // FAIL HIGH - increase upper bound
     else if (value >= beta) {
@@ -769,7 +800,7 @@ public class Search implements Runnable {
       searchCounter.aspirationResearches++;
       beta = Math.min(Evaluation.MAX, bestValue + 200);
       if (TRACE) trace("Aspiration for depth %d: START 2nd window %d/%d", depth, alpha, beta);
-      value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL);
+      value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL, MAIN_THREAD);
     }
     // ##########################################################
 
@@ -794,7 +825,7 @@ public class Search implements Runnable {
       alpha = Evaluation.MIN;
       beta = Evaluation.MAX;
       if (TRACE) trace("Aspiration for depth %d: START 3rd window %d/%d", depth, alpha, beta);
-      value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL);
+      value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL, MAIN_THREAD);
     }
     // ##########################################################
 
@@ -807,23 +838,24 @@ public class Search implements Runnable {
 
   /**
    * Main move search for all depths. Root ply is included as special case.
-   *
-   * @param position
+   *  @param position
    * @param depth
    * @param ply
    * @param alpha
    * @param beta
    * @param pvNode
    * @param doNullMove
+   * @param thread
    */
   private int search(final Position position, final int depth, final int ply, int alpha, int beta,
-                     final boolean pvNode, final boolean doNullMove) {
+                     final boolean pvNode, final boolean doNullMove, int thread) {
 
     // is this the root node?
     final boolean ROOT = ply == ROOT_PLY;
 
     // is this the main thread
     final boolean MAIN = Thread.currentThread() == searchThread;
+    assert !MAIN || thread == 0;
 
     if (TRACE) {
       trace("%sSearch in ply %d for depth %d: START alpha=%d beta=%d pvnode=%s currline=%s",
@@ -846,7 +878,7 @@ public class Search implements Runnable {
     if (depth <= LEAF || ply >= MAX_SEARCH_DEPTH - 1
         || ply - 1 >= searchCounter.currentIterationDepth) {
       if (TRACE) trace("%sSearch in ply %d for depth %d: LEAF NODE", getSpaces(ply), ply, depth);
-      return qsearch(position, ply, alpha, beta, pvNode);
+      return qsearch(position, ply, alpha, beta, pvNode, thread);
     }
 
     // Check if we need to stop search - could be external or time or
@@ -983,7 +1015,7 @@ public class Search implements Runnable {
         && doNullMove
     ) {
 
-      int staticEval = PERFT ? 0 : evaluate(position, ply, alpha, beta);
+      int staticEval = PERFT ? 0 : evaluate(position, ply, alpha, beta, thread);
       // ###############################################
       // Reverse Futility Pruning, (RFP, Static Null Move Pruning)
       // https://www.chessprogramming.org/Reverse_Futility_Pruning
@@ -1019,7 +1051,7 @@ public class Search implements Runnable {
         if (config.USE_VERIFY_NMP) r++;
 
         position.makeNullMove();
-        int nullValue = -search(position, depth - r, ply + 1, -beta, -beta + 1, NPV_NODE, NO_NULL);
+        int nullValue = -search(position, depth - r, ply + 1, -beta, -beta + 1, NPV_NODE, NO_NULL, thread);
         position.undoNullMove();
 
         // Check for mate threat
@@ -1033,7 +1065,7 @@ public class Search implements Runnable {
           searchCounter.nullMoveVerifications++;
           nullValue =
             search(position, depth - config.NMP_VERIFICATION_DEPTH, ply, alpha, beta, NPV_NODE,
-                   NO_NULL);
+                   NO_NULL, thread);
         }
 
         // pruning
@@ -1059,7 +1091,7 @@ public class Search implements Runnable {
       ){
           searchCounter.razorReductions++;
           if (TRACE) trace("%sSearch in ply %d for depth %d: RAZOR CUT", getSpaces(ply), ply, depth);
-          return qsearch(position, ply, alpha, beta, NPV_NODE);
+          return qsearch(position, ply, alpha, beta, NPV_NODE, thread);
         }
       // ###############################################
 
@@ -1082,7 +1114,7 @@ public class Search implements Runnable {
       int iidDepth = depth - config.IID_REDUCTION;
       // do the iterative search which will eventually
       // fill the pv list and the TT
-      search(position, iidDepth, ply, alpha, beta, PV_NODE, DO_NULL);
+      search(position, iidDepth, ply, alpha, beta, PV_NODE, DO_NULL, thread);
       // no we look in the pv list if we have a best move
       if (MAIN) bestNodeMove = pv[ply].empty() ? Move.NOMOVE : pv[ply].getFirst();
     }
@@ -1095,7 +1127,7 @@ public class Search implements Runnable {
     // We set position, killers and TT move.
     // Root moves have been generated in iterativeDeepening()
     // and are in field rootMoves
-    final MoveGenerator moveGenerator = MAIN ? moveGenerators[ply] : new MoveGenerator();
+    final MoveGenerator moveGenerator = moveGenerators[thread][ply];
     if (!ROOT) {
       moveGenerator.setPosition(position);
       if (config.USE_KILLER_MOVES && !killerMoves[ply].empty()) {
@@ -1331,14 +1363,14 @@ public class Search implements Runnable {
           trace("%sSearch in ply %d for depth %d: PV-SEARCH: %d/%d %s window %d/%d", getSpaces(ply),
                 ply, depth, i, movesSize, Move.toString(move), -beta, -alpha);
         }
-        value = -search(position, newDepth, ply + 1, -beta, -alpha, pvNode, DO_NULL);
+        value = -search(position, newDepth, ply + 1, -beta, -alpha, pvNode, DO_NULL, thread);
       }
       else {
         if (TRACE) {
           trace("%sSearch in ply %d for depth %d: NULL-WINDOW: %d/%d %s window %d/%d",
                 getSpaces(ply), ply, depth, i, movesSize, Move.toString(move), -alpha - 1, -alpha);
         }
-        value = -search(position, newDepth, ply + 1, -alpha - 1, -alpha, NPV_NODE, DO_NULL);
+        value = -search(position, newDepth, ply + 1, -alpha - 1, -alpha, NPV_NODE, DO_NULL, thread);
         if (value > alpha && value < beta && !stopSearch) {
           if (TRACE) {
             trace("%sSearch in ply %d for depth %d: RE-SEARCH: %d/%d %s value=%d window %d/%d",
@@ -1347,7 +1379,7 @@ public class Search implements Runnable {
           }
           if (ROOT) searchCounter.pvs_root_researches++;
           else searchCounter.pvs_researches++;
-          value = -search(position, newDepth, ply + 1, -beta, -alpha, PV_NODE, DO_NULL);
+          value = -search(position, newDepth, ply + 1, -beta, -alpha, PV_NODE, DO_NULL, thread);
         }
         else {
           if (ROOT) searchCounter.pvs_root_cutoffs++;
@@ -1514,10 +1546,11 @@ public class Search implements Runnable {
    * @param alpha
    * @param beta
    * @param pvNode
-   * @return evaluation
+   * @param thread
+ * @return evaluation
    */
   private int qsearch(final Position position, final int ply, int alpha, int beta,
-                      final boolean pvNode) {
+                      final boolean pvNode, int thread) {
 
     if (TRACE) {
       trace("%sQuiescence in ply %d: START alpha=%d beta=%d pvnode=%s (%s)", getSpaces(ply), ply,
@@ -1526,6 +1559,7 @@ public class Search implements Runnable {
 
     // is this the main thread
     final boolean MAIN = Thread.currentThread() == searchThread;
+    assert !MAIN || thread == 0;
 
     assert ply >= 1;
     assert alpha >= Evaluation.MIN && beta <= Evaluation.MAX;
@@ -1536,7 +1570,7 @@ public class Search implements Runnable {
       searchCounter.currentExtraSearchDepth = Math.max(searchCounter.currentExtraSearchDepth, ply);
 
     // if PERFT return with eval to count all captures etc.
-    if (PERFT) return evaluate(position, ply, alpha, beta);
+    if (PERFT) return evaluate(position, ply, alpha, beta, thread);
 
     // check draw through 50-moves-rule, 3-fold-repetition
     // we evaluate ech repetition as draw within the search tree - this weay we detect repetition
@@ -1553,9 +1587,9 @@ public class Search implements Runnable {
     if (!config.USE_QUIESCENCE || ply >= MAX_SEARCH_DEPTH - 1) {
       if (TRACE) {
         trace("%sQuiescence in ply %d: EVAL value=%d", getSpaces(ply), ply,
-              evaluate(position, ply, alpha, beta));
+              evaluate(position, ply, alpha, beta, thread));
       }
-      return evaluate(position, ply, alpha, beta);
+      return evaluate(position, ply, alpha, beta, thread);
     }
 
     // Check if we need to stop search - could be external or time or
@@ -1653,7 +1687,7 @@ public class Search implements Runnable {
     // Assuption is that there is at least on move which would improve the
     // current position. So if we are already >beta we don't need to look at it.
     if (!position.hasCheck()) {
-      int standPat = evaluate(position, ply, alpha, beta);
+      int standPat = evaluate(position, ply, alpha, beta, thread);
       bestNodeValue = standPat;
       if (TRACE) trace("%sQuiescence in ply %d: STANDPAT %d", getSpaces(ply), ply, standPat);
       if (standPat >= beta) {
@@ -1671,7 +1705,7 @@ public class Search implements Runnable {
     // Prepare move generator - set position, killers and TT move and generate
     // all PseudoLegalMoves for QSearch. Usually only capture moves and check
     // evasions will be determined in move generator
-    final MoveGenerator moveGenerator = MAIN ? moveGenerators[ply] : new MoveGenerator();
+    final MoveGenerator moveGenerator = moveGenerators[thread][ply];
     moveGenerator.setPosition(position);
     if (config.USE_KILLER_MOVES && !killerMoves[ply].empty()) {
       moveGenerator.setKillerMoves(killerMoves[ply]);
@@ -1763,7 +1797,7 @@ public class Search implements Runnable {
 
       // ###############################################
       // go one ply deeper into the search tree
-      value = -qsearch(position, ply + 1, -beta, -alpha, pvNode);
+      value = -qsearch(position, ply + 1, -beta, -alpha, pvNode, thread);
       // needed to remember if we even had a legal move
       numberOfSearchedMoves++;
       if (MAIN) currentVariation.removeLast();
@@ -1865,9 +1899,10 @@ public class Search implements Runnable {
    * @param ply
    * @param alpha
    * @param beta
+   * @param thread
    * @return the evaluation value of the position
    */
-  private int evaluate(Position position, int ply, int alpha, int beta) {
+  private int evaluate(Position position, int ply, int alpha, int beta, int thread) {
 
     // count all leaf nodes evaluated
     searchCounter.leafPositionsEvaluated++;
@@ -1884,9 +1919,7 @@ public class Search implements Runnable {
 
     // do evaluation
     final int value;
-    synchronized (evaluator) {
-      value = evaluator.evaluate(position);
-    }
+    value = evaluator[thread].evaluate(position);
 
     if (TRACE) {
       trace("%SEvaluation: %s = %d  ply: %d  currline: <%s>  position: %s", getSpaces(ply),
@@ -2626,14 +2659,14 @@ public class Search implements Runnable {
     public void start() {
       // create new search thread and start it
       String threadName = "Engine SMP: " + number;
-      myThread = new Thread(this, threadName);
+      myThread = new Thread(threads, this, threadName);
       myThread.setDaemon(true);
       myThread.start();
     }
 
     public void run() {
       //      LOG.debug("SMP Thread START depth {}: {}", depth, number);
-      search.search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL);
+      search.search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL, number);
       //      LOG.debug("SMP Thread END depth {}: {}", depth, number);
     }
   }
