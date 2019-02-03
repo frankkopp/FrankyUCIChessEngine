@@ -452,17 +452,19 @@ public class SimpleIntList implements Iterable<Integer> {
   public SimpleIntList clone() {
     return new SimpleIntList(this);
   }
+
   @Override
   public String toString() {
-    String s = "List size=" + size() + " available capacity=" + getAvailableCapacity() + " [";
+    StringBuilder s = new StringBuilder(
+      "List size=" + size() + " available capacity=" + getAvailableCapacity() + " [");
     for (int i = _head; i < _tail; i++) {
-      s += _list[i];
+      s.append(_list[i]);
       if (i < _tail - 1) {
-        s += ",";
+        s.append(",");
       }
     }
-    s += "]";
-    return s;
+    s.append("]");
+    return s.toString();
   }
 
   /* (non-Javadoc)
