@@ -122,8 +122,10 @@ public class MoveList extends SimpleIntList {
     return super.remove(move);
   }
 
-
-
+  @Override
+  public void sort(IntComparator comparator) {
+    super.sort(comparator);
+  }
 
   @Override
   public void sort(Comparator<Integer> comparator) {

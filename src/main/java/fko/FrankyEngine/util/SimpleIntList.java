@@ -418,6 +418,23 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
+   * A primitve int type comperator. Avoids boxing and unboxing of int to Integer
+   */
+  public interface IntComparator {
+    int compare(int a1, int a2);
+  }
+
+  /**
+   * fast sort of list
+   *
+   * @param comparator
+   */
+  public void sort(IntComparator comparator) {
+    if (this.empty()) return;
+    sort(_head, _tail, comparator);
+  }
+
+  /**
    * fast sort of list
    *
    * @param comparator
@@ -508,6 +525,38 @@ public class SimpleIntList implements Iterable<Integer> {
     _list = Arrays.copyOfRange(_list, _head, _arraySize);
     this._tail = _tail - _head;
     this._head = 0;
+  }
+
+  /**
+   * Sort implementation to order the list according to the given int comparator.<br>
+   * Using the IntComperator avoids boxing/unboxing if int to Integer
+   *
+   * @param head       (including)
+   * @param tail       (excluding)
+   * @param comparator
+   */
+  private void sort(int head, int tail, IntComparator comparator) {
+    insertionSort(head, tail, comparator);
+  }
+
+  /**
+   * Insertionsort algorithm for smaller arrays.
+   * Using the IntComperator avoids boxing/unboxing if int to Integer
+   * @param head
+   * @param tail
+   * @param comparator
+   */
+  private void insertionSort(int head, int tail, IntComparator comparator) {
+    int temp;
+    for (int i = head + 1; i < tail; i++) {
+      for (int j = i; j > head; j--) {
+        if (comparator.compare(_list[j], _list[j - 1]) < 0) {
+          temp = _list[j];
+          _list[j] = _list[j - 1];
+          _list[j - 1] = temp;
+        }
+      }
+    }
   }
 
   /**
@@ -602,6 +651,17 @@ public class SimpleIntList implements Iterable<Integer> {
         throw new ConcurrentModificationException();
       }
       return cursor < _tail;
+    }
+
+    /**
+     * @see Iterator#next()
+     */
+    public int nextInt() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+      return _list[cursor++];
+
     }
 
     /**

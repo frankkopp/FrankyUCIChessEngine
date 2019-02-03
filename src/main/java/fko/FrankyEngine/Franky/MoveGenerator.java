@@ -25,6 +25,7 @@
 
 package fko.FrankyEngine.Franky;
 
+import fko.FrankyEngine.util.SimpleIntList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,10 +86,10 @@ public class MoveGenerator {
   private int      pvMove      = Move.NOMOVE;
 
   // Comparator for move value victim least value attacker
-  private static final Comparator<Integer> mvvlvaComparator = Comparator.comparingInt(
-    (Integer move) -> (Move.getPiece(move).getType().getValue() - Move.getTarget(move)
+  private static final SimpleIntList.IntComparator mvvlvaComparator =
+    (move1, move2) -> Move.getPiece(move1).getType().getValue() - Move.getTarget(move2)
                                                                       .getType()
-                                                                      .getValue()));
+                                                                      .getValue();
 
   /**
    * Creates a new {@link MoveGenerator}
