@@ -618,14 +618,14 @@ public class SimpleIntList implements Iterable<Integer> {
    * Using a for loop instead the iterator is about 15% faster
    * See units tests
    * <p>
-   * <pre>
-   * for (int i=0; i<_squareList.size(); i++) {
-   *  for (int j=0; j<_squareList.size(); j++) {
+   * <pre><code>
+   * for (int i=0; i < _squareList.size(); i++) {
+   *  for (int j=0; j < _squareList.size(); j++) {
    *    tempa = _squareList.get(i);
    *    tempb = _squareList.get(j);
    *  }
    * }
-   * </pre>
+   * </code></pre>
    *
    * @return an iterator over the elements contained in this list
    */

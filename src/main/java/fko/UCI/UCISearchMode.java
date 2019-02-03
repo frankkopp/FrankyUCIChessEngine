@@ -57,12 +57,12 @@ import java.util.List;
  * * btime <x><br>
  * black has x msec left on the clock<br>
  * * winc <x><br>
- * white increment per move in mseconds if x > 0<br>
+ * white increment per move in mseconds if x &gt; 0<br>
  * * binc <x><br>
- * black increment per move in mseconds if x > 0<br>
+ * black increment per move in mseconds if x &gt; 0<br>
  * * movestogo <x><br>
  * there are x moves to the next time control,<br>
- * this will only be sent if x > 0,<br>
+ * this will only be sent if x &gt; 0,<br>
  * if you don't get this and get the wtime and btime it's sudden death<br>
  * * depth <x><br>
  * search x plies only.<br>

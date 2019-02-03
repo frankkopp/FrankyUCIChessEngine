@@ -1170,7 +1170,7 @@ public class Position {
   /**
    * Repetition of a position.
    * <p>
-   * To detect a 3-fold repetition the given position most occurr >=2 times before:<br/>
+   * To detect a 3-fold repetition the given position most occurr at least 2 times before:<br/>
    * <code>position.checkRepetitions(2)</code> checks for 3 fold-repetition
    * <p>
    * 3-fold repetition: This most commonly occurs when neither side is able to avoid
