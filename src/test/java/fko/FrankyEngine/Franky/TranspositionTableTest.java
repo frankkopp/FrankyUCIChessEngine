@@ -149,7 +149,7 @@ public class TranspositionTableTest {
   public void testSize() {
 
     System.out.println("Testing Transposition Table size:");
-    int[] megabytes = {0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 2048};
+    int[] megabytes = {1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 2048};
     for (int i : megabytes) {
       System.gc();
       long usedMemoryBefore =
