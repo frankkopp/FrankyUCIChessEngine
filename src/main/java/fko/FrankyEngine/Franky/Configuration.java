@@ -211,8 +211,8 @@ public class Configuration {
   /**
    * Use LAZY SMP - not sofisticated multithreading to fill up the TT quicker
    */
-  //  public boolean USE_LAZY_SMP = true;
-  //  public int SMP_CPUS = 4;
+  public boolean USE_LAZY_SMP = true;
+  public int SMP_CPUS = 4;
 
   /**
    * Experimental extra sorting of moves in move generation.
