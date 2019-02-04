@@ -47,7 +47,7 @@ public class SimpleIntList implements Iterable<Integer> {
    */
   public static final int DEFAULT_GROWTH_MARGIN = 10;
 
-  protected int   _arraySize = DEFAULT_MAX_ENTRIES;
+  protected int   _arraySize;
   protected int[] _list;
   protected int   _head      = 0;
   protected int   _tail      = 0;
@@ -273,7 +273,6 @@ public class SimpleIntList implements Iterable<Integer> {
   public boolean remove(int toRemove) {
     if (empty()) return false;
     int element = -1;
-
     // look for number in list
     for (int i = _head; i < _tail; i++) {
       if (_list[i] == toRemove) {
@@ -281,10 +280,8 @@ public class SimpleIntList implements Iterable<Integer> {
         break;
       }
     }
-
     // not found
     if (element < 0) return false;
-
     // first?
     if (element == _head) {
       _head++;
@@ -360,8 +357,6 @@ public class SimpleIntList implements Iterable<Integer> {
    * <p>
    * Moves all other elements one up until the former place of the element.
    * <p>
-   * Creates a new list with size <code>oldList.size() + DEFAULT_GROWTH_MARGIN</code>.
-   * <p>
    * If the number is not in the list nothing happens.
    *
    * @param number to push to the head
@@ -425,7 +420,8 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
-   * fast sort of list
+   * Sort implementation to order the list according to the given int comparator.<br>
+   * Using the IntComperator avoids boxing/unboxing if int to Integer
    *
    * @param comparator
    */
@@ -435,7 +431,7 @@ public class SimpleIntList implements Iterable<Integer> {
   }
 
   /**
-   * fast sort of list
+   * Sort implementation to order the list according to the given int comparator.<br>
    *
    * @param comparator
    */
@@ -542,6 +538,7 @@ public class SimpleIntList implements Iterable<Integer> {
   /**
    * Insertionsort algorithm for smaller arrays.
    * Using the IntComperator avoids boxing/unboxing if int to Integer
+   *
    * @param head
    * @param tail
    * @param comparator
