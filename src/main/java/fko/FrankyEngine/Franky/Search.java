@@ -1704,6 +1704,8 @@ public class Search implements Runnable {
       } // @formatter:on
       // ###############################################
 
+      // TODO: SEE test - skip loosing moves
+
       // ###############################################
       // Make the move and skip illegal moves
       position.makeMove(move);
