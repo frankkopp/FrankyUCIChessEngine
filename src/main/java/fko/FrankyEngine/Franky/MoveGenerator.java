@@ -434,18 +434,19 @@ public class MoveGenerator {
       if (Move.getPiece(move).getType() == PieceType.PAWN) {
         qSearchMoves.add(move);
       }
-      // recaptures
-      else if (Move.getEnd(position.getLastMove()) == Move.getEnd(move)
+      // recaptures @// @formatter:off
+      else if (position.getLastMove() != Move.NOMOVE
+               && Move.getEnd(position.getLastMove()) == Move.getEnd(move)
                && Move.getTarget(position.getLastMove()) != Piece.NOPIECE) {
         qSearchMoves.add(move);
       }
       // Lower value piece captures higher value piece
       // With a margin to also look at Bishop x Knight
-      else if (Move.getPiece(move).getType().getValue() + 50 <= Move.getTarget(move)
-                                                                    .getType()
-                                                                    .getValue()) {
+      else if (Move.getPiece(move).getType().getValue() + 50
+               <= Move.getTarget(move).getType().getValue()) {
         qSearchMoves.add(move);
       }
+      // @formatter:on
       // undefended pieces captures are good
       // If the defender is "behind" the attacker this will not be recognized here
       // This is not too bad as it only adds a move to qsearch which we could otherwise ignore

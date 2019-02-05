@@ -196,6 +196,8 @@ public class SuiteTestsTest {
     // Successful: 254 (84 Prozent)
     // Failed:      46 (15 Prozent)
 
+    config.USE_IID = true;
+
     config.USE_EXTENSIONS = true;
     // Successful: 254 (84 Prozent)
     // Failed:      46 (15 Prozent)
