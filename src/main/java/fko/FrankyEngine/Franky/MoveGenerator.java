@@ -86,7 +86,7 @@ public class MoveGenerator {
   private MoveList killerMoves = new MoveList(0);
   private int      pvMove      = Move.NOMOVE;
 
-  // Comparator for move value victim least value attacker
+  // Comparator for move most value victim least value attacker (incl. promotion)
   // @formatter:off
   private static final SimpleIntList.IntComparator mvvlvaComparator = (move1, move2) ->
     (Move.getPiece(move1).getType().getValue()
@@ -177,7 +177,7 @@ public class MoveGenerator {
      * generate the next batch until we have new moves or all moves are generated
      * and there are no more moves to generate
      */
-    while (onDemandMoveList.empty() && !(generationCycleState == OnDemandState.ALL)) {
+    while (onDemandMoveList.empty() && generationCycleState != OnDemandState.ALL) {
 
       switch (generationCycleState) {
         case NEW:
@@ -207,11 +207,9 @@ public class MoveGenerator {
             // pvMove is non capturing
             else {
               // only add it if we do want non capturing moves
-              if (!capturingOnly) {
-                // Move does need to be removed from non capturing moves later
-                // to not have it twice.
-                onDemandMoveList.add(pvMove);
-              }
+              // Move does need to be removed from non capturing moves later
+              // to not have it twice.
+              if (!capturingOnly) onDemandMoveList.add(pvMove);
             }
           }
 
@@ -235,23 +233,16 @@ public class MoveGenerator {
           onDemandMoveList.add(nonCapturingMoves);
 
           // removing pv move as this has been handled in CAPTURING phase.
-          if (pvMove != Move.NOMOVE) onDemandMoveList.remove(pvMove);
+          if (pvMove != Move.NOMOVE && !Move.isCapturing(pvMove)) onDemandMoveList.remove(pvMove);
 
           generationCycleState = OnDemandState.ALL;
-          break;
-
-        // we have all moves - do nothing
-        default:
           break;
       }
     }
 
     // return a move and delete it form the list
-    if (!onDemandMoveList.empty()) {
-      return onDemandMoveList.removeFirst();
-    }
-
-    return Move.NOMOVE;
+    if (onDemandMoveList.empty()) return Move.NOMOVE;
+    else return onDemandMoveList.removeFirst();
   }
 
   /**
@@ -363,12 +354,9 @@ public class MoveGenerator {
 
     clearLists();
 
-    if (capturingOnly) {
-      genMode = GEN_CAPTURES;
-    }
-    else {
-      genMode = GEN_ALL;
-    }
+    if (capturingOnly) genMode = GEN_CAPTURES;
+    else genMode = GEN_ALL;
+
     generatePseudoLegaMoves();
 
     // return a clone of the list as we will continue to reuse
@@ -438,6 +426,7 @@ public class MoveGenerator {
     }
 
     // lower amount of captures searched in quiescence search by only looking at "good" captures
+    // TODO: is this good?? better implementing SEE?
     qSearchMoves.clear();
     for (int m = 0; m < capturingMoves.size(); m++) {
       int move = capturingMoves.get(m);
@@ -445,16 +434,25 @@ public class MoveGenerator {
       if (Move.getPiece(move).getType() == PieceType.PAWN) {
         qSearchMoves.add(move);
       }
-      // Lower value piece captures higher value piece (with a margin)
-      else if (Move.getPiece(move).getType().getValue() + 200 < Move.getTarget(move)
+      // recaptures
+      else if (Move.getEnd(position.getLastMove()) == Move.getEnd(move)
+               && Move.getTarget(position.getLastMove()) != Piece.NOPIECE) {
+        qSearchMoves.add(move);
+      }
+      // Lower value piece captures higher value piece
+      // With a margin to also look at Bishop x Knight
+      else if (Move.getPiece(move).getType().getValue() + 50 <= Move.getTarget(move)
                                                                     .getType()
                                                                     .getValue()) {
         qSearchMoves.add(move);
       }
       // undefended pieces captures are good
+      // If the defender is "behind" the attacker this will not be recognized here
+      // This is not too bad as it only adds a move to qsearch which we could otherwise ignore
       else if (!position.isAttacked(position.getOpponent(), Move.getEnd(move))) {
         qSearchMoves.add(move);
       }
+      // ignore all other captures
     }
 
     // return a clone of the list as we will continue to reuse
@@ -571,8 +569,7 @@ public class MoveGenerator {
    * Sort value for all moves. Smaller values heapsort first
    */
   private int getSortValue(int move) {
-
-    // capturing moves
+    // capturing moves including capturing promotions
     if (Move.getTarget(move) != Piece.NOPIECE) {
       return Move.getPiece(move).getType().getValue() - Move.getPromotion(move).getType().getValue()
              - Move.getTarget(move).getType().getValue();
@@ -655,9 +652,6 @@ public class MoveGenerator {
   }
 
   private void generatePawnMoves() {
-    // reverse direction of pawns for black
-    final int pawnDir = activePlayer.isBlack() ? -1 : 1;
-
     // iterate over all squares where we have a pawn
     final SquareList squareList = position.getPawnSquares()[activePlayer.ordinal()];
     final int size = squareList.size();
@@ -673,7 +667,7 @@ public class MoveGenerator {
       for (int d : directions) {
 
         // calculate the to square
-        final int to = square.ordinal() + d * pawnDir;
+        final int to = square.ordinal() + d * activePlayer.direction;
 
         if ((to & 0x88) == 0) { // valid square
 

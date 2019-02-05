@@ -796,7 +796,7 @@ public class Position {
   /**
    * Checks if move is giving check to the opponent.
    * This method is faster than makeing the move and checking for legallity and giving check.
-   * Needs to be a valid wfor the position otherwise will crash.
+   * Needs to be a valid move for the position otherwise will crash.
    * For performance reason we do not want to check validity here.
    * Does NOT check if the move itself is legal (leaves the own king in check)
    *
@@ -804,7 +804,7 @@ public class Position {
    * @return true if move is giving check to opponent
    */
   public boolean givesCheck(final int move) {
-    // oppnents king square
+    // opponents king square
     final Square kingSquare = getKingSquares()[getOpponent().ordinal()];
     // fromSquare
     final Square fromSquare = Move.getStart(move);
@@ -880,7 +880,6 @@ public class Position {
       case KNIGHT:
         directions = Square.knightDirections;
         for (int d : directions) {
-          // calculate the to square
           if (Square.getSquare(targetSquare.ordinal() + d) == kingSquare) return true;
         }
         break;
@@ -962,7 +961,7 @@ public class Position {
         // @formatter:off
         if (Square.getSquare(to) != fromSquare
             && (!isEnPassant || Square.getSquare(to) != epTargetSquare)) {
-          // squares occupied by rook or queen from moving player give check
+            // squares occupied by rook or queen from moving player give check
             if (getPiece(to) != Piece.NOPIECE) {
               if (getPiece(to).getColor() == nextPlayer
                   && (getPiece(to).getType() == PieceType.ROOK
