@@ -53,6 +53,8 @@ import java.util.Random;
  * squares' coordinates uniquely determines whether those two squares are along the same row,
  * column, or diagonal (a common query used for determining check).
  *
+ * TODO: add bitboards for pieces and test if expensive
+ *
  * <p>https://www.chessprogramming.org/0x88
  */
 public class Position {
