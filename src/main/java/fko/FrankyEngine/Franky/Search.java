@@ -2001,7 +2001,7 @@ public class Search implements Runnable {
    * @return value depending on game phase to avoid easy draws
    */
   private int contempt(Position position) {
-    return -Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR;
+    return (int) (-position.getGamePhaseFactor() * EvaluationConfig.CONTEMPT_FACTOR);
   }
 
   /**

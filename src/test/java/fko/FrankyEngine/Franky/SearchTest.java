@@ -403,7 +403,7 @@ public class SearchTest {
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
     assertEquals("d8h4", Move.toSimpleString(search.getLastSearchResult().bestMove));
-    assertEquals(Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+    assertEquals((int) (position.getGamePhaseFactor() * EvaluationConfig.CONTEMPT_FACTOR),
                  search.getLastSearchResult().resultValue);
     LOG.warn("Best Move: {} Value: {} Ponder {}",
              Move.toSimpleString(search.getLastSearchResult().bestMove),
@@ -443,7 +443,7 @@ public class SearchTest {
       search.startSearch(position, searchMode);
       search.waitWhileSearching();
       assertEquals("e7e3", Move.toSimpleString(search.getLastSearchResult().bestMove));
-      //      assertEquals(-Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+      //      assertEquals(-Evaluation.getGamePhaseValue(position) * EvaluationConfig.CONTEMPT_FACTOR,
       //                   search.getLastSearchResult().resultValue);
       LOG.warn("Best Move: {} Value: {} Ponder {}",
                Move.toSimpleString(search.getLastSearchResult().bestMove),
@@ -460,7 +460,7 @@ public class SearchTest {
       search.startSearch(position, searchMode);
       search.waitWhileSearching();
       assertEquals("c6d6", Move.toSimpleString(search.getLastSearchResult().bestMove));
-      //      assertEquals(-Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+      //      assertEquals(-Evaluation.getGamePhaseValue(position) * EvaluationConfig.CONTEMPT_FACTOR,
       //                   search.getLastSearchResult().resultValue);
       LOG.warn("Best Move: {} Value: {} Ponder {}",
                Move.toSimpleString(search.getLastSearchResult().bestMove),

@@ -110,6 +110,9 @@ public class SuiteTestsTest {
     0.11 BASE
     Successful: 253 (84 Prozent)
     Failed:      47 (15 Prozent)
+    0.12
+    Successful: 276 (92 Prozent)
+    Failed:      24 (8 Prozent)
     */
     testSuite = new TestSuite("./testsets/wac.epd");
     testSuite.setSearchTime(5000);
@@ -213,7 +216,6 @@ public class SuiteTestsTest {
     // Failed:      48 (16 Prozent)
 
     config.USE_LMP = false;
-
 
     final int time = 5000;
 
@@ -340,14 +342,13 @@ public class SuiteTestsTest {
                       WordUtils.wrap(config.toString(), 80));
     testSuite.setConfig(config);
 
-    assertTrue(
-      testSuite.startOneTest("2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - bm Qg6; id \"WAC.001\";",
-                             5000, 0));
+    assertTrue(testSuite.startOneTest(
+      "2rr3k/pp3pp1/1nnqbN1p/3pN3/2pP4/2P3Q1/PPB4P/R4RK1 w - - bm Qg6; id \"WAC.001\";", 5000, 0));
 
     // difficult for LMR because of Queen sacrifice
-//    assertTrue(
-//      testSuite.startOneTest("6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - - dm 3;",
-//                             15000, 0));
+    //    assertTrue(
+    //      testSuite.startOneTest("6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - - dm 3;",
+    //                             15000, 0));
 
   }
 

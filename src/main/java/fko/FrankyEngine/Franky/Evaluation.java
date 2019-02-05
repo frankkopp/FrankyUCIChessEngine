@@ -73,12 +73,8 @@ public class Evaluation {
   public static final int CHECKMATE_THRESHOLD = CHECKMATE - Byte.MAX_VALUE;
 
   // Convenience constants
-  private static final int GAME_PHASE_MAX = 24;
-  private static final int WHITE          = Color.WHITE.ordinal();
-  private static final int BLACK          = Color.BLACK.ordinal();
-
-  // Game Phase
-  private int gamePhaseFactor = GAME_PHASE_MAX;
+  private static final int WHITE = Color.WHITE.ordinal();
+  private static final int BLACK = Color.BLACK.ordinal();
 
   // Evaluation Results
   private int value                = 0;
@@ -159,7 +155,8 @@ public class Evaluation {
     LOG.debug(String.format("%n%s", position.toBoardString()));
     LOG.debug(String.format("Position has check? %s", position.hasCheck()));
     LOG.debug(String.format("Next Move: %s", position.getNextPlayer().toString()));
-    LOG.debug(String.format("Gamephase:                 %5d", gamePhaseFactor));
+    LOG.debug(String.format("Gamephase:                 %5d (%,.2f)", position.getGamePhaseValue(),
+                            position.getGamePhaseFactor()));
     LOG.debug("-----------------------------------------------");
     LOG.debug(String.format("Material:                  %5d (%5d, %5d)", material, midGameMaterial,
                             endGameMaterial));
@@ -196,11 +193,7 @@ public class Evaluation {
     // Clear all evaluation values
     clearValues();
 
-    // GamePhase - a value between 0 and 24 depending on officer midGameMaterial of
-    // the position
-    gamePhaseFactor = getGamePhaseFactor(position);
-
-    final float phaseFactorMid = (float) gamePhaseFactor / GAME_PHASE_MAX;
+    final float phaseFactorMid = position.getGamePhaseFactor();
     final float phaseFactorEnd = 1f - phaseFactorMid;
 
     /*
@@ -251,7 +244,6 @@ public class Evaluation {
 
   private void clearValues() {
     value = 0;
-    gamePhaseFactor = 0;
 
     special = 0;
     material = 0;
@@ -281,7 +273,7 @@ public class Evaluation {
       position.isAttacked(position.getOpponent(), kingSquares[nextToMove]) ? CHECK_VALUE : 0;
 
     // TEMPO Bonus
-    special += TEMPO * ((float) gamePhaseFactor / GAME_PHASE_MAX);
+    special += TEMPO * position.getGamePhaseFactor();
 
     materialEvaluation();
 
@@ -344,7 +336,7 @@ public class Evaluation {
       this.endGamePiecePosition += kingEndGame[tableIndex];
 
       // king safety - skip in endgame
-      if (gamePhaseFactor > GAME_PHASE_MAX / 2) {
+      if (position.getGamePhaseFactor() >= 0.5) {
 
         // king safety WHITE
         if (nextToMove == WHITE && kingSquares[nextToMove].getRank() == r1) {
@@ -451,7 +443,7 @@ public class Evaluation {
       this.endGamePiecePosition -= kingEndGame[tableIndex];
 
       // king safety - skip in endgame
-      if (gamePhaseFactor > GAME_PHASE_MAX / 2) {
+      if (position.getGamePhaseFactor() >= 0.5) {
 
         // king safety WHITE
         if (opponent == WHITE && kingSquares[opponent].getRank() == r1) {
@@ -763,39 +755,6 @@ public class Evaluation {
   }
 
   /**
-   * Returns a value for the game phase between 0 and 24.
-   * <p>
-   * 24 is the standard opening position with all officer pieces present.<br>
-   * 0 means no officer pieces present.
-   * In rare cases were through pawn promotions more officers than the opening position
-   * are present the value is at maximum 24.
-   *
-   * @param position
-   * @return a value depending on officer midGameMaterial of both sides between 0 and 24
-   */
-  public static int getGamePhaseFactor(Position position) {
-
-    // protect against null position
-    if (position == null) {
-      IllegalArgumentException e = new IllegalArgumentException();
-      LOG.error("No position to evaluate. Set position before calling this", e);
-      throw e;
-    }
-
-    // @formatter:off
-    return Math.min(GAME_PHASE_MAX,
-                    position.getKnightSquares()[WHITE].size() +
-                    position.getKnightSquares()[BLACK].size() +
-                    position.getBishopSquares()[WHITE].size() +
-                    position.getBishopSquares()[BLACK].size() +
-                    2 * position.getRookSquares()[WHITE].size() +
-                    2 * position.getRookSquares()[BLACK].size() +
-                    4 * position.getQueenSquares()[WHITE].size() +
-                    4 * position.getQueenSquares()[BLACK].size());
-    // @formatter:on
-  }
-
-  /**
    * @param position
    * @return material balance from the view of the active player
    */
@@ -837,7 +796,7 @@ public class Evaluation {
     // @formatter:off
     return "Evaluation{" +
            "value=" + value +
-           ", gamePhaseFactor=" + gamePhaseFactor +
+           ", gamePhaseFactor=" + position.getGamePhaseFactor() +
            ", special=" + special +
            ", material=" + material +
            ", midGameMaterial=" + midGameMaterial +
@@ -893,10 +852,8 @@ public class Evaluation {
         break;
     }
 
-    final int gamePhaseFactor = getGamePhaseFactor(position);
-    final float phaseFactorMid = (float) gamePhaseFactor / GAME_PHASE_MAX;
-    final float phaseFactorEnd = 1f - phaseFactorMid;
-    return (int) (midGame * phaseFactorMid + endGame * phaseFactorEnd);
+    return (int) (midGame * position.getGamePhaseFactor() + endGame * (1f
+                                                                       - position.getGamePhaseFactor()));
 
   }
 }

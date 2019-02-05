@@ -25,6 +25,9 @@
 
 package fko.FrankyEngine.Franky;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -54,6 +57,8 @@ import java.util.Random;
  */
 public class Position {
 
+  private static final Logger LOG = LoggerFactory.getLogger(Position.class);
+
   /* Standard Board Setup as FEN */
   public static final String STANDARD_BOARD_FEN =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -63,6 +68,11 @@ public class Position {
 
   /* Max History */
   private static final int MAX_HISTORY = 512;
+
+  // Convenience constants
+  private static final int GAME_PHASE_MAX = 24;
+  private static final int WHITE          = Color.WHITE.ordinal();
+  private static final int BLACK          = Color.BLACK.ordinal();
 
   /*
    * The zobrist key to use as a hash key in transposition tables
@@ -137,6 +147,9 @@ public class Position {
 
   // Material value will always be up to date
   private int[] material;
+
+  // Game phase value
+  private int gamePhase;
 
   // caches a hasCheck and hasMate Flag for the current position. Will be set after
   // a call to hasCheck() and reset to TBD every time a move is made or unmade.
@@ -251,7 +264,6 @@ public class Position {
     // move history
     System.arraycopy(op.moveHistory, 0, moveHistory, 0, op.moveHistory.length);
 
-    // initializeLists();
     // copy piece lists
     for (int i = 0; i <= 1; i++) { // foreach color
       this.pawnSquares[i] = op.pawnSquares[i].clone();
@@ -261,9 +273,12 @@ public class Position {
       this.queenSquares[i] = op.queenSquares[i].clone();
       this.kingSquares[i] = op.kingSquares[i];
     }
+
+    // copy material and gamePhase values
     material = new int[2];
-    this.material[0] = op.material[0];
-    this.material[1] = op.material[1];
+    this.material[WHITE] = op.material[WHITE];
+    this.material[BLACK] = op.material[BLACK];
+    this.gamePhase = op.gamePhase;
   }
 
   /**
@@ -745,15 +760,19 @@ public class Position {
         break;
       case KNIGHT:
         knightSquares[color].add(toSquare);
+        gamePhase += 1;
         break;
       case BISHOP:
         bishopSquares[color].add(toSquare);
+        gamePhase += 1;
         break;
       case ROOK:
         rookSquares[color].add(toSquare);
+        gamePhase += 2;
         break;
       case QUEEN:
         queenSquares[color].add(toSquare);
+        gamePhase += 4;
         break;
       case KING:
         kingSquares[color] = toSquare;
@@ -775,15 +794,19 @@ public class Position {
         break;
       case KNIGHT:
         knightSquares[color].remove(fromSquare);
+        gamePhase -= 1;
         break;
       case BISHOP:
         bishopSquares[color].remove(fromSquare);
+        gamePhase -= 1;
         break;
       case ROOK:
         rookSquares[color].remove(fromSquare);
+        gamePhase -= 2;
         break;
       case QUEEN:
         queenSquares[color].remove(fromSquare);
+        gamePhase -= 4;
         break;
       case KING:
         kingSquares[color] = Square.NOSQUARE;
@@ -1247,48 +1270,37 @@ public class Position {
      * one side has two knights against the bare king
      * both sides have a king and a bishop, the bishops being the same color
      */
-    if (pawnSquares[Color.WHITE.ordinal()].size() == 0
-        && pawnSquares[Color.BLACK.ordinal()].size() == 0
-        && rookSquares[Color.WHITE.ordinal()].size() == 0
-        && rookSquares[Color.BLACK.ordinal()].size() == 0
-        && queenSquares[Color.WHITE.ordinal()].size() == 0
-        && queenSquares[Color.BLACK.ordinal()].size() == 0) {
+    if (pawnSquares[WHITE].size() == 0 && pawnSquares[BLACK].size() == 0
+        && rookSquares[WHITE].size() == 0 && rookSquares[BLACK].size() == 0
+        && queenSquares[WHITE].size() == 0 && queenSquares[BLACK].size() == 0) {
 
       // white king bare KK*
-      if (knightSquares[Color.WHITE.ordinal()].size() == 0
-          && bishopSquares[Color.WHITE.ordinal()].size() == 0) {
+      if (knightSquares[WHITE].size() == 0 && bishopSquares[WHITE].size() == 0) {
 
         // both kings bare KK, KKN, KKNN
-        if (knightSquares[Color.BLACK.ordinal()].size() <= 2
-            && bishopSquares[Color.BLACK.ordinal()].size() == 0) {
+        if (knightSquares[BLACK].size() <= 2 && bishopSquares[BLACK].size() == 0) {
           return true;
         }
 
         // KKB
-        return knightSquares[Color.BLACK.ordinal()].size() == 0
-               && bishopSquares[Color.BLACK.ordinal()].size() == 1;
+        return knightSquares[BLACK].size() == 0 && bishopSquares[BLACK].size() == 1;
 
       }
       // only black king bare K*K
-      else if (knightSquares[Color.BLACK.ordinal()].size() == 0
-               && bishopSquares[Color.BLACK.ordinal()].size() == 0) {
+      else if (knightSquares[BLACK].size() == 0 && bishopSquares[BLACK].size() == 0) {
 
         // both kings bare KK, KNK, KNNK
-        if (knightSquares[Color.WHITE.ordinal()].size() <= 2
-            && bishopSquares[Color.WHITE.ordinal()].size() == 0) {
+        if (knightSquares[WHITE].size() <= 2 && bishopSquares[WHITE].size() == 0) {
           return true;
         }
 
         // KBK
-        return knightSquares[Color.BLACK.ordinal()].size() == 0
-               && bishopSquares[Color.BLACK.ordinal()].size() == 1;
+        return knightSquares[BLACK].size() == 0 && bishopSquares[BLACK].size() == 1;
       }
 
       // KBKB - B same field color
-      else if (knightSquares[Color.BLACK.ordinal()].size() == 0
-               && bishopSquares[Color.BLACK.ordinal()].size() == 1
-               && knightSquares[Color.WHITE.ordinal()].size() == 0
-               && bishopSquares[Color.WHITE.ordinal()].size() == 1) {
+      else if (knightSquares[BLACK].size() == 0 && bishopSquares[BLACK].size() == 1
+               && knightSquares[WHITE].size() == 0 && bishopSquares[WHITE].size() == 1) {
 
         /*
          * Bishops are on the same field color if the sum of the
@@ -1296,16 +1308,44 @@ public class Position {
          * (file + rank) % 2 == 0 = black field
          * (file + rank) % 2 == 1 = white field
          */
-        final Square whiteBishop = bishopSquares[Color.WHITE.ordinal()].get(0);
+        final Square whiteBishop = bishopSquares[WHITE].get(0);
         int file_w = whiteBishop.getFile().get();
         int rank_w = whiteBishop.getRank().get();
-        final Square blackBishop = bishopSquares[Color.BLACK.ordinal()].get(0);
+        final Square blackBishop = bishopSquares[BLACK].get(0);
         int file_b = blackBishop.getFile().get();
         int rank_b = blackBishop.getRank().get();
         return ((file_w + rank_w) % 2) == ((file_b + rank_b) % 2);
       }
     }
     return false;
+  }
+
+  /**
+   * Returns a favtor between 1.0 and 0 for the game phase .
+   * <p>
+   * 1 is the standard opening position with all officer pieces present.<br>
+   * 0 means no officer pieces present.
+   * In rare cases were through pawn promotions more officers than the opening position
+   * are present the value is at maximum 1.0
+   *
+   * @return a value depending on officer midGameMaterial of both sides between 1.0 and 0
+   */
+  public float getGamePhaseFactor() {
+    return ((float) gamePhase / GAME_PHASE_MAX);
+  }
+
+  /**
+   * Returns a value for the game phase between 0 and 24.
+   * <p>
+   * 24 is the standard opening position with all officer pieces present.<br>
+   * 0 means no officer pieces present.
+   * In rare cases were through pawn promotions more officers than the opening position
+   * are present the value is at maximum 24.
+   *
+   * @return a value depending on officer midGameMaterial of both sides between 0 and 24
+   */
+  public int getGamePhaseValue() {
+    return Math.min(GAME_PHASE_MAX, gamePhase);
   }
 
   /**

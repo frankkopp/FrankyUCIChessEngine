@@ -779,6 +779,22 @@ public class PositionTest {
 
   }
 
+  @Test
+  void getGamePhaseFactor() {
+    Position position = new Position();
+    assertEquals(24, position.getGamePhaseValue());
+
+    position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
+    assertEquals(11, position.getGamePhaseValue());
+
+    position = new Position("k6n/7p/6P1/7K/8/8/8/8 w - - 0 1");
+    assertEquals(1, position.getGamePhaseValue());
+
+    // too many officers
+    position = new Position("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1");
+    assertEquals(24, position.getGamePhaseValue());
+  }
+
   /** Tests the timing */
   @Test
   @Disabled

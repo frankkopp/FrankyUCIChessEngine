@@ -62,7 +62,7 @@ public class EvaluationTest {
     // change if next player gets a bonus
     position = new Position(fenStandard);
     int value = evaluation.evaluate(position);
-    assertEquals(20, value, "Start Position should be 10 from TEMPO");
+    assertEquals(10, value, "Start Position should be 10 from TEMPO");
 
     // Mirrored position - should be equal
     position = new Position("k6n/7p/6P1/7K/8/8/8/8 w - - 0 1");
@@ -73,18 +73,6 @@ public class EvaluationTest {
     LOG.info(evaluation.toString());
     assertEquals(value1, value2, "Mirrored Position should be equal");
 
-  }
-
-  @Test
-  void getGamePhaseFactor() {
-    position = new Position();
-    assertEquals(24, Evaluation.getGamePhaseFactor(position));
-
-    position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
-    assertEquals(11, Evaluation.getGamePhaseFactor(position));
-
-    position = new Position("k6n/7p/6P1/7K/8/8/8/8 w - - 0 1");
-    assertEquals(1, Evaluation.getGamePhaseFactor(position));
   }
 
   @Test
@@ -188,17 +176,17 @@ public class EvaluationTest {
   public final void testCheckPosition() {
     // no in check
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
-    assertEquals(196, evaluation.evaluate(position));
+    assertEquals(191, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
 
     // white gives check to black
     position = new Position("r2R3k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2K5 b - - 0 1");
-    assertEquals(-229, evaluation.evaluate(position));
+    assertEquals(-234, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
 
     // black gives check to white
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1p1qPN2/6P1/1PPK4/3R4 w - - 0 2");
-    assertEquals(140, evaluation.evaluate(position));
+    assertEquals(135, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
   }
 
