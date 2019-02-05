@@ -82,6 +82,9 @@ public class SuiteTestsTest {
     Franky 0.11 - 10sec
     Successful:  11 (55 Prozent)
     Failed:       9 (45 Prozent)
+    Franky 0.12 - 10sec
+    Successful:  12 (60 Prozent)
+    Failed:       8 (40 Prozent)
      */
     testSuite = new TestSuite("./testsets/mate_test_suite.epd");
     testSuite.setSearchTime(10000);
@@ -91,7 +94,7 @@ public class SuiteTestsTest {
   @Test
   void startNullMOveZuzwangSuite() {
     /*
-    Franky-0.11 - 10sec
+    Franky-0.12 - 10sec
     Successful:   2 (40 Prozent)
     Failed:       3 (60 Prozent)
     */

@@ -61,6 +61,8 @@ public class Evaluation {
 
   private static final Logger LOG = LoggerFactory.getLogger(Evaluation.class);
 
+  private static final boolean DEBUG = false;
+
   // Constants for evaluations
   public static final int NOVALUE             = Short.MIN_VALUE; // TT uses shorts
   public static final int INFINITE            = 30000; // TT uses shorts
@@ -94,7 +96,6 @@ public class Evaluation {
   private int midGameKingSafety    = 0;
   private int endGameKingSafety    = 0;
 
-
   // Convenience fields - improve readability
   private Position     position;
   private int          nextToMove;
@@ -105,7 +106,6 @@ public class Evaluation {
   private SquareList[] rookSquares;
   private SquareList[] queenSquares;
   private Square[]     kingSquares;
-
 
   /**
    * Creates an instance of the Evaluator
@@ -147,7 +147,32 @@ public class Evaluation {
    */
   public int evaluate(Position position) {
     setPosition(position);
-    return evaluate();
+    final int evaluation = evaluate();
+    if (DEBUG) printEvaluation();
+    return evaluation;
+  }
+
+  private void printEvaluation() {
+    LOG.debug("========================================================"
+              + "==================================");
+    LOG.debug(String.format("Evaluation: Last move was %s", Move.toString(position.getLastMove())));
+    LOG.debug(String.format("%n%s", position.toBoardString()));
+    LOG.debug(String.format("Position has check? %s", position.hasCheck()));
+    LOG.debug(String.format("Next Move: %s", position.getNextPlayer().toString()));
+    LOG.debug(String.format("Gamephase:                 %5d", gamePhaseFactor));
+    LOG.debug("-----------------------------------------------");
+    LOG.debug(String.format("Material:                  %5d (%5d, %5d)", material, midGameMaterial,
+                            endGameMaterial));
+    LOG.debug(String.format("Piece Position             %5d (%5d, %5d)", piecePosition,
+                            midGamePiecePosition, endGamePiecePosition));
+    LOG.debug(String.format("Mobility:                  %5d (%5d, %5d)", mobility, midGameMobility,
+                            endGameMobility));
+    LOG.debug(
+      String.format("King Safety:               %5d (%5d, %5d)", kingSafety, midGameKingSafety,
+                    endGameKingSafety));
+    LOG.debug(String.format("Special:                   %5d ", special));
+    LOG.debug("-----------------------------------------------");
+    LOG.debug(String.format("Evaluation                 %5d ", value));
   }
 
   /**
@@ -175,6 +200,9 @@ public class Evaluation {
     // the position
     gamePhaseFactor = getGamePhaseFactor(position);
 
+    final float phaseFactorMid = (float) gamePhaseFactor / GAME_PHASE_MAX;
+    final float phaseFactorEnd = 1f - phaseFactorMid;
+
     /*
      * Ideally evaluate in 3 Stages to avoid doing certain loop multiple times
      * - 1. Static > O(1)
@@ -185,20 +213,17 @@ public class Evaluation {
     // Stage 1
     staticEvaluations();
 
-    material = midGameMaterial * (gamePhaseFactor / GAME_PHASE_MAX) +
-               endGameMaterial * (1 - gamePhaseFactor / GAME_PHASE_MAX);
+    material = (int) (midGameMaterial * phaseFactorMid + endGameMaterial * phaseFactorEnd);
 
     // Stage 2
     iterateOverPieces();
 
-    piecePosition = midGamePiecePosition * (gamePhaseFactor / GAME_PHASE_MAX) +
-                    endGamePiecePosition * (1 - gamePhaseFactor / GAME_PHASE_MAX);
+    piecePosition =
+      (int) (midGamePiecePosition * phaseFactorMid + endGamePiecePosition * phaseFactorEnd);
 
-    mobility = midGameMobility * (gamePhaseFactor / GAME_PHASE_MAX) +
-               endGameMobility * (1 - gamePhaseFactor / GAME_PHASE_MAX);
+    mobility = (int) (midGameMobility * phaseFactorMid + endGameMobility * phaseFactorEnd);
 
-    kingSafety = midGameKingSafety * (gamePhaseFactor / GAME_PHASE_MAX) +
-                 endGameKingSafety * (1 - gamePhaseFactor / GAME_PHASE_MAX);
+    kingSafety = (int) (midGameKingSafety * phaseFactorMid + endGameKingSafety * phaseFactorEnd);
 
     // Stage 3
     iterateOverSquares();
@@ -218,10 +243,8 @@ public class Evaluation {
     // In very rare cases evaluation can be below or above the MIN or MAX.
     // Mostly in artificial cases with many queens - some test cases do this.
     // Therefore we limit the value to MIN+1 or MAX-1.
-    if (value <= -Evaluation.CHECKMATE_THRESHOLD)
-      value = -Evaluation.CHECKMATE_THRESHOLD+1;
-    else if (value >= Evaluation.CHECKMATE_THRESHOLD)
-      value = Evaluation.CHECKMATE_THRESHOLD-1;
+    if (value <= -Evaluation.CHECKMATE_THRESHOLD) value = -Evaluation.CHECKMATE_THRESHOLD + 1;
+    else if (value >= Evaluation.CHECKMATE_THRESHOLD) value = Evaluation.CHECKMATE_THRESHOLD - 1;
 
     return value;
   }
@@ -258,9 +281,7 @@ public class Evaluation {
       position.isAttacked(position.getOpponent(), kingSquares[nextToMove]) ? CHECK_VALUE : 0;
 
     // TEMPO Bonus
-    special += nextToMove == WHITE
-               ? TEMPO * (gamePhaseFactor / GAME_PHASE_MAX)
-               : -TEMPO * (gamePhaseFactor / GAME_PHASE_MAX);
+    special += TEMPO * ((float) gamePhaseFactor / GAME_PHASE_MAX);
 
     materialEvaluation();
 
@@ -269,8 +290,8 @@ public class Evaluation {
   private void materialEvaluation() {
 
     // midGameMaterial is incrementally counted in Position
-    midGameMaterial = position.getNextPlayer().direction *
-                      (position.getMaterial(Color.WHITE) - position.getMaterial(Color.BLACK));
+    midGameMaterial = position.getNextPlayer().direction * (position.getMaterial(Color.WHITE)
+                                                            - position.getMaterial(Color.BLACK));
 
     // bonus/malus for bishop pair
     if (bishopSquares[nextToMove].size() >= 2) midGameMaterial += BISHOP_PAIR;
@@ -725,7 +746,8 @@ public class Evaluation {
 
         if (type.isSliding()) {
           to += d; // next sliding field in this direction
-        } else {
+        }
+        else {
           break; // no sliding piece type
         }
       }
@@ -872,9 +894,9 @@ public class Evaluation {
     }
 
     final int gamePhaseFactor = getGamePhaseFactor(position);
-
-    return midGame * (gamePhaseFactor / GAME_PHASE_MAX) +
-           endGame * (1 - gamePhaseFactor / GAME_PHASE_MAX);
+    final float phaseFactorMid = (float) gamePhaseFactor / GAME_PHASE_MAX;
+    final float phaseFactorEnd = 1f - phaseFactorMid;
+    return (int) (midGame * phaseFactorMid + endGame * phaseFactorEnd);
 
   }
 }
