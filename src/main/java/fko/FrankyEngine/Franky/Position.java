@@ -830,7 +830,7 @@ public class Position {
    */
   public boolean givesCheck(final int move) {
     // opponents king square
-    final Square kingSquare = getKingSquares()[getOpponent().ordinal()];
+    final Square kingSquare = kingSquares[getOpponent().ordinal()];
     // fromSquare
     final Square fromSquare = Move.getStart(move);
     // target square

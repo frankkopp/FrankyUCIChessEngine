@@ -117,23 +117,17 @@ public enum Square {
       S, SW, W, NW
   };
 
-  // upward diagonal bitboards
+  // upward diagonal bitboards @formatter:off
   static final long a8UpDiag = a8.bitBoard;
   static final long a7UpDiag = a7.bitBoard | b8.bitBoard;
   static final long a6UpDiag = a6.bitBoard | b7.bitBoard | c8.bitBoard;
   static final long a5UpDiag = a5.bitBoard | b6.bitBoard | c7.bitBoard | d8.bitBoard;
   static final long a4UpDiag = a4.bitBoard | b5.bitBoard | c6.bitBoard | d7.bitBoard | e8.bitBoard;
-  static final long a3UpDiag =
-    a3.bitBoard | b4.bitBoard | c5.bitBoard | d6.bitBoard | e7.bitBoard | f8.bitBoard;
-  static final long a2UpDiag =
-    a2.bitBoard | b3.bitBoard | c4.bitBoard | d5.bitBoard | e6.bitBoard | f7.bitBoard | g8.bitBoard;
-  static final long a1UpDiag =
-    a1.bitBoard | b2.bitBoard | c3.bitBoard | d4.bitBoard | e5.bitBoard | f6.bitBoard | g7.bitBoard
-    | h8.bitBoard;
-  static final long b1UpDiag =
-    b1.bitBoard | c2.bitBoard | d3.bitBoard | e4.bitBoard | f5.bitBoard | g6.bitBoard | h7.bitBoard;
-  static final long c1UpDiag =
-    c1.bitBoard | d2.bitBoard | e3.bitBoard | f4.bitBoard | g5.bitBoard | h6.bitBoard;
+  static final long a3UpDiag = a3.bitBoard | b4.bitBoard | c5.bitBoard | d6.bitBoard | e7.bitBoard | f8.bitBoard;
+  static final long a2UpDiag = a2.bitBoard | b3.bitBoard | c4.bitBoard | d5.bitBoard | e6.bitBoard | f7.bitBoard | g8.bitBoard;
+  static final long a1UpDiag = a1.bitBoard | b2.bitBoard | c3.bitBoard | d4.bitBoard | e5.bitBoard | f6.bitBoard | g7.bitBoard | h8.bitBoard;
+  static final long b1UpDiag = b1.bitBoard | c2.bitBoard | d3.bitBoard | e4.bitBoard | f5.bitBoard | g6.bitBoard | h7.bitBoard;
+  static final long c1UpDiag = c1.bitBoard | d2.bitBoard | e3.bitBoard | f4.bitBoard | g5.bitBoard | h6.bitBoard;
   static final long d1UpDiag = d1.bitBoard | e2.bitBoard | f3.bitBoard | g4.bitBoard | h5.bitBoard;
   static final long e1UpDiag = e1.bitBoard | f2.bitBoard | g3.bitBoard | h4.bitBoard;
   static final long f1UpDiag = f1.bitBoard | g2.bitBoard | h3.bitBoard;
@@ -145,25 +139,18 @@ public enum Square {
   static final long a2DownDiag = a2.bitBoard | b1.bitBoard;
   static final long a3DownDiag = a3.bitBoard | b2.bitBoard | c1.bitBoard;
   static final long a4DownDiag = a4.bitBoard | b3.bitBoard | c2.bitBoard | d1.bitBoard;
-  static final long a5DownDiag =
-    a5.bitBoard | b4.bitBoard | c3.bitBoard | d2.bitBoard | e1.bitBoard;
-  static final long a6DownDiag =
-    a6.bitBoard | b5.bitBoard | c4.bitBoard | d3.bitBoard | e2.bitBoard | f1.bitBoard;
-  static final long a7DownDiag =
-    a7.bitBoard | b6.bitBoard | c5.bitBoard | d4.bitBoard | e3.bitBoard | f2.bitBoard | g1.bitBoard;
-  static final long a8DownDiag =
-    a8.bitBoard | b7.bitBoard | c6.bitBoard | d5.bitBoard | e4.bitBoard | f3.bitBoard | g2.bitBoard
-    | h1.bitBoard;
-  static final long b8DownDiag =
-    b8.bitBoard | c7.bitBoard | d6.bitBoard | e5.bitBoard | f4.bitBoard | g3.bitBoard | h2.bitBoard;
-  static final long c8DownDiag =
-    c8.bitBoard | d7.bitBoard | e6.bitBoard | f5.bitBoard | g4.bitBoard | h3.bitBoard;
-  static final long d8DownDiag =
-    d8.bitBoard | e7.bitBoard | f6.bitBoard | g5.bitBoard | h4.bitBoard;
+  static final long a5DownDiag = a5.bitBoard | b4.bitBoard | c3.bitBoard | d2.bitBoard | e1.bitBoard;
+  static final long a6DownDiag = a6.bitBoard | b5.bitBoard | c4.bitBoard | d3.bitBoard | e2.bitBoard | f1.bitBoard;
+  static final long a7DownDiag = a7.bitBoard | b6.bitBoard | c5.bitBoard | d4.bitBoard | e3.bitBoard | f2.bitBoard | g1.bitBoard;
+  static final long a8DownDiag = a8.bitBoard | b7.bitBoard | c6.bitBoard | d5.bitBoard | e4.bitBoard | f3.bitBoard | g2.bitBoard | h1.bitBoard;
+  static final long b8DownDiag = b8.bitBoard | c7.bitBoard | d6.bitBoard | e5.bitBoard | f4.bitBoard | g3.bitBoard | h2.bitBoard;
+  static final long c8DownDiag = c8.bitBoard | d7.bitBoard | e6.bitBoard | f5.bitBoard | g4.bitBoard | h3.bitBoard;
+  static final long d8DownDiag = d8.bitBoard | e7.bitBoard | f6.bitBoard | g5.bitBoard | h4.bitBoard;
   static final long e8DownDiag = e8.bitBoard | f7.bitBoard | g6.bitBoard | h5.bitBoard;
   static final long f8DownDiag = f8.bitBoard | g7.bitBoard | h6.bitBoard;
   static final long g8DownDiag = g8.bitBoard | h7.bitBoard;
   static final long h8DownDiag = h8.bitBoard;
+  // @formatter:on
 
   static {
     values = Square.values();
@@ -223,7 +210,6 @@ public enum Square {
       index64 = -1;
       bitBoard = 0L;
     }
-
   }
 
   /**
