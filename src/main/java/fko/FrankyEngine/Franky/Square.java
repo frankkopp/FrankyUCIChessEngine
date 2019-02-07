@@ -446,15 +446,4 @@ public enum Square {
     }
   }
 
-  /**
-   * @param bitboard
-   * @return String of 64 bits of given long
-   */
-  public static String getBitboardString(long bitboard) {
-    StringBuilder stringBuilder = new StringBuilder();
-    for (int i = 0; i < Long.numberOfLeadingZeros((long) bitboard); i++) {
-      stringBuilder.append('0');
-    }
-    stringBuilder.append(Long.toBinaryString(bitboard));
-    return stringBuilder.toString();
-  }}
+}

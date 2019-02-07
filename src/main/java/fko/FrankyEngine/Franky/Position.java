@@ -141,6 +141,7 @@ public class Position {
 
   // Lists for all pieces
   private final SquareList[] pawnSquares   = new SquareList[Color.values.length];
+  private final long[]       pawnBitboard  = new long[Color.values.length];
   private final SquareList[] knightSquares = new SquareList[Color.values.length];
   private final SquareList[] bishopSquares = new SquareList[Color.values.length];
   private final SquareList[] rookSquares   = new SquareList[Color.values.length];
@@ -269,6 +270,7 @@ public class Position {
     // copy piece lists
     for (int i = 0; i <= 1; i++) { // foreach color
       this.pawnSquares[i] = op.pawnSquares[i].clone();
+      this.pawnBitboard[i] = op.pawnBitboard[i];
       this.knightSquares[i] = op.knightSquares[i].clone();
       this.bishopSquares[i] = op.bishopSquares[i].clone();
       this.rookSquares[i] = op.rookSquares[i].clone();
@@ -1417,6 +1419,7 @@ public class Position {
   private void initializeLists() {
     for (int i = 0; i <= 1; i++) { // foreach color
       pawnSquares[i] = new SquareList();
+      pawnBitboard[i] = 0L;
       knightSquares[i] = new SquareList();
       bishopSquares[i] = new SquareList();
       rookSquares[i] = new SquareList();
