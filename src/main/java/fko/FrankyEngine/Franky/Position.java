@@ -141,12 +141,15 @@ public class Position {
 
   // Lists for all pieces
   private final SquareList[] pawnSquares   = new SquareList[Color.values.length];
-  private final long[]       pawnBitboard  = new long[Color.values.length];
   private final SquareList[] knightSquares = new SquareList[Color.values.length];
   private final SquareList[] bishopSquares = new SquareList[Color.values.length];
   private final SquareList[] rookSquares   = new SquareList[Color.values.length];
   private final SquareList[] queenSquares  = new SquareList[Color.values.length];
   private final Square[]     kingSquares   = new Square[Color.values.length];
+
+  // bitboards
+  private final long[][] piecesBitboards   = new long[Color.values.length][PieceType.values.length];
+  private final long[]   occupiedBitboards = new long[Color.values.length];
 
   // Material value will always be up to date
   private int[] material;
@@ -267,15 +270,19 @@ public class Position {
     // move history
     System.arraycopy(op.moveHistory, 0, moveHistory, 0, op.moveHistory.length);
 
-    // copy piece lists
+    // copy piece lists and bitboards
     for (int i = 0; i <= 1; i++) { // foreach color
+      // piece lists
       this.pawnSquares[i] = op.pawnSquares[i].clone();
-      this.pawnBitboard[i] = op.pawnBitboard[i];
       this.knightSquares[i] = op.knightSquares[i].clone();
       this.bishopSquares[i] = op.bishopSquares[i].clone();
       this.rookSquares[i] = op.rookSquares[i].clone();
       this.queenSquares[i] = op.queenSquares[i].clone();
       this.kingSquares[i] = op.kingSquares[i];
+      // bitboards
+      this.occupiedBitboards[i] = op.occupiedBitboards[i];
+      System.arraycopy(op.piecesBitboards[i], 0, this.piecesBitboards[i], 0,
+                       PieceType.values.length);
     }
 
     // copy material and gamePhase values
@@ -758,6 +765,12 @@ public class Position {
    * @param color
    */
   private void addToPieceLists(Square toSquare, Piece piece, final int color) {
+    // update piece bitboards
+    assert (piecesBitboards[color][piece.getType().ordinal()] & toSquare.bitBoard) == 0;
+    piecesBitboards[color][piece.getType().ordinal()] |= toSquare.bitBoard;
+    assert (occupiedBitboards[color] & toSquare.bitBoard) == 0;
+    occupiedBitboards[color] |= toSquare.bitBoard;
+    // update piece square lists
     switch (piece.getType()) {
       case PAWN:
         pawnSquares[color].add(toSquare);
@@ -792,6 +805,13 @@ public class Position {
    * @param color
    */
   private void removeFromPieceLists(Square fromSquare, Piece piece, final int color) {
+    // update piece bitboards
+    assert (piecesBitboards[color][piece.getType().ordinal()] & fromSquare.bitBoard)
+           == fromSquare.bitBoard;
+    piecesBitboards[color][piece.getType().ordinal()] ^= fromSquare.bitBoard;
+    assert (occupiedBitboards[color] & fromSquare.bitBoard) == fromSquare.bitBoard;
+    occupiedBitboards[color] ^= fromSquare.bitBoard;
+    // update piece square lists
     switch (piece.getType()) {
       case PAWN:
         pawnSquares[color].remove(fromSquare);
@@ -1061,6 +1081,22 @@ public class Position {
 
     final int attackerColorIndex = attackerColor.ordinal();
 
+    // check knights if there are any
+    if (!(knightSquares[attackerColorIndex].isEmpty())) {
+      for (int d : Square.knightDirections) {
+        int i = squareIndex + d;
+        if ((i & 0x88) == 0) { // valid square
+          if (x88Board[i] != Piece.NOPIECE // not empty
+              && x88Board[i].getColor() == attackerColor // attacker piece
+              && (x88Board[i].getType() == PieceType.KNIGHT)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    // TODO check bitboard if even a rook or queen is in the same row
+
     // check sliding horizontal (rook + queen) if there are any
     if (!(rookSquares[attackerColorIndex].isEmpty()
           && queenSquares[attackerColorIndex].isEmpty())) {
@@ -1079,6 +1115,8 @@ public class Position {
         }
       }
     }
+
+    // TODO check bitboard if even a bishop or queen is in the same diagonal
 
     // check sliding diagonal (bishop + queen) if there are any
     if (!(bishopSquares[attackerColorIndex].isEmpty()
@@ -1099,20 +1137,6 @@ public class Position {
       }
     }
 
-    // check knights if there are any
-    if (!(knightSquares[attackerColorIndex].isEmpty())) {
-      for (int d : Square.knightDirections) {
-        int i = squareIndex + d;
-        if ((i & 0x88) == 0) { // valid square
-          if (x88Board[i] != Piece.NOPIECE // not empty
-              && x88Board[i].getColor() == attackerColor // attacker piece
-              && (x88Board[i].getType() == PieceType.KNIGHT)) {
-            return true;
-          }
-        }
-      }
-    }
-
     // check king
     for (int d : Square.kingDirections) {
       int i = squareIndex + d;
@@ -1125,31 +1149,36 @@ public class Position {
       }
     }
 
-    // check en passant
-    if (this.enPassantSquare != Square.NOSQUARE) {
-      if (isWhite // white is attacker
-          && x88Board[enPassantSquare.getSouth().ordinal()] == Piece.BLACK_PAWN
-          // black is target
-          && this.enPassantSquare.getSouth()
-             == square) { // this is indeed the en passant attacked square
-        // left
-        int i = squareIndex + Square.W;
-        if ((i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN) return true;
-        // right
-        i = squareIndex + Square.E;
-        return (i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN;
-      }
-      else if (!isWhite // black is attacker (assume not noColor)
-               && x88Board[enPassantSquare.getNorth().ordinal()] == Piece.WHITE_PAWN
-               // white is target
-               && this.enPassantSquare.getNorth()
-                  == square) { // this is indeed the en passant attacked square
-        // attack from left
-        int i = squareIndex + Square.W;
-        if ((i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN) return true;
-        // attack from right
-        i = squareIndex + Square.E;
-        return (i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN;
+    // if the target square is not empty these attacks are not possible
+    // as the pawn double move ensures that the target square is empty
+    if (x88Board[squareIndex] == Piece.NOPIECE) {
+
+      // check en passant
+      if (this.enPassantSquare != Square.NOSQUARE) {
+        if (isWhite // white is attacker
+            && x88Board[enPassantSquare.getSouth().ordinal()] == Piece.BLACK_PAWN
+            // black is target
+            && this.enPassantSquare.getSouth()
+               == square) { // this is indeed the en passant attacked square
+          // left
+          int i = squareIndex + Square.W;
+          if ((i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN) return true;
+          // right
+          i = squareIndex + Square.E;
+          return (i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN;
+        }
+        else if (!isWhite // black is attacker (assume not noColor)
+                 && x88Board[enPassantSquare.getNorth().ordinal()] == Piece.WHITE_PAWN
+                 // white is target
+                 && this.enPassantSquare.getNorth()
+                    == square) { // this is indeed the en passant attacked square
+          // attack from left
+          int i = squareIndex + Square.W;
+          if ((i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN) return true;
+          // attack from right
+          i = squareIndex + Square.E;
+          return (i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN;
+        }
       }
     }
     return false;
@@ -1413,18 +1442,30 @@ public class Position {
 
   public Square getEnPassantSquare() { return enPassantSquare; }
 
+  public long[][] getPiecesBitboards() { return piecesBitboards; }
+
+  public long[] getPiecesBitboards(Color c) { return piecesBitboards[c.ordinal()]; }
+
+  public long getPiecesBitboards(Color c,
+                                 PieceType pt) { return piecesBitboards[c.ordinal()][pt.ordinal()]; }
+
+  public long[] getOccupiedBitboards() { return occupiedBitboards; }
+
+  public long getOccupiedBitboards(Color c) { return occupiedBitboards[c.ordinal()]; }
+
   /**
    * Initialize the lists for the pieces and the material counter
    */
   private void initializeLists() {
     for (int i = 0; i <= 1; i++) { // foreach color
       pawnSquares[i] = new SquareList();
-      pawnBitboard[i] = 0L;
       knightSquares[i] = new SquareList();
       bishopSquares[i] = new SquareList();
       rookSquares[i] = new SquareList();
       queenSquares[i] = new SquareList();
       kingSquares[i] = Square.NOSQUARE;
+      occupiedBitboards[i] = 0L;
+      piecesBitboards[i] = new long[PieceType.values.length];
     }
     material = new int[2];
   }

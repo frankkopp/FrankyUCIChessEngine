@@ -27,18 +27,49 @@ package fko.FrankyEngine.Franky;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static fko.FrankyEngine.Franky.Bitboard.a1UpDiag;
+import static fko.FrankyEngine.Franky.Bitboard.a8DownDiag;
 
 class BitboardTest {
 
   @Test
   void toStringTest() {
-    System.out.printf("Square a8: %d%n%s%n", Square.a8.bitBoard, Bitboard.toString(Square.a8.bitBoard));
-    System.out.printf("Square a1: %d%n%s%n", Square.a1.bitBoard, Bitboard.toString(Square.a1.bitBoard));
-    System.out.printf("Square e4: %d%n%s%n", Square.e4.bitBoard, Bitboard.toString(Square.e4.bitBoard));
-    System.out.printf("Square h1: %d%n%s%n", Square.h1.bitBoard, Bitboard.toString(Square.h1.bitBoard));
-    System.out.printf("Square h8: %d%n%s%n", Square.h8.bitBoard, Bitboard.toString(Square.h8.bitBoard));
-    System.out.printf("Diagonal a1 up %d%n%s%n", Square.a1UpDiag, Bitboard.toString(Square.a1UpDiag));
-    System.out.printf("Diagonal a8 down %d%n%s%n", Square.a8DownDiag, Bitboard.toString(Square.a8DownDiag));
+    System.out.printf("Square a8: %d%n%s%n", Square.a8.bitBoard,
+                      Bitboard.toString(Square.a8.bitBoard));
+    System.out.printf("Square a1: %d%n%s%n", Square.a1.bitBoard,
+                      Bitboard.toString(Square.a1.bitBoard));
+    System.out.printf("Square e4: %d%n%s%n", Square.e4.bitBoard,
+                      Bitboard.toString(Square.e4.bitBoard));
+    System.out.printf("Square h1: %d%n%s%n", Square.h1.bitBoard,
+                      Bitboard.toString(Square.h1.bitBoard));
+    System.out.printf("Square h8: %d%n%s%n", Square.h8.bitBoard,
+                      Bitboard.toString(Square.h8.bitBoard));
+    System.out.printf("Diagonal a1 up %d%n%s%n", a1UpDiag, Bitboard.toString(a1UpDiag));
+    System.out.printf("Diagonal a8 down %d%n%s%n", a8DownDiag, Bitboard.toString(a8DownDiag));
   }
+
+  @Test
+  void bitBoardTest() {
+    long bitboard = 0L;
+    System.out.printf("Empty %d%n", bitboard);
+    System.out.println(Bitboard.toString(bitboard));
+
+    bitboard |= 255;
+    System.out.printf("Long: %d%n", bitboard);
+    System.out.println(Bitboard.toString(bitboard));
+
+    bitboard = bitboard << 8;
+    System.out.printf("Long: %d%n", bitboard);
+    System.out.println(Bitboard.toString(bitboard));
+
+    bitboard = bitboard >> 8;
+    System.out.printf("Long: %d%n", bitboard);
+    System.out.println(Bitboard.toString(bitboard));
+
+    bitboard = bitboard << (8*7);
+    System.out.printf("Long: %d%n", bitboard);
+    System.out.println(Bitboard.toString(bitboard));
+
+  }
+
 }

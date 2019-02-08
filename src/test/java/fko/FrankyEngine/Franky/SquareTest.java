@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static fko.FrankyEngine.Franky.Bitboard.a6UpDiag;
 import static fko.FrankyEngine.Franky.Square.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -170,6 +171,33 @@ public class SquareTest {
 
   }
 
+  @Test
+  void fileBitBoard() {
+    System.out.println(File.a.bitBoard);
+    System.out.println(Bitboard.toString(File.a.bitBoard));
+    assertEquals(72340172838076673L, File.a.bitBoard);
+    System.out.println(File.e.bitBoard);
+    System.out.println(Bitboard.toString(File.e.bitBoard));
+    assertEquals(1157442765409226768L, File.e.bitBoard);
+    System.out.println(File.h.bitBoard);
+    System.out.println(Bitboard.toString(File.h.bitBoard));
+    assertEquals(-9187201950435737472L, File.h.bitBoard);
+  }
+
+  @Test
+  void rankBitBoard() {
+    System.out.println(Rank.r1.bitBoard);
+    System.out.println(Bitboard.toString(Rank.r1.bitBoard));
+    assertEquals(255L, Rank.r1.bitBoard);
+    System.out.println(Rank.r4.bitBoard);
+    System.out.println(Bitboard.toString(Rank.r4.bitBoard));
+    assertEquals(4278190080L, Rank.r4.bitBoard);
+    System.out.println(Rank.r8.bitBoard);
+    System.out.println(Bitboard.toString(Rank.r8.bitBoard));
+    assertEquals(-72057594037927936L, Rank.r8.bitBoard);
+  }
+
+
   String getBitboardString(long bitboard) {
     StringBuilder stringBuilder = new StringBuilder();
     for (int i = 0; i < Long.numberOfLeadingZeros((long) bitboard); i++) {
@@ -178,5 +206,6 @@ public class SquareTest {
     stringBuilder.append(Long.toBinaryString(bitboard));
     return stringBuilder.toString();
   }
+
 
 }
