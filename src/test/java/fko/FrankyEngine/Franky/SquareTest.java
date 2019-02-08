@@ -182,6 +182,10 @@ public class SquareTest {
     System.out.println(File.h.bitBoard);
     System.out.println(Bitboard.toString(File.h.bitBoard));
     assertEquals(-9187201950435737472L, File.h.bitBoard);
+    System.out.println(File.NOFILE.bitBoard);
+    System.out.println(Bitboard.toString(File.NOFILE.bitBoard));
+    assertEquals(0, File.NOFILE.bitBoard);
+
   }
 
   @Test
@@ -195,6 +199,9 @@ public class SquareTest {
     System.out.println(Rank.r8.bitBoard);
     System.out.println(Bitboard.toString(Rank.r8.bitBoard));
     assertEquals(-72057594037927936L, Rank.r8.bitBoard);
+    System.out.println(Rank.NORANK.bitBoard);
+    System.out.println(Bitboard.toString(Rank.NORANK.bitBoard));
+    assertEquals(0, Rank.NORANK.bitBoard);
   }
 
 
