@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static fko.FrankyEngine.Franky.Bitboard.a6UpDiag;
+import static fko.FrankyEngine.Franky.Bitboard.*;
 import static fko.FrankyEngine.Franky.Square.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -148,7 +148,7 @@ public class SquareTest {
   }
 
   @Test
-  public void bitBoardTest() {
+  public void diagonalBitboardTest() {
     for (Square sq : validSquares) {
       System.out.printf("%s: %s  on up diagonal: %s down diagonal: %s%n", sq,
                         getBitboardString(sq.bitBoard), getBitboardString(sq.getUpDiag()),
@@ -159,15 +159,34 @@ public class SquareTest {
     System.out.printf("%s: %s %n", a6UpDiag, getBitboardString(a6UpDiag));
     System.out.println();
 
+    assertEquals(a1.getDownDiag(), a1DownDiag);
+    assertEquals(a2.getDownDiag(), a2DownDiag);
+    assertEquals(b1.getDownDiag(), a2DownDiag);
+    assertEquals(b7.getDownDiag(), a8DownDiag);
+    assertEquals(c4.getDownDiag(), a6DownDiag);
+    assertEquals(e4.getDownDiag(), a8DownDiag);
+    assertEquals(g7.getDownDiag(), f8DownDiag);
+
+    assertEquals(a1.getUpDiag(), a1UpDiag);
+    assertEquals(a2.getUpDiag(), a2UpDiag);
+    assertEquals(b1.getUpDiag(), b1UpDiag);
+    assertEquals(b7.getUpDiag(), a6UpDiag);
+    assertEquals(c4.getUpDiag(), a2UpDiag);
+    assertEquals(e4.getUpDiag(), b1UpDiag);
+    assertEquals(g7.getUpDiag(), a1UpDiag);
+
     System.out.printf("Is %s on %s: %s %n", a7, a6.name() + "upDiag",
                       a7.getUpDiag() == a6UpDiag ? "TRUE" : "FALSE");
+    assertNotEquals(a7.getUpDiag(), a6UpDiag);
     System.out.printf("Is %s on %s: %s %n", b7, a6.name() + "upDiag",
                       b7.getUpDiag() == a6UpDiag ? "TRUE" : "FALSE");
-
+    assertEquals(b7.getUpDiag(), a6UpDiag);
     System.out.printf("Is %s on %s: %s %n", a7, a6.name() + "downDiag",
                       a7.getDownDiag() == a6UpDiag ? "TRUE" : "FALSE");
+    assertNotEquals(a7.getDownDiag(), a6DownDiag);
     System.out.printf("Is %s on %s: %s %n", b7, a6.name() + "downDiag",
                       b7.getDownDiag() == a6UpDiag ? "TRUE" : "FALSE");
+    assertNotEquals(b7.getDownDiag(), a6DownDiag);
 
   }
 
@@ -213,6 +232,5 @@ public class SquareTest {
     stringBuilder.append(Long.toBinaryString(bitboard));
     return stringBuilder.toString();
   }
-
 
 }
