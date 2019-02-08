@@ -303,8 +303,7 @@ class UCIProtocolHandlerTest {
           System.out.println(line);
           assertEquals("c3d3",
                        Move.toSimpleString(engine.getSearch().getLastSearchResult().bestMove));
-          // because of contempt this is not 0 but 6
-          assertEquals(6, engine.getSearch().getLastSearchResult().resultValue);
+          assertEquals(0, engine.getSearch().getLastSearchResult().resultValue);
           break;
         }
       }
@@ -337,8 +336,7 @@ class UCIProtocolHandlerTest {
           System.out.println(line);
           assertEquals("d8h4",
                        Move.toSimpleString(engine.getSearch().getLastSearchResult().bestMove));
-          // because of contempt this is not 0 but 22
-          assertEquals(22, engine.getSearch().getLastSearchResult().resultValue);
+          assertEquals(0, engine.getSearch().getLastSearchResult().resultValue);
           break;
         }
       }
