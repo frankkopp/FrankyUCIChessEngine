@@ -38,43 +38,39 @@ public class Bitboard {
   private static final Logger LOG = LoggerFactory.getLogger(Bitboard.class);
 
   // upward diagonal bitboards @formatter:off
-  public static final long a8UpDiag = a8.bitBoard;
-  public static final long a7UpDiag = a7.bitBoard | b8.bitBoard;
-  public static final long a6UpDiag = a6.bitBoard | b7.bitBoard | c8.bitBoard;
-  public static final long a5UpDiag = a5.bitBoard | b6.bitBoard | c7.bitBoard | d8.bitBoard;
-  public static final long a4UpDiag = a4.bitBoard | b5.bitBoard | c6.bitBoard | d7.bitBoard | e8.bitBoard;
-  public static final long a3UpDiag = a3.bitBoard | b4.bitBoard | c5.bitBoard | d6.bitBoard | e7.bitBoard | f8.bitBoard;
-  public static final long a2UpDiag = a2.bitBoard | b3.bitBoard | c4.bitBoard | d5.bitBoard | e6.bitBoard | f7.bitBoard | g8.bitBoard;
-  public static final long a1UpDiag = a1.bitBoard | b2.bitBoard | c3.bitBoard | d4.bitBoard | e5.bitBoard | f6.bitBoard | g7.bitBoard | h8.bitBoard;
-  public static final long b1UpDiag = b1.bitBoard | c2.bitBoard | d3.bitBoard | e4.bitBoard | f5.bitBoard | g6.bitBoard | h7.bitBoard;
-  public static final long c1UpDiag = c1.bitBoard | d2.bitBoard | e3.bitBoard | f4.bitBoard | g5.bitBoard | h6.bitBoard;
-  public static final long d1UpDiag = d1.bitBoard | e2.bitBoard | f3.bitBoard | g4.bitBoard | h5.bitBoard;
-  public static final long e1UpDiag = e1.bitBoard | f2.bitBoard | g3.bitBoard | h4.bitBoard;
-  public static final long f1UpDiag = f1.bitBoard | g2.bitBoard | h3.bitBoard;
-  public static final long g1UpDiag = g1.bitBoard | h2.bitBoard;
-  public static final long h1UpDiag = h1.bitBoard;
+  public static final long a8UpDiag = 0b00000001_00000000_00000000_00000000_00000000_00000000_00000000_00000000L;
+  public static final long a7UpDiag = 0b00000010_00000001_00000000_00000000_00000000_00000000_00000000_00000000L;
+  public static final long a6UpDiag = 0b00000100_00000010_00000001_00000000_00000000_00000000_00000000_00000000L;
+  public static final long a5UpDiag = 0b00001000_00000100_00000010_00000001_00000000_00000000_00000000_00000000L;
+  public static final long a4UpDiag = 0b00010000_00001000_00000100_00000010_00000001_00000000_00000000_00000000L;
+  public static final long a3UpDiag = 0b00100000_00010000_00001000_00000100_00000010_00000001_00000000_00000000L;
+  public static final long a2UpDiag = 0b01000000_00100000_00010000_00001000_00000100_00000010_00000001_00000000L;
+  public static final long a1UpDiag = 0b10000000_01000000_00100000_00010000_00001000_00000100_00000010_00000001L;
+  public static final long b1UpDiag = 0b00000000_10000000_01000000_00100000_00010000_00001000_00000100_00000010L;
+  public static final long c1UpDiag = 0b00000000_00000000_10000000_01000000_00100000_00010000_00001000_00000100L;
+  public static final long d1UpDiag = 0b00000000_00000000_00000000_10000000_01000000_00100000_00010000_00001000L;
+  public static final long e1UpDiag = 0b00000000_00000000_00000000_00000000_10000000_01000000_00100000_00010000L;
+  public static final long f1UpDiag = 0b00000000_00000000_00000000_00000000_00000000_10000000_01000000_00100000L;
+  public static final long g1UpDiag = 0b00000000_00000000_00000000_00000000_00000000_00000000_10000000_01000000L;
+  public static final long h1UpDiag = 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_10000000L;
 
   // downward diagonal bitboards
-  public static final long a1DownDiag = a1.bitBoard;
-  public static final long a2DownDiag = a2.bitBoard | b1.bitBoard;
-  public static final long a3DownDiag = a3.bitBoard | b2.bitBoard | c1.bitBoard;
-  public static final long a4DownDiag = a4.bitBoard | b3.bitBoard | c2.bitBoard | d1.bitBoard;
-  public static final long a5DownDiag = a5.bitBoard | b4.bitBoard | c3.bitBoard | d2.bitBoard | e1.bitBoard;
-  public static final long a6DownDiag = a6.bitBoard | b5.bitBoard | c4.bitBoard | d3.bitBoard | e2.bitBoard | f1.bitBoard;
-  public static final long a7DownDiag = a7.bitBoard | b6.bitBoard | c5.bitBoard | d4.bitBoard | e3.bitBoard | f2.bitBoard | g1.bitBoard;
-  public static final long a8DownDiag = a8.bitBoard | b7.bitBoard | c6.bitBoard | d5.bitBoard | e4.bitBoard | f3.bitBoard | g2.bitBoard | h1.bitBoard;
-  public static final long b8DownDiag = b8.bitBoard | c7.bitBoard | d6.bitBoard | e5.bitBoard | f4.bitBoard | g3.bitBoard | h2.bitBoard;
-  public static final long c8DownDiag = c8.bitBoard | d7.bitBoard | e6.bitBoard | f5.bitBoard | g4.bitBoard | h3.bitBoard;
-  public static final long d8DownDiag = d8.bitBoard | e7.bitBoard | f6.bitBoard | g5.bitBoard | h4.bitBoard;
-  public static final long e8DownDiag = e8.bitBoard | f7.bitBoard | g6.bitBoard | h5.bitBoard;
-  public static final long f8DownDiag = f8.bitBoard | g7.bitBoard | h6.bitBoard;
-  public static final long g8DownDiag = g8.bitBoard | h7.bitBoard;
-  public static final long h8DownDiag = h8.bitBoard;
-  // @formatter:on
-
-  static {
-
-  }
+  public static final long a1DownDiag = 0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00000001L;
+  public static final long a2DownDiag = 0b00000000_00000000_00000000_00000000_00000000_00000000_00000001_00000010L;
+  public static final long a3DownDiag = 0b00000000_00000000_00000000_00000000_00000000_00000001_00000010_00000100L;
+  public static final long a4DownDiag = 0b00000000_00000000_00000000_00000000_00000001_00000010_00000100_00001000L;
+  public static final long a5DownDiag = 0b00000000_00000000_00000000_00000001_00000010_00000100_00001000_00010000L;
+  public static final long a6DownDiag = 0b00000000_00000000_00000001_00000010_00000100_00001000_00010000_00100000L;
+  public static final long a7DownDiag = 0b00000000_00000001_00000010_00000100_00001000_00010000_00100000_01000000L;
+  public static final long a8DownDiag = 0b00000001_00000010_00000100_00001000_00010000_00100000_01000000_10000000L;
+  public static final long b8DownDiag = 0b00000010_00000100_00001000_00010000_00100000_01000000_10000000_00000000L;
+  public static final long c8DownDiag = 0b00000100_00001000_00010000_00100000_01000000_10000000_00000000_00000000L;
+  public static final long d8DownDiag = 0b00001000_00010000_00100000_01000000_10000000_00000000_00000000_00000000L;
+  public static final long e8DownDiag = 0b00010000_00100000_01000000_10000000_00000000_00000000_00000000_00000000L;
+  public static final long f8DownDiag = 0b00100000_01000000_10000000_00000000_00000000_00000000_00000000_00000000L;
+  public static final long g8DownDiag = 0b01000000_10000000_00000000_00000000_00000000_00000000_00000000_00000000L;
+  public static final long h8DownDiag = 0b10000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000L;
+  // @formatter:ontboard can't be instantiated
 
   /**
    * Bitboard can't be instantiated
@@ -98,6 +94,6 @@ public class Bitboard {
       }
       output.append(System.lineSeparator());
     }
-    return output.toString();
+    return output.toString().trim();
   }
 }

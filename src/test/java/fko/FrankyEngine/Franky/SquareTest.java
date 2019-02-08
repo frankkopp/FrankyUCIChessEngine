@@ -28,6 +28,7 @@ package fko.FrankyEngine.Franky;
 import fko.FrankyEngine.Franky.Square.*;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import static fko.FrankyEngine.Franky.Bitboard.*;
@@ -39,6 +40,21 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  */
 public class SquareTest {
+
+  @Test
+  void listFields() throws IllegalAccessException {
+    for (Field f : Square.class.getFields()) {
+      f.setAccessible(true);
+      System.out.println(f.getName());
+      if (f.isEnumConstant()) {
+        final Square square = (Square) f.get(null);
+        System.out.println(Bitboard.toString(square.bitBoard));
+        System.out.printf("upDiag %d%n", square.getUpDiag());
+        System.out.printf("downDiag %d%n", square.getDownDiag());
+      }
+      System.out.println();
+    }
+  }
 
   /**
    * Tests basic Square operations
@@ -165,6 +181,7 @@ public class SquareTest {
     assertEquals(b7.getDownDiag(), a8DownDiag);
     assertEquals(c4.getDownDiag(), a6DownDiag);
     assertEquals(e4.getDownDiag(), a8DownDiag);
+    assertEquals(e8.getDownDiag(), e8DownDiag);
     assertEquals(g7.getDownDiag(), f8DownDiag);
 
     assertEquals(a1.getUpDiag(), a1UpDiag);
@@ -173,6 +190,7 @@ public class SquareTest {
     assertEquals(b7.getUpDiag(), a6UpDiag);
     assertEquals(c4.getUpDiag(), a2UpDiag);
     assertEquals(e4.getUpDiag(), b1UpDiag);
+    assertEquals(e8.getUpDiag(), a4UpDiag);
     assertEquals(g7.getUpDiag(), a1UpDiag);
 
     System.out.printf("Is %s on %s: %s %n", a7, a6.name() + "upDiag",

@@ -1095,11 +1095,13 @@ public class Position {
       }
     }
 
-    // TODO check bitboard if even a rook or queen is in the same row
-
     // check sliding horizontal (rook + queen) if there are any
-    if (!(rookSquares[attackerColorIndex].isEmpty()
-          && queenSquares[attackerColorIndex].isEmpty())) {
+    if (!(rookSquares[attackerColorIndex].isEmpty() && queenSquares[attackerColorIndex].isEmpty())
+        // are any rooks or queens in the same file or rank
+        && (((piecesBitboards[attackerColor.ordinal()][PieceType.ROOK.ordinal()]
+              | piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()]) & (
+               square.getFile().bitBoard | square.getRank().bitBoard)) != 0)) {
+      // check sliding attacks from all rook directions
       for (int d : Square.rookDirections) {
         int i = squareIndex + d;
         while ((i & 0x88) == 0) { // slide while valid square
@@ -1116,11 +1118,13 @@ public class Position {
       }
     }
 
-    // TODO check bitboard if even a bishop or queen is in the same diagonal
-
     // check sliding diagonal (bishop + queen) if there are any
-    if (!(bishopSquares[attackerColorIndex].isEmpty()
-          && queenSquares[attackerColorIndex].isEmpty())) {
+    if (!(bishopSquares[attackerColorIndex].isEmpty() && queenSquares[attackerColorIndex].isEmpty())
+        // are any bishops or queens in the same file or rank
+        && ((piecesBitboards[attackerColor.ordinal()][PieceType.BISHOP.ordinal()]
+             | piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()]) & (
+              square.getUpDiag() | square.getDownDiag())) != 0) {
+      // check sliding attacks from all bishop directions
       for (int d : Square.bishopDirections) {
         int i = squareIndex + d;
         while ((i & 0x88) == 0) { // slide while valid square
@@ -1188,7 +1192,7 @@ public class Position {
    * @return true if current position has check for next player
    */
   public boolean hasCheck() {
-    if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
+    //if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
     boolean check = isAttacked(nextPlayer.getInverseColor(), kingSquares[nextPlayer.ordinal()]);
     hasCheck = check ? Flag.TRUE : Flag.FALSE;
     return check;

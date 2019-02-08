@@ -487,6 +487,16 @@ public class PositionTest {
     position = new Position(testFen);
     System.out.println(position);
     assertFalse(position.isAttacked(Color.WHITE, Square.e8));
+
+    testFen = "rnbqkbnr/1ppppppp/8/p7/2P1Q3/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
+    position = new Position(testFen);
+    System.out.println(position);
+    assertFalse(position.isAttacked(Color.WHITE, Square.e8));
+
+    testFen = "rnbqkbnr/1ppppppp/8/p7/2P1Q3/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
+    position = new Position(testFen);
+    System.out.println(position);
+    assertFalse(position.isAttacked(Color.BLACK, Square.e1));
   }
 
   @Test
@@ -775,6 +785,26 @@ public class PositionTest {
     long emptySquares = ~occupiedSquares;
     System.out.println("All empty squares: "+emptySquares);
     System.out.println(Bitboard.toString(emptySquares));
+  }
+
+  @Test
+  void bitBoardsCalculations() {
+
+    String testFen = "rnbqkbnr/1ppppppp/8/p7/2P1Q3/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
+    Position position = new Position(testFen);
+    System.out.println(position);
+    assertFalse(position.isAttacked(Color.WHITE, Square.e8));
+
+    System.out.println(Bitboard.toString(
+      (position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(
+        Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
+                                          | Square.e8.getRank().bitBoard)));
+
+    System.out.println(
+      ((position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(
+        Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
+                                          | Square.e8.getRank().bitBoard)) > 0);
+
   }
 
   /** Tests the timing */

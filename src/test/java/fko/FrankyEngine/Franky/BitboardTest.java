@@ -27,25 +27,47 @@ package fko.FrankyEngine.Franky;
 
 import org.junit.jupiter.api.Test;
 
-import static fko.FrankyEngine.Franky.Bitboard.a1UpDiag;
-import static fko.FrankyEngine.Franky.Bitboard.a8DownDiag;
+import java.lang.reflect.Field;
 
 class BitboardTest {
 
   @Test
+  void listFields() throws IllegalAccessException {
+    for (Field f : Bitboard.class.getFields()) {
+      f.setAccessible(true);
+      long bitboard = (long) f.get(null);
+      System.out.printf("%s %s %n%s%n", f.getName(), bitboard, Bitboard.toString(bitboard));
+    }
+  }
+
+  @Test
   void toStringTest() {
-    System.out.printf("Square a8: %d%n%s%n", Square.a8.bitBoard,
-                      Bitboard.toString(Square.a8.bitBoard));
-    System.out.printf("Square a1: %d%n%s%n", Square.a1.bitBoard,
-                      Bitboard.toString(Square.a1.bitBoard));
-    System.out.printf("Square e4: %d%n%s%n", Square.e4.bitBoard,
-                      Bitboard.toString(Square.e4.bitBoard));
-    System.out.printf("Square h1: %d%n%s%n", Square.h1.bitBoard,
-                      Bitboard.toString(Square.h1.bitBoard));
-    System.out.printf("Square h8: %d%n%s%n", Square.h8.bitBoard,
-                      Bitboard.toString(Square.h8.bitBoard));
-    System.out.printf("Diagonal a1 up %d%n%s%n", a1UpDiag, Bitboard.toString(a1UpDiag));
-    System.out.printf("Diagonal a8 down %d%n%s%n", a8DownDiag, Bitboard.toString(a8DownDiag));
+
+    //    System.out.printf("Square a8: %d%n%s%n", Square.a8.bitBoard,
+    //                      Bitboard.toString(Square.a8.bitBoard));
+    ////    assertEquals(
+    ////      "1 0 0 0 0 0 0 0 \n" + "0 0 0 0 0 0 0 0 \n" + "0 0 0 0 0 0 0 0 \n" + "0 0 0 0 0 0 0 0 \n"
+    ////      + "0 0 0 0 0 0 0 0 \n" + "0 0 0 0 0 0 0 0 \n" + "0 0 0 0 0 0 0 0 \n" + "0 0 0 0 0 0 0 0 \n",
+    ////      Bitboard.toString(Square.a8.bitBoard));
+    //
+    //    System.out.printf("Square a1: %d%n%s%n", Square.a1.bitBoard,
+    //                      Bitboard.toString(Square.a1.bitBoard));
+    //    System.out.printf("Square e4: %d%n%s%n", Square.e4.bitBoard,
+    //                      Bitboard.toString(Square.e4.bitBoard));
+    //    System.out.printf("Square h1: %d%n%s%n", Square.h1.bitBoard,
+    //                      Bitboard.toString(Square.h1.bitBoard));
+    //    System.out.printf("Square h8: %d%n%s%n", Square.h8.bitBoard,
+    //                      Bitboard.toString(Square.h8.bitBoard));
+    //
+    //    System.out.printf("Diagonal a8 up %d%n%s%n", a8UpDiag, Bitboard.toString(a8UpDiag));
+    //    System.out.printf("Diagonal a4 up %d%n%s%n", a4UpDiag, Bitboard.toString(a4UpDiag));
+    //    System.out.printf("Diagonal a1 up %d%n%s%n", a1UpDiag, Bitboard.toString(a1UpDiag));
+    //    System.out.printf("Diagonal c1 up %d%n%s%n", c1UpDiag, Bitboard.toString(c1UpDiag));
+    //    System.out.printf("Diagonal h1 up %d%n%s%n", h1UpDiag, Bitboard.toString(h1UpDiag));
+    //    System.out.printf("Diagonal a1 up %d%n%s%n", a1UpDiag, Bitboard.toString(a1UpDiag));
+    //
+    //    System.out.printf("Diagonal a8 down %d%n%s%n", a8DownDiag, Bitboard.toString(a8DownDiag));
+
   }
 
   @Test

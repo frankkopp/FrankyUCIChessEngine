@@ -75,8 +75,8 @@ public enum Square {
    */
   public final long bitBoard;
 
-  private long upDiag;
-  private long downDiag;
+  private final long upDiag;
+  private final long downDiag;
 
   /**
    * pre-filled list with all valid squares
@@ -123,42 +123,6 @@ public enum Square {
     values = Square.values();
     validSquares = Collections.unmodifiableList(
       Arrays.stream(values()).filter(Square::isValidSquare).collect(Collectors.toList()));
-
-    // precompute diagonals for squares
-    for (Square sq : values()) {
-      if ((sq.bitBoard & a8UpDiag) > 0) sq.upDiag = a8UpDiag;
-      else if ((sq.bitBoard & a7UpDiag) > 0) sq.upDiag = a7UpDiag;
-      else if ((sq.bitBoard & a6UpDiag) > 0) sq.upDiag = a6UpDiag;
-      else if ((sq.bitBoard & a5UpDiag) > 0) sq.upDiag = a5UpDiag;
-      else if ((sq.bitBoard & a4UpDiag) > 0) sq.upDiag = a4UpDiag;
-      else if ((sq.bitBoard & a3UpDiag) > 0) sq.upDiag = a3UpDiag;
-      else if ((sq.bitBoard & a2UpDiag) > 0) sq.upDiag = a2UpDiag;
-      else if ((sq.bitBoard & a1UpDiag) > 0) sq.upDiag = a1UpDiag;
-      else if ((sq.bitBoard & b1UpDiag) > 0) sq.upDiag = b1UpDiag;
-      else if ((sq.bitBoard & c1UpDiag) > 0) sq.upDiag = c1UpDiag;
-      else if ((sq.bitBoard & d1UpDiag) > 0) sq.upDiag = d1UpDiag;
-      else if ((sq.bitBoard & e1UpDiag) > 0) sq.upDiag = e1UpDiag;
-      else if ((sq.bitBoard & f1UpDiag) > 0) sq.upDiag = f1UpDiag;
-      else if ((sq.bitBoard & g1UpDiag) > 0) sq.upDiag = g1UpDiag;
-      else if ((sq.bitBoard & h1UpDiag) > 0) sq.upDiag = h1UpDiag;
-
-      if ((sq.bitBoard & a1DownDiag) > 0) sq.downDiag = a1DownDiag;
-      else if ((sq.bitBoard & a2DownDiag) > 0) sq.downDiag = a2DownDiag;
-      else if ((sq.bitBoard & a3DownDiag) > 0) sq.downDiag = a3DownDiag;
-      else if ((sq.bitBoard & a4DownDiag) > 0) sq.downDiag = a4DownDiag;
-      else if ((sq.bitBoard & a5DownDiag) > 0) sq.downDiag = a5DownDiag;
-      else if ((sq.bitBoard & a6DownDiag) > 0) sq.downDiag = a6DownDiag;
-      else if ((sq.bitBoard & a7DownDiag) > 0) sq.downDiag = a7DownDiag;
-      else if ((sq.bitBoard & a8DownDiag) > 0) sq.downDiag = a8DownDiag;
-      else if ((sq.bitBoard & b8DownDiag) > 0) sq.downDiag = b8DownDiag;
-      else if ((sq.bitBoard & c8DownDiag) > 0) sq.downDiag = c8DownDiag;
-      else if ((sq.bitBoard & d8DownDiag) > 0) sq.downDiag = d8DownDiag;
-      else if ((sq.bitBoard & e8DownDiag) > 0) sq.downDiag = e8DownDiag;
-      else if ((sq.bitBoard & f8DownDiag) > 0) sq.downDiag = f8DownDiag;
-      else if ((sq.bitBoard & g8DownDiag) > 0) sq.downDiag = g8DownDiag;
-      else if ((sq.bitBoard & h8DownDiag) > 0) sq.downDiag = h8DownDiag;
-    }
-
   } // @formatter:on
 
   /**
@@ -177,6 +141,40 @@ public enum Square {
       index64 = -1;
       bitBoard = 0L;
     }
+    // precompute diagonals for squares
+    if ((this.bitBoard & a8UpDiag) != 0) this.upDiag = a8UpDiag;
+    else if ((this.bitBoard & a7UpDiag) != 0) this.upDiag = a7UpDiag;
+    else if ((this.bitBoard & a6UpDiag) != 0) this.upDiag = a6UpDiag;
+    else if ((this.bitBoard & a5UpDiag) != 0) this.upDiag = a5UpDiag;
+    else if ((this.bitBoard & a4UpDiag) != 0) this.upDiag = a4UpDiag;
+    else if ((this.bitBoard & a3UpDiag) != 0) this.upDiag = a3UpDiag;
+    else if ((this.bitBoard & a2UpDiag) != 0) this.upDiag = a2UpDiag;
+    else if ((this.bitBoard & a1UpDiag) != 0) this.upDiag = a1UpDiag;
+    else if ((this.bitBoard & b1UpDiag) != 0) this.upDiag = b1UpDiag;
+    else if ((this.bitBoard & c1UpDiag) != 0) this.upDiag = c1UpDiag;
+    else if ((this.bitBoard & d1UpDiag) != 0) this.upDiag = d1UpDiag;
+    else if ((this.bitBoard & e1UpDiag) != 0) this.upDiag = e1UpDiag;
+    else if ((this.bitBoard & f1UpDiag) != 0) this.upDiag = f1UpDiag;
+    else if ((this.bitBoard & g1UpDiag) != 0) this.upDiag = g1UpDiag;
+    else if ((this.bitBoard & h1UpDiag) != 0) this.upDiag = h1UpDiag;
+    else this.upDiag = 0;
+
+    if ((this.bitBoard & a1DownDiag) != 0) this.downDiag = a1DownDiag;
+    else if ((this.bitBoard & a2DownDiag) != 0) this.downDiag = a2DownDiag;
+    else if ((this.bitBoard & a3DownDiag) != 0) this.downDiag = a3DownDiag;
+    else if ((this.bitBoard & a4DownDiag) != 0) this.downDiag = a4DownDiag;
+    else if ((this.bitBoard & a5DownDiag) != 0) this.downDiag = a5DownDiag;
+    else if ((this.bitBoard & a6DownDiag) != 0) this.downDiag = a6DownDiag;
+    else if ((this.bitBoard & a7DownDiag) != 0) this.downDiag = a7DownDiag;
+    else if ((this.bitBoard & a8DownDiag) != 0) this.downDiag = a8DownDiag;
+    else if ((this.bitBoard & b8DownDiag) != 0) this.downDiag = b8DownDiag;
+    else if ((this.bitBoard & c8DownDiag) != 0) this.downDiag = c8DownDiag;
+    else if ((this.bitBoard & d8DownDiag) != 0) this.downDiag = d8DownDiag;
+    else if ((this.bitBoard & e8DownDiag) != 0) this.downDiag = e8DownDiag;
+    else if ((this.bitBoard & f8DownDiag) != 0) this.downDiag = f8DownDiag;
+    else if ((this.bitBoard & g8DownDiag) != 0) this.downDiag = g8DownDiag;
+    else if ((this.bitBoard & h8DownDiag) != 0) this.downDiag = h8DownDiag;
+    else this.downDiag = 0;
   }
 
   /**
@@ -275,6 +273,7 @@ public enum Square {
    */
   public File getFile() {
     if (!this.validSquare) return File.NOFILE;
+    // TODO precompute this
     return File.values[this.ordinal() % 16];
   }
 
@@ -283,6 +282,7 @@ public enum Square {
    */
   public Rank getRank() {
     if (!this.validSquare) return Rank.NORANK;
+    // TODO precompute this
     return Rank.values[this.ordinal() >>> 4];
   }
 
@@ -310,12 +310,11 @@ public enum Square {
   /**
    * This enum represents all files of a chess board. If used in a loop via values() omit NOFILE.
    */
-  public enum File {
-    a, b, c, d, e, f, g, h, NOFILE;
+  public enum File {a, b, c, d, e, f, g, h, NOFILE;
 
     // pre-filled list with all squares
     public static final File[] values;
-    public final long bitBoard;
+    public final        long   bitBoard;
 
     static {
       values = File.values();
@@ -357,12 +356,11 @@ public enum Square {
   /**
    * This enum represents all ranks of a chess board If used in a loop via values() omit NORANK.
    */
-  public enum Rank {
-    r1, r2, r3, r4, r5, r6, r7, r8, NORANK;
+  public enum Rank {r1, r2, r3, r4, r5, r6, r7, r8, NORANK;
 
     // pre-filled list with all squares
     public static final Rank[] values;
-    public final long bitBoard;
+    public final        long   bitBoard;
 
     static {
       values = Rank.values();
@@ -370,7 +368,7 @@ public enum Square {
 
     Rank() {
       final long a = 0b11111111L;
-      if (ordinal() < 8) this.bitBoard = a << 8*ordinal();
+      if (ordinal() < 8) this.bitBoard = a << 8 * ordinal();
       else bitBoard = 0;
     }
 
