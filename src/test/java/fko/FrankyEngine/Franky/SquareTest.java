@@ -60,7 +60,7 @@ public class SquareTest {
    * Tests basic Square operations
    */
   @Test
-  public void test() {
+  public void testSquares() {
     // Square addressing
     assertEquals(getSquare(0), a1);
     assertEquals(getSquare(119), h8);
@@ -167,12 +167,12 @@ public class SquareTest {
   public void diagonalBitboardTest() {
     for (Square sq : validSquares) {
       System.out.printf("%s: %s  on up diagonal: %s down diagonal: %s%n", sq,
-                        getBitboardString(sq.bitBoard), getBitboardString(sq.getUpDiag()),
-                        getBitboardString(sq.getDownDiag()));
+                        Bitboard.toString(sq.bitBoard), Bitboard.toString(sq.getUpDiag()),
+                        Bitboard.toString(sq.getDownDiag()));
     }
     System.out.println();
 
-    System.out.printf("%s: %s %n", a6UpDiag, getBitboardString(a6UpDiag));
+    System.out.printf("%s: %s %n", a6UpDiag, Bitboard.toString(a6UpDiag));
     System.out.println();
 
     assertEquals(a1.getDownDiag(), a1DownDiag);
@@ -239,16 +239,6 @@ public class SquareTest {
     System.out.println(Rank.NORANK.bitBoard);
     System.out.println(Bitboard.toString(Rank.NORANK.bitBoard));
     assertEquals(0, Rank.NORANK.bitBoard);
-  }
-
-
-  String getBitboardString(long bitboard) {
-    StringBuilder stringBuilder = new StringBuilder();
-    for (int i = 0; i < Long.numberOfLeadingZeros((long) bitboard); i++) {
-      stringBuilder.append('0');
-    }
-    stringBuilder.append(Long.toBinaryString(bitboard));
-    return stringBuilder.toString();
   }
 
 }
