@@ -1291,7 +1291,8 @@ public class Search implements Runnable {
       // ###############################################
 
       // Check if our givesCheck(move) works correctly
-      assert position.hasCheck() == givesCheck;
+      assert position.hasCheck()==givesCheck
+        : "Position check after move not the same as before the move";
 
       if (TRACE) {
         trace("%sSearch in ply %d for depth %d: MAKE MOVE %s (%d/%d) ", getSpaces(ply), ply, depth,
