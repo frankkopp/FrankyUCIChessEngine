@@ -28,6 +28,8 @@ package fko.FrankyEngine.Franky;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
 import static fko.FrankyEngine.Franky.EvaluationConfig.*;
 import static fko.FrankyEngine.Franky.Piece.*;
 import static fko.FrankyEngine.Franky.PieceType.PAWN;
@@ -77,20 +79,28 @@ public class Evaluation {
   private static final int BLACK = Color.BLACK.ordinal();
 
   // Evaluation Results
-  private int value                = 0;
-  private int special              = 0;
-  private int material             = 0;
+  private int value   = 0;
+  private int special = 0;
+
+  private int material        = 0;
+  private int midGameMaterial = 0;
+  private int endGameMaterial = 0;
+
   private int piecePosition        = 0;
-  private int mobility             = 0;
-  private int kingSafety           = 0;
-  private int midGameMaterial      = 0;
-  private int endGameMaterial      = 0;
   private int midGamePiecePosition = 0;
   private int endGamePiecePosition = 0;
-  private int midGameMobility      = 0;
-  private int endGameMobility      = 0;
-  private int midGameKingSafety    = 0;
-  private int endGameKingSafety    = 0;
+
+  private int mobility        = 0;
+  private int midGameMobility = 0;
+  private int endGameMobility = 0;
+
+  private int kingSafety        = 0;
+  private int midGameKingSafety = 0;
+  private int endGameKingSafety = 0;
+
+  private int pawnStructure        = 0;
+  private int midGamePawnStructure = 0;
+  private int endGamePawnStructure = 0;
 
   // Convenience fields - improve readability
   private Position     position;
@@ -148,30 +158,6 @@ public class Evaluation {
     return evaluation;
   }
 
-  private void printEvaluation() {
-    LOG.debug("========================================================"
-              + "==================================");
-    LOG.debug(String.format("Evaluation: Last move was %s", Move.toString(position.getLastMove())));
-    LOG.debug(String.format("%n%s", position.toBoardString()));
-    LOG.debug(String.format("Position has check? %s", position.hasCheck()));
-    LOG.debug(String.format("Next Move: %s", position.getNextPlayer().toString()));
-    LOG.debug(String.format("Gamephase:                 %5d (%,.2f)", position.getGamePhaseValue(),
-                            position.getGamePhaseFactor()));
-    LOG.debug("-----------------------------------------------");
-    LOG.debug(String.format("Material:                  %5d (%5d, %5d)", material, midGameMaterial,
-                            endGameMaterial));
-    LOG.debug(String.format("Piece Position             %5d (%5d, %5d)", piecePosition,
-                            midGamePiecePosition, endGamePiecePosition));
-    LOG.debug(String.format("Mobility:                  %5d (%5d, %5d)", mobility, midGameMobility,
-                            endGameMobility));
-    LOG.debug(
-      String.format("King Safety:               %5d (%5d, %5d)", kingSafety, midGameKingSafety,
-                    endGameKingSafety));
-    LOG.debug(String.format("Special:                   %5d ", special));
-    LOG.debug("-----------------------------------------------");
-    LOG.debug(String.format("Evaluation                 %5d ", value));
-  }
-
   /**
    * Evaluates the position.
    *
@@ -218,6 +204,9 @@ public class Evaluation {
 
     kingSafety = (int) (midGameKingSafety * phaseFactorMid + endGameKingSafety * phaseFactorEnd);
 
+    pawnStructure =
+      (int) (midGamePawnStructure * phaseFactorMid + endGamePawnStructure * phaseFactorEnd);
+
     // Stage 3
     iterateOverSquares();
 
@@ -228,6 +217,7 @@ public class Evaluation {
             piecePosition * POSITION_WEIGHT +
             mobility      * MOBILITY_WEIGHT +
             kingSafety    * KING_SAFETY_WEIGHT +
+            pawnStructure * DOUBLED_PAWN_WEIGHT +
             special;
     // @formatter:on
     // Sum up per game phase
@@ -244,24 +234,27 @@ public class Evaluation {
 
   private void clearValues() {
     value = 0;
-
     special = 0;
-    material = 0;
-    piecePosition = 0;
-    mobility = 0;
-    kingSafety = 0;
 
+    material = 0;
     midGameMaterial = 0;
     endGameMaterial = 0;
 
+    piecePosition = 0;
     midGamePiecePosition = 0;
     endGamePiecePosition = 0;
 
+    mobility = 0;
     midGameMobility = 0;
     endGameMobility = 0;
 
+    kingSafety = 0;
     midGameKingSafety = 0;
     endGameKingSafety = 0;
+
+    pawnStructure = 0;
+    midGamePawnStructure = 0;
+    endGamePawnStructure = 0;
   }
 
   private void staticEvaluations() {
@@ -683,8 +676,9 @@ public class Evaluation {
 
   private void evalPawns() {
     for (int i = 0; i < pawnSquares[nextToMove].size(); i++) {
-      Square square = pawnSquares[nextToMove].get(i);
+      final Square square = pawnSquares[nextToMove].get(i);
       final int index = square.ordinal();
+
       assert (position.getPiece(square).getType() == PAWN);
       assert (position.getPiece(square).getColor().ordinal() == nextToMove);
 
@@ -694,7 +688,17 @@ public class Evaluation {
       this.midGamePiecePosition += pawnsMidGame[tableIndex];
       this.endGamePiecePosition += pawnsEndGame[tableIndex];
 
+      // penalty for doubled pawn
+      final long pawnsOnFile =
+        square.getFile().bitBoard & position.getPiecesBitboards(position.getNextPlayer(), PAWN);
+      final int count = Long.bitCount(pawnsOnFile);
+      this.midGamePawnStructure += count * DOUBLED_PAWN_PENALTY;
+      this.endGamePawnStructure += count * DOUBLED_PAWN_PENALTY;
+
+      // bonus for unblocked pawn (no opponent pawn on file and neighbour file
+
     }
+
     for (int i = 0; i < pawnSquares[opponent].size(); i++) {
       Square square = pawnSquares[opponent].get(i);
       final int index = square.ordinal();
@@ -706,6 +710,15 @@ public class Evaluation {
         opponent == WHITE ? getWhiteTableIndex(index) : getBlackTableIndex(index);
       this.midGamePiecePosition -= pawnsMidGame[tableIndex];
       this.endGamePiecePosition -= pawnsEndGame[tableIndex];
+
+      // penalty for doubled pawn
+      final long pawnsOnFile =
+        square.getFile().bitBoard & position.getPiecesBitboards(position.getOpponent(), PAWN);
+      final int count = Long.bitCount(pawnsOnFile);
+      this.midGamePawnStructure -= count * DOUBLED_PAWN_PENALTY;
+      this.endGamePawnStructure -= count * DOUBLED_PAWN_PENALTY;
+
+      // bonus for unblocked pawn (no opponent pawn on file and neighbour file
     }
   }
 
@@ -791,25 +804,6 @@ public class Evaluation {
     return kingSafety;
   }
 
-  @Override
-  public String toString() {
-    // @formatter:off
-    return "Evaluation{" +
-           "value=" + value +
-           ", gamePhaseFactor=" + position.getGamePhaseFactor() +
-           ", special=" + special +
-           ", material=" + material +
-           ", midGameMaterial=" + midGameMaterial +
-           ", endGameMaterial=" + endGameMaterial +
-           ", piecePosition=" + piecePosition +
-           ", midGamePiecePosition=" + midGamePiecePosition +
-           ", endGamePiecePosition=" + endGamePiecePosition +
-           ", mobility=" + mobility +
-           ", midGameMobility=" + midGameMobility +
-           ", endGameMobility=" + endGameMobility + '}';
-    // @formatter:on
-  }
-
   public static int getPositionValue(Position position, int move) {
 
     final int nextToMove = position.getNextPlayer().ordinal();
@@ -854,6 +848,50 @@ public class Evaluation {
 
     return (int) (midGame * position.getGamePhaseFactor() + endGame * (1f
                                                                        - position.getGamePhaseFactor()));
+  }
 
+  @Override
+  public String toString() {
+    return "Evaluation{" + "value=" + value + ", special=" + special + ", material=" + material
+           + ", midGameMaterial=" + midGameMaterial + ", endGameMaterial=" + endGameMaterial
+           + ", piecePosition=" + piecePosition + ", midGamePiecePosition=" + midGamePiecePosition
+           + ", endGamePiecePosition=" + endGamePiecePosition + ", mobility=" + mobility
+           + ", midGameMobility=" + midGameMobility + ", endGameMobility=" + endGameMobility
+           + ", kingSafety=" + kingSafety + ", midGameKingSafety=" + midGameKingSafety
+           + ", endGameKingSafety=" + endGameKingSafety + ", pawnStructure=" + pawnStructure
+           + ", midGamePawnStructure=" + midGamePawnStructure + ", endGamePawnStructure="
+           + endGamePawnStructure + ", position=" + position + ", nextToMove=" + nextToMove
+           + ", opponent=" + opponent + ", pawnSquares=" + Arrays.toString(pawnSquares)
+           + ", knightSquares=" + Arrays.toString(knightSquares) + ", bishopSquares="
+           + Arrays.toString(bishopSquares) + ", rookSquares=" + Arrays.toString(rookSquares)
+           + ", queenSquares=" + Arrays.toString(queenSquares) + ", kingSquares=" + Arrays.toString(
+      kingSquares) + '}';
+  }
+
+  public void printEvaluation() {
+    LOG.debug("========================================================"
+              + "==================================");
+    LOG.debug(String.format("Evaluation: Last move was %s", Move.toString(position.getLastMove())));
+    LOG.debug(String.format("%n%s", position.toBoardString()));
+    LOG.debug(String.format("Position has check? %s", position.hasCheck()));
+    LOG.debug(String.format("Next Move: %s", position.getNextPlayer().toString()));
+    LOG.debug(String.format("Gamephase:                 %5d (%,.2f)", position.getGamePhaseValue(),
+                            position.getGamePhaseFactor()));
+    LOG.debug("-----------------------------------------------");
+    LOG.debug(String.format("Material:                  %5d (%5d, %5d)", material, midGameMaterial,
+                            endGameMaterial));
+    LOG.debug(String.format("Piece Position             %5d (%5d, %5d)", piecePosition,
+                            midGamePiecePosition, endGamePiecePosition));
+    LOG.debug(String.format("Mobility:                  %5d (%5d, %5d)", mobility, midGameMobility,
+                            endGameMobility));
+    LOG.debug(
+      String.format("King Safety:               %5d (%5d, %5d)", kingSafety, midGameKingSafety,
+                    endGameKingSafety));
+    LOG.debug(
+      String.format("Pawn Structure:            %5d (%5d, %5d)", pawnStructure, midGamePawnStructure,
+                    endGamePawnStructure));
+    LOG.debug(String.format("Special:                   %5d ", special));
+    LOG.debug("-----------------------------------------------");
+    LOG.debug(String.format("Evaluation                 %5d ", value));
   }
 }

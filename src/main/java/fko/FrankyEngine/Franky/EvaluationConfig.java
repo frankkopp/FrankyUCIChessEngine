@@ -42,13 +42,16 @@ class EvaluationConfig {
   static final int ROOK_MOBILITY_FACTOR    = 2;
   static final int QUEEN_MOBILITY_FACTOR   = 1;
 
-  static final int MATERIAL_WEIGHT    = 1;
-  static final int POSITION_WEIGHT    = 1;
-  static final int MOBILITY_WEIGHT    = 2;
-  static final int KING_SAFETY_WEIGHT = 1;
+  static final int MATERIAL_WEIGHT     = 1;
+  static final int POSITION_WEIGHT     = 1;
+  static final int MOBILITY_WEIGHT     = 2;
+  static final int KING_SAFETY_WEIGHT  = 1;
+  static final int DOUBLED_PAWN_WEIGHT = 1;
 
   static final int KING_SAFETY_PAWNSHIELD = 10;
   static final int CORNERED_ROOK_PENALTY  = -50;
+
+  static final int DOUBLED_PAWN_PENALTY = -15;
 
   public static int CONTEMPT_FACTOR = 2; // will be multiplied with game phase factor
 

@@ -246,8 +246,14 @@ public class EvaluationTest {
    move = Move.fromSANNotation(position, "Ke7");
    assertEquals(-20, Evaluation.getPositionValue(position, move));
 
-
  }
+
+  @Test
+  void pawnStructure() {
+    position = new Position("r2qkbnr/1pp2ppp/p1np4/4p3/B3P3/5P1P/PPPP1P2/RNBQ1RK1 b kq -");
+    evaluation.evaluate(position);
+    evaluation.printEvaluation();
+  }
 
   @Test
   @Disabled
