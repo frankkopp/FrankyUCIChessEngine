@@ -25,7 +25,6 @@
 
 package fko.FrankyEngine.Franky;
 
-import javafx.geometry.Pos;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

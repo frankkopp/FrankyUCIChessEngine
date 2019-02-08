@@ -31,7 +31,7 @@
 
     <groupId>fko.FrankyEngine</groupId>
     <artifactId>Franky</artifactId>
-    <version>0.12</version>
+    <version>0.13</version>
 
     <properties>
         <!-- JAVA8 -->
