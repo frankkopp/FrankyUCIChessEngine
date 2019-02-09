@@ -67,7 +67,7 @@ public class SearchMode {
 
   /**
    * Keeps the search mode state
-   *  @param whiteTime remaining time in msec
+   * @param whiteTime remaining time in msec
    * @param blackTime remaining in msec
    * @param whiteInc time inc per move in msec
    * @param blackInc time inc in msec
@@ -170,11 +170,17 @@ public class SearchMode {
     }
   }
 
+  /**
+   * Is called by the engine when UCI signals the engine a ponderhit
+   */
   public void ponderHit() {
     ponder = false;
     setupLimits();
   }
 
+  /**
+   * Is called by the engine when UCI signals to stop pondering
+   */
   public void ponderStop() {
     ponder = false;
   }
