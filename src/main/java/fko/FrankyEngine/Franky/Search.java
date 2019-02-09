@@ -445,8 +445,7 @@ public class Search implements Runnable {
       return searchResult;
     }
 
-    // For fixed depth searches we start at the final depth directly
-    // no iterative deepening
+    // start depth from searchMode
     int depth = searchMode.getStartDepth();
 
     // if time based game setup the soft and hard time limits
@@ -465,9 +464,7 @@ public class Search implements Runnable {
     searchCounter.currentSearchDepth = ROOT_PLY;
     searchCounter.currentExtraSearchDepth = ROOT_PLY;
 
-    // Do a TT lookup to try to find a first best move for this position and
-    // maybe even be able to skip some iterations when a valid cache hit has been
-    // found.
+    // Do a TT lookup to try to find a first best move for this position
     if (config.USE_TT_ROOT && config.USE_TRANSPOSITION_TABLE && !PERFT) {
 
       TT_Entry ttEntry = transpositionTable.get(position.getZobristKey());
@@ -490,16 +487,17 @@ public class Search implements Runnable {
           assert (int) ttEntry.value != Evaluation.NOVALUE;
           // set best move value from TT
           currentBestRootValue = (int) ttEntry.value;
-          //
-          //          // skip lower depths in next search
-          //          if (ttEntry.depth >= depth) {
-          //            depth = ttEntry.depth + 1;
-          //            LOG.debug("TT cached result of depth {}. Start depth is now {}", ttEntry.depth, depth);
-          //            // send info to UCI to let the user know that we have a result for the cached depth
-          //            engine.sendInfoToUCI(String.format("depth %d %s time %d pv %s", ttEntry.depth,
-          //                                               getScoreString(currentBestRootValue), elapsedTime(),
-          //                                               pv[ROOT_PLY].toNotationString()));
-          //          }
+
+          // skip lower depths in next search
+          // commented out as other programs don't do this.
+          // if (ttEntry.depth >= depth) {
+          //   depth = ttEntry.depth + 1;
+          //   LOG.debug("TT cached result of depth {}. Start depth is now {}", ttEntry.depth, depth);
+          //   // send info to UCI to let the user know that we have a result for the cached depth
+          //   engine.sendInfoToUCI(String.format("depth %d %s time %d pv %s", ttEntry.depth,
+          //                                      getScoreString(currentBestRootValue), elapsedTime(),
+          //                                      pv[ROOT_PLY].toNotationString()));
+          // }
         }
       }
       else searchCounter.tt_Misses++;
@@ -508,9 +506,11 @@ public class Search implements Runnable {
     // generate all legal root moves, and set pv move if we got one from TT
     generateRootMoves(position);
 
-    // if we did not get a PV from the TT set a temporary PV
+    // if we did not get a bestMove and PV from the TT set a temporary bestMove
+    // and PV use the first move from the generated moves as this is likely to
+    // be the best anyway due to move sorting.
     if (currentBestRootMove == Move.NOMOVE) {
-      assert pv[ROOT_PLY].empty(); // if we have no TT move we should not have a pv
+      assert pv[ROOT_PLY].empty() : "if we have no TT move we should not have a pv";
       currentBestRootMove = rootMoves.getMove(0);
       pv[ROOT_PLY].add(currentBestRootMove);
       semiPv[ROOT_PLY].add(currentBestRootMove);
@@ -519,7 +519,7 @@ public class Search implements Runnable {
     // single reply in root
     if (rootMoves.size() == 1) {
       singleReply[ROOT_PLY] = true;
-      // add time for this move
+      // add time for this move as this is a special situation (forced moved?)
       if (searchMode.isTimeControl()) addExtraTime(1.5);
     }
     else {
@@ -576,13 +576,13 @@ public class Search implements Runnable {
         assert !config.USE_PVS : "If using MTDf PVS should turned off";
         value = mtdf_search(position, depth, currentBestRootValue );
       }
-      // ASPIRATION - yet not efficient
+      // ASPIRATION - not yet very efficient due to search oscillation
       else if (config.USE_ASPIRATION_WINDOW
           && depth >= config.ASPIRATION_START_DEPTH
           && !PERFT
           && currentBestRootValue != Evaluation.NOVALUE
       ) {
-        assert !config.USE_MTDf : "If using Aspiration MTDF should be turned off";
+        assert !config.USE_MTDf : "If using Aspiration MTDf should be turned off";
         value = aspiration_search(position, depth, currentBestRootValue);
       }
       // ALPHA_BETA
@@ -1291,7 +1291,7 @@ public class Search implements Runnable {
       // ###############################################
 
       // Check if our givesCheck(move) works correctly
-      assert position.hasCheck()==givesCheck
+      assert position.hasCheck() == givesCheck
         : "Position check after move not the same as before the move";
 
       if (TRACE) {

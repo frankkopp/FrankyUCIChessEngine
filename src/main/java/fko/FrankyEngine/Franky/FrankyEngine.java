@@ -40,9 +40,6 @@ import java.util.Properties;
 
 /**
  * Franky Engine for UCI GUIs
- * <p>
-
-
  */
 public class FrankyEngine implements IUCIEngine {
 
