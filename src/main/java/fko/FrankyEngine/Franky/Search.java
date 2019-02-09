@@ -1357,12 +1357,9 @@ public class Search implements Runnable {
       // For the first move this is always the case.
       if (value > bestNodeValue) {
 
-        // for testing
-        MoveList.savePV(move, semiPv[ply + 1], semiPv[ply]);
-
         if (TRACE) {
-          trace("%sSearch in ply %d for depth %d: NEW BEST NODE %d > %d SemiPV: %s", getSpaces(ply),
-                ply, depth, value, bestNodeValue, semiPv[ply].toNotationString());
+          trace("%sSearch in ply %d for depth %d: NEW BEST NODE %d > %d", getSpaces(ply),
+                ply, depth, value, bestNodeValue);
         }
 
         bestNodeValue = value;
@@ -1746,12 +1743,9 @@ public class Search implements Runnable {
       // For the PV move this is always the case.
       if (value > bestNodeValue) {
 
-        // for testing
-        MoveList.savePV(move, semiPv[ply + 1], semiPv[ply]);
-
         if (TRACE) {
-          trace("%sQuiescence in ply %d: NEW BEST NODE %d > %d SemiPV: %s", getSpaces(ply), ply,
-                value, bestNodeValue, semiPv[ply].toNotationString());
+          trace("%sQuiescence in ply %d: NEW BEST NODE %d > %d", getSpaces(ply), ply,
+                value, bestNodeValue);
         }
 
         bestNodeValue = value;
