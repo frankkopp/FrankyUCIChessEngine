@@ -249,9 +249,7 @@ public class SearchMode {
 
   public synchronized boolean isTimeControl() { return timeControl; }
 
-  public synchronized int getStartDepth() {
-    return startDepth;
-  }
+  public synchronized int getStartDepth() { return startDepth; }
 
   public synchronized int getMaxDepth() {
     return maxDepth;
