@@ -5,7 +5,8 @@ Franky 1.0
 ==============================================
 (c) Frank Kopp 2019
 
-Released as JAR or EXE (http://www.jar2exe.com/)
+Released as JAR or EXE (https://github.com/frankkopp/FrankyUCIChessEngine/blob/master/Releases/Franky-1.0.exe) 
+(http://www.jar2exe.com/)
 
 Credits:
 - https://www.chessprogramming.org
