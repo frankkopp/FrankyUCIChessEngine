@@ -67,10 +67,6 @@ public class Search implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Search.class);
 
-  // to turn of tracing of search - LOG.trace is too slow - need additional
-  // constant so the compiler can completely remove it if set to false
-  private static final boolean TRACE = false;
-
   // how often shall an update of the search be send to UCI in ms
   private static final int UCI_UPDATE_INTERVAL = 500;
 
@@ -370,10 +366,7 @@ public class Search implements Runnable {
     lastSearchResult = getBookMove(currentPosition);
 
     // if we didn't get a book move start the search
-    if (lastSearchResult == null) {
-      if (TRACE) trace("START search for %s", currentPosition.toFENString());
-      lastSearchResult = iterativeDeepening(currentPosition);
-    }
+    if (lastSearchResult == null) lastSearchResult = iterativeDeepening(currentPosition);
     assert lastSearchResult != null;
 
     // if the mode still is ponder at this point we finished the ponder
@@ -404,7 +397,6 @@ public class Search implements Runnable {
    * @return search result
    */
   private SearchResult iterativeDeepening(Position position) {
-    if (TRACE) trace("Iterative deepening start");
 
     // remember the start time of the search
     startTime = System.currentTimeMillis();
@@ -536,8 +528,6 @@ public class Search implements Runnable {
     // ###########################################
     // ### BEGIN Iterative Deepening
     do {
-      if (TRACE) trace("Depth %d start", depth);
-
       assert currentBestRootMove != Move.NOMOVE;
 
       searchCounter.currentIterationDepth = depth;
@@ -603,8 +593,6 @@ public class Search implements Runnable {
       // check if we need to stop search - could be external or time.
       if (stopSearch || softTimeLimitReached() || hardTimeLimitReached()) break;
 
-      if (TRACE) trace("Depth %d end", depth);
-
     } while (++depth <= searchMode.getMaxDepth());
     // ### ENDOF Iterative Deepening
     // ###########################################
@@ -628,7 +616,6 @@ public class Search implements Runnable {
     // print result of the search
     printSearchResultInfo();
 
-    if (TRACE) trace("Iterative deepening end");
     return searchResult;
   }
 
@@ -700,8 +687,6 @@ public class Search implements Runnable {
    * @param bestValue
    */
   private int aspiration_search(Position position, int depth, final int bestValue) {
-    if (TRACE) trace("Aspiration for depth %d: START", depth);
-
     // need to have a good guess for the score of the best move
     assert bestValue != Evaluation.NOVALUE;
 
@@ -709,10 +694,6 @@ public class Search implements Runnable {
     // 1st aspiration
     int alpha = Math.max(Evaluation.MIN, bestValue - 30);
     int beta = Math.min(Evaluation.MAX, bestValue + 30);
-    if (TRACE) {
-      trace("Aspiration for depth %d: START 1st window %d/%d (bestValue=%d)", depth, alpha, beta,
-            bestValue);
-    }
     int value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL);
     // ##########################################################
 
@@ -723,28 +704,18 @@ public class Search implements Runnable {
     // 2nd aspiration
     // FAIL LOW - decrease lower bound
     if (value <= alpha) {
-      if (TRACE) {
-        trace("Aspiration for depth %d: FAIL_LOW 1st window %d/%d value=%d", depth, alpha, beta,
-              value);
-      }
       sendUCIAspirationResearchInfo(" upperbound");
       searchCounter.aspirationResearches++;
       // add some extra time because of fail low - we might have found strong opponents move
       addExtraTime(1.3);
       alpha = Math.max(Evaluation.MIN, bestValue - 200);
-      if (TRACE) trace("Aspiration for depth %d: START 2nd window %d/%d", depth, alpha, beta);
       value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL);
     }
     // FAIL HIGH - increase upper bound
     else if (value >= beta) {
-      if (TRACE) {
-        trace("Aspiration for depth %d: FAIL-HIGH: 2nd window %d/%d value=%d ", depth, alpha, beta,
-              value);
-      }
       sendUCIAspirationResearchInfo(" lowerbound");
       searchCounter.aspirationResearches++;
       beta = Math.min(Evaluation.MAX, bestValue + 200);
-      if (TRACE) trace("Aspiration for depth %d: START 2nd window %d/%d", depth, alpha, beta);
       value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL);
     }
     // ##########################################################
@@ -756,11 +727,6 @@ public class Search implements Runnable {
     // 3rd aspiration
     // FAIL - full window search
     if (value <= alpha || value >= beta) {
-      if (TRACE) {
-        trace("Aspiration for depth %d: %s 2nd window %d/%d value=%d ", depth,
-              value <= alpha ? "FAIL-LOW" : "FAIL-HIGH", alpha, beta, value);
-      }
-
       if (value <= alpha) sendUCIAspirationResearchInfo(" lowerbound");
       else sendUCIAspirationResearchInfo(" upperbound");
       searchCounter.aspirationResearches++;
@@ -768,14 +734,9 @@ public class Search implements Runnable {
       if (value <= alpha) addExtraTime(1.3);
       alpha = Evaluation.MIN;
       beta = Evaluation.MAX;
-      if (TRACE) trace("Aspiration for depth %d: START 3rd window %d/%d", depth, alpha, beta);
       value = search(position, depth, ROOT_PLY, alpha, beta, PV_NODE, DO_NULL);
     }
     // ##########################################################
-
-    if (TRACE) {
-      trace("Aspiration for depth %d: END (Result %d in window %d/%d)", depth, value, alpha, beta);
-    }
 
     return stopSearch ? bestValue : value;
   }
@@ -797,11 +758,6 @@ public class Search implements Runnable {
     // is this the root node?
     final boolean ROOT = ply == ROOT_PLY;
 
-    if (TRACE) {
-      trace("%sSearch in ply %d for depth %d: START alpha=%d beta=%d pvnode=%s currline=%s",
-            getSpaces(ply), ply, depth, alpha, beta, pvNode, currentVariation.toNotationString());
-    }
-
     assert depth <= MAX_SEARCH_DEPTH;
     assert alpha >= Evaluation.MIN && beta <= Evaluation.MAX;
     assert pvNode || alpha == beta - 1;
@@ -815,7 +771,6 @@ public class Search implements Runnable {
     // iteration to avoid search explosion through extensions
     if (depth <= LEAF || ply >= MAX_SEARCH_DEPTH - 1
         || ply - 1 >= searchCounter.currentIterationDepth) {
-      if (TRACE) trace("%sSearch in ply %d for depth %d: LEAF NODE", getSpaces(ply), ply, depth);
       return qsearch(position, ply, alpha, beta, pvNode);
     }
 
@@ -826,10 +781,6 @@ public class Search implements Runnable {
         || hardTimeLimitReached()
         || checkMaxNodes()
     ) {
-      if (TRACE) {
-        if (!stopSearch) trace("%sSearch in ply %d for depth %d: STOPPED (time=%,d)",
-                                        getSpaces(ply), ply, depth, hardTimeLimit);
-      }
       stopSearch = true;
       return Evaluation.MIN; // value does not matter because of top flag
     }
@@ -844,19 +795,11 @@ public class Search implements Runnable {
     if (!PERFT) {
       if (ROOT) {
         if (position.check50Moves() || position.checkRepetitions(2)) {
-          if (TRACE) {
-            trace("%sSearch in ply %d for depth %d: REPETITION DRAW (repetitions=%d)",
-                  getSpaces(ply), ply, depth, position.countRepetitions());
-          }
           return Evaluation.DRAW;
         }
       }
       else {
         if (position.check50Moves() || position.checkRepetitions(1)) {
-          if (TRACE) {
-            trace("%sSearch in ply %d for depth %d: REPETITION DRAW (repetitions=%d)",
-                  getSpaces(ply), ply, depth, position.countRepetitions());
-          }
           return contempt(position);
         }
       }
@@ -875,7 +818,6 @@ public class Search implements Runnable {
       if (alpha >= beta) {
         assert isCheckMateValue(alpha);
         searchCounter.mateDistancePrunings++;
-        if (TRACE) trace("%sSearch in ply %d for depth %d: MDP CUT", getSpaces(ply), ply, depth);
         return alpha;
       }
     } // @formatter:on
@@ -907,10 +849,6 @@ public class Search implements Runnable {
           else if (!pvNode && ttEntry.type == TT_EntryType.ALPHA && value <= alpha) cut = true;
           else if (!pvNode && ttEntry.type == TT_EntryType.BETA && value >= beta) cut = true;
           if (cut) {
-            if (TRACE) {
-              trace("%sSearch in ply %d for depth %d: TT CUT value=%d", getSpaces(ply), ply, depth,
-                    value);
-            }
             searchCounter.tt_Cuts++;
             return value;
           }
@@ -964,7 +902,6 @@ public class Search implements Runnable {
         final int evalMargin = config.RFP_MARGIN * depth;
         if (staticEval - evalMargin >= beta ){
           searchCounter.rfpPrunings++;
-          if (TRACE) trace("%sSearch in ply %d for depth %d: STATIC CUT", getSpaces(ply), ply, depth);
           storeTT(position, staticEval, TT_EntryType.BETA, depth, bestNodeMove, mateThreat[ply]);
           return staticEval - evalMargin; // fail-hard: beta / fail-soft: staticEval - evalMargin;
         }
@@ -1007,7 +944,6 @@ public class Search implements Runnable {
 
         // pruning
         if (nullValue >= beta) {
-          if (TRACE) trace("%sSearch in ply %d for depth %d: NULL CUT", getSpaces(ply), ply, depth);
           searchCounter.nullMovePrunings++;
           storeTT(position, nullValue, TT_EntryType.BETA, depth, bestNodeMove, mateThreat[ply]);
           return nullValue; // fail-hard: beta / fail-soft: nullValue;
@@ -1027,7 +963,6 @@ public class Search implements Runnable {
           && staticEval + config.RAZOR_MARGIN <= alpha
       ){
           searchCounter.razorReductions++;
-          if (TRACE) trace("%sSearch in ply %d for depth %d: RAZOR CUT", getSpaces(ply), ply, depth);
           return qsearch(position, ply, alpha, beta, NPV_NODE);
         }
       // ###############################################
@@ -1074,19 +1009,10 @@ public class Search implements Runnable {
       }
     }
     int legalMovesSize = 0; // used only for tracing
-    if (TRACE && !ROOT) {
-      legalMovesSize = moveGenerators[ply].getLegalMoves().size();
-      trace("%sSearch in ply %d for depth %d: MOVE GEN (%d moves) ", getSpaces(ply), ply, depth,
-            legalMovesSize);
-    }
     // ###############################################
 
     // Check if we need to stop search again - there is a lot happening since last check
     if (stopSearch) {
-      if (TRACE) {
-        trace("%sSearch in ply %d for depth %d: STOPPED2 (time=%,d)", getSpaces(ply), ply, depth,
-              hardTimeLimit);
-      }
       return Evaluation.MIN; // value does not matter because of top flag
     }
 
@@ -1098,10 +1024,6 @@ public class Search implements Runnable {
     int movesSize = ROOT ? rootMoves.size() : legalMovesSize;
     move = getNextMove(ply, i++);
     while (move != Move.NOMOVE) {
-      if (TRACE) {
-        trace("%sSearch in ply %d for depth %d: MOVE %s (%d/%d) ", getSpaces(ply), ply, depth,
-              Move.toSimpleString(move), i, movesSize);
-      }
 
       // compute if this move gives chess
       final boolean givesCheck = position.givesCheck(move);
@@ -1123,7 +1045,6 @@ public class Search implements Runnable {
           && Move.getPromotion(move).getType() != PieceType.QUEEN
           && Move.getPromotion(move).getType() != PieceType.KNIGHT) {
           searchCounter.minorPromotionPrunings++;
-          if (TRACE) trace("%sSearch in ply %d for depth %d: MPP CUT", getSpaces(ply), ply, depth);
           move = getNextMove(ply, i++);
           continue;
         } // @formatter:on
@@ -1152,10 +1073,6 @@ public class Search implements Runnable {
         ) {
           extension = 1;
           newDepth += extension;
-          if (TRACE) {
-            trace("%sSearch in ply %d for depth %d: PRE EXTENSION %d",
-                getSpaces(ply), ply, depth, newDepth);
-          }
         } // @formatter:on
       }
       // ###############################################
@@ -1186,8 +1103,6 @@ public class Search implements Runnable {
           final int razorMargin = PieceType.QUEEN.getValue();
           if (materialEval + moveGain + razorMargin <= alpha) {
             searchCounter.lrReductions++;
-            if (TRACE) trace("%sSearch in ply %d for depth %d: LR REDUCTION",
-                             getSpaces(ply), ply, depth);
             newDepth = PRE_FRONTIER; // reduction by 1
           }
         }
@@ -1202,7 +1117,6 @@ public class Search implements Runnable {
           final int extFutilityMargin = PieceType.ROOK.getValue();
           if (materialEval + moveGain + extFutilityMargin <= alpha) {
             searchCounter.efpPrunings++;
-            if (TRACE) trace("%sSearch in ply %d for depth %d: EFP CUT", getSpaces(ply), ply, depth);
             move = getNextMove(ply, i++);
             continue;
           }
@@ -1224,10 +1138,6 @@ public class Search implements Runnable {
           if (materialEval + moveGain + futilityMargin <= alpha) {
             if (materialEval + moveGain > bestNodeValue) bestNodeValue = materialEval + moveGain;
             searchCounter.fpPrunings++;
-            if (TRACE) trace("%sSearch in ply %d for depth %d: FP CUT %s <%s> <%s>",
-                             getSpaces(ply), ply, depth, Move.toSimpleString(move),
-                            currentVariation.toNotationString(),
-                            pv[ROOT_PLY].toNotationString());
             move = getNextMove(ply, i++);
             continue;
           }
@@ -1256,7 +1166,6 @@ public class Search implements Runnable {
             && numberOfSearchedMoves >= config.LMR_MIN_MOVES
         ) {
           searchCounter.lmrReductions++;
-          if (TRACE) trace("%sSearch in ply %d for depth %d: LMR", getSpaces(ply), ply, depth);
           newDepth -= config.LMR_REDUCTION;
         }
         // ###############################################
@@ -1268,10 +1177,6 @@ public class Search implements Runnable {
       // Root moves are always legal.
       position.makeMove(move);
       if (!ROOT && wasIllegalMove(position)) {
-        if (TRACE) {
-          trace("%sSearch in ply %d for depth %d: MOVE ILLEGAL %s (%d/%d) ", getSpaces(ply), ply,
-                depth, Move.toSimpleString(move), i, movesSize);
-        }
         position.undoMove();
         move = getNextMove(ply, i++);
         continue;
@@ -1285,33 +1190,15 @@ public class Search implements Runnable {
       assert position.hasCheck() == givesCheck
         : "Position check after move not the same as before the move";
 
-      if (TRACE) {
-        trace("%sSearch in ply %d for depth %d: MAKE MOVE %s (%d/%d) ", getSpaces(ply), ply, depth,
-              Move.toSimpleString(move), numberOfSearchedMoves + 1, movesSize);
-      }
-
       // ###############################################
       // ### START PVS SEARCH
       int value;
       if (!config.USE_PVS || PERFT || numberOfSearchedMoves == 0) {
-        if (TRACE) {
-          trace("%sSearch in ply %d for depth %d: PV-SEARCH: %d/%d %s window %d/%d", getSpaces(ply),
-                ply, depth, i, movesSize, Move.toString(move), -beta, -alpha);
-        }
         value = -search(position, newDepth, ply + 1, -beta, -alpha, pvNode, DO_NULL);
       }
       else {
-        if (TRACE) {
-          trace("%sSearch in ply %d for depth %d: NULL-WINDOW: %d/%d %s window %d/%d",
-                getSpaces(ply), ply, depth, i, movesSize, Move.toString(move), -alpha - 1, -alpha);
-        }
         value = -search(position, newDepth, ply + 1, -alpha - 1, -alpha, NPV_NODE, DO_NULL);
         if (value > alpha && value < beta && !stopSearch) {
-          if (TRACE) {
-            trace("%sSearch in ply %d for depth %d: RE-SEARCH: %d/%d %s value=%d window %d/%d",
-                  getSpaces(ply), ply, depth, i, movesSize, Move.toString(move), value, -beta,
-                  -alpha);
-          }
           if (ROOT) searchCounter.pvs_root_researches++;
           else searchCounter.pvs_researches++;
           value = -search(position, newDepth, ply + 1, -beta, -alpha, PV_NODE, DO_NULL);
@@ -1337,18 +1224,10 @@ public class Search implements Runnable {
         continue;
       }
 
-      if (TRACE) {
-        trace("%sSearch in ply %s for depth %d: UNDO MOVE %s VALUE %d", getSpaces(ply), ply, depth,
-              Move.toString(move), value);
-      }
-
       // End a stopped search here as the value from this is not reliable.
       // If we already have searched moves and found a better alpha then we
       // still use this better move.
-      if (stopSearch) {
-        if (TRACE) trace("Search in ply %d for depth %d: STOP FLAG", ply, depth);
-        break;
-      }
+      if (stopSearch) break;
 
       // write the value back to the root moves list
       if (ROOT) rootMoves.set(i - 1, move, value);
@@ -1356,14 +1235,6 @@ public class Search implements Runnable {
       // Did we find a better move for this node?
       // For the first move this is always the case.
       if (value > bestNodeValue) {
-
-        // for testing
-        MoveList.savePV(move, semiPv[ply + 1], semiPv[ply]);
-
-        if (TRACE) {
-          trace("%sSearch in ply %d for depth %d: NEW BEST NODE %d > %d SemiPV: %s", getSpaces(ply),
-                ply, depth, value, bestNodeValue, semiPv[ply].toNotationString());
-        }
 
         bestNodeValue = value;
         bestNodeMove = move;
@@ -1383,11 +1254,6 @@ public class Search implements Runnable {
             }
           }
 
-          if (TRACE) {
-            trace("%sSearch in ply %d for depth %d: CUT NODE %d > %d (beta)", getSpaces(ply), ply,
-                  depth, value, beta);
-          }
-
           searchCounter.prunings++;
           if (i < MAX_MOVES) searchCounter.betaCutOffs[i - 1]++;
           // store the bestNodeMove any way as this is the a refutation and
@@ -1403,12 +1269,6 @@ public class Search implements Runnable {
         // TT.
         if (value > alpha) { // NEW ALPHA => NEW PV NODE
           MoveList.savePV(move, pv[ply + 1], pv[ply]);
-          if (TRACE) {
-            final String oldBest = Move.toSimpleString(currentBestRootMove);
-            trace("%sSearch in ply %d for depth %d: NEW PV %s (%d) > %s (%d) (alpha) PV: %s",
-                  getSpaces(ply), ply, depth, Move.toSimpleString(move), value, oldBest, alpha,
-                  pv[ply].toNotationString());
-          }
           ttType = TT_EntryType.EXACT;
           alpha = value;
           if (ROOT) {
@@ -1420,10 +1280,6 @@ public class Search implements Runnable {
 
       // check if we need to stop search - could be external or time.
       if (ROOT && (stopSearch || softTimeLimitReached() || hardTimeLimitReached())) {
-        if (TRACE) {
-          trace("%sSearch in ply %d for depth %d: STOPPED (soft=%,d hard=%,d)", getSpaces(ply), ply,
-                depth, softTimeLimit, hardTimeLimit);
-        }
         break;
       }
 
@@ -1434,33 +1290,18 @@ public class Search implements Runnable {
     // ##### Iterate through all available moves
     // ##########################################################
 
-    // if we never had a beta cut off (cut-node) or never found a better
-    // alpha (pv-node) we have a fail-low
-    if (pv[ply].empty() && TRACE) {
-      if (ROOT) trace("Root Search for depth %d: ASPIRATION FAIL-LOW", depth);
-      else trace("%sSearch in ply %d for depth %d: ALL NODE", getSpaces(ply), ply, depth);
-    }
-
     // if we did not have a legal move then we have a mate
     if (!ROOT && numberOfSearchedMoves == 0 && !stopSearch) {
       searchCounter.nonLeafPositionsEvaluated++;
       if (position.hasCheck()) {
         // We have a check mate. Return a -CHECKMATE.
-        if (TRACE) trace("%sSearch in ply %d for depth %d: CHECKMATE", getSpaces(ply), ply, depth);
         bestNodeValue = -Evaluation.CHECKMATE + ply;
       }
       else {
         // We have a stale mate. Return the draw value.
-        if (TRACE) trace("%sSearch in ply %d for depth %d: STALEMATE", getSpaces(ply), ply, depth);
         bestNodeValue = Evaluation.DRAW;
       }
       assert ttType == TT_EntryType.ALPHA;
-    }
-
-    if (TRACE) {
-      trace("%sSearch in ply %d for depth %d: END value=%d (%d moves searched) (%s)",
-            getSpaces(ply), ply, depth, alpha, numberOfSearchedMoves,
-            currentVariation.toNotationString());
     }
 
     // store the best alpha
@@ -1486,11 +1327,6 @@ public class Search implements Runnable {
   private int qsearch(final Position position, final int ply, int alpha, int beta,
                       final boolean pvNode) {
 
-    if (TRACE) {
-      trace("%sQuiescence in ply %d: START alpha=%d beta=%d pvnode=%s (%s)", getSpaces(ply), ply,
-            alpha, beta, pvNode, currentVariation.toNotationString());
-    }
-
     assert ply >= 1;
     assert alpha >= Evaluation.MIN && beta <= Evaluation.MAX;
     assert pvNode || alpha == beta - 1;
@@ -1505,19 +1341,11 @@ public class Search implements Runnable {
     // we evaluate ech repetition as draw within the search tree - this weay we detect repetition
     // earlier - this should not weeken the search
     if (position.check50Moves() || position.checkRepetitions(1)) {
-      if (TRACE) {
-        trace("%sQuiescence in ply %d: REPETITION DRAW (repetitions=%d)", getSpaces(ply), ply,
-              position.countRepetitions());
-      }
       return contempt(position);
     }
 
     // If quiescence is turned off or we reach max depth return evaluation
     if (!config.USE_QUIESCENCE || ply >= MAX_SEARCH_DEPTH - 1) {
-      if (TRACE) {
-        trace("%sQuiescence in ply %d: EVAL value=%d", getSpaces(ply), ply,
-              evaluate(position, ply, alpha, beta));
-      }
       return evaluate(position, ply, alpha, beta);
     }
 
@@ -1528,10 +1356,6 @@ public class Search implements Runnable {
         || hardTimeLimitReached()
         || checkMaxNodes()
     ) {
-      if (TRACE) {
-        if (!stopSearch) trace("%sQuiescence in ply %d: STOPPED (time=%,d)",
-                                        getSpaces(ply), ply, hardTimeLimit);
-      }
       stopSearch = true;
       return Evaluation.MIN; // value does ont matter because of top flag
     }
@@ -1546,7 +1370,6 @@ public class Search implements Runnable {
       if (alpha >= beta) {
         assert isCheckMateValue(alpha);
         searchCounter.mateDistancePrunings++;
-        if (TRACE) trace("%sQuiescence in ply %d: MDP CUT", getSpaces(ply), ply);
         return alpha;
       }
     }
@@ -1579,9 +1402,6 @@ public class Search implements Runnable {
         else if (!pvNode && ttEntry.type == TT_EntryType.ALPHA && value <= alpha) cut = true;
         else if (!pvNode && ttEntry.type == TT_EntryType.BETA && value >= beta) cut = true;
         if (cut) {
-          if (TRACE) {
-            trace("%sSearch in ply %d: TT CUT value=%d", getSpaces(ply), ply, value);
-          }
           searchCounter.tt_Cuts++;
           return value;
         }
@@ -1615,13 +1435,8 @@ public class Search implements Runnable {
     if (!position.hasCheck()) {
       int standPat = evaluate(position, ply, alpha, beta);
       bestNodeValue = standPat;
-      if (TRACE) trace("%sQuiescence in ply %d: STANDPAT %d", getSpaces(ply), ply, standPat);
       if (standPat >= beta) {
         storeTT(position, standPat, TT_EntryType.BETA, DEPTH_NONE, Move.NOMOVE, mateThreat[ply]);
-        if (TRACE) {
-          trace("%sQuiescence in ply %d: STANDPAT CUT (%d > %d beta)", getSpaces(ply), ply,
-                standPat, beta);
-        }
         return standPat; // fail-hard: beta, fail-soft: statEval
       }
       if (standPat > alpha) alpha = standPat;
@@ -1637,10 +1452,6 @@ public class Search implements Runnable {
     }
     MoveList moves = moveGenerators[ply].getPseudoLegalQSearchMoves();
     searchCounter.movesGenerated += moves.size();
-
-    if (TRACE) {
-      trace("%sQuiescence in ply %d: MOVE GEN (%d moves)", getSpaces(ply), ply, moves.size());
-    }
 
     // ###############################################
     // moves to search recursively
@@ -1659,7 +1470,6 @@ public class Search implements Runnable {
             && Move.getPromotion(move).getType() != PieceType.QUEEN
             && Move.getPromotion(move).getType() != PieceType.KNIGHT) {
           searchCounter.minorPromotionPrunings++;
-          if (TRACE) trace("%sQuiescence in ply %d: MPP CUT", getSpaces(ply), ply);
           continue;
         }
         // @formatter:on
@@ -1688,7 +1498,6 @@ public class Search implements Runnable {
         value = materialEval + moveGain + deltaMargin;
         if (value <= alpha) {
           searchCounter.qfpPrunings++;
-          if (TRACE) trace("%sSearch in ply %d: DELTA PRUNING", getSpaces(ply), ply);
           if (value > bestNodeValue) bestNodeValue = value;
           continue;
         }
@@ -1713,11 +1522,6 @@ public class Search implements Runnable {
       sendUCIUpdate(position);
       // ###############################################
 
-      if (TRACE) {
-        trace("%sQuiescence in ply %d: MAKE MOVE %s (%d/%d)", getSpaces(ply), ply,
-              Move.toSimpleString(move), numberOfSearchedMoves + 1, moves.size());
-      }
-
       // ###############################################
       // go one ply deeper into the search tree
       value = -qsearch(position, ply + 1, -beta, -alpha, pvNode);
@@ -1729,30 +1533,14 @@ public class Search implements Runnable {
 
       assert stopSearch || (value > Evaluation.MIN && value < Evaluation.MAX);
 
-      if (TRACE) {
-        trace("%sQuiescence in ply %s: UNDO MOVE %s VALUE %d", getSpaces(ply), ply,
-              Move.toString(move), value);
-      }
-
       // End a stopped search here as the value from this is not reliable.
       // If we already have searched moves and found a better alpha then we
       // still use this better move.
-      if (stopSearch) {
-        if (TRACE) trace("sQuiescence in ply %d: STOP FLAG", ply);
-        break;
-      }
+      if (stopSearch) break;
 
       // Did we find a better move for this node?
       // For the PV move this is always the case.
       if (value > bestNodeValue) {
-
-        // for testing
-        MoveList.savePV(move, semiPv[ply + 1], semiPv[ply]);
-
-        if (TRACE) {
-          trace("%sQuiescence in ply %d: NEW BEST NODE %d > %d SemiPV: %s", getSpaces(ply), ply,
-                value, bestNodeValue, semiPv[ply].toNotationString());
-        }
 
         bestNodeValue = value;
         bestNodeMove = move;
@@ -1761,10 +1549,6 @@ public class Search implements Runnable {
         // opponent can/will avoid this move altogether so we can stop search this node
         // fail-high
         if (value >= beta && config.USE_ALPHABETA_PRUNING && !PERFT) {
-          if (TRACE) {
-            trace("%sQuiescence in ply %d: CUT NODE %d > %d (beta)", getSpaces(ply), ply, value,
-                  beta);
-          }
           searchCounter.prunings++;
           if (i < MAX_MOVES) searchCounter.betaCutOffs[i]++;
           ttType = TT_EntryType.BETA;
@@ -1774,11 +1558,6 @@ public class Search implements Runnable {
         // Did we find a better move than in previous nodes then this is our new
         // PV and best move for this ply.
         if (value > alpha) { // NEW ALPHA => NEW PV NODE
-          if (TRACE) {
-            trace("%sQuiescence in ply %d: NEW PV %s (%d) > %s (%d) (alpha) PV: %s", getSpaces(ply),
-                  ply, Move.toSimpleString(move), value, pv[ply], alpha,
-                  pv[ply].toNotationString());
-          }
           MoveList.savePV(move, pv[ply + 1], pv[ply]);
           ttType = TT_EntryType.EXACT;
           alpha = value;
@@ -1788,28 +1567,16 @@ public class Search implements Runnable {
     } // iteration over all qmoves
     // ###############################################
 
-    // if we never had a beta cut off (cut-node) or never found a better
-    // alpha (pv-node) we have an fail-low
-    if (TRACE && bestNodeMove == Move.NOMOVE) {
-      trace("%sQuiescence in ply %d: ALL NODE", getSpaces(ply), ply);
-    }
-
     // if we did not have a legal move then we might have a mate or only quiet moves
     if (numberOfSearchedMoves == 0 && position.hasCheck() && !stopSearch) {
       // as we will not enter evaluation we count it here
       searchCounter.nonLeafPositionsEvaluated++;
       // We have a check mate. Return a -CHECKMATE.
-      if (TRACE) trace("%sQuiescence in ply %d: CHECKMATE", getSpaces(ply), ply);
       bestNodeValue = -Evaluation.CHECKMATE + ply;
       assert ttType == TT_EntryType.ALPHA;
     }
 
     assert stopSearch || (bestNodeValue > Evaluation.MIN && bestNodeValue < Evaluation.MAX);
-
-    if (TRACE) {
-      trace("%sQuiescence in ply %d: END value=%d (%d moves searched) (%s)", getSpaces(ply), ply,
-            bestNodeValue, numberOfSearchedMoves, currentVariation.toNotationString());
-    }
 
     storeTT(position, bestNodeValue, ttType, 0, bestNodeMove, mateThreat[ply]);
     return bestNodeValue; /// fail-hard: alpha / fail-soft: bestvalue
@@ -1840,15 +1607,7 @@ public class Search implements Runnable {
     }
 
     // do evaluation
-    final int value = evaluator.evaluate(position);
-
-    if (TRACE) {
-      trace("%SEvaluation: %s = %d  ply: %d  currline: <%s>  position: %s", getSpaces(ply),
-            Move.toString(position.getLastMove()), value, ply,
-            currentVariation.toNotationString().trim(), position.toFENString());
-    }
-
-    return value;
+    return evaluator.evaluate(position);
   }
 
   /**
@@ -2233,24 +1992,6 @@ public class Search implements Runnable {
       "Engine got Best Move: " + Move.toSimpleString(lastSearchResult.bestMove) + " [Ponder " + Move
         .toSimpleString(lastSearchResult.ponderMove) + "]");
     else engine.sendResult(lastSearchResult.bestMove, lastSearchResult.ponderMove);
-  }
-
-  /**
-   * Logs formatted trace messages to LOG
-   *
-   * @param format
-   * @param args
-   */
-  private void trace(String format, Object... args) {
-    LOG.trace("{}", String.format(format, args));
-  }
-
-  private StringBuilder getSpaces(int ply) {
-    StringBuilder spaces = new StringBuilder();
-    for (int i = 1; i <= ply; i++) {
-      spaces.append("  ");
-    }
-    return spaces;
   }
 
   /**
