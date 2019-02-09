@@ -62,16 +62,6 @@ import java.util.concurrent.CountDownLatch;
  * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: Lazy SMP
  *
- * 1: Franky-0.11    14.5/80 ······
- * 2: Myrddin-087-64 10.0/10 10-0-0
- * 2: Mediocre_v0.5  10.0/10 10-0-0
- * 2: Flux-1.0       10.0/10 10-0-0
- * 5: Clueless       8.0/10   8-2-0
- * 6: Ranita_24      7.5/10   7-2-1
- * 6: Franky-0.10    7.5/10   6-1-3
- * 8: Fmax           6.5/10   5-2-3
- * 9: GERBIL         6.0/10   5-3-2
- *
  */
 public class Search implements Runnable {
 
@@ -136,7 +126,6 @@ public class Search implements Runnable {
   // to store the best move or principal variation we need to generate the move sequence backwards
   // in the recursion. This field stores the pv for each ply so far
   private final MoveList[]      pv;
-  private final MoveList[]      semiPv;
   // killer move lists per ply
   private       MoveList[]      killerMoves;
   // remember if there have been mate threads in a ply
@@ -183,7 +172,6 @@ public class Search implements Runnable {
     currentVariation = new MoveList(MAX_SEARCH_DEPTH);
     moveGenerators = new MoveGenerator[MAX_SEARCH_DEPTH];
     pv = new MoveList[MAX_SEARCH_DEPTH];
-    semiPv = new MoveList[MAX_SEARCH_DEPTH];
     killerMoves = new MoveList[MAX_SEARCH_DEPTH];
     mateThreat = new boolean[MAX_SEARCH_DEPTH];
     singleReply = new boolean[MAX_SEARCH_DEPTH];
@@ -335,7 +323,6 @@ public class Search implements Runnable {
       moveGenerators[i].SORT_MOVES = config.USE_SORT_ALL_MOVES;
       // prepare principal variation lists
       pv[i] = new MoveList(MAX_SEARCH_DEPTH);
-      semiPv[i] = new MoveList(MAX_SEARCH_DEPTH);
       // init killer moves
       killerMoves[i] = new MoveList(config.NO_KILLER_MOVES + 1);
       // mateThreads
@@ -400,8 +387,8 @@ public class Search implements Runnable {
     // ### SEARCH
     // ###########################################
 
-    LOG.info("Search result was: {} PV {} SemiPV {}", lastSearchResult.toString(),
-             pv[ROOT_PLY].toNotationString(), semiPv[ROOT_PLY].toNotationString());
+    LOG.info("Search result was: {} PV {} ", lastSearchResult.toString(),
+             pv[ROOT_PLY].toNotationString());
 
     // send result to engine
     sendUCIBestMove();
@@ -433,7 +420,6 @@ public class Search implements Runnable {
 
     // clear principal Variation for root depth
     pv[ROOT_PLY].clear();
-    semiPv[ROOT_PLY].clear();
 
     // prepare search result
     SearchResult searchResult = new SearchResult();
@@ -478,7 +464,6 @@ public class Search implements Runnable {
         if (ttEntry.bestMove != Move.NOMOVE) {
           currentBestRootMove = ttEntry.bestMove;
           getPVLine(position, ttEntry.depth, pv[ROOT_PLY]);
-          semiPv[ROOT_PLY] = pv[ROOT_PLY].clone();
           assert pv[ROOT_PLY].getFirst() == currentBestRootMove;
         }
 
@@ -513,7 +498,6 @@ public class Search implements Runnable {
       assert pv[ROOT_PLY].empty() : "if we have no TT move we should not have a pv";
       currentBestRootMove = rootMoves.getMove(0);
       pv[ROOT_PLY].add(currentBestRootMove);
-      semiPv[ROOT_PLY].add(currentBestRootMove);
     }
 
     // single reply in root
@@ -600,6 +584,7 @@ public class Search implements Runnable {
         rootMoves.pushToHead(pv[ROOT_PLY].getFirst());
       }
 
+      // check after search conditions
       assert currentBestRootMove != Move.NOMOVE : "We should have a best move here";
       assert !pv[ROOT_PLY].empty() : "PV should not be empty";
       assert currentBestRootMove == pv[ROOT_PLY].getFirst() : "best move is different from pv";
@@ -613,7 +598,7 @@ public class Search implements Runnable {
       sendUCIIterationEndInfo();
 
       // if the last iteration had many bestMoveChanges extend time
-      // if (depth > 4 && searchCounter.bestMoveChanges > (depth / 2) + 1) addExtraTime(1.4);
+      // TODO: if (depth > 4 && searchCounter.bestMoveChanges > (depth / 2) + 1) addExtraTime(1.4);
 
       // check if we need to stop search - could be external or time.
       if (stopSearch || softTimeLimitReached() || hardTimeLimitReached()) break;
@@ -647,6 +632,11 @@ public class Search implements Runnable {
     return searchResult;
   }
 
+  /**
+   * Generates root moves and stores them in rootMoves. UCI move filter is applied and moves are
+   * sorted best guess first.
+   * @param position
+   */
   private void generateRootMoves(Position position) {
     moveGenerators[ROOT_PLY].setPosition(position);
     if (config.USE_PVS_ORDERING) {
@@ -670,8 +660,8 @@ public class Search implements Runnable {
    * MTDf Search
    * https://askeplaat.wordpress.com/534-2/mtdf-algorithm/
    *
-   * Is for testing only - evaluation per iteration is changing
-   * too much for this to be useful.
+   * This is for testing only - evaluation per iteration is changing
+   * too much for this to be useful (yet).
    *
    * @param position
    * @param depth
@@ -698,11 +688,12 @@ public class Search implements Runnable {
   }
 
   /**
-   * Aspiration search works with the assumption that the value from previous searches will not
-   * change too much and therefore the search can be tried with a narrow window for alpha and beta
-   * around the previous value to cause more cut offs. If the result is at the edge or outside
-   * (not possible in fail-hard) of our window, we try another search with a wider window. If this
-   * also fails we fall back to a full window search.
+   * Aspiration search works with the assumption that the value from previous
+   * searches will not change too much and therefore the search can be tried
+   * with a narrow window for alpha and beta around the previous value to cause
+   * more cut offs. If the result is at the edge or outside(not possible in
+   * fail-hard) of our window, we try another search with a wider window. If
+   * this also fails we fall back to a full window search.
    *
    * @param position
    * @param depth
@@ -773,7 +764,6 @@ public class Search implements Runnable {
       if (value <= alpha) sendUCIAspirationResearchInfo(" lowerbound");
       else sendUCIAspirationResearchInfo(" upperbound");
       searchCounter.aspirationResearches++;
-
       // add some extra time because of fail low - we might have found strong opponents move
       if (value <= alpha) addExtraTime(1.3);
       alpha = Evaluation.MIN;
@@ -850,7 +840,7 @@ public class Search implements Runnable {
     // Check draw through 50-moves-rule, 3-fold-repetition
     // In non root nodes we evaluate each repetition as draw within
     // the search tree - this way we detect repetition
-    // earlier - this should not weeken the search
+    // earlier - this should not weaken the search
     if (!PERFT) {
       if (ROOT) {
         if (position.check50Moves() || position.checkRepetitions(2)) {
@@ -900,7 +890,7 @@ public class Search implements Runnable {
       if (ttEntry != null) {
         searchCounter.tt_Hits++;
 
-        // independend from tt entry depth
+        // independent from tt entry depth
         ttMove = ttEntry.bestMove;
         mateThreat[ply] = ttEntry.mateThreat;
 
@@ -943,12 +933,11 @@ public class Search implements Runnable {
     else {
       bestNodeMove = ttMove;
       pv[ply].clear();
-      semiPv[ply].clear();
     }
 
     // ###############################################
     // FORWARD PRUNING BETA             @formatter:off
-    // Prunings which return a beta value and not just
+    // Pruning which return a beta value and not just
     // skip moves.
     // - Static Eval
     // - RFP
@@ -961,7 +950,9 @@ public class Search implements Runnable {
         && doNullMove
     ) {
 
-      int staticEval = PERFT ? 0 : evaluate(position, ply, alpha, beta);
+      // get an evaluation for the position
+      int staticEval = evaluate(position, ply, alpha, beta);
+
       // ###############################################
       // Reverse Futility Pruning, (RFP, Static Null Move Pruning)
       // https://www.chessprogramming.org/Reverse_Futility_Pruning
@@ -983,7 +974,7 @@ public class Search implements Runnable {
       // ###############################################
       // NULL MOVE PRUNING
       // https://www.chessprogramming.org/Null_Move_Pruning
-      // If the next player skips a move and is still ahead (>beta)
+      // If the next player would skip a move and would still be ahead (>beta)
       // we can prune this move. It also detects mate threats by
       // assuming the opponent could do two move in a row.
       if (config.USE_NMP
@@ -1027,7 +1018,7 @@ public class Search implements Runnable {
       // ###############################################
       // RAZORING
       // If this position is already weaker as alpha (<alpha)
-      // by a large margin we jump into qsearch to see if we there
+      // by a large margin we jump into qsearch to see if there
       // are any capturing moves which might improve the situation
       if(config.USE_RAZOR_PRUNING
           && depth <= config.RAZOR_DEPTH
@@ -1049,7 +1040,7 @@ public class Search implements Runnable {
     // If we didn't get a best move from the TT to play
     // first (PV) then do a shallow search to find
     // one. This is most effective with bad move ordering.
-    // Our move orderung is quite good so this might be
+    // If move ordering is quite good this might be
     // a waste of search time.
     // @formatter:off
     if (config.USE_IID && !PERFT
@@ -1246,16 +1237,16 @@ public class Search implements Runnable {
         // ###############################################
         // Late Move Pruning (Move Count Based Pruning)
         // TODO: DANGER - more testing needed
-        if (config.USE_LMP
-            && depth < config.LMP_MIN_DEPTH
-            && numberOfSearchedMoves >= config.LMP_MIN_MOVES
-            && !ROOT
-        ) {
-          searchCounter.lmpPrunings++;
-          if (TRACE) trace("%sSearch in ply %d for depth %d: LMP CUT", getSpaces(ply), ply, depth);
-          move = getNextMove(ply, i++);
-          continue;
-        }
+        // if (config.USE_LMP
+        //     && depth < config.LMP_MIN_DEPTH
+        //     && numberOfSearchedMoves >= config.LMP_MIN_MOVES
+        //     && !ROOT
+        // ) {
+        //   searchCounter.lmpPrunings++;
+        //   if (TRACE) trace("%sSearch in ply %d for depth %d: LMP CUT", getSpaces(ply), ply, depth);
+        //   move = getNextMove(ply, i++);
+        //   continue;
+        // }
         // ###############################################
 
         // ###############################################
@@ -1614,7 +1605,6 @@ public class Search implements Runnable {
 
     // clear principal Variation for this depth
     pv[ply].clear();
-    semiPv[ply].clear();
 
     // ###############################################
     // StandPat
@@ -2418,7 +2408,7 @@ public class Search implements Runnable {
    */
   public class SearchCounter {
 
-    // counter for cut off to measure qualitiy of move ordering
+    // counter for cut off to measure quality of move ordering
     long[] betaCutOffs = new long[MAX_MOVES];
 
     // Info values

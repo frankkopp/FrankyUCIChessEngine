@@ -171,7 +171,7 @@ public class Configuration {
   public int     RAZOR_MARGIN      = 600;
 
   /**
-   * Internatl Iterative Deepening
+   * Internal Iterative Deepening
    */
   public boolean USE_IID       = true;
   public int     IID_REDUCTION = 2;

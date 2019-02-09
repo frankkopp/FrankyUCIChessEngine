@@ -85,12 +85,12 @@
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </logger>
-    <logger name="fko.FrankyEngine" level="DEBUG" additivity="false">
+    <logger name="fko.FrankyEngine" level="WARN" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="TRACE"/>
     </logger>
-    <logger name="fko.FrankyEngine.Franky.Search" level="TRACE" additivity="false">
+    <logger name="fko.FrankyEngine.Franky.Search" level="WARN" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="TRACE"/>
