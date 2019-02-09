@@ -76,18 +76,6 @@ public class EvaluationTest {
   }
 
   @Test
-  void getGamePhaseFactor() {
-    position = new Position();
-    assertEquals(24, Evaluation.getGamePhaseFactor(position));
-
-    position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
-    assertEquals(11, Evaluation.getGamePhaseFactor(position));
-
-    position = new Position("k6n/7p/6P1/7K/8/8/8/8 w - - 0 1");
-    assertEquals(1, Evaluation.getGamePhaseFactor(position));
-  }
-
-  @Test
   void material() {
     // Start position
     position = new Position(fenStandard);
@@ -138,17 +126,31 @@ public class EvaluationTest {
 
   @Test
   void position() {
+    int value;
     // Start Position
     position = new Position();
-    assertEquals(0,evaluation.position(position));
+    value = evaluation.position(this.position);
+    assertEquals(0, value);
+
+    this.position.makeMove(Move.fromUCINotation(this.position, "e2e4"));
+    value = evaluation.position(this.position);
+    assertEquals(-55, value);
+
+    this.position.makeMove(Move.fromUCINotation(this.position, "e7e5"));
+    value = evaluation.position(this.position);
+    assertEquals(0, value);
+
+    this.position.makeMove(Move.fromUCINotation(this.position, "g1f3"));
+    value = evaluation.position(this.position);
+    assertEquals(-50, value);
 
     // All White pieces no Black pieces but King
-    position = new Position("4k3/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1");
-    assertEquals(-35,evaluation.position(position));
+    this.position = new Position("4k3/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1");
+    assertEquals(-117, evaluation.position(this.position));
 
     // All Black pieces no White pieces but King
-    position = new Position("rnbqkbnr/pppppppp/8/8/8/8/8/4K3 w kq - 0 1");
-    assertEquals(35,evaluation.position(position));
+    this.position = new Position("rnbqkbnr/pppppppp/8/8/8/8/8/4K3 w kq - 0 1");
+    assertEquals(117, evaluation.position(this.position));
 
   }
 
@@ -174,17 +176,17 @@ public class EvaluationTest {
   public final void testCheckPosition() {
     // no in check
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
-    assertEquals(163, evaluation.evaluate(position));
+    assertEquals(191, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
 
     // white gives check to black
     position = new Position("r2R3k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2K5 b - - 0 1");
-    assertEquals(-222, evaluation.evaluate(position));
+    assertEquals(-234, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
 
     // black gives check to white
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1p1qPN2/6P1/1PPK4/3R4 w - - 0 2");
-    assertEquals(147, evaluation.evaluate(position));
+    assertEquals(135, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
   }
 
@@ -242,7 +244,7 @@ public class EvaluationTest {
    assertEquals(-5, Evaluation.getPositionValue(position, move));
 
    move = Move.fromSANNotation(position, "Ke7");
-   assertEquals(-10, Evaluation.getPositionValue(position, move));
+   assertEquals(-20, Evaluation.getPositionValue(position, move));
 
 
  }
@@ -250,7 +252,7 @@ public class EvaluationTest {
   @Test
   @Disabled
   public final void testNewEvals() {
-    position = new Position("rnbqkbnr/8/pppppppp/8/8/PPPPPPPP/8/RNBQKBNR w KQkq - 0 1");
+    position = new Position("r1bq1rk1/pp1p1ppp/2n2b2/2p1p3/4P3/2NP1NP1/PPP1KPBP/R2Q3R b - - 1 1");
     evaluation.evaluate(position);
   }
 

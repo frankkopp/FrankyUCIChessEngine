@@ -403,7 +403,7 @@ public class SearchTest {
     search.startSearch(position, searchMode);
     search.waitWhileSearching();
     assertEquals("d8h4", Move.toSimpleString(search.getLastSearchResult().bestMove));
-    assertEquals(Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+    assertEquals((int) (position.getGamePhaseFactor() * EvaluationConfig.CONTEMPT_FACTOR),
                  search.getLastSearchResult().resultValue);
     LOG.warn("Best Move: {} Value: {} Ponder {}",
              Move.toSimpleString(search.getLastSearchResult().bestMove),
@@ -443,7 +443,7 @@ public class SearchTest {
       search.startSearch(position, searchMode);
       search.waitWhileSearching();
       assertEquals("e7e3", Move.toSimpleString(search.getLastSearchResult().bestMove));
-      //      assertEquals(-Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+      //      assertEquals(-Evaluation.getGamePhaseValue(position) * EvaluationConfig.CONTEMPT_FACTOR,
       //                   search.getLastSearchResult().resultValue);
       LOG.warn("Best Move: {} Value: {} Ponder {}",
                Move.toSimpleString(search.getLastSearchResult().bestMove),
@@ -460,7 +460,7 @@ public class SearchTest {
       search.startSearch(position, searchMode);
       search.waitWhileSearching();
       assertEquals("c6d6", Move.toSimpleString(search.getLastSearchResult().bestMove));
-      //      assertEquals(-Evaluation.getGamePhaseFactor(position) * EvaluationConfig.CONTEMPT_FACTOR,
+      //      assertEquals(-Evaluation.getGamePhaseValue(position) * EvaluationConfig.CONTEMPT_FACTOR,
       //                   search.getLastSearchResult().resultValue);
       LOG.warn("Best Move: {} Value: {} Ponder {}",
                Move.toSimpleString(search.getLastSearchResult().bestMove),
@@ -696,10 +696,12 @@ public class SearchTest {
     search.config.USE_RFP = false;
     search.config.USE_NMP = false;
     search.config.USE_RAZOR_PRUNING = false;
+    search.config.USE_IID = false;
     search.config.USE_EXTENSIONS = false;
     search.config.USE_LIMITED_RAZORING = false;
     search.config.USE_EXTENDED_FUTILITY_PRUNING = false;
     search.config.USE_FUTILITY_PRUNING = false;
+    search.config.USE_QFUTILITY_PRUNING = false;
     search.config.USE_LMP = false;
     search.config.USE_LMR = false;
     search.config.USE_QUIESCENCE = false;
@@ -710,15 +712,15 @@ public class SearchTest {
     int blackInc = 0;
     int movesToGo = 0;
     int moveTime = 0;
-    int depth = 4;
+    int depth = 1;
     int mateIn = 0;
     boolean infinite = false;
 
     String result = "";
 
-    // fen = "8/8/8/8/8/5K2/R7/7k w - -"; // Position
+    fen = "r1bq1rk1/pp1p1ppp/2n2b2/2p1p3/4P3/2NP1NP1/PPP2PBP/R2QK2R w KQ -";
     // fen = "1r2kb1r/2Rn4/p4p2/4pN1p/4N1p1/6B1/P4PPP/3R2K1 w k -";
-    fen = "r2qkb1r/p1p1pppp/2pp1n2/5b2/P2P4/2N5/1PP1PPPP/R1BQKB1R b KQkq d3";
+    //fen = "r2qkb1r/p1p1pppp/2pp1n2/5b2/P2P4/2N5/1PP1PPPP/R1BQKB1R b KQkq d3";
     // fen = "1b1qrr2/1p4pk/1np4p/p3Np1B/Pn1P4/R1N3B1/1Pb2PPP/2Q1R1K1 b - -";
     // fen = "R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1";
     // fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
@@ -739,15 +741,17 @@ public class SearchTest {
     search.config.USE_PVS = true;
     search.config.USE_PVS_ORDERING = true;
     search.config.USE_KILLER_MOVES = true;
-    search.config.USE_ASPIRATION_WINDOW = false;
+    search.config.USE_ASPIRATION_WINDOW = true;
     search.config.USE_MDP = true;
     search.config.USE_MPP = true;
     search.config.USE_RFP = true;
     search.config.USE_NMP = true;
+    search.config.USE_IID = true;
     search.config.USE_EXTENSIONS = true;
     search.config.USE_LIMITED_RAZORING = true;
     search.config.USE_EXTENDED_FUTILITY_PRUNING = true;
     search.config.USE_FUTILITY_PRUNING = true;
+    search.config.USE_QFUTILITY_PRUNING = true;
     search.config.USE_LMP = false;
     search.config.USE_LMR = true;
     search.config.USE_QUIESCENCE = true;

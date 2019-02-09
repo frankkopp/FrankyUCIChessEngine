@@ -28,8 +28,10 @@ package fko.FrankyEngine.Franky;
 import fko.FrankyEngine.Franky.Square.*;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
+import static fko.FrankyEngine.Franky.Bitboard.*;
 import static fko.FrankyEngine.Franky.Square.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,11 +41,26 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class SquareTest {
 
+  @Test
+  void listFields() throws IllegalAccessException {
+    for (Field f : Square.class.getFields()) {
+      f.setAccessible(true);
+      System.out.println(f.getName());
+      if (f.isEnumConstant()) {
+        final Square square = (Square) f.get(null);
+        System.out.println(Bitboard.toString(square.bitBoard));
+        System.out.printf("upDiag %d%n", square.getUpDiag());
+        System.out.printf("downDiag %d%n", square.getDownDiag());
+      }
+      System.out.println();
+    }
+  }
+
   /**
    * Tests basic Square operations
    */
   @Test
-  public void test() {
+  public void testSquares() {
     // Square addressing
     assertEquals(getSquare(0), a1);
     assertEquals(getSquare(119), h8);
@@ -147,36 +164,81 @@ public class SquareTest {
   }
 
   @Test
-  public void bitBoardTest() {
+  public void diagonalBitboardTest() {
     for (Square sq : validSquares) {
       System.out.printf("%s: %s  on up diagonal: %s down diagonal: %s%n", sq,
-                        getBitboardString(sq.bitBoard), getBitboardString(sq.getUpDiag()),
-                        getBitboardString(sq.getDownDiag()));
+                        Bitboard.toString(sq.bitBoard), Bitboard.toString(sq.getUpDiag()),
+                        Bitboard.toString(sq.getDownDiag()));
     }
     System.out.println();
 
-    System.out.printf("%s: %s %n", a6UpDiag, getBitboardString(a6UpDiag));
+    System.out.printf("%s: %s %n", a6UpDiag, Bitboard.toString(a6UpDiag));
     System.out.println();
+
+    assertEquals(a1.getDownDiag(), a1DownDiag);
+    assertEquals(a2.getDownDiag(), a2DownDiag);
+    assertEquals(b1.getDownDiag(), a2DownDiag);
+    assertEquals(b7.getDownDiag(), a8DownDiag);
+    assertEquals(c4.getDownDiag(), a6DownDiag);
+    assertEquals(e4.getDownDiag(), a8DownDiag);
+    assertEquals(e8.getDownDiag(), e8DownDiag);
+    assertEquals(g7.getDownDiag(), f8DownDiag);
+
+    assertEquals(a1.getUpDiag(), a1UpDiag);
+    assertEquals(a2.getUpDiag(), a2UpDiag);
+    assertEquals(b1.getUpDiag(), b1UpDiag);
+    assertEquals(b7.getUpDiag(), a6UpDiag);
+    assertEquals(c4.getUpDiag(), a2UpDiag);
+    assertEquals(e4.getUpDiag(), b1UpDiag);
+    assertEquals(e8.getUpDiag(), a4UpDiag);
+    assertEquals(g7.getUpDiag(), a1UpDiag);
 
     System.out.printf("Is %s on %s: %s %n", a7, a6.name() + "upDiag",
                       a7.getUpDiag() == a6UpDiag ? "TRUE" : "FALSE");
+    assertNotEquals(a7.getUpDiag(), a6UpDiag);
     System.out.printf("Is %s on %s: %s %n", b7, a6.name() + "upDiag",
                       b7.getUpDiag() == a6UpDiag ? "TRUE" : "FALSE");
-
+    assertEquals(b7.getUpDiag(), a6UpDiag);
     System.out.printf("Is %s on %s: %s %n", a7, a6.name() + "downDiag",
                       a7.getDownDiag() == a6UpDiag ? "TRUE" : "FALSE");
+    assertNotEquals(a7.getDownDiag(), a6DownDiag);
     System.out.printf("Is %s on %s: %s %n", b7, a6.name() + "downDiag",
                       b7.getDownDiag() == a6UpDiag ? "TRUE" : "FALSE");
+    assertNotEquals(b7.getDownDiag(), a6DownDiag);
 
   }
 
-  String getBitboardString(long bitboard) {
-    StringBuilder stringBuilder = new StringBuilder();
-    for (int i = 0; i < Long.numberOfLeadingZeros((long) bitboard); i++) {
-      stringBuilder.append('0');
-    }
-    stringBuilder.append(Long.toBinaryString(bitboard));
-    return stringBuilder.toString();
+  @Test
+  void fileBitBoard() {
+    System.out.println(File.a.bitBoard);
+    System.out.println(Bitboard.toString(File.a.bitBoard));
+    assertEquals(72340172838076673L, File.a.bitBoard);
+    System.out.println(File.e.bitBoard);
+    System.out.println(Bitboard.toString(File.e.bitBoard));
+    assertEquals(1157442765409226768L, File.e.bitBoard);
+    System.out.println(File.h.bitBoard);
+    System.out.println(Bitboard.toString(File.h.bitBoard));
+    assertEquals(-9187201950435737472L, File.h.bitBoard);
+    System.out.println(File.NOFILE.bitBoard);
+    System.out.println(Bitboard.toString(File.NOFILE.bitBoard));
+    assertEquals(0, File.NOFILE.bitBoard);
+
+  }
+
+  @Test
+  void rankBitBoard() {
+    System.out.println(Rank.r1.bitBoard);
+    System.out.println(Bitboard.toString(Rank.r1.bitBoard));
+    assertEquals(255L, Rank.r1.bitBoard);
+    System.out.println(Rank.r4.bitBoard);
+    System.out.println(Bitboard.toString(Rank.r4.bitBoard));
+    assertEquals(4278190080L, Rank.r4.bitBoard);
+    System.out.println(Rank.r8.bitBoard);
+    System.out.println(Bitboard.toString(Rank.r8.bitBoard));
+    assertEquals(-72057594037927936L, Rank.r8.bitBoard);
+    System.out.println(Rank.NORANK.bitBoard);
+    System.out.println(Bitboard.toString(Rank.NORANK.bitBoard));
+    assertEquals(0, Rank.NORANK.bitBoard);
   }
 
 }

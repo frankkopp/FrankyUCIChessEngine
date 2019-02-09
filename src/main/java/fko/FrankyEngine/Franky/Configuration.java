@@ -166,12 +166,12 @@ public class Configuration {
    * Razor  - early qsearch for low static evals
    * https://www.chessprogramming.org/Razoring
    */
-  public boolean USE_RAZOR_PRUNING = false;
+  public boolean USE_RAZOR_PRUNING = true;
   public int     RAZOR_DEPTH       = 3;
   public int     RAZOR_MARGIN      = 600;
 
   /**
-   * Internatl Iterative Deepening
+   * Internal Iterative Deepening
    */
   public boolean USE_IID       = true;
   public int     IID_REDUCTION = 2;

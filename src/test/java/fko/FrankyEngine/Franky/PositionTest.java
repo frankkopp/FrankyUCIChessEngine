@@ -243,222 +243,75 @@ public class PositionTest {
     assertEquals(81, moves.size());
   }
 
-  /** */
   @Test
   public void testMoveOnBoard() {
-    //        GameBoard gameBoard = new GameBoardImpl();
-    //        Position omegaBoard = new Position(gameBoard);
-    //
-    //        String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
-    //
-    //        // normal
-    //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new Position(gameBoard);
-    //        GameMove gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"c4-a4");
-    //        int move = Move.convertFromGameMove(gameMove);
-    //        GameMove convertedMove = Move.convertToGameMove(move);
-    //        assert(gameMove.equals(convertedMove));
-    //        omegaBoard.makeMove(move);
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/q3Pp2/6R1/p1p2PPP/1R4K1 w
-    // kq - 1 114"));
-    //        omegaBoard.undoMove();
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b
-    // kq e3 0 113"));
-    //
-    //        // normal pawn move
-    //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new Position(gameBoard);
-    //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"b7-b6");
-    //        move = Move.convertFromGameMove(gameMove);
-    //        convertedMove = Move.convertToGameMove(move);
-    //        assert(gameMove.equals(convertedMove));
-    //        omegaBoard.makeMove(move);
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/2pn3p/1pq1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w
-    // kq - 0 114"));
-    //        omegaBoard.undoMove();
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b
-    // kq e3 0 113"));
-    //
-    //        // normal capture
-    //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new Position(gameBoard);
-    //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"c4-e4");
-    //        move = Move.convertFromGameMove(gameMove);
-    //        convertedMove = Move.convertToGameMove(move);
-    //        assert(gameMove.equals(convertedMove));
-    //        omegaBoard.makeMove(move);
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/4qp2/6R1/p1p2PPP/1R4K1 w
-    // kq - 0 114"));
-    //        omegaBoard.undoMove();
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b
-    // kq e3 0 113"));
-    //
-    //        // pawn double
-    //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new Position(gameBoard);
-    //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"b7-b5");
-    //        move = Move.convertFromGameMove(gameMove);
-    //        convertedMove = Move.convertToGameMove(move);
-    //        assert(gameMove.equals(convertedMove));
-    //        omegaBoard.makeMove(move);
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/2pn3p/2q1q1n1/1p6/2q1Pp2/6R1/p1p2PPP/1R4K1
-    // w kq b6 0 114"));
-    //        omegaBoard.undoMove();
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b
-    // kq e3 0 113"));
-    //
-    //        // castling
-    //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new Position(gameBoard);
-    //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"e8-g8");
-    //        move = Move.convertFromGameMove(gameMove);
-    //        convertedMove = Move.convertToGameMove(move);
-    //        assert(gameMove.equals(convertedMove));
-    //        omegaBoard.makeMove(move);
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r4rk1/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w
-    // - - 1 114"));
-    //        omegaBoard.undoMove();
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b
-    // kq e3 0 113"));
-    //
-    //        // promotion
-    //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new Position(gameBoard);
-    //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"a2-a1Q");
-    //        move = Move.convertFromGameMove(gameMove);
-    //        convertedMove = Move.convertToGameMove(move);
-    //        assert(gameMove.equals(convertedMove));
-    //        omegaBoard.makeMove(move);
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/2p2PPP/qR4K1 w
-    // kq - 0 114"));
-    //        omegaBoard.undoMove();
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b
-    // kq e3 0 113"));
-    //
-    //        // promotion capture
-    //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new Position(gameBoard);
-    //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"a2-b1R");
-    //        move = Move.convertFromGameMove(gameMove);
-    //        convertedMove = Move.convertToGameMove(move);
-    //        assert(gameMove.equals(convertedMove));
-    //        omegaBoard.makeMove(move);
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/2p2PPP/1r4K1 w
-    // kq - 0 114"));
-    //        omegaBoard.undoMove();
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b
-    // kq e3 0 113"));
-    //
-    //        // en passant
-    //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new Position(gameBoard);
-    //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"f4-e3");
-    //        move = Move.convertFromGameMove(gameMove);
-    //        convertedMove = Move.convertToGameMove(move);
-    //        assert(gameMove.equals(convertedMove));
-    //        omegaBoard.makeMove(move);
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q5/4p1R1/p1p2PPP/1R4K1 w
-    // kq - 0 114"));
-    //        omegaBoard.undoMove();
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b
-    // kq e3 0 113"));
-    //
-    //        // multiple moves
-    //        // normal
-    //        gameBoard = new GameBoardImpl(testFen);
-    //        omegaBoard = new Position(gameBoard);
-    //        // en passant
-    //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"f4-e3");
-    //        move = Move.convertFromGameMove(gameMove);
-    //        convertedMove = Move.convertToGameMove(move);
-    //        assert(gameMove.equals(convertedMove));
-    //        omegaBoard.makeMove(move);
-    //        gameBoard.makeMove(convertedMove);
-    //        System.out.println(omegaBoard);
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q5/4p1R1/p1p2PPP/1R4K1 w
-    // kq - 0 114"));
-    //        // pawn capture
-    //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"f2-e3");
-    //        move = Move.convertFromGameMove(gameMove);
-    //        convertedMove = Move.convertToGameMove(move);
-    //        assert(gameMove.equals(convertedMove));
-    //        omegaBoard.makeMove(move);
-    //        gameBoard.makeMove(convertedMove);
-    //        System.out.println(omegaBoard);
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q5/4P1R1/p1p3PP/1R4K1 b
-    // kq - 0 114"));
-    //        // castling
-    //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"e8-g8");
-    //        move = Move.convertFromGameMove(gameMove);
-    //        convertedMove = Move.convertToGameMove(move);
-    //        assert(gameMove.equals(convertedMove));
-    //        omegaBoard.makeMove(move);
-    //        gameBoard.makeMove(convertedMove);
-    //        System.out.println(omegaBoard);
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r4rk1/1ppn3p/2q1q1n1/8/2q5/4P1R1/p1p3PP/1R4K1 w -
-    // - 1 115"));
-    //        // pawn double
-    //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"h2-h4");
-    //        move = Move.convertFromGameMove(gameMove);
-    //        convertedMove = Move.convertToGameMove(move);
-    //        assert(gameMove.equals(convertedMove));
-    //        omegaBoard.makeMove(move);
-    //        gameBoard.makeMove(convertedMove);
-    //        System.out.println(omegaBoard);
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r4rk1/1ppn3p/2q1q1n1/8/2q4P/4P1R1/p1p3P1/1R4K1 b
-    // - h3 0 115"));
-    //        // pawn promotion
-    //        gameMove = NotationHelper.createNewMoveFromSimpleNotation(gameBoard,"a2-b1R");
-    //        move = Move.convertFromGameMove(gameMove);
-    //        convertedMove = Move.convertToGameMove(move);
-    //        assert(gameMove.equals(convertedMove));
-    //        omegaBoard.makeMove(move);
-    //        gameBoard.makeMove(convertedMove);
-    //        System.out.println(omegaBoard);
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r4rk1/1ppn3p/2q1q1n1/8/2q4P/4P1R1/2p3P1/1r4K1 w -
-    // - 0 116"));
-    //        // now test undo
-    //        omegaBoard.undoMove();
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r4rk1/1ppn3p/2q1q1n1/8/2q4P/4P1R1/p1p3P1/1R4K1 b
-    // - h3 0 115"));
-    //        omegaBoard.undoMove();
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r4rk1/1ppn3p/2q1q1n1/8/2q5/4P1R1/p1p3PP/1R4K1 w -
-    // - 1 115"));
-    //        omegaBoard.undoMove();
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q5/4P1R1/p1p3PP/1R4K1 b
-    // kq - 0 114"));
-    //        omegaBoard.undoMove();
-    //
-    // assertTrue(omegaBoard.toFENString().equals("r3k2r/1ppn3p/2q1q1n1/8/2q5/4p1R1/p1p2PPP/1R4K1 w
-    // kq - 0 114"));
-    //        omegaBoard.undoMove();
-    //        assertTrue(omegaBoard.toFENString().equals(testFen));
-    //        System.out.println(omegaBoard);
+    Position position;
 
+    String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
+
+    position = new Position(testFen);
+    position.makeMove(Move.fromUCINotation(position, "c4a4"));
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/q3Pp2/6R1/p1p2PPP/1R4K1 w kq - 1 114",
+                 position.toFENString());
+    position.undoMove();
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113",
+                 position.toFENString());
+
+    // normal pawn move
+    position.makeMove(Move.fromUCINotation(position, "b7b6"));
+    assertEquals("r3k2r/2pn3p/1pq1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq - 0 114",
+                 position.toFENString());
+    position.undoMove();
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113",
+                 position.toFENString());
+
+    // normal capture
+    position.makeMove(Move.fromUCINotation(position, "c4e4"));
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/4qp2/6R1/p1p2PPP/1R4K1 w kq - 0 114",
+                 position.toFENString());
+    position.undoMove();
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113",
+                 position.toFENString());
+
+    // pawn double
+    position.makeMove(Move.fromUCINotation(position, "b7b5"));
+    assertEquals("r3k2r/2pn3p/2q1q1n1/1p6/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq b6 0 114",
+                 position.toFENString());
+    position.undoMove();
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113",
+                 position.toFENString());
+
+    // castling
+    position.makeMove(Move.fromUCINotation(position, "e8g8"));
+    assertEquals("r4rk1/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w - - 1 114",
+                 position.toFENString());
+    position.undoMove();
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113",
+                 position.toFENString());
+
+    // promotion
+    position.makeMove(Move.fromUCINotation(position, "a2a1q"));
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/2p2PPP/qR4K1 w kq - 0 114",
+                 position.toFENString());
+    position.undoMove();
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113",
+                 position.toFENString());
+
+    // promotion capture
+    position.makeMove(Move.fromUCINotation(position, "a2b1r"));
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/2p2PPP/1r4K1 w kq - 0 114",
+                 position.toFENString());
+    position.undoMove();
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113",
+                 position.toFENString());
+
+    // en passant
+    position.makeMove(Move.fromUCINotation(position, "f4e3"));
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q5/4p1R1/p1p2PPP/1R4K1 w kq - 0 114",
+                 position.toFENString());
+    position.undoMove();
+    assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113",
+                 position.toFENString());
   }
 
   /** Some timings to find fastest code - so nfr test */
@@ -613,26 +466,36 @@ public class PositionTest {
   @Test
   public void testIsAttacked() {
     String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
-    Position omegaBoard = new Position(testFen);
+    Position position = new Position(testFen);
 
-    System.out.println(omegaBoard);
+    System.out.println(position);
 
     // pawns
-    assertTrue(omegaBoard.isAttacked(Color.WHITE, Square.g3));
-    assertTrue(omegaBoard.isAttacked(Color.WHITE, Square.e3));
-    assertTrue(omegaBoard.isAttacked(Color.BLACK, Square.b1));
-    assertTrue(omegaBoard.isAttacked(Color.BLACK, Square.e4));
-    assertTrue(omegaBoard.isAttacked(Color.BLACK, Square.e3));
+    assertTrue(position.isAttacked(Color.WHITE, Square.g3));
+    assertTrue(position.isAttacked(Color.WHITE, Square.e3));
+    assertTrue(position.isAttacked(Color.BLACK, Square.b1));
+    assertTrue(position.isAttacked(Color.BLACK, Square.e4));
+    assertTrue(position.isAttacked(Color.BLACK, Square.e3));
 
     // sliding
-    assertTrue(omegaBoard.isAttacked(Color.WHITE, Square.g6));
-    assertTrue(omegaBoard.isAttacked(Color.BLACK, Square.a5));
+    assertTrue(position.isAttacked(Color.WHITE, Square.g6));
+    assertTrue(position.isAttacked(Color.BLACK, Square.a5));
 
     // king
     testFen = "rnbqkbnr/1ppppppp/8/p7/Q1P5/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
-    omegaBoard = new Position(testFen);
-    System.out.println(omegaBoard);
-    assertFalse(omegaBoard.isAttacked(Color.WHITE, Square.e8));
+    position = new Position(testFen);
+    System.out.println(position);
+    assertFalse(position.isAttacked(Color.WHITE, Square.e8));
+
+    testFen = "rnbqkbnr/1ppppppp/8/p7/2P1Q3/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
+    position = new Position(testFen);
+    System.out.println(position);
+    assertFalse(position.isAttacked(Color.WHITE, Square.e8));
+
+    testFen = "rnbqkbnr/1ppppppp/8/p7/2P1Q3/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
+    position = new Position(testFen);
+    System.out.println(position);
+    assertFalse(position.isAttacked(Color.BLACK, Square.e1));
   }
 
   @Test
@@ -776,6 +639,170 @@ public class PositionTest {
     position = new Position("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q1NNQQ2/1p6/qk3KB1 b - -");
     move = Move.fromUCINotation(position, "b1c2");
     assertTrue(position.givesCheck(move));
+
+  }
+
+  @Test
+  void getGamePhaseFactor() {
+    Position position = new Position();
+    assertEquals(24, position.getGamePhaseValue());
+
+    position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
+    assertEquals(11, position.getGamePhaseValue());
+
+    position = new Position("k6n/7p/6P1/7K/8/8/8/8 w - - 0 1");
+    assertEquals(1, position.getGamePhaseValue());
+
+    // too many officers
+    position = new Position("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1");
+    assertEquals(24, position.getGamePhaseValue());
+  }
+
+  @Test
+  void bitBoardStandardPosition() {
+    Position pos = new Position();
+    for (Color c : Color.values) {
+      for (PieceType pt : PieceType.values) {
+        final long bitboard = pos.getPiecesBitboards(c, pt);
+//        System.out.printf("%s %s %d %n", c.name(), pt.name(), bitboard);
+//        System.out.println(Bitboard.toString(bitboard));
+        if (c == Color.WHITE && pt == PieceType.PAWN) assertEquals(65280L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.KNIGHT) assertEquals(66L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.BISHOP) assertEquals(36L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.ROOK) assertEquals(129L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.QUEEN) assertEquals(8L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.KING) assertEquals(16L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.PAWN) assertEquals(71776119061217280L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KNIGHT) assertEquals(4755801206503243776L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.BISHOP) assertEquals(2594073385365405696L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.ROOK) assertEquals(-9151314442816847872L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.QUEEN) assertEquals(576460752303423488L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KING) assertEquals(1152921504606846976L, bitboard);
+      }
+    }
+  }
+
+  @Test
+  void bitBoardPosition() {
+    Position pos = new Position();
+    pos.makeMove(Move.fromUCINotation(pos, "e2e4"));
+    pos.makeMove(Move.fromUCINotation(pos, "d7d5"));
+    pos.makeMove(Move.fromUCINotation(pos, "e4d5"));
+    pos.makeMove(Move.fromUCINotation(pos, "d8d5"));
+    pos.makeMove(Move.fromUCINotation(pos, "b1c3"));
+    pos.makeMove(Move.fromUCINotation(pos, "d5e5"));
+    pos.makeMove(Move.fromUCINotation(pos, "f1e2"));
+    pos.makeMove(Move.fromUCINotation(pos, "e8d8"));
+    pos.makeMove(Move.fromUCINotation(pos, "g1f3"));
+    pos.makeMove(Move.fromUCINotation(pos, "e5g5"));
+    pos.makeMove(Move.fromUCINotation(pos, "e1g1"));
+    pos.makeMove(Move.fromUCINotation(pos, "b8c6"));
+
+    for (Color c : Color.values) {
+      for (PieceType pt : PieceType.values) {
+        final long bitboard = pos.getPiecesBitboards(c, pt);
+//        System.out.printf("%s %s %d %n", c.name(), pt.name(), bitboard);
+//        System.out.println(Bitboard.toString(bitboard));
+        if (c == Color.WHITE && pt == PieceType.PAWN) assertEquals(61184L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.KNIGHT) assertEquals(2359296L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.BISHOP) assertEquals(4100L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.ROOK) assertEquals(33L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.QUEEN) assertEquals(8L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.KING) assertEquals(64L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.PAWN) assertEquals(69524319247532032L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KNIGHT) assertEquals(4611690416473899008L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.BISHOP) assertEquals(2594073385365405696L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.ROOK) assertEquals(-9151314442816847872L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.QUEEN) assertEquals(274877906944L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KING) assertEquals(576460752303423488L, bitboard);
+      }
+    }
+
+    Position posCopy = new Position(pos);
+    for (Color c : Color.values) {
+      for (PieceType pt : PieceType.values) {
+        final long bitboard = posCopy.getPiecesBitboards(c, pt);
+//        System.out.printf("%s %s %d %n", c.name(), pt.name(), bitboard);
+//        System.out.println(Bitboard.toString(bitboard));
+        if (c == Color.WHITE && pt == PieceType.PAWN) assertEquals(61184L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.KNIGHT) assertEquals(2359296L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.BISHOP) assertEquals(4100L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.ROOK) assertEquals(33L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.QUEEN) assertEquals(8L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.KING) assertEquals(64L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.PAWN) assertEquals(69524319247532032L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KNIGHT) assertEquals(4611690416473899008L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.BISHOP) assertEquals(2594073385365405696L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.ROOK) assertEquals(-9151314442816847872L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.QUEEN) assertEquals(274877906944L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KING) assertEquals(576460752303423488L, bitboard);
+      }
+    }
+  }
+
+  @Test
+  void bitBoardCombinations() {
+    Position pos = new Position();
+    final long white = pos.getOccupiedBitboards(Color.WHITE);
+    final long black = pos.getOccupiedBitboards(Color.BLACK);
+//    System.out.printf("%s %d%n%s%n", Color.WHITE, white, Bitboard.toString(white));
+//    System.out.printf("%s %d%n%S%n", Color.BLACK, black, Bitboard.toString(black));
+    assertEquals(65535L, white);
+    assertEquals(-281474976710656L, black);
+    long occupiedSquares = (white | black);
+//    System.out.println("All occupoied squares: "+occupiedSquares);
+//    System.out.println(Bitboard.toString(occupiedSquares));
+    assertEquals(-281474976645121L, occupiedSquares);
+    long emptySquares = ~occupiedSquares;
+//    System.out.println("All empty squares: "+emptySquares);
+//    System.out.println(Bitboard.toString(emptySquares));
+    assertEquals(281474976645120L, emptySquares);
+  }
+
+  @Test
+  void bitBoardCombinations2() {
+    Position pos = new Position();
+    pos.makeMove(Move.fromUCINotation(pos, "e2e4"));
+    pos.makeMove(Move.fromUCINotation(pos, "d7d5"));
+    pos.makeMove(Move.fromUCINotation(pos, "e4d5"));
+    pos.makeMove(Move.fromUCINotation(pos, "d8d5"));
+    pos.makeMove(Move.fromUCINotation(pos, "b1c3"));
+    pos.makeMove(Move.fromUCINotation(pos, "d5e5"));
+    pos.makeMove(Move.fromUCINotation(pos, "f1e2"));
+    pos.makeMove(Move.fromUCINotation(pos, "e8d8"));
+    pos.makeMove(Move.fromUCINotation(pos, "g1f3"));
+    pos.makeMove(Move.fromUCINotation(pos, "e5g5"));
+    pos.makeMove(Move.fromUCINotation(pos, "e1g1"));
+    pos.makeMove(Move.fromUCINotation(pos, "b8c6"));
+    final long white = pos.getOccupiedBitboards(Color.WHITE);
+    final long black = pos.getOccupiedBitboards(Color.BLACK);
+    System.out.printf("%s %d%n%s%n", Color.WHITE, white, Bitboard.toString(white));
+    System.out.printf("%s %d%n%S%n", Color.BLACK, black, Bitboard.toString(black));
+    long occupiedSquares = (white | black);
+    System.out.println("All occupoied squares: "+occupiedSquares);
+    System.out.println(Bitboard.toString(occupiedSquares));
+    long emptySquares = ~occupiedSquares;
+    System.out.println("All empty squares: "+emptySquares);
+    System.out.println(Bitboard.toString(emptySquares));
+  }
+
+  @Test
+  void bitBoardsCalculations() {
+
+    String testFen = "rnbqkbnr/1ppppppp/8/p7/2P1Q3/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
+    Position position = new Position(testFen);
+    System.out.println(position);
+    assertFalse(position.isAttacked(Color.WHITE, Square.e8));
+
+    System.out.println(Bitboard.toString(
+      (position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(
+        Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
+                                          | Square.e8.getRank().bitBoard)));
+
+    System.out.println(
+      ((position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(
+        Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
+                                          | Square.e8.getRank().bitBoard)) > 0);
 
   }
 
