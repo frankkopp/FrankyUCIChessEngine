@@ -141,7 +141,7 @@ public enum Square {
       index64 = -1;
       bitBoard = 0L;
     }
-    // precompute diagonals for squares
+    // pre-compute diagonals for squares
     if ((this.bitBoard & a8UpDiag) != 0) this.upDiag = a8UpDiag;
     else if ((this.bitBoard & a7UpDiag) != 0) this.upDiag = a7UpDiag;
     else if ((this.bitBoard & a6UpDiag) != 0) this.upDiag = a6UpDiag;

@@ -25,6 +25,7 @@
 
 package fko.FrankyEngine.Franky;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -41,6 +42,7 @@ public class Timing_EnumSetIteratorVsArrayTest {
 
 
   @Test
+  @Disabled
   public void testTiming() {
 
     prepare();
