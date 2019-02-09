@@ -3,17 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fko.FrankyEngine</groupId>
   <artifactId>Franky</artifactId>
-    <
-    <
-    <
-    <
-    <
-    <
-    < HEAD
-  <version>0.13</version>
-    =======
-    <version>1.0</version>
-    >>>>>>> develop
+  <version>1.1</version>
   <profiles>
     <profile>
       <id>Franky</id>
@@ -125,21 +115,9 @@
                 <configuration>
                   <executable>"C:\Program Files (x86)\Jar2Exe Wizard\j2ewiz.exe"</executable>
                   <commandlineArgs>/jar
-                      <
-                      <
-                      <
-                      <
-                      <
-                      <
-                      < HEAD
-                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-0.13.jar
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-1.1.jar
                                         /o
-                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-0.13.exe
-                      =======
-                      C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-1.0.jar
-                      /o
-                      C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-1.0.exe
-                      >>>>>>> develop
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-1.1.exe
                                         /m
                                         fko.FrankyEngine.Main
                                         /type
@@ -151,21 +129,9 @@
                                         /checksum
                                         /amd64
                                         /pv
-                      <
-                      <
-                      <
-                      <
-                      <
-                      <
-                      < HEAD
-                                        0.13
+                                        1.1
                                         /ve
-                                        "ProductVersion=0.13"
-                      =======
-                      1.0
-                      /ve
-                      "ProductVersion=1.0"
-                      >>>>>>> develop
+                                        "ProductVersion=1.1"
                                         /ve
                                         "ProductName=Franky Chess Engine"
                                         /ve
@@ -188,17 +154,7 @@
                   <executable>cmd.exe</executable>
                   <commandlineArgs>/C
                                         COPY
-                      <
-                      <
-                      <
-                      <
-                      <
-                      <
-                      < HEAD
-                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-0.13*
-                      =======
-                      C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-1.0*
-                      >>>>>>> develop
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-1.1*
                                         C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\Releases</commandlineArgs>
                   <workingDirectory>C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine</workingDirectory>
                 </configuration>
