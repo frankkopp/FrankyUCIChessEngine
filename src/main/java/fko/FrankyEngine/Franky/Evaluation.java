@@ -690,12 +690,12 @@ public class Evaluation {
 
       // penalty for doubled pawn
       final long pawnsOnFile =
-        square.getFile().bitBoard & position.getPiecesBitboards(position.getNextPlayer(), PAWN);
+        square.getFile().bitBoard & position.getPiecesBitboards(nextToMove, PAWN);
       final int count = Long.bitCount(pawnsOnFile);
       this.midGamePawnStructure += count * DOUBLED_PAWN_PENALTY;
       this.endGamePawnStructure += count * DOUBLED_PAWN_PENALTY;
 
-      // bonus for unblocked pawn (no opponent pawn on file and neighbour file
+      // bonus for passed pawn (no opponent pawn on file and neighbour file
 
     }
 
@@ -713,12 +713,12 @@ public class Evaluation {
 
       // penalty for doubled pawn
       final long pawnsOnFile =
-        square.getFile().bitBoard & position.getPiecesBitboards(position.getOpponent(), PAWN);
+        square.getFile().bitBoard & position.getPiecesBitboards(opponent, PAWN);
       final int count = Long.bitCount(pawnsOnFile);
       this.midGamePawnStructure -= count * DOUBLED_PAWN_PENALTY;
       this.endGamePawnStructure -= count * DOUBLED_PAWN_PENALTY;
 
-      // bonus for unblocked pawn (no opponent pawn on file and neighbour file
+      // bonus for passed pawn (no opponent pawn on file and neighbour file
     }
   }
 

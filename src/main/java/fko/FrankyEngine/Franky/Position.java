@@ -1453,6 +1453,8 @@ public class Position {
   public long getPiecesBitboards(Color c,
                                  PieceType pt) { return piecesBitboards[c.ordinal()][pt.ordinal()]; }
 
+  public long getPiecesBitboards(int c, PieceType pt) { return piecesBitboards[c][pt.ordinal()]; }
+
   public long[] getOccupiedBitboards() { return occupiedBitboards; }
 
   public long getOccupiedBitboards(Color c) { return occupiedBitboards[c.ordinal()]; }
