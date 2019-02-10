@@ -25,7 +25,6 @@
 
 package fko.FrankyEngine.Franky;
 
-import fko.FrankyEngine.Franky.TranspositionTable.TT_Entry;
 import fko.FrankyEngine.Franky.TranspositionTable.TT_EntryType;
 import fko.FrankyEngine.Franky.openingbook.OpeningBook;
 import fko.FrankyEngine.Franky.openingbook.OpeningBookImpl;
@@ -453,25 +452,25 @@ public class Search implements Runnable {
     // Do a TT lookup to try to find a first best move for this position
     if (config.USE_TT_ROOT && config.USE_TRANSPOSITION_TABLE && !PERFT) {
 
-      TT_Entry ttEntry = transpositionTable.get(position.getZobristKey());
-      if (ttEntry != null) {
+      long ttEntry = transpositionTable.get(position.getZobristKey());
+      if (ttEntry != 0) {
         searchCounter.tt_Hits++;
 
         // mate thread flag
-        mateThreat[ROOT_PLY] = ttEntry.mateThreat;
+        mateThreat[ROOT_PLY] = TranspositionTable.hasMateThreat(ttEntry);
 
         // get best move and PV from TT
-        if (ttEntry.bestMove != Move.NOMOVE) {
-          currentBestRootMove = ttEntry.bestMove;
-          getPVLine(position, ttEntry.depth, pv[ROOT_PLY]);
+        if (TranspositionTable.getBestMove(ttEntry) != Move.NOMOVE) {
+          currentBestRootMove = TranspositionTable.getBestMove(ttEntry);
+          getPVLine(position, TranspositionTable.getDepth(ttEntry), pv[ROOT_PLY]);
           assert pv[ROOT_PLY].getFirst() == currentBestRootMove;
         }
 
         // use value only if tt depth was equal or deeper
-        if (ttEntry.depth >= depth) {
-          assert (int) ttEntry.value != Evaluation.NOVALUE;
+        if (TranspositionTable.getDepth(ttEntry) >= depth) {
+          assert (int) TranspositionTable.getValue(ttEntry) != Evaluation.NOVALUE;
           // set best move value from TT
-          currentBestRootValue = (int) ttEntry.value;
+          currentBestRootValue = (int) TranspositionTable.getValue(ttEntry);
 
           // skip lower depths in next search
           // commented out as other programs don't do this.
@@ -886,26 +885,28 @@ public class Search implements Runnable {
     int ttMove = Move.NOMOVE;
     if (config.USE_TRANSPOSITION_TABLE && !PERFT) {
 
-      TT_Entry ttEntry = transpositionTable.get(position.getZobristKey());
-      if (ttEntry != null) {
+      long ttEntry = transpositionTable.get(position.getZobristKey());
+      if (ttEntry != 0) {
         searchCounter.tt_Hits++;
 
         // independent from tt entry depth
-        ttMove = ttEntry.bestMove;
-        mateThreat[ply] = ttEntry.mateThreat;
+        ttMove = TranspositionTable.getBestMove(ttEntry);
+        mateThreat[ply] = TranspositionTable.hasMateThreat(ttEntry);
 
         // use value only if tt depth was equal or deeper
-        if (ttEntry.depth >= depth) {
-          int value = ttEntry.value;
+        if (TranspositionTable.getDepth(ttEntry) >= depth) {
+          int value = TranspositionTable.getValue(ttEntry);
           assert value != Evaluation.NOVALUE;
           // correct the mate value as this has been recorded
           // relative to a different ply
           if (isCheckMateValue(value)) value = value > 0 ? value - ply : value + ply;
           // in PV node only return ttHit if it was an exact hit
           boolean cut = false;
-          if (ttEntry.type == TT_EntryType.EXACT) cut = true;
-          else if (!pvNode && ttEntry.type == TT_EntryType.ALPHA && value <= alpha) cut = true;
-          else if (!pvNode && ttEntry.type == TT_EntryType.BETA && value >= beta) cut = true;
+          if (TranspositionTable.getType(ttEntry) == TT_EntryType.EXACT) cut = true;
+          else if (!pvNode && TranspositionTable.getType(ttEntry) == TT_EntryType.ALPHA
+                   && value <= alpha) cut = true;
+          else if (!pvNode && TranspositionTable.getType(ttEntry) == TT_EntryType.BETA
+                   && value >= beta) cut = true;
           if (cut) {
             if (TRACE) {
               trace("%sSearch in ply %d for depth %d: TT CUT value=%d", getSpaces(ply), ply, depth,
@@ -1555,26 +1556,28 @@ public class Search implements Runnable {
     int ttMove = Move.NOMOVE;
     if (config.USE_TRANSPOSITION_TABLE && !PERFT) {
 
-      TT_Entry ttEntry = transpositionTable.get(position.getZobristKey());
-      if (ttEntry != null) {
+      long ttEntry = transpositionTable.get(position.getZobristKey());
+      if (ttEntry != 0) {
         searchCounter.tt_Hits++;
 
         // independend from tt entry depth
-        ttMove = ttEntry.bestMove;
-        mateThreat[ply] = ttEntry.mateThreat;
+        ttMove = TranspositionTable.getBestMove(ttEntry);
+        mateThreat[ply] = TranspositionTable.hasMateThreat(ttEntry);
 
         // use value only if tt depth was equal or deeper
         //if (ttEntry.depth >= DEPTH_NONE) {
-        int value = ttEntry.value;
+        int value = TranspositionTable.getValue(ttEntry);
         assert value != Evaluation.NOVALUE;
         // correct the mate value as this has been recorded
         // relative to a different ply
         if (isCheckMateValue(value)) value = value > 0 ? value - ply : value + ply;
         // in PV node only return ttHit if it was an exact hit
         boolean cut = false;
-        if (ttEntry.type == TT_EntryType.EXACT) cut = true;
-        else if (!pvNode && ttEntry.type == TT_EntryType.ALPHA && value <= alpha) cut = true;
-        else if (!pvNode && ttEntry.type == TT_EntryType.BETA && value >= beta) cut = true;
+        if (TranspositionTable.getType(ttEntry) == TT_EntryType.EXACT) cut = true;
+        else if (!pvNode && TranspositionTable.getType(ttEntry) == TT_EntryType.ALPHA
+                 && value <= alpha) cut = true;
+        else if (!pvNode && TranspositionTable.getType(ttEntry) == TT_EntryType.BETA
+                 && value >= beta) cut = true;
         if (cut) {
           if (TRACE) {
             trace("%sSearch in ply %d: TT CUT value=%d", getSpaces(ply), ply, value);
@@ -1896,10 +1899,10 @@ public class Search implements Runnable {
    */
   private void getPVLine(final Position position, final byte depth, final MoveList pv) {
     if (depth < 0) return;
-    TT_Entry ttEntry = transpositionTable.get(position.getZobristKey());
-    if (ttEntry != null && ttEntry.bestMove != Move.NOMOVE) {
-      pv.add(ttEntry.bestMove);
-      position.makeMove(ttEntry.bestMove);
+    long ttEntry = transpositionTable.get(position.getZobristKey());
+    if (ttEntry != 0 && TranspositionTable.getBestMove(ttEntry) != Move.NOMOVE) {
+      pv.add(TranspositionTable.getBestMove(ttEntry));
+      position.makeMove(TranspositionTable.getBestMove(ttEntry));
       getPVLine(position, (byte) (depth - 1), pv);
       position.undoMove();
     }
@@ -2384,17 +2387,6 @@ public class Search implements Runnable {
       return "Best Move: " + Move.toString(bestMove) + " (" + getScoreString(resultValue) + ") "
              + " Ponder Move: " + Move.toString(ponderMove) + " Depth: " + depth + "/" + extraDepth;
     }
-  }
-
-  /**
-   * Simple data structure for return value when probing the transposition table.
-   */
-  class TTHit {
-    int  value    = Evaluation.NOVALUE;
-    byte type     = TT_EntryType.NONE;
-    byte depth    = 0;
-    int  bestMove = Move.NOMOVE;
-    public boolean mateThreat;
   }
 
   /**

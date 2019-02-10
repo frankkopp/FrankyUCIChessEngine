@@ -25,7 +25,6 @@
 
 package fko.FrankyEngine.Franky;
 
-import fko.FrankyEngine.Franky.Search.TTHit;
 import fko.UCI.IUCIEngine;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.text.WordUtils;
@@ -911,7 +910,6 @@ public class SearchTest {
   @Disabled
   public void showSize() {
     //System.out.println(VM.current().details());
-    System.out.println(ClassLayout.parseClass(TTHit.class).toPrintable());
     //System.out.println(ClassLayout.parseClass(Search.class).toPrintable());
   }
 

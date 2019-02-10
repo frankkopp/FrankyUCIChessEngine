@@ -48,6 +48,8 @@ public class TranspositionTable {
   private static final int KB = 1024;
   private static final int MB = KB * KB;
 
+  private static final int ENTRY_SIZE = 8;
+
   private long sizeInByte;
   private int  maxNumberOfEntries;
   private int  numberOfEntries = 0;
@@ -59,7 +61,14 @@ public class TranspositionTable {
   private long numberOfHits       = 0L;
   private long numberOfMisses     = 0L;
 
-  private final TT_Entry[] entries;
+  private long[] keys;
+  // move:       32 bit  0-31
+  // Value:      16 bit 32-47
+  // Depth:       8 bit 48-55
+  // Age:         3 bit 56-58
+  // Type:        2 bit 59-60
+  // MateThread:  1 bit 61
+  private long[] data;
 
   /**
    * Creates a hash table with a approximated number of entries calculated by
@@ -100,14 +109,11 @@ public class TranspositionTable {
     }
 
     // size in byte divided by entry size plus size for array bucket
-    maxNumberOfEntries = (int) (sizeInByte / (TT_Entry.SIZE + Integer.BYTES));
+    maxNumberOfEntries = (int) (sizeInByte / (ENTRY_SIZE + Integer.BYTES));
 
     // create buckets for hash table
-    entries = new TT_Entry[maxNumberOfEntries];
-    // initialize to not create objects during usage
-    for (int i = 0; i < maxNumberOfEntries; i++) {
-      entries[i] = new TT_Entry();
-    }
+    keys = new long[maxNumberOfEntries];
+    data = new long[maxNumberOfEntries];
 
     LOG.info("{}", String.format("Transposition Table Size:    %,5d MB", sizeInByte / (KB * KB)));
     LOG.info("{}", String.format("Transposition Table Entries: %,d", maxNumberOfEntries));
@@ -136,88 +142,108 @@ public class TranspositionTable {
    */
   public void put(final long key, final short value, final byte type, final byte depth,
                   final int bestMove, final boolean mateThreat) {
+    put(false, key, value, type, depth, bestMove, mateThreat);
+  }
+
+  /**
+   * Stores the node value and the depth it has been calculated at.
+   * @param forced ignores age check when true
+   * @param key
+   * @param value
+   * @param type
+   * @param depth
+   * @param bestMove
+   * @param mateThreat
+   */
+  public void put(boolean forced, final long key, final short value, final byte type,
+                  final byte depth, final int bestMove, final boolean mateThreat) {
 
     assert depth >= 0;
     assert type > 0;
     assert value > Evaluation.NOVALUE;
 
-    final TT_Entry ttEntry = entries[getHash(key)];
+    //final TTEntry ttEntry = entries[getHash(key)];
+    final int hashKey = getHash(key);
+    final long entryKey = keys[hashKey];
+    long entryData = data[hashKey];
 
     numberOfPuts++;
 
     // New hash
-    if (ttEntry.key == 0) {
+    if (entryKey == 0) {
       numberOfEntries++;
-
-      ttEntry.key = key;
-      //ttEntry.fen = position.toFENString();
-      ttEntry.age = 1;
-      ttEntry.mateThreat = mateThreat;
-      ttEntry.value = value;
-      ttEntry.type = type;
-      ttEntry.depth = depth;
-      ttEntry.bestMove = bestMove;
+      keys[hashKey] = key;
+      entryData = resetAge(entryData);
+      entryData = setMateThreat(entryData, mateThreat);
+      entryData = setValue(entryData, value);
+      entryData = setType(entryData, type);
+      entryData = setDepth(entryData, depth);
+      entryData = setBestMove(entryData, bestMove);
+      data[hashKey] = entryData;
     }
     // Same hash but different position
     // overwrite if
     // - the new entry's depth is higher or equal
     // - the previous entry has not been used (is aged)
     // @formatter:off
-    else if (key != ttEntry.key
-             && depth >= ttEntry.depth
-             && ttEntry.age > 0
+    else if (entryKey != key
+             && depth >= getDepth(entryData)
+             && (forced || getAge(entryData) > 0)
     ) { // @formatter:on
       numberOfCollisions++;
-
-      ttEntry.key = key;
-      //ttEntry.fen = position.toFENString();
-      ttEntry.age = 1;
-      ttEntry.mateThreat = mateThreat;
-
-      ttEntry.value = value;
-      ttEntry.type = type;
-      ttEntry.depth = depth;
-      ttEntry.bestMove = bestMove;
+      keys[hashKey] = key;
+      entryData = resetAge(entryData);
+      entryData = setMateThreat(entryData, mateThreat);
+      entryData = setValue(entryData, value);
+      entryData = setType(entryData, type);
+      entryData = setDepth(entryData, depth);
+      entryData = setBestMove(entryData, bestMove);
+      data[hashKey] = entryData;
     }
     // Same hash and same position -> update entry?
-    else if (key == ttEntry.key) {
+    else if (entryKey == key) {
 
       // if from same depth only update when quality of new entry is better
       // e.g. don't replace EXACT with ALPHA or BETA
-      if (depth == ttEntry.depth) {
+      if (getDepth(entryData) == depth) {
         numberOfUpdates++;
 
-        // ttEntry.fen = position.toFENString();
-        ttEntry.age = 1;
-        ttEntry.mateThreat = mateThreat;
+        entryData = resetAge(entryData);
+        entryData = setMateThreat(entryData, mateThreat);
 
         // old was not EXACT - update
-        if (ttEntry.type != TT_EntryType.EXACT) {
-          ttEntry.value = value;
-          ttEntry.type = type;
-          ttEntry.depth = depth;
+        if (getType(entryData) != TT_EntryType.EXACT) {
+          entryData = setValue(entryData, value);
+          entryData = setType(entryData, type);
+          entryData = setDepth(entryData, depth);
         }
         // old entry was exact, the new entry is also EXACT -> assert that they are identical
-        else assert type != TT_EntryType.EXACT || ttEntry.value == value;
+        else assert type != TT_EntryType.EXACT || getValue(entryData) == value;
 
         // overwrite bestMove only with a valid move
-        if (bestMove != Move.NOMOVE) ttEntry.bestMove = bestMove;
+        if (bestMove != Move.NOMOVE) entryData = setBestMove(entryData, bestMove);
+
+        data[hashKey] = entryData;
       }
       // if depth is greater then update in any case
-      else if (depth > ttEntry.depth) {
+      else if (getDepth(entryData) < depth) {
         numberOfUpdates++;
+        entryData = resetAge(entryData);
+        entryData = setMateThreat(entryData, mateThreat);
+        entryData = setValue(entryData, value);
+        entryData = setType(entryData, type);
+        entryData = setDepth(entryData, depth);
 
-        // ttEntry.fen = position.toFENString();
-        ttEntry.age = 1;
-        ttEntry.mateThreat = mateThreat;
-        ttEntry.value = value;
-        ttEntry.type = type;
-        ttEntry.depth = depth;
+        // overwrite bestMove only with a valid move
+        if (bestMove != Move.NOMOVE) entryData = setBestMove(entryData, bestMove);
 
-        // overwrite bestNive only with a valid move
-        if (bestMove != Move.NOMOVE) ttEntry.bestMove = bestMove;
-      } // overwrite bestMove if there wasn't any before
-      else if (ttEntry.bestMove == Move.NOMOVE) ttEntry.bestMove = bestMove;
+        data[hashKey] = entryData;
+      }
+      // overwrite bestMove if there wasn't any before
+      else if (getBestMove(entryData) == Move.NOMOVE) {
+        entryData = setBestMove(entryData, bestMove);
+        data[hashKey] = entryData;
+      }
     }
   }
 
@@ -229,18 +255,22 @@ public class TranspositionTable {
    * @param key
    * @return value for key or <tt>Integer.MIN_VALUE</tt> if not found
    */
-  public TT_Entry get(final long key) {
+  public long get(final long key) {
     numberOfProbes++;
-    final TT_Entry ttEntry = entries[getHash(key)];
-    if (ttEntry.key == key) { // hash hit
+    final int hashKey = getHash(key);
+    final long entryKey = keys[hashKey];
+    long entryData = data[hashKey];
+
+    if (entryKey == key) { // hash hit
       numberOfHits++;
       // decrease age of entry until 0
-      ttEntry.age = (byte) Math.max(ttEntry.age - 1, 0);
-      return ttEntry;
+      entryData = decreaseAge(entryData);
+      data[hashKey] = entryData;
+      return entryData;
     }
     else numberOfMisses++;
     // cache miss or collision
-    return null;
+    return 0;
   }
 
   /**
@@ -249,16 +279,8 @@ public class TranspositionTable {
    */
   public void clear() {
     // tests show for() is about 60% slower than lambda parallel()
-    IntStream.range(0, entries.length).parallel().filter(i -> entries[i].key != 0).forEach(i -> {
-      entries[i].key = 0L;
-      //entries[i].fen = "";
-      entries[i].value = Evaluation.NOVALUE;
-      entries[i].depth = 0;
-      entries[i].type = TT_EntryType.NONE;
-      entries[i].bestMove = Move.NOMOVE;
-      entries[i].age = 0;
-      entries[i].mateThreat = false;
-    });
+    keys = new long[maxNumberOfEntries];
+    data = new long[maxNumberOfEntries];
     numberOfEntries = 0;
     numberOfPuts = 0;
     numberOfCollisions = 0;
@@ -273,11 +295,8 @@ public class TranspositionTable {
    */
   public void ageEntries() {
     // tests show for() is about 60% slower than lambda parallel()
-    IntStream.range(0, entries.length)
-             .parallel()
-             .filter(i -> entries[i].key != 0)
-             .forEach(
-               i -> entries[i].age = (byte) Math.min(entries[i].age + 1, Byte.MAX_VALUE - 1));
+    IntStream.range(0, data.length)
+             .parallel().filter(i -> keys[i] != 0).forEach(i -> data[i] = increaseAge(data[i]));
   }
 
   /**
@@ -336,6 +355,14 @@ public class TranspositionTable {
     return numberOfMisses;
   }
 
+  /**
+   * @param key
+   * @return returns a hash key
+   */
+  private int getHash(long key) {
+    return (int) (key % maxNumberOfEntries);
+  }
+
   @Override
   public String toString() {
     return String.format("TranspositionTable'{'" + "Size: %,d MB, max entries: %,d "
@@ -357,53 +384,110 @@ public class TranspositionTable {
                                          ? 0
                                          : 100 * ((double) numberOfMisses / numberOfProbes));
   }
+  // ###########################################################################
+  // Bit operations for data
 
-  /**
-   * @param key
-   * @return returns a hash key
-   */
-  private int getHash(long key) {
-    return (int) (key % maxNumberOfEntries);
+  // ###########################################################################
+  // MASKs
+  private static final long MOVE_bitMASK  = 0b11111111111111111111111111111111L;
+  private static final long VALUE_bitMASK = 0b1111111111111111;
+  private static final long DEPTH_bitMASK = 0b11111111;
+  private static final long AGE_bitMASK   = 0b111;
+  private static final long TYPE_bitMASK  = 0b11;
+
+  private static final long MATE_bitMASK = 0b1;
+  // Bit operation values
+  private static final long MOVE_SHIFT   = 0;
+  private static final long MOVE_MASK    = MOVE_bitMASK << MOVE_SHIFT;
+  private static final long VALUE_SHIFT  = 32;
+  private static final long VALUE_MASK   = VALUE_bitMASK << VALUE_SHIFT;
+  private static final long DEPTH_SHIFT  = 48;
+  private static final long DEPTH_MASK   = DEPTH_bitMASK << DEPTH_SHIFT;
+  private static final long AGE_SHIFT    = 56;
+  private static final long AGE_MASK     = AGE_bitMASK << AGE_SHIFT;
+  private static final long TYPE_SHIFT   = 59;
+  private static final long TYPE_MASK    = TYPE_bitMASK << TYPE_SHIFT;
+  private static final long MATE_SHIFT   = 61;
+
+  private static final long MATE_MASK = MATE_bitMASK << MATE_SHIFT;
+
+  public static long setBestMove(long data, int bestMove) {
+    // reset old move
+    data &= ~MOVE_MASK;
+    return data | bestMove << MOVE_SHIFT;
   }
 
-  // @formatter:off
-  /**
-   * Entry for transposition table.
-   * <pre>
-   * fko.FrankyEngine.Franky.TranspositionTable$TT_Entry object internals:
-   * OFFSET  SIZE      TYPE DESCRIPTION                               VALUE
-   *      0    12           (object header)                           N/A
-   *     12     4       int TT_Entry.bestMove                         N/A
-   *     16     8      long TT_Entry.key                              N/A
-   *     24     2     short TT_Entry.value                            N/A
-   *     26     1      byte TT_Entry.depth                            N/A
-   *     27     1      byte TT_Entry.type                             N/A
-   *     28     1   boolean TT_Entry.age                              N/A
-   *     29     3           (loss due to the next object alignment)
-   * Instance size: 32 bytes
-   * </pre>
-   */
-  // @formatter:on
-  public static final class TT_Entry {
-
-    static final int SIZE = 32;
-
-    long    key        = 0L;
-    byte    age        = 0;
-    boolean mateThreat = false;
-    short   value      = Evaluation.NOVALUE;
-    byte    depth      = 0;
-    byte    type       = TT_EntryType.NONE;
-    int     bestMove   = Move.NOMOVE;
-    //String fen = "";
+  public static int getBestMove(long data) {
+    return (int) ((data & MOVE_MASK) >>> MOVE_SHIFT);
   }
 
-  /**
-   * Defines the type of transposition table entry for alpha beta search.
-   *
-   * Byte is smaller than enum!
-   */
+  public static long setValue(long data, short value) {
+    data &= ~VALUE_MASK;
+    return data | (long) value << VALUE_SHIFT;
+  }
+
+  public static short getValue(long data) {
+    return (short) ((data & VALUE_MASK) >>> VALUE_SHIFT);
+  }
+
+  public static long setDepth(long data, byte depth) {
+    data &= ~DEPTH_MASK;
+    return data | (long) depth << DEPTH_SHIFT;
+  }
+
+  public static byte getDepth(long data) {
+    return (byte) ((data & DEPTH_MASK) >>> DEPTH_SHIFT);
+  }
+
+  public static long setAge(long data, byte age) {
+    if (age < 0) age = 0;
+    data &= ~AGE_MASK;
+    return data | (long) age << AGE_SHIFT;
+  }
+
+  public static byte getAge(long data) {
+    return (byte) ((data & AGE_MASK) >>> AGE_SHIFT);
+  }
+
+  public static long resetAge(long data) {
+    return setAge(data, (byte) 1);
+  }
+
+  public static long increaseAge(long data) {
+    return setAge(data, (byte) Math.min(7, getAge(data) + 1));
+  }
+
+  public static long decreaseAge(long data) {
+    return setAge(data, (byte) (getAge(data) - 1));
+  }
+
+  public static long setType(long data, byte type) {
+    if (type > 3 || type < 0) type = 0;
+    data &= ~TYPE_MASK;
+    return data | (long) type << TYPE_SHIFT;
+  }
+
+  public static byte getType(long data) {
+    return (byte) ((data & TYPE_MASK) >>> TYPE_SHIFT);
+  }
+
+  public static long setMateThreat(long data, boolean mateThreat) {
+    if (mateThreat) return data | 1L << MATE_SHIFT;
+    else return data & ~MATE_MASK;
+  }
+
+  public static boolean hasMateThreat(long data) {
+    return (data & MATE_MASK) >>> MATE_SHIFT == 1;
+  }
+
+  private static String printBitString(long data) {
+    StringBuilder bitBoardLine = new StringBuilder();
+    for (int i = 0; i < Long.numberOfLeadingZeros(data); i++) bitBoardLine.append('0');
+    return bitBoardLine.append(Long.toBinaryString(data)).toString();
+  }
+
   public static class TT_EntryType {
+
     public static final byte NONE  = 0;
     public static final byte EXACT = 1;
     public static final byte ALPHA = 2;
@@ -422,4 +506,5 @@ public class TranspositionTable {
       }
     }
   }
+
 }

@@ -56,17 +56,23 @@ public class TranspositionTableTest {
 
   @Test
   public final void test_Cache() {
-    TranspositionTable cache = new TranspositionTable(32);
+    TranspositionTable tt = new TranspositionTable(1024);
     Position position = new Position();
-    assertEquals(32 * 1024 * 1024, cache.getSize());
-    cache.put(position.getZobristKey(), (short) 999, TT_EntryType.EXACT, (byte) 5);
-    assertEquals(1, cache.getNumberOfEntries());
-    assertEquals(999, cache.get(position.getZobristKey()).value);
-    cache.put(position.getZobristKey(), (short) 1111, TT_EntryType.EXACT, (byte) 15);
-    assertEquals(1111, cache.get(position.getZobristKey()).value);
-    assertEquals(1, cache.getNumberOfEntries());
-    cache.clear();
-    assertEquals(0, cache.getNumberOfEntries());
+    assertEquals(1024 * 1024 * 1024, tt.getSize());
+
+    tt.put(position.getZobristKey(), (short) 999, TT_EntryType.EXACT, (byte) 5);
+    assertEquals(1, tt.getNumberOfEntries());
+    assertEquals(999, TranspositionTable.getValue(tt.get(position.getZobristKey())));
+
+    tt.put(position.getZobristKey(), (short) 1111, TT_EntryType.EXACT, (byte) 15);
+    assertEquals(1, tt.getNumberOfEntries());
+    assertEquals(1111, TranspositionTable.getValue(tt.get(position.getZobristKey())));
+    assertEquals(0, TranspositionTable.getAge(tt.get(position.getZobristKey())));
+    assertEquals(TT_EntryType.EXACT, TranspositionTable.getType(tt.get(position.getZobristKey())));
+    assertEquals(15, TranspositionTable.getDepth(tt.get(position.getZobristKey())));
+
+    tt.clear();
+    assertEquals(0, tt.getNumberOfEntries());
   }
 
   @Test
@@ -74,7 +80,7 @@ public class TranspositionTableTest {
     engine = new FrankyEngine();
     search = ((FrankyEngine) engine).getSearch();
 
-    final int depth = 10;
+    final int depth = 8;
 
     LOG.info("Start COLLISION Test for depth {}", depth);
 
@@ -103,7 +109,6 @@ public class TranspositionTableTest {
     }
     System.out.println();
   }
-
 
   /**
    * General test of TT usage
@@ -160,31 +165,82 @@ public class TranspositionTableTest {
       long hashAllocation = (usedMemoryAfter - usedMemoryBefore) / (1024 * 1024);
       System.out.format("TT Size (config): %dMB = %dMB real size - Nodes: %d%n", i, hashAllocation,
                         tt.getMaxEntries());
-      tt=null; // GC help
+      tt = null; // GC help
     }
   }
 
   @Test
   public void testStats() {
-
     TranspositionTable tt = new TranspositionTable(1024);
-
     Random r = new Random(System.currentTimeMillis());
-
-    int i=0;
+    int i = 0;
     while (i++ < 100_000_000) {
       tt.put(Math.abs(r.nextLong()), (short) 1, TT_EntryType.EXACT, (byte) 0);
     }
-
     System.out.println(tt.toString());
-
   }
 
   @Test
   @Disabled
   public void showSize() {
     //System.out.println(VM.current().details());
-    System.out.println(ClassLayout.parseClass(TranspositionTable.TT_Entry.class).toPrintable());
+    System.out.println(ClassLayout.parseClass(TranspositionTable.class).toPrintable());
+  }
+
+  @Test
+  @Disabled
+  public void testSpeed() {
+
+    /*
+    Bit Encoding v1.1
+    Round 0 Test 1 avg: 1,567 sec
+    Round 1 Test 1 avg: 1,560 sec
+    Round 2 Test 1 avg: 1,531 sec
+    Round 3 Test 1 avg: 1,552 sec
+    Round 4 Test 1 avg: 1,465 sec
+     */
+
+    TranspositionTable tt = new TranspositionTable(16);
+    Random r = new Random(123); // System.currentTimeMillis());
+    System.out.println(tt.toString());
+
+    ArrayList<String> result = new ArrayList<>();
+
+    int ROUNDS = 5;
+    int ITERATIONS = 10;
+    int REPETITIONS = 10_000_000;
+
+    for (int round = 0; round < ROUNDS; round++) {
+      long start = 0, end = 0, sum = 0;
+
+      System.out.printf("Running round %d of Timing Test Test 1 vs. Test 2%n", round);
+      System.gc();
+
+      int i = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          final long key = Math.abs(r.nextLong());
+          tt.put(true, key, (short) 1, TT_EntryType.EXACT, (byte) 0, Move.NOMOVE, false);
+          if (tt.get(key) == 0) {
+            System.out.println("NOT FOUND");
+          }
+        }
+        end = System.nanoTime();
+        sum += end - start;
+        System.out.println(tt.toString());
+        tt.ageEntries();
+      }
+      float avg1 = ((float) sum / ITERATIONS) / 1e9f;
+
+      result.add(String.format("Round %d Test 1 avg: %,.3f sec", round, avg1));
+    }
+
+    System.out.println();
+    for (String s : result) {
+      System.out.println(s);
+    }
+
   }
 
   @Test
@@ -239,6 +295,7 @@ public class TranspositionTableTest {
     }
 
   }
+
   int buckets = 123456789;
 
   private int test1(long r) { return (int) (r % buckets); }
