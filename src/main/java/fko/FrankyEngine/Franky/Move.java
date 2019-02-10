@@ -42,7 +42,7 @@ public class Move {
   private static final Logger LOG = LoggerFactory.getLogger(Move.class);
 
   // NOMOVE
-  public static final  int NOMOVE           = -99;
+  public static final int NOMOVE = 0;
 
   // MASKs
   private static final int SQUARE_bitMASK   = 0x7F;
@@ -55,13 +55,12 @@ public class Move {
   3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0
   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 Info          Mask    Values
   ------------------------------------------------------------------------------------------------
-   																									1	1	1	1	1	1	1	Start Square	7F	1111111	  127
-  																		1	1	1	1	1	1	1								End Square	  7F	1111111	  127
-  														1	1	1	1															Piece	        f	  1111	    15
-  										1	1	1	1																			Target	      f 	1111	    15
-  						1	1	1	1																							Promotion	    f	  1111	    15
-  			1	1	1																											MoveType	    7	  111	      7
-  1	1	1																														Castling	    7	  111	      7
+                                                    1 1 1 1 1 1 1	 Start Square	7F	1111111	    127
+  																		   1 1 1 1 1 1 1								 End Square	  7F	1111111	  127
+                              1 1 1 1                             Piece	        f	  1111	    15
+                      1 1 1 1						                           Target	        f 	1111	    15
+              1 1 1 1																						     Promotion	    f	  1111	    15
+        1 1 1																											     MoveType	      7	  111	      7
   */
   // @formatter:on
 
@@ -91,8 +90,8 @@ public class Move {
   /**
    * Create a Move.
    */
-  public static int createMove(MoveType movetype, Square start, Square end, Piece piece, Piece target,
-                        Piece promotion) {
+  public static int createMove(MoveType movetype, Square start, Square end, Piece piece,
+                               Piece target, Piece promotion) {
     int move = 0;
     // Encode start
     move |= start.ordinal() << START_SQUARE_SHIFT;
@@ -220,7 +219,8 @@ public class Move {
         default:
           break;
       }
-    } else {
+    }
+    else {
       s += getMoveType(move) + " " + getPiece(move) + getStart(move);
       s += getTarget(move) == Piece.NOPIECE ? "-" : "x" + getTarget(move).toString();
       s += getEnd(move).toString() + getPromotion(move).toString();
@@ -267,8 +267,10 @@ public class Move {
         if (promotion.isEmpty()) {
           return m;
         }
-        if (Move.getMoveType(m).equals(MoveType.PROMOTION) &&
-            Move.getPromotion(m).getShortName().toLowerCase().equals(promotion)) {
+        if (Move.getMoveType(m).equals(MoveType.PROMOTION) && Move.getPromotion(m)
+                                                                  .getShortName()
+                                                                  .toLowerCase()
+                                                                  .equals(promotion)) {
           return m;
         }
       }
@@ -315,8 +317,8 @@ public class Move {
     String promotion = matcher.group(6);
     String checkSign = matcher.group(7);
 
-    LOG.trace("Piece: {} File: {} Row: {} Target: {} Promotion: {} CheckSign: {}",
-              piece, disambFile, disambRank, targetSquare, promotion, checkSign);
+    LOG.trace("Piece: {} File: {} Row: {} Target: {} Promotion: {} CheckSign: {}", piece,
+              disambFile, disambRank, targetSquare, promotion, checkSign);
 
     // generate all legal moves from the position
     // and try to find a matching move
@@ -343,9 +345,11 @@ public class Move {
       if (Move.getEnd(move).name().equals(targetSquare)) {
         if (Move.getPiece(move).getType().getShortName().equals(piece)) {
           LOG.trace("Piece MATCH " + Move.getPiece(move).getType().toString());
-        } else if (piece == null && Move.getPiece(move).getType().equals(PieceType.PAWN)) {
+        }
+        else if (piece == null && Move.getPiece(move).getType().equals(PieceType.PAWN)) {
           LOG.trace("Piece MATCH PAWN");
-        } else {
+        }
+        else {
           LOG.trace("Piece NO MATCH");
           continue;
         }
@@ -354,7 +358,8 @@ public class Move {
         if (disambFile != null) {
           if (Move.getStart(move).getFile().name().equals(disambFile)) {
             LOG.trace("File MATCH " + Move.getStart(move).getFile().name());
-          } else {
+          }
+          else {
             LOG.trace("File NO MATCH " + Move.getStart(move).getFile().name());
             continue;
           }
@@ -362,7 +367,8 @@ public class Move {
         if (disambRank != null) {
           if (("" + Move.getStart(move).getRank().get()).equals(disambRank)) {
             LOG.trace("Rank MATCH " + Move.getStart(move).getRank().get());
-          } else {
+          }
+          else {
             LOG.trace("Rank NO MATCH " + Move.getStart(move).getRank().get());
             continue;
           }
@@ -372,7 +378,8 @@ public class Move {
         if (promotion != null) {
           if (Move.getPromotion(move).getType().getShortName().equals(promotion)) {
             LOG.trace("Promotion MATCH");
-          } else {
+          }
+          else {
             LOG.trace("Promotion NO MATCH");
             continue;
           }
@@ -385,7 +392,8 @@ public class Move {
     if (movesFound > 1) {
       LOG.error("SAN move is ambiguous!");
       return NOMOVE;
-    } else if (movesFound == 0 || !Move.isValid(moveFromSAN)) {
+    }
+    else if (movesFound == 0 || !Move.isValid(moveFromSAN)) {
       LOG.error("SAN move not valid! No such move at the current position: " + sanMove);
       return NOMOVE;
     }
