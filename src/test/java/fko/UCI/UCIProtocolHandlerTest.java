@@ -108,8 +108,8 @@ class UCIProtocolHandlerTest {
   @Test
   void setoptionCommand() throws InterruptedException {
 
-    commandToEngine("setoption name Hash value 4096");
-    assertEquals(4096, engine.getHashSizeOption());
+    commandToEngine("setoption name Hash value 2048");
+    assertEquals(2048, engine.getHashSizeOption());
 
     assertTrue(engine.getPonderOption());
     commandToEngine("setoption name Ponder value false");
