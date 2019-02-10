@@ -147,7 +147,7 @@ public class TranspositionTable {
 
   /**
    * Stores the node value and the depth it has been calculated at.
-   * @param forced ignores age check when true
+   * @param forced when true skips age check
    * @param key
    * @param value
    * @param type
@@ -205,7 +205,7 @@ public class TranspositionTable {
 
       // if from same depth only update when quality of new entry is better
       // e.g. don't replace EXACT with ALPHA or BETA
-      if (getDepth(entryData) == depth) {
+      if (depth == getDepth(entryData)) {
         numberOfUpdates++;
 
         entryData = resetAge(entryData);
