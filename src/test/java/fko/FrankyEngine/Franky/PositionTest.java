@@ -639,6 +639,11 @@ public class PositionTest {
     position = new Position("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q1NNQQ2/1p6/qk3KB1 b - -");
     move = Move.fromUCINotation(position, "b1c2");
     assertTrue(position.givesCheck(move));
+    position = new Position("8/8/8/8/8/5K2/R7/7k w - -");
+    move = Move.fromUCINotation(position, "a2h2");
+    assertTrue(position.givesCheck(move));
+
+
 
   }
 

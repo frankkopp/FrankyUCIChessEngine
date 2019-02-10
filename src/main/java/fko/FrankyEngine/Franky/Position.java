@@ -851,6 +851,7 @@ public class Position {
    * @return true if move is giving check to opponent
    */
   public boolean givesCheck(final int move) {
+
     // opponents king square
     final Square kingSquare = kingSquares[getOpponent().ordinal()];
     // fromSquare
@@ -920,14 +921,17 @@ public class Position {
         // normal pawn direct chess include en passant captures
         int[] directions = Square.pawnAttackDirections;
         for (int d : directions) {
-          if (Square.getSquare(targetSquare.ordinal() + d * nextPlayer.direction) == kingSquare)
+          if (Square.getSquare(targetSquare.ordinal() + d * nextPlayer.direction) == kingSquare) {
             return true;
+          }
         }
         break;
       case KNIGHT:
         directions = Square.knightDirections;
         for (int d : directions) {
-          if (Square.getSquare(targetSquare.ordinal() + d) == kingSquare) return true;
+          if (Square.getSquare(targetSquare.ordinal() + d) == kingSquare) {
+            return true;
+          }
         }
         break;
       case ROOK:
@@ -949,7 +953,9 @@ public class Position {
               // square occupied - stop sliding
               if (getPiece(to) != Piece.NOPIECE) {
                 // captures king -> check
-                if (Square.getSquare(to) == kingSquare) return true;
+                if (Square.getSquare(to) == kingSquare) {
+                  return true;
+                }
                 else break;
               }
             }
@@ -976,7 +982,9 @@ public class Position {
               // square occupied - stop sliding
               if (getPiece(to) != Piece.NOPIECE) {
                 // captures king -> check
-                if (Square.getSquare(to) == kingSquare) return true;
+                if (Square.getSquare(to) == kingSquare) {
+                  return true;
+                }
                 else break;
               }
             }
@@ -992,7 +1000,7 @@ public class Position {
 
     // we only need to check for rook, bishop and queens
     // knight and pawn attacks can't be revealed
-    // exeption is en passant where the captured piece can reveal check
+    // exception is en passant where the captured piece can reveal check
     // check all directions and slide until invalid
     final boolean isEnPassant = Move.getMoveType(move) == MoveType.ENPASSANT;
 
@@ -1045,7 +1053,33 @@ public class Position {
         to += d; // next sliding field in this direction
       }
     }
+    return false;
+  }
 
+  /**
+   * @return true if current position has check for next player
+   */
+  public boolean hasCheck() {
+    if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
+    boolean check = isAttacked(nextPlayer.getInverseColor(), kingSquares[nextPlayer.ordinal()]);
+    hasCheck = check ? Flag.TRUE : Flag.FALSE;
+    return check;
+  }
+
+  /**
+   * Tests for mate on this position. If true the next player has has no move and is in check.
+   * Expensive test as all legal moves have to be generated.
+   *
+   * @return true if current position is mate for next player
+   */
+  public boolean hasCheckMate() {
+    if (!hasCheck()) return false;
+    if (hasMate != Flag.TBD) return hasMate == Flag.TRUE;
+    if (!mateCheckMG.hasLegalMove(this)) {
+      hasMate = Flag.TRUE;
+      return true;
+    }
+    hasMate = Flag.FALSE;
     return false;
   }
 
@@ -1185,33 +1219,6 @@ public class Position {
         }
       }
     }
-    return false;
-  }
-
-  /**
-   * @return true if current position has check for next player
-   */
-  public boolean hasCheck() {
-    //if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
-    boolean check = isAttacked(nextPlayer.getInverseColor(), kingSquares[nextPlayer.ordinal()]);
-    hasCheck = check ? Flag.TRUE : Flag.FALSE;
-    return check;
-  }
-
-  /**
-   * Tests for mate on this position. If true the next player has has no move and is in check.
-   * Expensive test as all legal moves have to be generated.
-   *
-   * @return true if current position is mate for next player
-   */
-  public boolean hasCheckMate() {
-    if (!hasCheck()) return false;
-    if (hasMate != Flag.TBD) return hasMate == Flag.TRUE;
-    if (!mateCheckMG.hasLegalMove(this)) {
-      hasMate = Flag.TRUE;
-      return true;
-    }
-    hasMate = Flag.FALSE;
     return false;
   }
 
