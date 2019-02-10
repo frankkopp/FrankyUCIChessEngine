@@ -62,12 +62,6 @@ public class TranspositionTable {
   private long numberOfMisses     = 0L;
 
   private long[] keys;
-  // move:       32 bit  0-31
-  // Value:      16 bit 32-47
-  // Depth:       8 bit 48-55
-  // Age:         3 bit 56-58
-  // Type:        2 bit 59-60
-  // MateThread:  1 bit 61
   private long[] data;
 
   /**
@@ -296,7 +290,9 @@ public class TranspositionTable {
   public void ageEntries() {
     // tests show for() is about 60% slower than lambda parallel()
     IntStream.range(0, data.length)
-             .parallel().filter(i -> keys[i] != 0).forEach(i -> data[i] = increaseAge(data[i]));
+             .parallel()
+             .filter(i -> keys[i] != 0)
+             .forEach(i -> data[i] = increaseAge(data[i]));
   }
 
   /**
@@ -386,87 +382,213 @@ public class TranspositionTable {
   }
   // ###########################################################################
   // Bit operations for data
-
+  // data:       length position values
+  // ----------------------------------------------------
+  // move:       31 bit  0-30    (only positive integers)
+  // Value:      15 bit 31-45    (only positive shorts)
+  // Depth:       7 bit 46-52    (only positive bytes)
+  // Age:         3 bit 53-55    (0-7)
+  // Type:        2 bit 56-57    (0-3)
+  // MateThread:  1 bit 58       (0-1)
+  // Free:        5 bit
   // ###########################################################################
+
   // MASKs
-  private static final long MOVE_bitMASK  = 0b11111111111111111111111111111111L;
-  private static final long VALUE_bitMASK = 0b1111111111111111;
-  private static final long DEPTH_bitMASK = 0b11111111;
-  private static final long AGE_bitMASK   = 0b111;
-  private static final long TYPE_bitMASK  = 0b11;
+  private static final long MOVE_bitMASK  = 0b1111111111111111111111111111111L;
+  private static final long VALUE_bitMASK = 0b111111111111111L;
+  private static final long DEPTH_bitMASK = 0b1111111L;
+  private static final long AGE_bitMASK   = 0b111L;
+  private static final long TYPE_bitMASK  = 0b11L;
+  private static final long MATE_bitMASK  = 0b1L;
 
-  private static final long MATE_bitMASK = 0b1;
   // Bit operation values
-  private static final long MOVE_SHIFT   = 0;
-  private static final long MOVE_MASK    = MOVE_bitMASK << MOVE_SHIFT;
-  private static final long VALUE_SHIFT  = 32;
-  private static final long VALUE_MASK   = VALUE_bitMASK << VALUE_SHIFT;
-  private static final long DEPTH_SHIFT  = 48;
-  private static final long DEPTH_MASK   = DEPTH_bitMASK << DEPTH_SHIFT;
-  private static final long AGE_SHIFT    = 56;
-  private static final long AGE_MASK     = AGE_bitMASK << AGE_SHIFT;
-  private static final long TYPE_SHIFT   = 59;
-  private static final long TYPE_MASK    = TYPE_bitMASK << TYPE_SHIFT;
-  private static final long MATE_SHIFT   = 61;
+  private static final long MOVE_SHIFT  = 0;
+  private static final long MOVE_MASK   = MOVE_bitMASK << MOVE_SHIFT;
+  private static final long VALUE_SHIFT = 31;
+  private static final long VALUE_MASK  = VALUE_bitMASK << VALUE_SHIFT;
+  private static final long DEPTH_SHIFT = 46;
+  private static final long DEPTH_MASK  = DEPTH_bitMASK << DEPTH_SHIFT;
+  private static final long AGE_SHIFT   = 53;
+  private static final long AGE_MASK    = AGE_bitMASK << AGE_SHIFT;
+  private static final long TYPE_SHIFT  = 56;
+  private static final long TYPE_MASK   = TYPE_bitMASK << TYPE_SHIFT;
+  private static final long MATE_SHIFT  = 58;
+  private static final long MATE_MASK   = MATE_bitMASK << MATE_SHIFT;
 
-  private static final long MATE_MASK = MATE_bitMASK << MATE_SHIFT;
-
+  /**
+   * Encodes the given move into the bit representation of the long.
+   * Accepts any positive int and does not check if this is a valid move.
+   * Any negative values will be set to 0.
+   *
+   * @param data
+   * @param bestMove
+   * @return long with value encoded
+   */
   public static long setBestMove(long data, int bestMove) {
+    if (bestMove < 0) bestMove = 0;
     // reset old move
     data &= ~MOVE_MASK;
     return data | bestMove << MOVE_SHIFT;
   }
 
+  /**
+   * Decodes the move from the long. Does not have to be a valid move as it
+   * will ont be checked during storing or retrieving.
+   *
+   * @param data
+   * @return decoded value
+   */
   public static int getBestMove(long data) {
     return (int) ((data & MOVE_MASK) >>> MOVE_SHIFT);
   }
 
+  /**
+   * Encodes the given value into the bit representation of the long.
+   * Accepts any short and does not check if this is a valid value.
+   *
+   * As our bit encoding does not allow negative values due to Java not
+   * supporting unsigned primitive numbers we need to shift the value.
+   * Therefore our max/min evaluation values should be smaller/greater than
+   * Short.MAX/2 or Short.MIN/2. Anything bigger or smaller will be set to
+   * MAX/MIN here!
+   * Internally the value will then be shifted to a positive short and when
+   * retrieved shifted back to its original value
+   *
+   * @param data
+   * @param value
+   * @return long with value encoded
+   */
   public static long setValue(long data, short value) {
+    if (value < Evaluation.NOVALUE) value = -Evaluation.INFINITE;
+    else if (value > Evaluation.INFINITE) value = Evaluation.INFINITE;
+    // shift to positive short to avoid signed short setting the negative bit
+    value += -Evaluation.NOVALUE;
+    assert value > 0;
     data &= ~VALUE_MASK;
     return data | (long) value << VALUE_SHIFT;
   }
 
+  /**
+   * Decodes the value from the long. Does not have to be a valid value
+   * as it will ont be checked during storing or retrieving.
+   *
+   * As our bit encoding does not allow negative values due to Java not
+   * supporting unsigned primitive numbers we need to shift the value.
+   * Therefore our max/min evaluation values should be smaller/greater than
+   * Short.MAX/2 or Short.MIN/2. Anything bigger or smaller will be set to
+   * MAX/MIN here!
+   * Internally the value will then be shifted to a positive short and when
+   * retrieved shifted back to its original value
+   *
+   * @param data
+   * @return decoded value
+   */
   public static short getValue(long data) {
-    return (short) ((data & VALUE_MASK) >>> VALUE_SHIFT);
+    // shift value back to original value
+    return (short) ((short) ((data & VALUE_MASK) >>> VALUE_SHIFT) + Evaluation.NOVALUE);
   }
 
+  /**
+   * Encodes the given depth into the bit representation of the long.
+   * Accepts any positive byte. Any negative values will be set to 0.
+   *
+   * @param data
+   * @param depth
+   * @return long with value encoded
+   */
   public static long setDepth(long data, byte depth) {
+    if (depth < 0) depth = 0;
     data &= ~DEPTH_MASK;
     return data | (long) depth << DEPTH_SHIFT;
   }
 
+  /**
+   * Decodes the depth from the long. Does not have to be a valid value
+   * as it will ont be checked during storing or retrieving.
+   *
+   * @param data
+   * @return decoded value
+   */
   public static byte getDepth(long data) {
     return (byte) ((data & DEPTH_MASK) >>> DEPTH_SHIFT);
   }
 
+  /**
+   * Encodes the given age into the bit representation of the long.
+   * Accepts any positive byte. Any negative values will be set to 0.
+   *
+   * @param data
+   * @param age
+   * @return long with value encoded
+   */
   public static long setAge(long data, byte age) {
     if (age < 0) age = 0;
     data &= ~AGE_MASK;
     return data | (long) age << AGE_SHIFT;
   }
 
+  /**
+   * Decodes the age from the long.
+   *
+   * @param data
+   * @return decoded value
+   */
   public static byte getAge(long data) {
     return (byte) ((data & AGE_MASK) >>> AGE_SHIFT);
   }
 
+  /**
+   * Encodes default age (1) into the bit representation of the long.
+   *
+   * @param data
+   * @return long with value encoded
+   */
   public static long resetAge(long data) {
     return setAge(data, (byte) 1);
   }
 
+  /**
+   * Encodes age+1 into the bit representation of the long.
+   * Maximum age of 7 is ensured.
+   *
+   * @param data
+   * @return long with value encoded
+   */
   public static long increaseAge(long data) {
     return setAge(data, (byte) Math.min(7, getAge(data) + 1));
   }
 
+  /**
+   * Encodes age-1 into the bit representation of the long.
+   * Minimum age of 0 is ensured.
+   *
+   * @param data
+   * @return long with value encoded
+   */
   public static long decreaseAge(long data) {
     return setAge(data, (byte) (getAge(data) - 1));
   }
 
+  /**
+   * Encodes the given type into the bit representation of the long.
+   * Accepts values 0 =< value <= 3. Other values will be set to 0.
+   *
+   * @param data
+   * @param type
+   * @return long with value encoded
+   */
   public static long setType(long data, byte type) {
     if (type > 3 || type < 0) type = 0;
     data &= ~TYPE_MASK;
     return data | (long) type << TYPE_SHIFT;
   }
 
+  /**
+   * Decodes the type from the long.
+   *
+   * @param data
+   * @return decoded value
+   */
   public static byte getType(long data) {
     return (byte) ((data & TYPE_MASK) >>> TYPE_SHIFT);
   }
@@ -480,10 +602,12 @@ public class TranspositionTable {
     return (data & MATE_MASK) >>> MATE_SHIFT == 1;
   }
 
-  private static String printBitString(long data) {
+  public static String printBitString(long data) {
     StringBuilder bitBoardLine = new StringBuilder();
     for (int i = 0; i < Long.numberOfLeadingZeros(data); i++) bitBoardLine.append('0');
-    return bitBoardLine.append(Long.toBinaryString(data)).toString();
+    String binaryString = Long.toBinaryString(data);
+    if (binaryString.equals("0")) binaryString = "";
+    return bitBoardLine.append(binaryString).toString();
   }
 
   public static class TT_EntryType {

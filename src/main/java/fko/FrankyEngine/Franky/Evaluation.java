@@ -66,8 +66,12 @@ public class Evaluation {
   private static final boolean DEBUG = false;
 
   // Constants for evaluations
-  public static final int NOVALUE             = Short.MIN_VALUE; // TT uses shorts
-  public static final int INFINITE            = 30000; // TT uses shorts
+  // Our Transposition Table entry is bit encoded and because Java does not have
+  // unsigned number primitives each TT entry value needs to be positive.
+  // Therefore our max should be smaller than short/2 so we can shift the
+  // negative values in the TT entry.
+  public static final int INFINITE            = 15000; // TT uses shorts
+  public static final int NOVALUE             = -INFINITE - 1; // TT uses shorts
   public static final int MIN                 = -10000;
   public static final int MAX                 = 10000;
   public static final int DRAW                = 0;
@@ -117,6 +121,7 @@ public class Evaluation {
    * Creates an instance of the Evaluator
    */
   public Evaluation() {
+    assert NOVALUE < Short.MAX_VALUE / 2;
   }
 
   /**

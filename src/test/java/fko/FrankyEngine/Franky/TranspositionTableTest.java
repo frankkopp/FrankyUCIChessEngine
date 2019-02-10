@@ -25,7 +25,7 @@
 
 package fko.FrankyEngine.Franky;
 
-import fko.FrankyEngine.Franky.TranspositionTable.TT_EntryType;
+import fko.FrankyEngine.Franky.TranspositionTable.*;
 import fko.UCI.IUCIEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -37,8 +37,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static fko.FrankyEngine.Franky.TranspositionTable.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Frank
@@ -47,16 +47,17 @@ public class TranspositionTableTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(TranspositionTableTest.class);
 
-  private IUCIEngine engine;
-  private Search     search;
+  private IUCIEngine         engine;
+  private Search             search;
+  private TranspositionTable tt;
 
   @BeforeEach
   void setUp() {
+    tt = new TranspositionTable(128);
   }
 
   @Test
   public final void test_Cache() {
-    TranspositionTable tt = new TranspositionTable(1024);
     Position position = new Position();
     assertEquals(1024 * 1024 * 1024, tt.getSize());
 
@@ -73,6 +74,104 @@ public class TranspositionTableTest {
 
     tt.clear();
     assertEquals(0, tt.getNumberOfEntries());
+  }
+
+  @Test
+  public final void printBitStringTest() {
+    System.out.println(printBitString(0L));
+    assertEquals(64, printBitString(0L).length());
+    assertEquals("0000000000000000000000000000000000000000000000000000000000000000",
+                 printBitString(0L));
+    System.out.println(printBitString(1L));
+    assertEquals(64, printBitString(1L).length());
+    assertEquals("0000000000000000000000000000000000000000000000000000000000000001",
+                 printBitString(1L));
+    System.out.println(printBitString(-1L));
+    assertEquals(64, printBitString(-1L).length());
+    assertEquals("1111111111111111111111111111111111111111111111111111111111111111",
+                 printBitString(-1L));
+  }
+
+  @Test
+  public final void testBinaryEncoding() {
+    long data = 0L;
+
+    Position position = new Position();
+
+    System.out.println();
+    System.out.println("Empty:          " + printBitString(data));
+
+    // MOVE
+    int move = Move.fromUCINotation(position, "e2e4");
+    data = setBestMove(data, move);
+    System.out.println("Move e2e4:      " + printBitString(data));
+    assertEquals(move, data);
+    assertEquals(move, getBestMove(data));
+
+    // test for negative move int - should be set to NOMOVE (=0)
+    data = setBestMove(data, -1);
+    System.out.println("Move negative:  " + printBitString(data));
+    assertEquals(0, data);
+    assertEquals(Move.NOMOVE, getBestMove(data));
+
+    // VALUE
+    data = setValue(data, (short) Evaluation.CHECKMATE_THRESHOLD);
+    System.out.println("Value:          " + printBitString(data));
+    assertEquals(Evaluation.CHECKMATE_THRESHOLD, getValue(data));
+
+    // negative values fo value
+    data = setValue(data, (short) -1);
+    System.out.println("Value negative: " + printBitString(data));
+    assertEquals(-1, getValue(data));
+
+    // DEPTH
+    // negative values for depth will be set to 0
+    data = setDepth(data, Byte.MIN_VALUE);
+    System.out.println("Value exeed:    " + printBitString(data));
+    assertEquals(0, getDepth(data));
+
+    // negative values for depth will be set to 0
+    data = setDepth(data, (byte) -1);
+    System.out.println("Depth negative: " + printBitString(data));
+    assertEquals(0, getDepth(data));
+
+    data = setDepth(data, (byte) Search.MAX_SEARCH_DEPTH);
+    System.out.println("Depth max:      " + printBitString(data));
+    assertEquals(Search.MAX_SEARCH_DEPTH, getDepth(data));
+
+    // AGE
+    data = resetAge(data);
+    System.out.println("Age reset:      " + printBitString(data));
+    assertEquals(1, getAge(data));
+    data = increaseAge(data);
+    System.out.println("Age inc:        " + printBitString(data));
+    assertEquals(2, getAge(data));
+    data = decreaseAge(data);
+    System.out.println("Age dec:        " + printBitString(data));
+    assertEquals(1, getAge(data));
+
+    // TYPE
+    assertEquals(TT_EntryType.NONE, getType(data));
+    data = setType(data, TT_EntryType.EXACT);
+    System.out.println("Tyoe EXACT:     " + printBitString(data));
+    assertEquals(TT_EntryType.EXACT, getType(data));
+    data = setType(data, TT_EntryType.BETA);
+    System.out.println("Tyoe BETA:      " + printBitString(data));
+    assertEquals(TT_EntryType.BETA, getType(data));
+    data = setType(data, (byte) -1);
+    System.out.println("Tyoe neg:       " + printBitString(data));
+    assertEquals(TT_EntryType.NONE, getType(data));
+    data = setType(data, (byte) 4);
+    System.out.println("Tyoe exeed:     " + printBitString(data));
+    assertEquals(TT_EntryType.NONE, getType(data));
+
+    // MATE THREAT
+    assertFalse(hasMateThreat(data));
+    System.out.println("Mate threat:    " + printBitString(data));
+    data = setMateThreat(data, true);
+    assertTrue(hasMateThreat(data));
+    System.out.println("Mate threat:    " + printBitString(data));
+
   }
 
   @Test
