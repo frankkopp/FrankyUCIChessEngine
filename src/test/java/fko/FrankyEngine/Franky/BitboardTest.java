@@ -25,6 +25,7 @@
 
 package fko.FrankyEngine.Franky;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -38,36 +39,6 @@ class BitboardTest {
       long bitboard = (long) f.get(null);
       System.out.printf("%s %s %n%s%n", f.getName(), bitboard, Bitboard.toString(bitboard));
     }
-  }
-
-  @Test
-  void toStringTest() {
-
-    //    System.out.printf("Square a8: %d%n%s%n", Square.a8.bitBoard,
-    //                      Bitboard.toString(Square.a8.bitBoard));
-    ////    assertEquals(
-    ////      "1 0 0 0 0 0 0 0 \n" + "0 0 0 0 0 0 0 0 \n" + "0 0 0 0 0 0 0 0 \n" + "0 0 0 0 0 0 0 0 \n"
-    ////      + "0 0 0 0 0 0 0 0 \n" + "0 0 0 0 0 0 0 0 \n" + "0 0 0 0 0 0 0 0 \n" + "0 0 0 0 0 0 0 0 \n",
-    ////      Bitboard.toString(Square.a8.bitBoard));
-    //
-    //    System.out.printf("Square a1: %d%n%s%n", Square.a1.bitBoard,
-    //                      Bitboard.toString(Square.a1.bitBoard));
-    //    System.out.printf("Square e4: %d%n%s%n", Square.e4.bitBoard,
-    //                      Bitboard.toString(Square.e4.bitBoard));
-    //    System.out.printf("Square h1: %d%n%s%n", Square.h1.bitBoard,
-    //                      Bitboard.toString(Square.h1.bitBoard));
-    //    System.out.printf("Square h8: %d%n%s%n", Square.h8.bitBoard,
-    //                      Bitboard.toString(Square.h8.bitBoard));
-    //
-    //    System.out.printf("Diagonal a8 up %d%n%s%n", a8UpDiag, Bitboard.toString(a8UpDiag));
-    //    System.out.printf("Diagonal a4 up %d%n%s%n", a4UpDiag, Bitboard.toString(a4UpDiag));
-    //    System.out.printf("Diagonal a1 up %d%n%s%n", a1UpDiag, Bitboard.toString(a1UpDiag));
-    //    System.out.printf("Diagonal c1 up %d%n%s%n", c1UpDiag, Bitboard.toString(c1UpDiag));
-    //    System.out.printf("Diagonal h1 up %d%n%s%n", h1UpDiag, Bitboard.toString(h1UpDiag));
-    //    System.out.printf("Diagonal a1 up %d%n%s%n", a1UpDiag, Bitboard.toString(a1UpDiag));
-    //
-    //    System.out.printf("Diagonal a8 down %d%n%s%n", a8DownDiag, Bitboard.toString(a8DownDiag));
-
   }
 
   @Test
@@ -88,10 +59,107 @@ class BitboardTest {
     System.out.printf("Long: %d%n", bitboard);
     System.out.println(Bitboard.toString(bitboard));
 
-    bitboard = bitboard << (8*7);
+    bitboard = bitboard << (8 * 7);
     System.out.printf("Long: %d%n", bitboard);
     System.out.println(Bitboard.toString(bitboard));
-
   }
 
+  // 8 0 0 0 0 0 0 0 0
+  // 7 0 0 0 0 0 0 0 0
+  // 6 0 0 0 0 0 0 0 0
+  // 5 0 0 0 0 0 0 0 0
+  // 4 0 0 0 0 0 0 0 0
+  // 3 0 0 0 0 0 0 0 0
+  // 2 0 0 0 0 0 0 0 0
+  // 1 0 0 0 0 0 0 0 0
+  //   a b c d e f g h
+  @Test
+  @Disabled
+  public void develop() {
+
+    // White Pawns
+    System.out.println("WHITE PAWNS");
+    for (Square square : Square.validSquares) {
+      System.out.println(square);
+      System.out.println(
+        Bitboard.printBitString(Bitboard.pawnAttacks[Color.WHITE.ordinal()][square.index64]));
+      System.out.println(
+        Bitboard.toString(Bitboard.pawnAttacks[Color.WHITE.ordinal()][square.index64]));
+      System.out.println();
+    }
+    // Knight
+    System.out.println("BLACK PAWN");
+    for (Square square : Square.validSquares) {
+      System.out.println(square);
+      System.out.println(
+        Bitboard.printBitString(Bitboard.pawnAttacks[Color.BLACK.ordinal()][square.index64]));
+      System.out.println(
+        Bitboard.toString(Bitboard.pawnAttacks[Color.BLACK.ordinal()][square.index64]));
+      System.out.println();
+    }
+
+    // Knight
+    System.out.println("KNIGHTS");
+    for (Square square : Square.validSquares) {
+      System.out.println(square);
+      System.out.println(Bitboard.printBitString(Bitboard.knightAttacks[square.index64]));
+      System.out.println(Bitboard.toString(Bitboard.knightAttacks[square.index64]));
+      System.out.println();
+    }
+
+    // Bishop
+    System.out.println("BISHOPS\n");
+    for (Square square : Square.validSquares) {
+      System.out.println(square);
+      System.out.println(Bitboard.printBitString(Bitboard.bishopAttacks[square.index64]));
+      System.out.println(Bitboard.toString(Bitboard.bishopAttacks[square.index64]));
+      System.out.println();
+    }
+
+    // Bishop
+    System.out.println("ROOKS\n");
+    for (Square square : Square.validSquares) {
+      System.out.println(square);
+      System.out.println(Bitboard.printBitString(Bitboard.rookAttacks[square.index64]));
+      System.out.println(Bitboard.toString(Bitboard.rookAttacks[square.index64]));
+      System.out.println();
+    }
+
+    // Queen
+    System.out.println("QUEEN\n");
+    for (Square square : Square.validSquares) {
+      System.out.println(square);
+      System.out.println(Bitboard.printBitString(Bitboard.queenAttacks[square.index64]));
+      System.out.println(Bitboard.toString(Bitboard.queenAttacks[square.index64]));
+      System.out.println();
+    }
+
+    // King
+    System.out.println("KING\n");
+    for (Square square : Square.validSquares) {
+      System.out.println(square);
+      System.out.println(Bitboard.printBitString(Bitboard.kingAttacks[square.index64]));
+      System.out.println(Bitboard.toString(Bitboard.kingAttacks[square.index64]));
+      System.out.println();
+    }
+
+    //    Square king = Square.g1;
+    //    Square oppKnight = Square.f3;
+    //
+    //    int shift = king.index64 - center.index64;
+    //
+    //    long shiftedKnightAttacks = knightAttack >> 24;
+    //    System.out.println(shiftedKnightAttacks);
+    //    System.out.println(Bitboard.printBitString(shiftedKnightAttacks));
+    //    System.out.println(Bitboard.toString(shiftedKnightAttacks));
+    //    shiftedKnightAttacks = knightAttack >> 23;
+    //    System.out.println(shiftedKnightAttacks);
+    //    System.out.println(Bitboard.printBitString(shiftedKnightAttacks));
+    //    System.out.println(Bitboard.toString(shiftedKnightAttacks));
+    //    shiftedKnightAttacks = knightAttack >> 22;
+    //    System.out.println(shiftedKnightAttacks);
+    //    System.out.println(Bitboard.printBitString(shiftedKnightAttacks));
+    //    System.out.println(Bitboard.toString(shiftedKnightAttacks));
+
+  }
 }

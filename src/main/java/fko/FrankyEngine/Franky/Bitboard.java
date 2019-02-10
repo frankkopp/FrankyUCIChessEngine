@@ -68,14 +68,104 @@ public class Bitboard {
   public static final long f8DownDiag = 0b00100000_01000000_10000000_00000000_00000000_00000000_00000000_00000000L;
   public static final long g8DownDiag = 0b01000000_10000000_00000000_00000000_00000000_00000000_00000000_00000000L;
   public static final long h8DownDiag = 0b10000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000L;
-  // @formatter:ontboard can't be instantiated
+  // @formatter:on
+
+  public static long[][] pawnAttacks   = new long[2][64];
+  public static long[]   knightAttacks = new long[64];
+  public static long[]   bishopAttacks = new long[64];
+  public static long[]   rookAttacks   = new long[64];
+  public static long[]   queenAttacks  = new long[64];
+  public static long[]   kingAttacks   = new long[64];
+
+  static {
+
+    // Pre compute all attack bitboards for all squares
+
+    // white pawn attacks - ignore that pawns can'*t be on all squares
+    Square.validSquares
+      //.parallelStream()
+      .forEach(square -> {
+        int[] directions = Square.pawnAttackDirections;
+        for (int d : directions) {
+          final int to = square.ordinal() + d * Color.WHITE.direction;
+          if ((to & 0x88) != 0) continue;
+          pawnAttacks[Color.WHITE.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
+        }
+      });
+    // black pawn attacks - ignore that pawns can'*t be on all squares
+    Square.validSquares
+      //.parallelStream()
+      .forEach(square -> {
+        int[] directions = Square.pawnAttackDirections;
+        for (int d : directions) {
+          final int to = square.ordinal() + d * Color.BLACK.direction;
+          if ((to & 0x88) != 0) continue;
+          pawnAttacks[Color.BLACK.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
+        }
+      });
+    // knight attacks
+    Square.validSquares
+      //.parallelStream()
+      .forEach(square -> {
+        int[] directions = Square.knightDirections;
+        for (int d : directions) {
+          final int to = square.ordinal() + d;
+          if ((to & 0x88) != 0) continue;
+          knightAttacks[square.index64] |= Square.getSquare(to).bitBoard;
+        }
+      });
+    // bishop attacks
+    Square.validSquares
+      //.parallelStream()
+      .forEach(square -> {
+        int[] directions = Square.bishopDirections;
+        for (int d : directions) {
+          int to = square.ordinal() + d;
+          while ((to & 0x88) == 0) { // slide while valid square
+            bishopAttacks[square.index64] |= Square.getSquare(to).bitBoard;
+            to += d; // next sliding field in this direction
+          }
+        }
+      });
+    // rook attacks
+    Square.validSquares
+      //.parallelStream()
+      .forEach(square -> {
+        int[] directions = Square.rookDirections;
+        for (int d : directions) {
+          int to = square.ordinal() + d;
+          while ((to & 0x88) == 0) { // slide while valid square
+            rookAttacks[square.index64] |= Square.getSquare(to).bitBoard;
+            to += d; // next sliding field in this direction
+          }
+        }
+      });
+    // quuen attacks
+    Square.validSquares
+      //.parallelStream()
+      .forEach(square -> {
+        queenAttacks[square.index64] = rookAttacks[square.index64] | bishopAttacks[square.index64];
+      });
+    // king attacks
+    Square.validSquares
+      //.parallelStream()
+      .forEach(square -> {
+        int[] directions = Square.kingDirections;
+        for (int d : directions) {
+          final int to = square.ordinal() + d;
+          kingAttacks[square.index64] |= Square.getSquare(to).bitBoard;
+        }
+      });
+
+  }
 
   /**
    * Bitboard can't be instantiated
    */
-  private Bitboard() {}
+  private Bitboard() {
+  }
 
-    /**
+  /**
    * Returns a string representing a bitboard in a 8 by 8 matrix
    * @param bitboard
    * @return
@@ -93,5 +183,18 @@ public class Bitboard {
       output.append(System.lineSeparator());
     }
     return output.toString().trim();
+  }
+
+  /**
+   * Returns a string representing a bitboard as a binary long
+   * @param bitboard
+   * @return
+   */
+  public static String printBitString(long bitboard) {
+    StringBuilder bitBoardLine = new StringBuilder();
+    for (int i = 0; i < Long.numberOfLeadingZeros(bitboard); i++) bitBoardLine.append('0');
+    String binaryString = Long.toBinaryString(bitboard);
+    if (binaryString.equals("0")) binaryString = "";
+    return bitBoardLine.append(binaryString).toString();
   }
 }
