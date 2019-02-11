@@ -174,6 +174,26 @@ class BitboardTest {
   }
 
   @Test
+  public void directions() {
+    for (Square from : Square.validSquares) {
+      for (Square to : Square.validSquares) {
+        System.out.printf("From: %s To:%s = %s%n", from, to,
+                          Bitboard.direction[from.index64][to.index64]);
+      }
+    }
+  }
+
+  @Test
+  public void intermediates() {
+    for (Square from : Square.validSquares) {
+      for (Square to : Square.validSquares) {
+        System.out.printf("From: %s To:%s%n%s%n%n", from, to,
+                          Bitboard.toString(Bitboard.intermediate[from.index64][to.index64]));
+      }
+    }
+  }
+
+  @Test
   @Disabled
   public void showSize() {
     //System.out.println(VM.current().details());

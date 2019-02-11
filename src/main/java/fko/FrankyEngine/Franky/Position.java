@@ -1125,6 +1125,7 @@ public class Position {
     if ((Bitboard.rookAttacks[square.index64] & (
       piecesBitboards[attackerColorIndex][PieceType.ROOK.ordinal()]
       | piecesBitboards[attackerColorIndex][PieceType.QUEEN.ordinal()])) != 0) {
+
       // check sliding attacks from all rook directions
       int[] rookDirections = Square.rookDirections;
       for (int idx = 0, rookDirectionsLength = rookDirections.length;
@@ -1150,6 +1151,7 @@ public class Position {
     if ((Bitboard.bishopAttacks[square.index64] & (
       piecesBitboards[attackerColorIndex][PieceType.BISHOP.ordinal()]
       | piecesBitboards[attackerColorIndex][PieceType.QUEEN.ordinal()])) != 0) {
+
       // check sliding attacks from all bishop directions
       int[] bishopDirections = Square.bishopDirections;
       for (int idx = 0, bishopDirectionsLength = bishopDirections.length;

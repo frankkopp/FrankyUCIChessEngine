@@ -84,13 +84,19 @@ public class Bitboard {
   /** pawn squares on file in front of each pawn */
   public static final long[][] pawnFrontLines = new long[2][64];
 
+  /** all direction from sq1 to sq2 along queen movements */
+  public static final int[][] direction = new int[64][64];
+
+  /** bitboards for all squares in between two squares */
+  public static final long[][] intermediate = new long[64][64];
+
   static {
 
     // Pre compute all attack bitboards for all squares
+    //.parallelStream() // does not work in static initializer deadlock (Java Issue)
 
     // white pawn attacks - ignore that pawns can'*t be on all squares
     Square.validSquares
-      //.parallelStream() // does not work in static initializer deadlock (Java Issue)
       .forEach(square -> {
         int[] directions = Square.pawnAttackDirections;
         for (int d : directions) {
@@ -101,7 +107,6 @@ public class Bitboard {
       });
     // black pawn attacks - ignore that pawns can'*t be on all squares
     Square.validSquares
-      //.parallelStream()
       .forEach(square -> {
         int[] directions = Square.pawnAttackDirections;
         for (int d : directions) {
@@ -112,7 +117,6 @@ public class Bitboard {
       });
     // knight attacks
     Square.validSquares
-      //.parallelStream()
       .forEach(square -> {
         int[] directions = Square.knightDirections;
         for (int d : directions) {
@@ -123,7 +127,6 @@ public class Bitboard {
       });
     // bishop attacks
     Square.validSquares
-      //.parallelStream()
       .forEach(square -> {
         int[] directions = Square.bishopDirections;
         for (int d : directions) {
@@ -136,7 +139,6 @@ public class Bitboard {
       });
     // rook attacks
     Square.validSquares
-      //.parallelStream()
       .forEach(square -> {
         int[] directions = Square.rookDirections;
         for (int d : directions) {
@@ -149,13 +151,11 @@ public class Bitboard {
       });
     // quuen attacks
     Square.validSquares
-      //.parallelStream()
       .forEach(square -> {
         queenAttacks[square.index64] = rookAttacks[square.index64] | bishopAttacks[square.index64];
       });
     // king attacks
     Square.validSquares
-      //.parallelStream()
       .forEach(square -> {
         int[] directions = Square.kingDirections;
         for (int d : directions) {
@@ -168,7 +168,6 @@ public class Bitboard {
     // Pawn front line - all squares north of the square for white, south for black
     // white pawn attacks - ignore that pawns can'*t be on all squares
     Square.validSquares
-      //.parallelStream()
       .forEach(square -> {
         int to = square.ordinal() + Square.N;
         while ((to & 0x88) == 0) {
@@ -178,7 +177,6 @@ public class Bitboard {
       });
     // black pawn attacks - ignore that pawns can'*t be on all squares
     Square.validSquares
-      //.parallelStream()
       .forEach(square -> {
         int to = square.ordinal() + Square.S;
         while ((to & 0x88) == 0) {
@@ -186,6 +184,31 @@ public class Bitboard {
           to += Square.S;
         }
       });
+
+    // directions and intermediate
+    for (Square from : Square.validSquares) {
+      for (Square to : Square.validSquares) {
+        boolean found = false;
+        int[] directions = Square.queenDirections;
+        for (int d : directions) {
+          int t = from.ordinal() + d;
+          while ((t & 0x88) == 0) { // slide while valid square
+            Square square = Square.getSquare(t);
+            if (square == to) {
+              direction[from.index64][to.index64] = d;
+              found = true;
+              break;
+            }
+            else {
+              intermediate[from.index64][to.index64] |= square.bitBoard;
+            }
+            t += d; // next sliding field in this direction
+          }
+          if (found) break;
+          intermediate[from.index64][to.index64] = 0L;
+        }
+      }
+    }
 
   }
 
