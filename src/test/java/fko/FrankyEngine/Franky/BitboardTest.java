@@ -37,6 +37,7 @@ class BitboardTest {
   void listFields() throws IllegalAccessException {
     for (Field f : Bitboard.class.getFields()) {
       f.setAccessible(true);
+      if (!(f.get(null) instanceof Long)) continue;
       long bitboard = (long) f.get(null);
       System.out.printf("%s %s %n%s%n", f.getName(), bitboard, Bitboard.toString(bitboard));
     }
@@ -66,7 +67,6 @@ class BitboardTest {
   }
 
   @Test
-  @Disabled
   public void attackBitboards() {
 
     // White Pawns

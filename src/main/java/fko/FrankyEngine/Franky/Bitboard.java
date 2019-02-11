@@ -84,7 +84,7 @@ public class Bitboard {
 
     // white pawn attacks - ignore that pawns can'*t be on all squares
     Square.validSquares
-      //.parallelStream()
+      //.parallelStream() // does not work in static initializer deadlock (Java Issue)
       .forEach(square -> {
         int[] directions = Square.pawnAttackDirections;
         for (int d : directions) {
