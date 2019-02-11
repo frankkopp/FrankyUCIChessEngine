@@ -465,7 +465,7 @@ public class PositionTest {
 
   @Test
   public void testIsAttacked() {
-    String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
+    String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3";
     Position position = new Position(testFen);
 
     System.out.println(position);
@@ -477,14 +477,21 @@ public class PositionTest {
     assertTrue(position.isAttacked(Color.BLACK, Square.e4));
     assertTrue(position.isAttacked(Color.BLACK, Square.e3));
 
+    // knight
+    assertTrue(position.isAttacked(Color.BLACK, Square.e5));
+    assertTrue(position.isAttacked(Color.BLACK, Square.f4));
+    assertFalse(position.isAttacked(Color.BLACK, Square.g1));
+
     // sliding
     assertTrue(position.isAttacked(Color.WHITE, Square.g6));
     assertTrue(position.isAttacked(Color.BLACK, Square.a5));
 
-    // king
     testFen = "rnbqkbnr/1ppppppp/8/p7/Q1P5/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
     position = new Position(testFen);
     System.out.println(position);
+
+    // king
+    assertTrue(position.isAttacked(Color.WHITE, Square.d1));
     assertFalse(position.isAttacked(Color.WHITE, Square.e8));
 
     testFen = "rnbqkbnr/1ppppppp/8/p7/2P1Q3/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
@@ -643,8 +650,6 @@ public class PositionTest {
     move = Move.fromUCINotation(position, "a2h2");
     assertTrue(position.givesCheck(move));
 
-
-
   }
 
   @Test
@@ -669,20 +674,26 @@ public class PositionTest {
     for (Color c : Color.values) {
       for (PieceType pt : PieceType.values) {
         final long bitboard = pos.getPiecesBitboards(c, pt);
-//        System.out.printf("%s %s %d %n", c.name(), pt.name(), bitboard);
-//        System.out.println(Bitboard.toString(bitboard));
+        //        System.out.printf("%s %s %d %n", c.name(), pt.name(), bitboard);
+        //        System.out.println(Bitboard.toString(bitboard));
         if (c == Color.WHITE && pt == PieceType.PAWN) assertEquals(65280L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.KNIGHT) assertEquals(66L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.BISHOP) assertEquals(36L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.ROOK) assertEquals(129L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.QUEEN) assertEquals(8L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.KING) assertEquals(16L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.PAWN) assertEquals(71776119061217280L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.KNIGHT) assertEquals(4755801206503243776L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.BISHOP) assertEquals(2594073385365405696L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.ROOK) assertEquals(-9151314442816847872L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.QUEEN) assertEquals(576460752303423488L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.KING) assertEquals(1152921504606846976L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.PAWN)
+          assertEquals(71776119061217280L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KNIGHT)
+          assertEquals(4755801206503243776L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.BISHOP)
+          assertEquals(2594073385365405696L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.ROOK)
+          assertEquals(-9151314442816847872L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.QUEEN)
+          assertEquals(576460752303423488L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KING)
+          assertEquals(1152921504606846976L, bitboard);
       }
     }
   }
@@ -706,20 +717,25 @@ public class PositionTest {
     for (Color c : Color.values) {
       for (PieceType pt : PieceType.values) {
         final long bitboard = pos.getPiecesBitboards(c, pt);
-//        System.out.printf("%s %s %d %n", c.name(), pt.name(), bitboard);
-//        System.out.println(Bitboard.toString(bitboard));
+        //        System.out.printf("%s %s %d %n", c.name(), pt.name(), bitboard);
+        //        System.out.println(Bitboard.toString(bitboard));
         if (c == Color.WHITE && pt == PieceType.PAWN) assertEquals(61184L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.KNIGHT) assertEquals(2359296L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.BISHOP) assertEquals(4100L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.ROOK) assertEquals(33L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.QUEEN) assertEquals(8L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.KING) assertEquals(64L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.PAWN) assertEquals(69524319247532032L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.KNIGHT) assertEquals(4611690416473899008L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.BISHOP) assertEquals(2594073385365405696L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.ROOK) assertEquals(-9151314442816847872L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.PAWN)
+          assertEquals(69524319247532032L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KNIGHT)
+          assertEquals(4611690416473899008L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.BISHOP)
+          assertEquals(2594073385365405696L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.ROOK)
+          assertEquals(-9151314442816847872L, bitboard);
         else if (c == Color.BLACK && pt == PieceType.QUEEN) assertEquals(274877906944L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.KING) assertEquals(576460752303423488L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KING)
+          assertEquals(576460752303423488L, bitboard);
       }
     }
 
@@ -727,20 +743,25 @@ public class PositionTest {
     for (Color c : Color.values) {
       for (PieceType pt : PieceType.values) {
         final long bitboard = posCopy.getPiecesBitboards(c, pt);
-//        System.out.printf("%s %s %d %n", c.name(), pt.name(), bitboard);
-//        System.out.println(Bitboard.toString(bitboard));
+        //        System.out.printf("%s %s %d %n", c.name(), pt.name(), bitboard);
+        //        System.out.println(Bitboard.toString(bitboard));
         if (c == Color.WHITE && pt == PieceType.PAWN) assertEquals(61184L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.KNIGHT) assertEquals(2359296L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.BISHOP) assertEquals(4100L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.ROOK) assertEquals(33L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.QUEEN) assertEquals(8L, bitboard);
         else if (c == Color.WHITE && pt == PieceType.KING) assertEquals(64L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.PAWN) assertEquals(69524319247532032L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.KNIGHT) assertEquals(4611690416473899008L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.BISHOP) assertEquals(2594073385365405696L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.ROOK) assertEquals(-9151314442816847872L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.PAWN)
+          assertEquals(69524319247532032L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KNIGHT)
+          assertEquals(4611690416473899008L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.BISHOP)
+          assertEquals(2594073385365405696L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.ROOK)
+          assertEquals(-9151314442816847872L, bitboard);
         else if (c == Color.BLACK && pt == PieceType.QUEEN) assertEquals(274877906944L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.KING) assertEquals(576460752303423488L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KING)
+          assertEquals(576460752303423488L, bitboard);
       }
     }
   }
@@ -750,17 +771,17 @@ public class PositionTest {
     Position pos = new Position();
     final long white = pos.getOccupiedBitboards(Color.WHITE);
     final long black = pos.getOccupiedBitboards(Color.BLACK);
-//    System.out.printf("%s %d%n%s%n", Color.WHITE, white, Bitboard.toString(white));
-//    System.out.printf("%s %d%n%S%n", Color.BLACK, black, Bitboard.toString(black));
+    //    System.out.printf("%s %d%n%s%n", Color.WHITE, white, Bitboard.toString(white));
+    //    System.out.printf("%s %d%n%S%n", Color.BLACK, black, Bitboard.toString(black));
     assertEquals(65535L, white);
     assertEquals(-281474976710656L, black);
     long occupiedSquares = (white | black);
-//    System.out.println("All occupoied squares: "+occupiedSquares);
-//    System.out.println(Bitboard.toString(occupiedSquares));
+    //    System.out.println("All occupoied squares: "+occupiedSquares);
+    //    System.out.println(Bitboard.toString(occupiedSquares));
     assertEquals(-281474976645121L, occupiedSquares);
     long emptySquares = ~occupiedSquares;
-//    System.out.println("All empty squares: "+emptySquares);
-//    System.out.println(Bitboard.toString(emptySquares));
+    //    System.out.println("All empty squares: "+emptySquares);
+    //    System.out.println(Bitboard.toString(emptySquares));
     assertEquals(281474976645120L, emptySquares);
   }
 
@@ -784,10 +805,10 @@ public class PositionTest {
     System.out.printf("%s %d%n%s%n", Color.WHITE, white, Bitboard.toString(white));
     System.out.printf("%s %d%n%S%n", Color.BLACK, black, Bitboard.toString(black));
     long occupiedSquares = (white | black);
-    System.out.println("All occupoied squares: "+occupiedSquares);
+    System.out.println("All occupoied squares: " + occupiedSquares);
     System.out.println(Bitboard.toString(occupiedSquares));
     long emptySquares = ~occupiedSquares;
-    System.out.println("All empty squares: "+emptySquares);
+    System.out.println("All empty squares: " + emptySquares);
     System.out.println(Bitboard.toString(emptySquares));
   }
 
@@ -869,7 +890,7 @@ public class PositionTest {
 
     int ROUNDS = 5;
     int ITERATIONS = 10;
-    int REPETITIONS = 2_000_000;
+    int REPETITIONS = 10_000_000;
 
     final Position position = new Position("8/b2r1pk1/p1R2p2/1p5p/r2Pp3/PRP3P1/5K1P/8 b - d3");
     final int move = Move.fromUCINotation(position, "e4d3");
@@ -884,7 +905,7 @@ public class PositionTest {
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
         for (int j = 0; j < REPETITIONS; j++) {
-          test1(position, move);
+          test1(position, Color.BLACK, Square.f2);
         }
         end = System.nanoTime();
         sum += end - start;
@@ -896,7 +917,7 @@ public class PositionTest {
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
         for (int j = 0; j < REPETITIONS; j++) {
-          test2(position, move);
+          test2(position, Color.BLACK, Square.f2);
         }
         end = System.nanoTime();
         sum += end - start;
@@ -916,19 +937,29 @@ public class PositionTest {
 
   }
 
-  private void test1(final Position position, int move) {
-    // slow version
-    position.makeMove(move);
-    if (position.isAttacked(position.getOpponent(),
-                            position.getKingSquares()[position.getNextPlayer().ordinal()])) {
-      position.undoMove();
-      return;
-    }
-    // undo move
-    position.undoMove();
+  private void test1(final Position position, Color c, Square s) {
+    position.isAttacked(c, s);
   }
 
-  private void test2(final Position position, int move) {
-    position.givesCheck(move);
+  private void test2(final Position position, Color c, Square s) {
+    position.isAttacked2(c, s);
   }
+
+  //     private void test1(final Position position, int move) {
+  //      // slow version
+  //      position.makeMove(move);
+  //      if (position.isAttacked(position.getOpponent(),
+  //                              position.getKingSquares()[position.getNextPlayer().ordinal()])) {
+  //        position.undoMove();
+  //        return;
+  //      }
+  //      // undo move
+  //      position.undoMove();
+  //    }
+  //
+  //    private void test2(final Position position, int move) {
+  //      position.givesCheck(move);
+  //  }
+  //
+
 }

@@ -1100,43 +1100,164 @@ public class Position {
     final int squareIndex = square.ordinal();
     final boolean isWhite = attackerColor.isWhite();
 
+    final int attackerColorIndex = attackerColor.ordinal();
+    final int opponentColorIndex = attackerColor.getInverseColor().ordinal();
+
     /*
      * Checks are ordered for likelihood to return from this as fast as possible
      */
 
     // check pawns
     // reverse direction to look for pawns which could attack
-    final int pawnDir = isWhite ? -1 : 1;
-    final Piece attackerPawn = isWhite ? Piece.WHITE_PAWN : Piece.BLACK_PAWN;
-    for (int d : Square.pawnAttackDirections) {
-      final int i = squareIndex + d * pawnDir;
-      if ((i & 0x88) == 0 && x88Board[i] == attackerPawn) return true;
+    if ((Bitboard.pawnAttacks[opponentColorIndex][square.index64]
+         & piecesBitboards[attackerColorIndex][PieceType.PAWN.ordinal()]) != 0) {
+      return true;
     }
 
-    final int attackerColorIndex = attackerColor.ordinal();
+    // check knights
+    if (
+      (Bitboard.knightAttacks[square.index64] & piecesBitboards[attackerColorIndex][PieceType.KNIGHT
+        .ordinal()]) != 0) {
+      return true;
+    }
 
-    // check knights if there are any
-    if (!(knightSquares[attackerColorIndex].isEmpty())) {
-      for (int d : Square.knightDirections) {
+    // check sliding horizontal (rook + queen) if there are any
+    if ((Bitboard.rookAttacks[square.index64] & (
+      piecesBitboards[attackerColorIndex][PieceType.ROOK.ordinal()]
+      | piecesBitboards[attackerColorIndex][PieceType.QUEEN.ordinal()])) != 0) {
+      // check sliding attacks from all rook directions
+      int[] rookDirections = Square.rookDirections;
+      for (int idx = 0, rookDirectionsLength = rookDirections.length;
+           idx < rookDirectionsLength;
+           idx++) {
+
+        int d = rookDirections[idx];
         int i = squareIndex + d;
-        if ((i & 0x88) == 0) { // valid square
-          if (x88Board[i] != Piece.NOPIECE // not empty
-              && x88Board[i].getColor() == attackerColor // attacker piece
-              && (x88Board[i].getType() == PieceType.KNIGHT)) {
-            return true;
+        while ((i & 0x88) == 0) { // slide while valid square
+          if (x88Board[i] != Piece.NOPIECE) { // not empty
+            if (x88Board[i].getColor() == attackerColor // attacker piece
+                && (x88Board[i].getType() == PieceType.ROOK || x88Board[i].getType() == PieceType.QUEEN)) {
+              return true;
+            }
+            break; // not an attacker color or attacker piece blocking the way.
           }
+          i += d; // next sliding field in this direction
         }
       }
     }
 
+    // check sliding diagonal (bishop + queen) if there are any
+    if ((Bitboard.bishopAttacks[square.index64] & (
+      piecesBitboards[attackerColorIndex][PieceType.BISHOP.ordinal()]
+      | piecesBitboards[attackerColorIndex][PieceType.QUEEN.ordinal()])) != 0) {
+      // check sliding attacks from all bishop directions
+      int[] bishopDirections = Square.bishopDirections;
+      for (int idx = 0, bishopDirectionsLength = bishopDirections.length;
+           idx < bishopDirectionsLength;
+           idx++) {
+
+        int d = bishopDirections[idx];
+        int i = squareIndex + d;
+        while ((i & 0x88) == 0) { // slide while valid square
+          if (x88Board[i] != Piece.NOPIECE) { // not empty
+            if (x88Board[i].getColor() == attackerColor // attacker piece
+                && (x88Board[i].getType() == PieceType.BISHOP || x88Board[i].getType() == PieceType.QUEEN)) {
+              return true;
+            }
+            break; // not an attacker color or attacker piece blocking the way.
+          }
+          i += d; // next sliding field in this direction
+        }
+      }
+    }
+
+    // check king
+    if ((Bitboard.kingAttacks[square.index64]
+         & piecesBitboards[attackerColorIndex][PieceType.KING.ordinal()]) != 0) {
+      return true;
+    }
+
+    // check en passant
+    if (this.enPassantSquare != Square.NOSQUARE) {
+      // white is attacker
+      if (isWhite
+          // black is target
+          && x88Board[enPassantSquare.getSouth().ordinal()] == Piece.BLACK_PAWN
+          // this is indeed the en passant attacked square
+          && this.enPassantSquare.getSouth() == square) {
+        // left
+        int i = squareIndex + Square.W;
+        if ((i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN) return true;
+        // right
+        i = squareIndex + Square.E;
+        return (i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN;
+      }
+      // black is attacker (assume not noColor)
+      else if (!isWhite
+               // white is target
+               && x88Board[enPassantSquare.getNorth().ordinal()] == Piece.WHITE_PAWN
+               // this is indeed the en passant attacked square
+               && this.enPassantSquare.getNorth() == square) {
+        // attack from left
+        int i = squareIndex + Square.W;
+        if ((i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN) return true;
+        // attack from right
+        i = squareIndex + Square.E;
+        return (i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * This checks if a certain square is currently under attack by the player of the given color. It
+   * does not matter who has the next move on this position. It also is not checking if the actual
+   * attack can be done as a legal move. E.g. a pinned piece could not actually make a capture on
+   * the square.
+   *
+   * @param attackerColor
+   * @param square
+   * @return true if under attack
+   */
+  public boolean isAttacked2(Color attackerColor, Square square) {
+    assert (square != Square.NOSQUARE);
+    assert (!attackerColor.isNone());
+
+    final int squareIndex = square.ordinal();
+    final boolean isWhite = attackerColor.isWhite();
+
+    final int attackerColorIndex = attackerColor.ordinal();
+    final int opponentColorIndex = attackerColor.getInverseColor().ordinal();
+
+    /*
+     * Checks are ordered for likelihood to return from this as fast as possible
+     */
+
+    // check pawns
+    // reverse direction to look for pawns which could attack
+    if ((Bitboard.pawnAttacks[opponentColorIndex][square.index64]
+         & piecesBitboards[attackerColorIndex][PieceType.PAWN.ordinal()]) != 0) {
+      return true;
+    }
+
+    // check knights
+    if (
+      (Bitboard.knightAttacks[square.index64] & piecesBitboards[attackerColorIndex][PieceType.KNIGHT
+        .ordinal()]) != 0) {
+      return true;
+    }
+
     // check sliding horizontal (rook + queen) if there are any
-    if (!(rookSquares[attackerColorIndex].isEmpty() && queenSquares[attackerColorIndex].isEmpty())
-        // are any rooks or queens in the same file or rank
-        && (((piecesBitboards[attackerColor.ordinal()][PieceType.ROOK.ordinal()]
-              | piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()]) & (
-               square.getFile().bitBoard | square.getRank().bitBoard)) != 0)) {
+    if ((Bitboard.rookAttacks[square.index64] & (
+      piecesBitboards[attackerColorIndex][PieceType.ROOK.ordinal()]
+      | piecesBitboards[attackerColorIndex][PieceType.QUEEN.ordinal()])) != 0) {
       // check sliding attacks from all rook directions
-      for (int d : Square.rookDirections) {
+      int[] rookDirections = Square.rookDirections;
+      for (int idx = 0, rookDirectionsLength = rookDirections.length;
+           idx < rookDirectionsLength;
+           idx++) {
+
+        int d = rookDirections[idx];
         int i = squareIndex + d;
         while ((i & 0x88) == 0) { // slide while valid square
           if (x88Board[i] != Piece.NOPIECE) { // not empty
@@ -1153,13 +1274,16 @@ public class Position {
     }
 
     // check sliding diagonal (bishop + queen) if there are any
-    if (!(bishopSquares[attackerColorIndex].isEmpty() && queenSquares[attackerColorIndex].isEmpty())
-        // are any bishops or queens in the same file or rank
-        && ((piecesBitboards[attackerColor.ordinal()][PieceType.BISHOP.ordinal()]
-             | piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()]) & (
-              square.getUpDiag() | square.getDownDiag())) != 0) {
+    if ((Bitboard.bishopAttacks[square.index64] & (
+      piecesBitboards[attackerColorIndex][PieceType.BISHOP.ordinal()]
+      | piecesBitboards[attackerColorIndex][PieceType.QUEEN.ordinal()])) != 0) {
       // check sliding attacks from all bishop directions
-      for (int d : Square.bishopDirections) {
+      int[] bishopDirections = Square.bishopDirections;
+      for (int idx = 0, bishopDirectionsLength = bishopDirections.length;
+           idx < bishopDirectionsLength;
+           idx++) {
+
+        int d = bishopDirections[idx];
         int i = squareIndex + d;
         while ((i & 0x88) == 0) { // slide while valid square
           if (x88Board[i] != Piece.NOPIECE) { // not empty
@@ -1176,47 +1300,38 @@ public class Position {
     }
 
     // check king
-    for (int d : Square.kingDirections) {
-      int i = squareIndex + d;
-      if ((i & 0x88) == 0) { // valid square
-        if (x88Board[i] != Piece.NOPIECE // not empty
-            && x88Board[i].getColor() == attackerColor // attacker piece
-            && (x88Board[i].getType() == PieceType.KING)) {
-          return true;
-        }
-      }
+    if ((Bitboard.kingAttacks[square.index64]
+         & piecesBitboards[attackerColorIndex][PieceType.KING.ordinal()]) != 0) {
+      return true;
     }
 
-    // if the target square is not empty these attacks are not possible
-    // as the pawn double move ensures that the target square is empty
-    if (x88Board[squareIndex] == Piece.NOPIECE) {
-
-      // check en passant
-      if (this.enPassantSquare != Square.NOSQUARE) {
-        if (isWhite // white is attacker
-            && x88Board[enPassantSquare.getSouth().ordinal()] == Piece.BLACK_PAWN
-            // black is target
-            && this.enPassantSquare.getSouth()
-               == square) { // this is indeed the en passant attacked square
-          // left
-          int i = squareIndex + Square.W;
-          if ((i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN) return true;
-          // right
-          i = squareIndex + Square.E;
-          return (i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN;
-        }
-        else if (!isWhite // black is attacker (assume not noColor)
-                 && x88Board[enPassantSquare.getNorth().ordinal()] == Piece.WHITE_PAWN
-                 // white is target
-                 && this.enPassantSquare.getNorth()
-                    == square) { // this is indeed the en passant attacked square
-          // attack from left
-          int i = squareIndex + Square.W;
-          if ((i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN) return true;
-          // attack from right
-          i = squareIndex + Square.E;
-          return (i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN;
-        }
+    // check en passant
+    if (this.enPassantSquare != Square.NOSQUARE) {
+      // white is attacker
+      if (isWhite
+          // black is target
+          && x88Board[enPassantSquare.getSouth().ordinal()] == Piece.BLACK_PAWN
+          // this is indeed the en passant attacked square
+          && this.enPassantSquare.getSouth() == square) {
+        // left
+        int i = squareIndex + Square.W;
+        if ((i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN) return true;
+        // right
+        i = squareIndex + Square.E;
+        return (i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN;
+      }
+      // black is attacker (assume not noColor)
+      else if (!isWhite
+               // white is target
+               && x88Board[enPassantSquare.getNorth().ordinal()] == Piece.WHITE_PAWN
+               // this is indeed the en passant attacked square
+               && this.enPassantSquare.getNorth() == square) {
+        // attack from left
+        int i = squareIndex + Square.W;
+        if ((i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN) return true;
+        // attack from right
+        i = squareIndex + Square.E;
+        return (i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN;
       }
     }
     return false;
