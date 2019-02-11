@@ -70,14 +70,18 @@ public class Bitboard {
   public static final long h8DownDiag = 0b10000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000L;
   // @formatter:on
 
+  // attack bitboards
   public static final long[][] pawnAttacks   = new long[2][64];
   public static final long[]   knightAttacks = new long[64];
   public static final long[]   bishopAttacks = new long[64];
   public static final long[]   rookAttacks   = new long[64];
   public static final long[]   queenAttacks  = new long[64];
   public static final long[]   kingAttacks   = new long[64];
+
+  /** king ring (is identical to king attacks) */
   public static final long[]   kingRing      = kingAttacks;
 
+  /** pawn squares on file in front of each pawn */
   public static final long[][] pawnFrontLines = new long[2][64];
 
   static {

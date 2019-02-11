@@ -162,6 +162,18 @@ class BitboardTest {
   }
 
   @Test
+  public void testKingRing() {
+    // King
+    System.out.println("KING\n");
+    for (Square square : Square.validSquares) {
+      System.out.println(square);
+      System.out.println(Bitboard.printBitString(Bitboard.kingRing[square.index64]));
+      System.out.println(Bitboard.toString(Bitboard.kingRing[square.index64]));
+      System.out.println();
+    }
+  }
+
+  @Test
   @Disabled
   public void showSize() {
     //System.out.println(VM.current().details());
