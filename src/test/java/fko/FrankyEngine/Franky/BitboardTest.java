@@ -79,7 +79,7 @@ class BitboardTest {
         Bitboard.toString(Bitboard.pawnAttacks[Color.WHITE.ordinal()][square.index64]));
       System.out.println();
     }
-    // Knight
+    // Black Pawns
     System.out.println("BLACK PAWN");
     for (Square square : Square.validSquares) {
       System.out.println(square);
@@ -132,6 +132,31 @@ class BitboardTest {
       System.out.println(square);
       System.out.println(Bitboard.printBitString(Bitboard.kingAttacks[square.index64]));
       System.out.println(Bitboard.toString(Bitboard.kingAttacks[square.index64]));
+      System.out.println();
+    }
+  }
+
+  @Test
+  public void pawnBitboards() {
+
+    // White Pawns
+    System.out.println("WHITE PAWNS");
+    for (Square square : Square.validSquares) {
+      System.out.println(square);
+      System.out.println(
+        Bitboard.printBitString(Bitboard.pawnFrontLines[Color.WHITE.ordinal()][square.index64]));
+      System.out.println(
+        Bitboard.toString(Bitboard.pawnFrontLines[Color.WHITE.ordinal()][square.index64]));
+      System.out.println();
+    }
+    // Black Pawns
+    System.out.println("BLACK PAWN");
+    for (Square square : Square.validSquares) {
+      System.out.println(square);
+      System.out.println(
+        Bitboard.printBitString(Bitboard.pawnFrontLines[Color.BLACK.ordinal()][square.index64]));
+      System.out.println(
+        Bitboard.toString(Bitboard.pawnFrontLines[Color.BLACK.ordinal()][square.index64]));
       System.out.println();
     }
   }

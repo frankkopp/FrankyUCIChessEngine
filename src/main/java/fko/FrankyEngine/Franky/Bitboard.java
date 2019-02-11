@@ -78,6 +78,8 @@ public class Bitboard {
   public static final long[]   kingAttacks   = new long[64];
   public static final long[]   kingRing      = kingAttacks;
 
+  public static final long[][] pawnFrontLines = new long[2][64];
+
   static {
 
     // Pre compute all attack bitboards for all squares
@@ -156,6 +158,28 @@ public class Bitboard {
           final int to = square.ordinal() + d;
           if ((to & 0x88) != 0) continue;
           kingAttacks[square.index64] |= Square.getSquare(to).bitBoard;
+        }
+      });
+
+    // Pawn front line - all squares north of the square for white, south for black
+    // white pawn attacks - ignore that pawns can'*t be on all squares
+    Square.validSquares
+      //.parallelStream()
+      .forEach(square -> {
+        int to = square.ordinal() + Square.N;
+        while ((to & 0x88) == 0) {
+          pawnFrontLines[Color.WHITE.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
+          to += Square.N;
+        }
+      });
+    // black pawn attacks - ignore that pawns can'*t be on all squares
+    Square.validSquares
+      //.parallelStream()
+      .forEach(square -> {
+        int to = square.ordinal() + Square.S;
+        while ((to & 0x88) == 0) {
+          pawnFrontLines[Color.BLACK.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
+          to += Square.S;
         }
       });
 
