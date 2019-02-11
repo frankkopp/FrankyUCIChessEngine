@@ -333,10 +333,10 @@ public class Evaluation {
       this.midGamePiecePosition += kingMidGame[tableIndex];
       this.endGamePiecePosition += kingEndGame[tableIndex];
 
-      // king safety - skip in endgame
+      // king castle safety - skip in endgame
       if (position.getGamePhaseFactor() >= 0.5) {
 
-        // king safety WHITE
+        // king castle safety WHITE
         if (nextToMove == WHITE && kingSquares[nextToMove].getRank() == r1) {
 
           // king side castle
@@ -382,7 +382,7 @@ public class Evaluation {
             }
           }
         }
-        // king safety BLACK
+        // king castle safety BLACK
         else if (nextToMove == BLACK && kingSquares[nextToMove].getRank() == r8) {
           // king side castle
           if (kingSquares[nextToMove].getFile().get() > e.get()) {
@@ -440,10 +440,10 @@ public class Evaluation {
       this.midGamePiecePosition -= kingMidGame[tableIndex];
       this.endGamePiecePosition -= kingEndGame[tableIndex];
 
-      // king safety - skip in endgame
+      // king castle safety - skip in endgame
       if (position.getGamePhaseFactor() >= 0.5) {
 
-        // king safety WHITE
+        // king castle safety WHITE
         if (opponent == WHITE && kingSquares[opponent].getRank() == r1) {
 
           // king side castle
@@ -489,7 +489,7 @@ public class Evaluation {
             }
           }
         }
-        // king safety BLACK
+        // king castle safety BLACK
         else if (opponent == BLACK && kingSquares[opponent].getRank() == r8) {
 
           // king side castle
@@ -694,8 +694,8 @@ public class Evaluation {
       this.endGamePiecePosition += pawnsEndGame[tableIndex];
 
       // penalty for doubled pawn
-      final long pawnsOnFile =
-        square.getFile().bitBoard & position.getPiecesBitboards(nextToMove, PAWN);
+      final long pawnsOnFile = Bitboard.pawnFrontLines[nextToMove][square.index64]
+        & position.getPiecesBitboards(nextToMove, PAWN);
       final int count = Long.bitCount(pawnsOnFile);
       this.midGamePawnStructure += count * DOUBLED_PAWN_PENALTY;
       this.endGamePawnStructure += count * DOUBLED_PAWN_PENALTY;
@@ -717,8 +717,8 @@ public class Evaluation {
       this.endGamePiecePosition -= pawnsEndGame[tableIndex];
 
       // penalty for doubled pawn
-      final long pawnsOnFile =
-        square.getFile().bitBoard & position.getPiecesBitboards(opponent, PAWN);
+      final long pawnsOnFile = Bitboard.pawnFrontLines[opponent][square.index64]
+                               & position.getPiecesBitboards(opponent, PAWN);
       final int count = Long.bitCount(pawnsOnFile);
       this.midGamePawnStructure -= count * DOUBLED_PAWN_PENALTY;
       this.endGamePawnStructure -= count * DOUBLED_PAWN_PENALTY;
@@ -892,9 +892,8 @@ public class Evaluation {
     LOG.debug(
       String.format("King Safety:               %5d (%5d, %5d)", kingSafety, midGameKingSafety,
                     endGameKingSafety));
-    LOG.debug(
-      String.format("Pawn Structure:            %5d (%5d, %5d)", pawnStructure, midGamePawnStructure,
-                    endGamePawnStructure));
+    LOG.debug(String.format("Pawn Structure:            %5d (%5d, %5d)", pawnStructure,
+                            midGamePawnStructure, endGamePawnStructure));
     LOG.debug(String.format("Special:                   %5d ", special));
     LOG.debug("-----------------------------------------------");
     LOG.debug(String.format("Evaluation                 %5d ", value));
