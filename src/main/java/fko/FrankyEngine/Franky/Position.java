@@ -1126,6 +1126,7 @@ public class Position {
       piecesBitboards[attackerColorIndex][PieceType.ROOK.ordinal()]
       | piecesBitboards[attackerColorIndex][PieceType.QUEEN.ordinal()])) != 0) {
 
+      // TODO use bitboards for this!
       // check sliding attacks from all rook directions
       int[] rookDirections = Square.rookDirections;
       for (int idx = 0, rookDirectionsLength = rookDirections.length;
