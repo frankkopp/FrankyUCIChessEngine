@@ -809,6 +809,15 @@ public class Evaluation {
     return kingSafety;
   }
 
+  /**
+   * @return number of pseudo legal moves for the next player
+   */
+  public int pawnStructure(Position position) {
+    // midGameMobility is done in the squares iteration
+    evaluate(position);
+    return pawnStructure;
+  }
+
   public static int getPositionValue(Position position, int move) {
 
     final int nextToMove = position.getNextPlayer().ordinal();
