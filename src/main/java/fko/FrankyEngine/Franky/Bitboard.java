@@ -70,12 +70,13 @@ public class Bitboard {
   public static final long h8DownDiag = 0b10000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000L;
   // @formatter:on
 
-  public static long[][] pawnAttacks   = new long[2][64];
-  public static long[]   knightAttacks = new long[64];
-  public static long[]   bishopAttacks = new long[64];
-  public static long[]   rookAttacks   = new long[64];
-  public static long[]   queenAttacks  = new long[64];
-  public static long[]   kingAttacks   = new long[64];
+  public static final long[][] pawnAttacks   = new long[2][64];
+  public static final long[]   knightAttacks = new long[64];
+  public static final long[]   bishopAttacks = new long[64];
+  public static final long[]   rookAttacks   = new long[64];
+  public static final long[]   queenAttacks  = new long[64];
+  public static final long[]   kingAttacks   = new long[64];
+  public static final long[]   kingRing      = kingAttacks;
 
   static {
 
@@ -153,6 +154,7 @@ public class Bitboard {
         int[] directions = Square.kingDirections;
         for (int d : directions) {
           final int to = square.ordinal() + d;
+          if ((to & 0x88) != 0) continue;
           kingAttacks[square.index64] |= Square.getSquare(to).bitBoard;
         }
       });

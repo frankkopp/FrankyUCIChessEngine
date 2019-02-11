@@ -27,6 +27,7 @@ package fko.FrankyEngine.Franky;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.openjdk.jol.info.ClassLayout;
 
 import java.lang.reflect.Field;
 
@@ -64,18 +65,9 @@ class BitboardTest {
     System.out.println(Bitboard.toString(bitboard));
   }
 
-  // 8 0 0 0 0 0 0 0 0
-  // 7 0 0 0 0 0 0 0 0
-  // 6 0 0 0 0 0 0 0 0
-  // 5 0 0 0 0 0 0 0 0
-  // 4 0 0 0 0 0 0 0 0
-  // 3 0 0 0 0 0 0 0 0
-  // 2 0 0 0 0 0 0 0 0
-  // 1 0 0 0 0 0 0 0 0
-  //   a b c d e f g h
   @Test
   @Disabled
-  public void develop() {
+  public void attackBitboards() {
 
     // White Pawns
     System.out.println("WHITE PAWNS");
@@ -142,24 +134,13 @@ class BitboardTest {
       System.out.println(Bitboard.toString(Bitboard.kingAttacks[square.index64]));
       System.out.println();
     }
-
-    //    Square king = Square.g1;
-    //    Square oppKnight = Square.f3;
-    //
-    //    int shift = king.index64 - center.index64;
-    //
-    //    long shiftedKnightAttacks = knightAttack >> 24;
-    //    System.out.println(shiftedKnightAttacks);
-    //    System.out.println(Bitboard.printBitString(shiftedKnightAttacks));
-    //    System.out.println(Bitboard.toString(shiftedKnightAttacks));
-    //    shiftedKnightAttacks = knightAttack >> 23;
-    //    System.out.println(shiftedKnightAttacks);
-    //    System.out.println(Bitboard.printBitString(shiftedKnightAttacks));
-    //    System.out.println(Bitboard.toString(shiftedKnightAttacks));
-    //    shiftedKnightAttacks = knightAttack >> 22;
-    //    System.out.println(shiftedKnightAttacks);
-    //    System.out.println(Bitboard.printBitString(shiftedKnightAttacks));
-    //    System.out.println(Bitboard.toString(shiftedKnightAttacks));
-
   }
+
+  @Test
+  @Disabled
+  public void showSize() {
+    //System.out.println(VM.current().details());
+    System.out.println(ClassLayout.parseClass(Bitboard.class).toPrintable());
+  }
+
 }
