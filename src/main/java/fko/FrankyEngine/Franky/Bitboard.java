@@ -166,7 +166,8 @@ public class Bitboard {
       });
 
     // Pawn front line - all squares north of the square for white, south for black
-    // white pawn attacks - ignore that pawns can'*t be on all squares
+    // white pawn - ignore that pawns can'*t be on all squares
+    // TODO precompute passed pawn masks
     Square.validSquares
       .forEach(square -> {
         int to = square.ordinal() + Square.N;
@@ -175,7 +176,7 @@ public class Bitboard {
           to += Square.N;
         }
       });
-    // black pawn attacks - ignore that pawns can'*t be on all squares
+    // black pawn - ignore that pawns can'*t be on all squares
     Square.validSquares
       .forEach(square -> {
         int to = square.ordinal() + Square.S;
