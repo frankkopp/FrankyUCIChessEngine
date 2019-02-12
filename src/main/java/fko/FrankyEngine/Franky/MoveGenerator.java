@@ -797,8 +797,7 @@ public class MoveGenerator {
     final PieceType type = PieceType.KNIGHT;
     // iterate over all squares where we have a piece
     final SquareList squareList = position.getKnightSquares()[activePlayer.ordinal()];
-    final int size = squareList.size();
-    for (int i = 0; i < size; i++) {
+    for (int i = 0, size = squareList.size(); i < size; i++) {
       final Square square = squareList.get(i);
       assert position.getPiece(square).getType() == type;
       generateMoves(type, square, Square.knightDirections);
@@ -809,8 +808,7 @@ public class MoveGenerator {
     final PieceType type = PieceType.BISHOP;
     // iterate over all squares where we have this piece type
     final SquareList squareList = position.getBishopSquares()[activePlayer.ordinal()];
-    final int size = squareList.size();
-    for (int i = 0; i < size; i++) {
+    for (int i = 0, size = squareList.size(); i < size; i++) {
       final Square square = squareList.get(i);
       assert position.getPiece(square).getType() == type;
       generateMoves(type, square, Square.bishopDirections);
@@ -821,8 +819,7 @@ public class MoveGenerator {
     final PieceType type = PieceType.ROOK;
     // iterate over all squares where we have this piece type
     final SquareList squareList = position.getRookSquares()[activePlayer.ordinal()];
-    final int size = squareList.size();
-    for (int i = 0; i < size; i++) {
+    for (int i = 0, size = squareList.size(); i < size; i++) {
       final Square square = squareList.get(i);
       assert position.getPiece(square).getType() == type;
       generateMoves(type, square, Square.rookDirections);
@@ -833,8 +830,7 @@ public class MoveGenerator {
     final PieceType type = PieceType.QUEEN;
     // iterate over all squares where we have this piece type
     final SquareList squareList = position.getQueenSquares()[activePlayer.ordinal()];
-    final int size = squareList.size();
-    for (int i = 0; i < size; i++) {
+    for (int i = 0, size = squareList.size(); i < size; i++) {
       final Square square = squareList.get(i);
       assert position.getPiece(square).getType() == type;
       generateMoves(type, square, Square.queenDirections);
