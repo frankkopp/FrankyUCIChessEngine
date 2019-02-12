@@ -47,13 +47,14 @@ public class TranspositionTable {
 
   private static final int KB = 1024;
   private static final int MB = KB * KB;
-
   private static final int ENTRY_SIZE = 8;
 
+  // size and fill info
   private long sizeInByte;
   private int  maxNumberOfEntries;
   private int  numberOfEntries = 0;
 
+  // statistics
   private long numberOfPuts       = 0L;
   private long numberOfCollisions = 0L;
   private long numberOfUpdates    = 0L;
@@ -61,8 +62,9 @@ public class TranspositionTable {
   private long numberOfHits       = 0L;
   private long numberOfMisses     = 0L;
 
-  private long[] keys;
-  private long[] data;
+  // these two longs hold the actual entries for the transposition table
+  private long[] keys; // zobrist key
+  private long[] data; // tt entry data
 
   /**
    * Creates a hash table with a approximated number of entries calculated by
@@ -268,8 +270,7 @@ public class TranspositionTable {
   }
 
   /**
-   * Clears all entry by resetting the to key=0 and
-   * value=Integer-MIN_VALUE
+   * Clears all entries
    */
   public void clear() {
     // tests show for() is about 60% slower than lambda parallel()
@@ -285,7 +286,7 @@ public class TranspositionTable {
   }
 
   /**
-   * Mark all entries unused and clear for overwriting
+   * Age all entries to clear them for overwriting
    */
   public void ageEntries() {
     // tests show for() is about 60% slower than lambda parallel()
@@ -593,11 +594,24 @@ public class TranspositionTable {
     return (byte) ((data & TYPE_MASK) >>> TYPE_SHIFT);
   }
 
+  /**
+   * Encodes the given mateThreat into the bit representation of the long.
+   *
+   * @param data
+   * @param mateThreat
+   * @return long with value encoded
+   */
   public static long setMateThreat(long data, boolean mateThreat) {
     if (mateThreat) return data | 1L << MATE_SHIFT;
     else return data & ~MATE_MASK;
   }
 
+  /**
+   * Decodes the mateThreat from the long.
+   *
+   * @param data
+   * @return decoded value
+   */
   public static boolean hasMateThreat(long data) {
     return (data & MATE_MASK) >>> MATE_SHIFT == 1;
   }
@@ -610,6 +624,10 @@ public class TranspositionTable {
     return bitBoardLine.append(binaryString).toString();
   }
 
+  /**
+   * Constants for the TT Entry types NONE, EXACT, ALPHA, BETA.
+   * Implemented as byte data types to save space
+   */
   public static class TT_EntryType {
 
     public static final byte NONE  = 0;
