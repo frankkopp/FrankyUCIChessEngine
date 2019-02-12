@@ -807,9 +807,10 @@ public class MoveGenerator {
   private void generateBishopMoves() {
     final PieceType type = PieceType.BISHOP;
     // iterate over all squares where we have this piece type
-    final SquareList squareList = position.getBishopSquares()[activePlayer.ordinal()];
-    for (int i = 0, size = squareList.size(); i < size; i++) {
-      final Square square = squareList.get(i);
+    for (int i = 0, size = position.getBishopSquares()[activePlayer.ordinal()].size();
+         i < size;
+         i++) {
+      final Square square = position.getBishopSquares()[activePlayer.ordinal()].get(i);
       assert position.getPiece(square).getType() == type;
       generateMoves(type, square, Square.bishopDirections);
     }
@@ -818,9 +819,10 @@ public class MoveGenerator {
   private void generateRookMoves() {
     final PieceType type = PieceType.ROOK;
     // iterate over all squares where we have this piece type
-    final SquareList squareList = position.getRookSquares()[activePlayer.ordinal()];
-    for (int i = 0, size = squareList.size(); i < size; i++) {
-      final Square square = squareList.get(i);
+    for (int i = 0, size = position.getRookSquares()[activePlayer.ordinal()].size();
+         i < size;
+         i++) {
+      final Square square = position.getRookSquares()[activePlayer.ordinal()].get(i);
       assert position.getPiece(square).getType() == type;
       generateMoves(type, square, Square.rookDirections);
     }
@@ -829,9 +831,10 @@ public class MoveGenerator {
   private void generateQueenMoves() {
     final PieceType type = PieceType.QUEEN;
     // iterate over all squares where we have this piece type
-    final SquareList squareList = position.getQueenSquares()[activePlayer.ordinal()];
-    for (int i = 0, size = squareList.size(); i < size; i++) {
-      final Square square = squareList.get(i);
+    for (int i = 0, size = position.getQueenSquares()[activePlayer.ordinal()].size();
+         i < size;
+         i++) {
+      final Square square = position.getQueenSquares()[activePlayer.ordinal()].get(i);
       assert position.getPiece(square).getType() == type;
       generateMoves(type, square, Square.queenDirections);
     }
@@ -862,8 +865,8 @@ public class MoveGenerator {
         // free square - non capture
         if (target == Piece.NOPIECE) { // empty
           if ((genMode & GEN_NONCAPTURES) > 0) { // generate non captures
-            nonCapturingMoves.add(Move.createMove(MoveType.NORMAL, square,
-                                                  Square.getSquare(to), Piece.getPiece(type, activePlayer), target,
+            nonCapturingMoves.add(Move.createMove(MoveType.NORMAL, square, Square.getSquare(to),
+                                                  Piece.getPiece(type, activePlayer), target,
                                                   Piece.NOPIECE));
           }
         }
@@ -872,8 +875,8 @@ public class MoveGenerator {
           if ((genMode & GEN_CAPTURES) > 0) { // generate captures
             if (target.getColor() == activePlayer.getInverseColor()) { // opponents color
               assert target.getType() != PieceType.KING; // did we miss a check?
-              capturingMoves.add(Move.createMove(MoveType.NORMAL, square,
-                                                 Square.getSquare(to), Piece.getPiece(type, activePlayer), target,
+              capturingMoves.add(Move.createMove(MoveType.NORMAL, square, Square.getSquare(to),
+                                                 Piece.getPiece(type, activePlayer), target,
                                                  Piece.NOPIECE));
             }
           }
