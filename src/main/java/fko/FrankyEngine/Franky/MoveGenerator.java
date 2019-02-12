@@ -796,9 +796,10 @@ public class MoveGenerator {
   private void generateKnightMoves() {
     final PieceType type = PieceType.KNIGHT;
     // iterate over all squares where we have a piece
-    final SquareList squareList = position.getKnightSquares()[activePlayer.ordinal()];
-    for (int i = 0, size = squareList.size(); i < size; i++) {
-      final Square square = squareList.get(i);
+    for (int i = 0, size = position.getKnightSquares()[activePlayer.ordinal()].size();
+         i < size;
+         i++) {
+      final Square square = position.getKnightSquares()[activePlayer.ordinal()].get(i);
       assert position.getPiece(square).getType() == type;
       generateMoves(type, square, Square.knightDirections);
     }
