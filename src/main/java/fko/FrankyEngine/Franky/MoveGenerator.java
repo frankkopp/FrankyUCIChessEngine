@@ -151,7 +151,7 @@ public class MoveGenerator {
   public void setKillerMoves(MoveList killerMoves) {
     assert killerMoves != null : "parameter null not allowed";
     this.killerMoves.clear();
-    for (int m = 0; m < killerMoves.size(); m++) {
+    for (int m = 0, size = killerMoves.size(); m < size; m++) {
       this.killerMoves.add(killerMoves.get(m));
     }
   }
@@ -428,7 +428,7 @@ public class MoveGenerator {
     // lower amount of captures searched in quiescence search by only looking at "good" captures
     // TODO: is this good?? better implementing SEE?
     qSearchMoves.clear();
-    for (int m = 0; m < capturingMoves.size(); m++) {
+    for (int m = 0, size = capturingMoves.size(); m < size; m++) {
       int move = capturingMoves.get(m);
       // all pawn captures - they never loose material
       if (Move.getPiece(move).getType() == PieceType.PAWN) {
@@ -615,12 +615,12 @@ public class MoveGenerator {
     // create index array - this is faster then to call getSortValue() every
     // time a compare takes place
     int[] sortIdx = new int[moveList.size()];
-    for (int i = 0; i < moveList.size(); i++) {
+    for (int i = 0, size = moveList.size(); i < size; i++) {
       sortIdx[i] = getSortValue(moveList.get(i));
     }
     // insertion sort
     int ts;
-    for (int i = 0; i < moveList.size(); i++) {
+    for (int i = 0, size = moveList.size(); i < size; i++) {
       for (int j = i; j > 0; j--) {
         if (sortIdx[j] - sortIdx[j - 1] < 0) {
           moveList.swap(j - 1, j);
@@ -649,18 +649,19 @@ public class MoveGenerator {
 
   private void generatePawnMoves() {
     // iterate over all squares where we have a pawn
-    final SquareList squareList = position.getPawnSquares()[activePlayer.ordinal()];
-    final int size = squareList.size();
-    for (int i = 0; i < size; i++) {
-      final Square square = squareList.get(i);
+    for (int i = 0, size = position.getPawnSquares()[activePlayer.ordinal()].size();
+         i < size;
+         i++) {
 
+      final Square square = position.getPawnSquares()[activePlayer.ordinal()].get(i);
       assert position.getPiece(square).getType() == PieceType.PAWN;
 
       // get all possible x88 index values for pawn moves
       // these are basically int values to add or subtract from the
       // current square index. Very efficient with a x88 board.
-      int[] directions = Square.pawnDirections;
-      for (int d : directions) {
+      int[] pawnDirections = Square.pawnDirections;
+      for (int j = 0, length = pawnDirections.length; j < length; j++) {
+        int d = pawnDirections[j];
 
         // calculate the to square
         final int to = square.ordinal() + d * activePlayer.direction;
@@ -857,7 +858,11 @@ public class MoveGenerator {
     // get all possible x88 index values for piece's moves
     // these are basically int values to add or subtract from the
     // current square index. Very efficient with a x88 board.
-    for (int d : pieceDirections) {
+    for (int i = 0, pieceDirectionsLength = pieceDirections.length;
+         i < pieceDirectionsLength;
+         i++) {
+
+      int d = pieceDirections[i];
       int to = square.ordinal() + d;
 
       while ((to & 0x88) == 0) { // slide while valid square
@@ -1027,8 +1032,7 @@ public class MoveGenerator {
   private boolean findKnightMove() {
     PieceType type = PieceType.KNIGHT;
     final SquareList squareList = position.getKnightSquares()[activePlayer.ordinal()];
-    final int size = squareList.size();
-    for (int i = 0; i < size; i++) {
+    for (int i = 0, size = squareList.size(); i < size; i++) {
       final Square os = squareList.get(i);
       if (findMove(type, os, Square.knightDirections)) return true;
     }
@@ -1043,8 +1047,7 @@ public class MoveGenerator {
   private boolean findQueenMove() {
     PieceType type = PieceType.QUEEN;
     final SquareList squareList = position.getQueenSquares()[activePlayer.ordinal()];
-    final int size = squareList.size();
-    for (int i = 0; i < size; i++) {
+    for (int i = 0, size = squareList.size(); i < size; i++) {
       final Square os = squareList.get(i);
       if (findMove(type, os, Square.queenDirections)) return true;
     }
@@ -1060,8 +1063,7 @@ public class MoveGenerator {
     PieceType type = PieceType.BISHOP;
     // iterate over all squares where we have this piece type
     final SquareList squareList = position.getBishopSquares()[activePlayer.ordinal()];
-    final int size = squareList.size();
-    for (int i = 0; i < size; i++) {
+    for (int i = 0, size = squareList.size(); i < size; i++) {
       final Square os = squareList.get(i);
       if (findMove(type, os, Square.bishopDirections)) return true;
     }
@@ -1076,10 +1078,9 @@ public class MoveGenerator {
   private boolean findRookMove() {
     PieceType type = PieceType.ROOK;
     // iterate over all squares where we have this piece type
-    final SquareList squareList = position.getRookSquares()[activePlayer.ordinal()];
-    final int size = squareList.size();
-    for (int i = 0; i < size; i++) {
-      final Square os = squareList.get(i);
+    final SquareList rookSquare = position.getRookSquares()[activePlayer.ordinal()];
+    for (int i = 0, size = rookSquare.size(); i < size; i++) {
+      final Square os = rookSquare.get(i);
       if (findMove(type, os, Square.rookDirections)) return true;
     }
     return false;
@@ -1096,7 +1097,11 @@ public class MoveGenerator {
    */
   private boolean findMove(PieceType type, Square square, int[] pieceDirections) {
     int move;
-    for (int d : pieceDirections) {
+    for (int i = 0, pieceDirectionsLength = pieceDirections.length;
+         i < pieceDirectionsLength;
+         i++) {
+
+      int d = pieceDirections[i];
       int to = square.ordinal() + d;
       while ((to & 0x88) == 0) { // slide while valid square
         final Piece target = position.getPiece(to);
@@ -1137,16 +1142,18 @@ public class MoveGenerator {
     int move;
 
     // iterate over all squares where we have a pawn
-    final SquareList squareList = position.getPawnSquares()[activePlayer.ordinal()];
-    final int size = squareList.size();
-    for (int i = 0; i < size; i++) {
-      final Square square = squareList.get(i);
+    for (int i = 0, size = position.getPawnSquares()[activePlayer.ordinal()].size();
+         i < size;
+         i++) {
+
+      final Square square = position.getPawnSquares()[activePlayer.ordinal()].get(i);
 
       // get all possible x88 index values for pawn moves
       // these are basically int values to add or subtract from the
       // current square index. Very efficient with a x88 board.
       int[] directions = Square.pawnDirections;
-      for (int d : directions) {
+      for (int i1 = 0, directionsLength = directions.length; i1 < directionsLength; i1++) {
+        int d = directions[i1];
         // calculate the to square
         final int to = square.ordinal() + d * activePlayer.direction;
         if ((to & 0x88) == 0) { // valid square

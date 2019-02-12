@@ -250,9 +250,22 @@ public class EvaluationTest {
 
   @Test
   void pawnStructure() {
+    // doubled pawn
     position = new Position("r2qkbnr/1pp2ppp/p1np4/4p3/B3P3/5P1P/PPPP1P2/RNBQ1RK1 b kq -");
     evaluation.evaluate(position);
     evaluation.printEvaluation();
+    assertEquals(10, evaluation.pawnStructure(position));
+
+    // passed pawn
+    position = new Position("2r1r1k1/5npp/3q4/1QpP1p2/1p6/4PP2/1B2R1PP/2R3K1 w - -");
+    evaluation.evaluate(position);
+    evaluation.printEvaluation();
+    assertEquals(-30, evaluation.pawnStructure(position));
+
+    position = new Position("1qr1r1k1/5pp1/1p2p2p/1Qbn3b/2R5/3P1NPP/3NPPB1/1R4K1 w - -");
+    evaluation.evaluate(position);
+    evaluation.printEvaluation();
+    assertEquals(-30, evaluation.pawnStructure(position));
   }
 
   @Test
@@ -266,8 +279,8 @@ public class EvaluationTest {
   @Disabled
   public void testTiming() {
 
-    int ROUNDS = 5;
-    int DURATION = 2;
+    int ROUNDS = 10;
+    int DURATION = 3;
 
     int ITERATIONS = 0;
 

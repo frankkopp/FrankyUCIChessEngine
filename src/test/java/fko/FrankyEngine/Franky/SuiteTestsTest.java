@@ -119,6 +119,9 @@ public class SuiteTestsTest {
     0.13
     Successful: 273 (91 Prozent)
     Failed:      27 (9 Prozent)
+    1.1
+    Successful: 274 (91 Prozent)
+    Failed:      26 (8 Prozent)
     */
     testSuite = new TestSuite("./testsets/wac.epd");
     testSuite.setSearchTime(5000);

@@ -52,6 +52,7 @@ class EvaluationConfig {
   static final int CORNERED_ROOK_PENALTY  = -50;
 
   static final int DOUBLED_PAWN_PENALTY = -10;
+  static final int PASSED_PAWN          = 30;
 
   public static int CONTEMPT_FACTOR = 2; // will be multiplied with game phase factor
 
