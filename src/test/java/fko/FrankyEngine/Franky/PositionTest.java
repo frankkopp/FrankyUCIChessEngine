@@ -972,7 +972,7 @@ public class PositionTest {
   }
 
   private void test2(final Position position, int move) {
-    position.givesCheck2(move);
+    //position.givesCheck2(move);
   }
 
 

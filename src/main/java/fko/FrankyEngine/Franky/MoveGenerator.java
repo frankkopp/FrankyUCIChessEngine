@@ -630,11 +630,6 @@ public class MoveGenerator {
         }
       }
     }
-    // DEBUG
-    //    for (int i = 0; i < moveList.size(); i++) {
-    //      System.out.printf("%-20s (%d)%n", Move.toString(moveList.get(i)), sortIdx[i]);
-    //    }
-    //    System.out.println();
   }
 
   /**
@@ -871,10 +866,9 @@ public class MoveGenerator {
         // free square - non capture
         if (target == Piece.NOPIECE) { // empty
           if ((genMode & GEN_NONCAPTURES) > 0) { // generate non captures
-            nonCapturingMoves.add(
-              Move.createMove(MoveType.NORMAL, Square.getSquare(square.ordinal()),
-                              Square.getSquare(to), Piece.getPiece(type, activePlayer), target,
-                              Piece.NOPIECE));
+            nonCapturingMoves.add(Move.createMove(MoveType.NORMAL, square,
+                                                  Square.getSquare(to), Piece.getPiece(type, activePlayer), target,
+                                                  Piece.NOPIECE));
           }
         }
         // occupied square - capture if opponent and stop sliding
@@ -882,11 +876,9 @@ public class MoveGenerator {
           if ((genMode & GEN_CAPTURES) > 0) { // generate captures
             if (target.getColor() == activePlayer.getInverseColor()) { // opponents color
               assert target.getType() != PieceType.KING; // did we miss a check?
-              capturingMoves.add(
-                Move.createMove(MoveType.NORMAL, Square.getSquare(square.ordinal()),
-                                Square.getSquare(to), Piece.getPiece(type, activePlayer), target,
-                                Piece.NOPIECE));
-
+              capturingMoves.add(Move.createMove(MoveType.NORMAL, square,
+                                                 Square.getSquare(to), Piece.getPiece(type, activePlayer), target,
+                                                 Piece.NOPIECE));
             }
           }
           break;
