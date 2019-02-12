@@ -51,15 +51,18 @@ public class TranspositionTableTest {
   private Search             search;
   private TranspositionTable tt;
 
+  private int size;
+
   @BeforeEach
   void setUp() {
-    tt = new TranspositionTable(128);
+    size = 128;
+    tt = new TranspositionTable(size);
   }
 
   @Test
   public final void test_Cache() {
     Position position = new Position();
-    assertEquals(1024 * 1024 * 1024, tt.getSize());
+    assertEquals(size * 1024 * 1024, tt.getSize());
 
     tt.put(position.getZobristKey(), (short) 999, TT_EntryType.EXACT, (byte) 5);
     assertEquals(1, tt.getNumberOfEntries());

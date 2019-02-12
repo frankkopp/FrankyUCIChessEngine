@@ -488,21 +488,38 @@ public class PositionTest {
 
     testFen = "rnbqkbnr/1ppppppp/8/p7/Q1P5/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
     position = new Position(testFen);
-    System.out.println(position);
 
     // king
-    assertTrue(position.isAttacked(Color.WHITE, Square.d1));
-    assertFalse(position.isAttacked(Color.WHITE, Square.e8));
-
-    testFen = "rnbqkbnr/1ppppppp/8/p7/2P1Q3/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
-    position = new Position(testFen);
     System.out.println(position);
-    assertFalse(position.isAttacked(Color.WHITE, Square.e8));
+    assertTrue(position.isAttacked(Color.WHITE, Square.d1));
 
-    testFen = "rnbqkbnr/1ppppppp/8/p7/2P1Q3/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
-    position = new Position(testFen);
     System.out.println(position);
     assertFalse(position.isAttacked(Color.BLACK, Square.e1));
+
+    // rook
+    System.out.println(position);
+    assertTrue(position.isAttacked(Color.BLACK, Square.a5));
+
+    System.out.println(position);
+    assertFalse(position.isAttacked(Color.BLACK, Square.a4));
+
+    // queen
+    System.out.println(position);
+    assertFalse(position.isAttacked(Color.WHITE, Square.e8));
+
+    System.out.println(position);
+    assertTrue(position.isAttacked(Color.WHITE, Square.d7));
+
+    System.out.println(position);
+    assertFalse(position.isAttacked(Color.WHITE, Square.e8));
+
+    // bug tests
+    testFen = "r1bqk1nr/pppp1ppp/2nb4/1B2B3/3pP3/8/PPP2PPP/RN1QK1NR b KQkq -";
+    position = new Position(testFen);
+    System.out.println(position);
+    assertFalse(position.isAttacked(Color.WHITE, Square.e8));
+    assertFalse(position.isAttacked(Color.BLACK, Square.e1));
+
   }
 
   @Test
@@ -649,6 +666,9 @@ public class PositionTest {
     position = new Position("8/8/8/8/8/5K2/R7/7k w - -");
     move = Move.fromUCINotation(position, "a2h2");
     assertTrue(position.givesCheck(move));
+    position = new Position("r1bqkb1r/ppp1pppp/2n2n2/1B1P4/8/8/PPPP1PPP/RNBQK1NR w KQkq -");
+    move = Move.fromUCINotation(position, "d5c6");
+    assertFalse(position.givesCheck(move));
 
   }
 
@@ -892,8 +912,8 @@ public class PositionTest {
     int ITERATIONS = 10;
     int REPETITIONS = 10_000_000;
 
-    final Position position = new Position("8/b2r1pk1/p1R2p2/1p5p/r2Pp3/PRP3P1/5K1P/8 b - d3");
-    final int move = Move.fromUCINotation(position, "e4d3");
+    final Position position = new Position("8/b2r1pk1/p1R2p2/1p5p/r2p4/PRP3P1/5K1P/8 b - - 0 1");
+    final int move = Move.fromUCINotation(position, "d4d3");
 
     for (int round = 0; round < ROUNDS; round++) {
       long start = 0, end = 0, sum = 0;
@@ -905,7 +925,8 @@ public class PositionTest {
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
         for (int j = 0; j < REPETITIONS; j++) {
-          test1(position, Color.BLACK, Square.f2);
+          test1(position, move);
+          //          test1(position, Color.BLACK, Square.f2);
         }
         end = System.nanoTime();
         sum += end - start;
@@ -917,7 +938,8 @@ public class PositionTest {
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
         for (int j = 0; j < REPETITIONS; j++) {
-          test2(position, Color.BLACK, Square.f2);
+          test2(position, move);
+          //          test2(position, Color.BLACK, Square.f2);
         }
         end = System.nanoTime();
         sum += end - start;
@@ -936,30 +958,22 @@ public class PositionTest {
     }
 
   }
-
-  private void test1(final Position position, Color c, Square s) {
-    position.isAttacked(c, s);
-  }
-
-  private void test2(final Position position, Color c, Square s) {
-    position.isAttacked2(c, s);
-  }
-
-  //     private void test1(final Position position, int move) {
-  //      // slow version
-  //      position.makeMove(move);
-  //      if (position.isAttacked(position.getOpponent(),
-  //                              position.getKingSquares()[position.getNextPlayer().ordinal()])) {
-  //        position.undoMove();
-  //        return;
-  //      }
-  //      // undo move
-  //      position.undoMove();
-  //    }
   //
-  //    private void test2(final Position position, int move) {
-  //      position.givesCheck(move);
+  //  private void test1(final Position position, Color c, Square s) {
+  //    position.isAttacked(c, s);
   //  }
   //
+  //  private void test2(final Position position, Color c, Square s) {
+  //    position.isAttacked2(c, s);
+  //  }
+
+  private void test1(final Position position, int move) {
+    position.givesCheck(move);
+  }
+
+  private void test2(final Position position, int move) {
+    position.givesCheck2(move);
+  }
+
 
 }
