@@ -46,44 +46,44 @@ public enum Piece {
 
   static final Piece[] values;
 
-  private final PieceType _type;
-  private final Color     _color;
-  private final String    _shortName;
+  private final PieceType type;
+  private final Color     color;
+  private final String    shortName;
 
   static {
     values = Piece.values();
   }
 
   Piece(PieceType type, Color color, String shortName) {
-    _type = type;
-    _color = color;
-    _shortName = shortName;
+    this.type = type;
+    this.color = color;
+    this.shortName = shortName;
   }
 
   /**
    * @return the type
    */
   public PieceType getType() {
-    return _type;
+    return type;
   }
 
   /**
    * @return the color
    */
   public Color getColor() {
-    return _color;
+    return color;
   }
 
   /**
    * @return the shortName
    */
   public String getShortName() {
-    return _shortName;
+    return shortName;
   }
 
   @Override
   public String toString() {
-    return _shortName;
+    return shortName;
   }
 
   /**
