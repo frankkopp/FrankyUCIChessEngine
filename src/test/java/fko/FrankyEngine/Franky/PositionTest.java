@@ -949,7 +949,7 @@ public class PositionTest {
 
     long myPieces = position.getOccupiedBitboards(myColor);
     long oppPieces = position.getOccupiedBitboards(myColor.getInverseColor());
-    long attacks = getAttacks(position, square, rays);
+    long attacks = getSlidingAttacks(position, square, rays);
 
     System.out.println(position);
     System.out.println();
@@ -957,24 +957,24 @@ public class PositionTest {
     System.out.println(Bitboard.toString(attacks));
     System.out.println();
 
-    long queenMoves = attacks & ~myPieces;
+    long moves = attacks & ~myPieces;
     System.out.println("Moves:");
-    System.out.println(Bitboard.toString(queenMoves));
+    System.out.println(Bitboard.toString(moves));
     System.out.println();
 
-    long queenCaptures = queenMoves & oppPieces;
+    long captures = moves & oppPieces;
     System.out.println("Captures:");
-    System.out.println(Bitboard.toString(queenCaptures));
+    System.out.println(Bitboard.toString(captures));
     System.out.println();
 
-    long queenNonCaptures = queenMoves & ~oppPieces;
+    long nonCaptures = moves & ~oppPieces;
     System.out.println("Non Captures:");
-    System.out.println(Bitboard.toString(queenNonCaptures));
+    System.out.println(Bitboard.toString(nonCaptures));
     System.out.println();
 
   }
 
-  private long getAttacks(Position position, Square square, int[] rays) {
+  private long getSlidingAttacks(Position position, Square square, int[] rays) {
     long attacks = 0L;
     for (int d : rays) {
       long rayHits = (Bitboard.rays[d][square.index64] & position.getAllOccupiedBitboard());
