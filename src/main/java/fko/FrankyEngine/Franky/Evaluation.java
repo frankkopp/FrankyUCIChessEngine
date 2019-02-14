@@ -205,6 +205,8 @@ public class Evaluation {
     piecePosition =
       (int) (midGamePiecePosition * phaseFactorMid + endGamePiecePosition * phaseFactorEnd);
 
+    // TODO: we can derive mobility from attacks - if we have more use for attack info
+    //  then it is worth the extra effort
     mobility = (int) (midGameMobility * phaseFactorMid + endGameMobility * phaseFactorEnd);
 
     kingSafety = (int) (midGameKingSafety * phaseFactorMid + endGameKingSafety * phaseFactorEnd);
@@ -213,7 +215,8 @@ public class Evaluation {
       (int) (midGamePawnStructure * phaseFactorMid + endGamePawnStructure * phaseFactorEnd);
 
     // Stage 3
-    iterateOverSquares();
+    // TODO: not yet used - board control, attacks_to, etc.
+    // iterateOverSquares();
 
     // ######################################
     // Sum up
@@ -222,7 +225,7 @@ public class Evaluation {
             piecePosition * POSITION_WEIGHT +
             mobility      * MOBILITY_WEIGHT +
             kingSafety    * KING_SAFETY_WEIGHT +
-            pawnStructure * DOUBLED_PAWN_WEIGHT +
+            pawnStructure * PAWN_STRUCTURE_WEIGHT +
             special;
     // @formatter:on
     // Sum up per game phase
@@ -270,7 +273,9 @@ public class Evaluation {
     special -=
       position.isAttacked(position.getOpponent(), kingSquares[nextToMove]) ? CHECK_VALUE : 0;
 
-    // TEMPO Bonus
+    // TEMPO Bonus for the side to move (helps with evaluation alternation -
+    // less difference between side which makes aspiration search faster
+    // (not empirically tested)
     special += TEMPO * position.getGamePhaseFactor();
 
     materialEvaluation();
@@ -400,6 +405,7 @@ public class Evaluation {
       this.endGamePawnStructure -= count * DOUBLED_PAWN_PENALTY;
 
       // bonus for passed pawn (no opponent pawn on file and neighbour file
+      // TODO: optimize this with better mask
       long oppPawnsOnFile =
         Bitboard.pawnFrontLines[opponent][square.index64] & position.getPiecesBitboards(opponent,
                                                                                         PAWN);
