@@ -33,10 +33,8 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -1851,7 +1849,7 @@ public class Search implements Runnable {
     final int value;
 
     // timing
-    long start = System.nanoTime();
+    // long start = System.nanoTime();
 
     // check cache
     if (config.USE_EVAL_CACHE
@@ -1861,18 +1859,18 @@ public class Search implements Runnable {
     // do evaluation
     else {
       value = evaluator.evaluate(position);
-      // assert value >= Short.MIN_VALUE;
-      // assert value <= Short.MAX_VALUE;
+      assert value >= Short.MIN_VALUE;
+      assert value <= Short.MAX_VALUE;
       // store value int cache
       if (config.USE_EVAL_CACHE) evalCache.put(position.getZobristKey(), (short) value);
     }
 
-    evalTime += System.nanoTime() - start;
+    // evalTime += System.nanoTime() - start;
 
     // DEBUG
-    if (searchCounter.leafPositionsEvaluated % 10000 == 0)
-      System.out.printf("Evals: %,d Avg time: %,d%n", searchCounter.leafPositionsEvaluated,
-                        evalTime / searchCounter.leafPositionsEvaluated);
+    //    if (searchCounter.leafPositionsEvaluated % 10000 == 0)
+    //      System.out.printf("Evals: %,d Avg time: %,d%n", searchCounter.leafPositionsEvaluated,
+    //                        evalTime / searchCounter.leafPositionsEvaluated);
 
 
     if (TRACE) {

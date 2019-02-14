@@ -108,6 +108,7 @@ public class TranspositionTable {
     maxNumberOfEntries = (int) (sizeInByte / (ENTRY_SIZE + Integer.BYTES));
 
     // create buckets for hash table
+    System.gc();
     keys = new long[maxNumberOfEntries];
     data = new long[maxNumberOfEntries];
 
