@@ -45,6 +45,18 @@ public class Configuration {
   public int HASH_SIZE = 1024;
 
   /**
+   * Use Eval Cache
+   * Currently this is a little slower than eval itself but with
+   * more complicated evaluations it might pay off.
+   */
+  public boolean USE_EVAL_CACHE = true;
+
+  /**
+   * Eval Cache Size
+   */
+  public int EVAL_CACHE_SIZE = 64;
+
+  /**
    * Ponder
    */
   public boolean PONDER = true;

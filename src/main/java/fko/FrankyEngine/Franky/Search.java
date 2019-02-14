@@ -33,8 +33,10 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -135,6 +137,9 @@ public class Search implements Runnable {
   // hash tables
   private TranspositionTable transpositionTable;
 
+  // cache for evaluation
+  private EvalCache evalCache;
+
   // time variables
   private long startTime;
   private long stopTime;
@@ -151,6 +156,9 @@ public class Search implements Runnable {
   private SearchResult lastSearchResult;
   private long         uciUpdateTicker;
   private boolean      hadBookMove          = false;
+
+  // DEBUG
+  private long evalTime;
 
   /**
    * Creates a search object and stores a back reference to the engine object and also the
@@ -185,6 +193,9 @@ public class Search implements Runnable {
 
     // set hash sizes
     setHashSize(this.config.HASH_SIZE);
+
+    // set EvalCache
+    evalCache = new EvalCache(this.config.EVAL_CACHE_SIZE);
   }
 
   /**
@@ -1836,8 +1847,31 @@ public class Search implements Runnable {
       return 1;
     }
 
+    // timing
+    long start = System.nanoTime();
+
+    // check cache
+    if (config.USE_EVAL_CACHE) {
+      int evalFromCache = evalCache.get(position.getZobristKey());
+      if (evalFromCache != Evaluation.NOVALUE) return evalFromCache;
+    }
+
     // do evaluation
     final int value = evaluator.evaluate(position);
+
+    if (config.USE_EVAL_CACHE) {
+      assert value >= Short.MIN_VALUE;
+      assert value <= Short.MAX_VALUE;
+      // store value int cache
+      evalCache.put(position.getZobristKey(), (short) value);
+    }
+
+    evalTime += System.nanoTime() - start;
+
+    if (searchCounter.leafPositionsEvaluated % 10000 == 0)
+      System.out.printf("Evals: %,d Avg time: %,d%n", searchCounter.leafPositionsEvaluated,
+                        evalTime / searchCounter.leafPositionsEvaluated);
+
 
     if (TRACE) {
       trace("%SEvaluation: %s = %d  ply: %d  currline: <%s>  position: %s", getSpaces(ply),
@@ -2205,12 +2239,16 @@ public class Search implements Runnable {
 
       }
 
+      // tt stats
       LOG.debug(searchCounter.toString());
       LOG.info(transpositionTable.toString());
       LOG.info(String.format(
         "TT Stats: Nodes visited: %,d TT Hits %,d TT Misses %,d TT Cuts %,d TT Ignored %,d",
         searchCounter.nodesVisited, searchCounter.tt_Hits, searchCounter.tt_Misses,
         searchCounter.tt_Cuts, searchCounter.tt_Ignored));
+
+      // eval cache stats
+      LOG.info(evalCache.toString());
 
       uciUpdateTicker = System.currentTimeMillis();
     }
