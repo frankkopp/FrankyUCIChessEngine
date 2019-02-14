@@ -99,8 +99,8 @@ public class EvalCache {
     LOG.debug("{}", String.format("Memory available for TT:     %,5d MB", ttMemory / MB));
 
     if (ttMemory < sizeInByte) {
-      LOG.warn("{}", String.format(
-        "Not enough memory for a %,dMB transposition cache - reducing to %,dMB", sizeInByte / MB,
+      LOG.warn("{}", String.format("Not enough memory for a %,dMB eval cache - reducing to %,dMB",
+                                   sizeInByte / MB,
         (ttMemory) / MB));
       sizeInByte = (int) (ttMemory); // % of memory
     }
@@ -112,8 +112,8 @@ public class EvalCache {
     keys = new long[maxNumberOfEntries];
     data = new short[maxNumberOfEntries];
 
-    LOG.info("{}", String.format("Transposition Table Size:    %,5d MB", sizeInByte / (KB * KB)));
-    LOG.info("{}", String.format("Transposition Table Entries: %,d", maxNumberOfEntries));
+    LOG.info("{}", String.format("EvalCache Size:    %,5d MB", sizeInByte / (KB * KB)));
+    LOG.info("{}", String.format("EvalCache Entries: %,d", maxNumberOfEntries));
   }
 
   /**
