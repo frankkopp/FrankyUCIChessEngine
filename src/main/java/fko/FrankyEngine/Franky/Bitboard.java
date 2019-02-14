@@ -28,12 +28,17 @@ package fko.FrankyEngine.Franky;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static fko.FrankyEngine.Franky.PieceType.PAWN;
+
 /**
  * Bitboard
  */
 public class Bitboard {
 
   private static final Logger LOG = LoggerFactory.getLogger(Bitboard.class);
+
+  private static final int WHITE = Color.WHITE.ordinal();
+  private static final int BLACK = Color.BLACK.ordinal();
 
   // upward diagonal bitboards @formatter:off
   public static final long a8UpDiag = 0b00000001_00000000_00000000_00000000_00000000_00000000_00000000_00000000L;
@@ -102,7 +107,7 @@ public class Bitboard {
   public static final long[] kingRing = kingAttacks;
 
   /** pawn squares on file in front of each pawn */
-  public static final long[][] pawnFrontLines = new long[2][64];
+  public static final long[][] passedPawnMask = new long[2][64];
   // TODO add passed pawn
 
   /** all direction from sq1 to sq2 along queen movements */
@@ -122,7 +127,7 @@ public class Bitboard {
       for (int d : directions) {
         final int to = square.ordinal() + d * Color.WHITE.direction;
         if ((to & 0x88) != 0) continue;
-        pawnAttacks[Color.WHITE.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
+        pawnAttacks[WHITE][square.index64] |= Square.getSquare(to).bitBoard;
       }
     });
     // black pawn attacks - ignore that pawns can'*t be on all squares
@@ -131,7 +136,7 @@ public class Bitboard {
       for (int d : directions) {
         final int to = square.ordinal() + d * Color.BLACK.direction;
         if ((to & 0x88) != 0) continue;
-        pawnAttacks[Color.BLACK.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
+        pawnAttacks[BLACK][square.index64] |= Square.getSquare(to).bitBoard;
       }
     });
     // knight attacks
@@ -239,19 +244,25 @@ public class Bitboard {
     // white pawn - ignore that pawns can'*t be on all squares
     // TODO precompute passed pawn masks
     Square.validSquares.forEach(square -> {
-      int to = square.ordinal() + Square.N;
-      while ((to & 0x88) == 0) {
-        pawnFrontLines[Color.WHITE.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
-        to += Square.N;
-      }
+      int squareIdx = square.index64;
+      passedPawnMask[WHITE][square.index64] |= rays[NORTH][squareIdx];
+      final int file = square.getFile().ordinal();
+      final int rank = square.getRank().ordinal();
+      if (file > 0 && rank < 7)
+        passedPawnMask[WHITE][square.index64] |= rays[NORTH][square.getWest().getNorth().index64];
+      if (file < 7 && rank < 7)
+        passedPawnMask[WHITE][square.index64] |= rays[NORTH][square.getEast().getNorth().index64];
     });
     // black pawn - ignore that pawns can'*t be on all squares
     Square.validSquares.forEach(square -> {
-      int to = square.ordinal() + Square.S;
-      while ((to & 0x88) == 0) {
-        pawnFrontLines[Color.BLACK.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
-        to += Square.S;
-      }
+      int squareIdx = square.index64;
+      passedPawnMask[BLACK][square.index64] |= rays[SOUTH][squareIdx];
+      final int file = square.getFile().ordinal();
+      final int rank = square.getRank().ordinal();
+      if (file > 0 && rank > 0)
+        passedPawnMask[BLACK][square.index64] |= rays[SOUTH][square.getWest().getSouth().index64];
+      if (file < 7 && rank > 0)
+        passedPawnMask[BLACK][square.index64] |= rays[SOUTH][square.getEast().getSouth().index64];
     });
 
     // directions and intermediate

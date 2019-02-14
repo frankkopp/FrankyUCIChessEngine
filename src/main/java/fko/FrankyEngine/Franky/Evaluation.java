@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
 import static fko.FrankyEngine.Franky.EvaluationConfig.*;
 import static fko.FrankyEngine.Franky.Piece.*;
@@ -342,48 +341,22 @@ public class Evaluation {
 
       // penalty for doubled pawn
       final long pawnsOnFile =
-        Bitboard.pawnFrontLines[nextToMove][square.index64] & position.getPiecesBitboards(
-          nextToMove, PAWN);
+        Bitboard.rays[nextToMove == WHITE ? Bitboard.NORTH : Bitboard.SOUTH][square.index64]
+        & position.getPiecesBitboards(nextToMove, PAWN);
       int count = Long.bitCount(pawnsOnFile);
       this.midGamePawnStructure += count * DOUBLED_PAWN_PENALTY;
       this.endGamePawnStructure += count * DOUBLED_PAWN_PENALTY;
 
+      // @formatter:off
       // bonus for passed pawn (no opponent pawn on file and neighbour files
-      long oppPawnsOnFile =
-        Bitboard.pawnFrontLines[nextToMove][square.index64] & position.getPiecesBitboards(opponent,
-                                                                                          PAWN);
-      // no pawn on same file
-      if (oppPawnsOnFile == 0) {
-        if (nextToMove == WHITE) {
-          if (square.getFile().ordinal() > 0) {
-            oppPawnsOnFile |=
-              (Bitboard.pawnFrontLines[nextToMove][square.getWest().getNorth().index64]
-               & position.getPiecesBitboards(opponent, PAWN));
-          }
-          if (square.getFile().ordinal() < 7) {
-            oppPawnsOnFile |=
-              (Bitboard.pawnFrontLines[nextToMove][square.getEast().getNorth().index64]
-               & position.getPiecesBitboards(opponent, PAWN));
-          }
-        }
-        else {
-          if (square.getFile().ordinal() > 0) {
-            oppPawnsOnFile |=
-              (Bitboard.pawnFrontLines[nextToMove][square.getWest().getSouth().index64]
-               & position.getPiecesBitboards(opponent, PAWN));
-          }
-          if (square.getFile().ordinal() < 7) {
-            oppPawnsOnFile |=
-              (Bitboard.pawnFrontLines[nextToMove][square.getEast().getSouth().index64]
-               & position.getPiecesBitboards(opponent, PAWN));
-          }
-        }
-        if (oppPawnsOnFile == 0) {
-          this.midGamePawnStructure += PASSED_PAWN;
-          this.endGamePawnStructure += PASSED_PAWN;
-        }
+      if ((Bitboard.passedPawnMask[nextToMove][square.index64]
+         & position.getPiecesBitboards(opponent, PAWN)) == 0
+      ) {
+        this.midGamePawnStructure += PASSED_PAWN;
+        this.endGamePawnStructure += PASSED_PAWN;
       }
     }
+    // @formatter:on
 
     for (int i = 0, size = pawnSquares[opponent].size(); i < size; i++) {
       Square square = pawnSquares[opponent].get(i);
@@ -399,49 +372,23 @@ public class Evaluation {
 
       // penalty for doubled pawn
       final long pawnsOnFile =
-        Bitboard.pawnFrontLines[opponent][square.index64] & position.getPiecesBitboards(opponent,
-                                                                                        PAWN);
+        Bitboard.rays[opponent == WHITE ? Bitboard.NORTH : Bitboard.SOUTH][square.index64]
+        & position.getPiecesBitboards(opponent, PAWN);
       int count = Long.bitCount(pawnsOnFile);
       this.midGamePawnStructure -= count * DOUBLED_PAWN_PENALTY;
       this.endGamePawnStructure -= count * DOUBLED_PAWN_PENALTY;
 
       // bonus for passed pawn (no opponent pawn on file and neighbour file
       // TODO: optimize this with better mask
-      long oppPawnsOnFile =
-        Bitboard.pawnFrontLines[opponent][square.index64] & position.getPiecesBitboards(opponent,
-                                                                                        PAWN);
-      // no pawn on same file
-      if (oppPawnsOnFile == 0) {
-        if (opponent == WHITE) {
-          if (square.getFile().ordinal() > 0) {
-            oppPawnsOnFile |=
-              (Bitboard.pawnFrontLines[opponent][square.getWest().getNorth().index64]
-               & position.getPiecesBitboards(nextToMove, PAWN));
-          }
-          if (square.getFile().ordinal() < 7) {
-            oppPawnsOnFile |=
-              (Bitboard.pawnFrontLines[opponent][square.getEast().getNorth().index64]
-               & position.getPiecesBitboards(nextToMove, PAWN));
-          }
-        }
-        else {
-          if (square.getFile().ordinal() > 0) {
-            oppPawnsOnFile |=
-              (Bitboard.pawnFrontLines[opponent][square.getWest().getSouth().index64]
-               & position.getPiecesBitboards(nextToMove, PAWN));
-          }
-          if (square.getFile().ordinal() < 7) {
-            oppPawnsOnFile |=
-              (Bitboard.pawnFrontLines[opponent][square.getEast().getSouth().index64]
-               & position.getPiecesBitboards(nextToMove, PAWN));
-          }
-        }
-        if (oppPawnsOnFile == 0) {
-          this.midGamePawnStructure -= PASSED_PAWN;
-          this.endGamePawnStructure -= PASSED_PAWN;
-        }
+      // @formatter:off
+      // bonus for passed pawn (no opponent pawn on file and neighbour files
+      if ((Bitboard.passedPawnMask[opponent][square.index64]
+         & position.getPiecesBitboards(nextToMove, PAWN)) == 0
+      ) {
+        this.midGamePawnStructure -= PASSED_PAWN;
+        this.endGamePawnStructure -= PASSED_PAWN;
       }
-    }
+    } // @formatter:on
   }
 
   private void evalKnights() {
