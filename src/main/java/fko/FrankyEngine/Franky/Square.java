@@ -71,10 +71,32 @@ public enum Square {
   public final int index64;
 
   /**
+   * pre computed mapping from index64 to square
+   */
+  public static final Square[] index64Map = new Square[64];
+
+  /**
+   * pre computed mapping from position of bit in bitboard to square
+   * To get position use <code>Long.numberOfLeadingZeros</code>
+   */
+  public static Square[] bitCountMap = new Square[65];
+
+  /**
    * pre-computed bitBoard representation
    */
   public final long bitBoard;
 
+  // precomputed neighbours
+  private Square north;
+  private Square east;
+  private Square south;
+  private Square west;
+
+  // precomputed file and rank
+  private final File file;
+  private final Rank rank;
+
+  // precomputed diagonals
   private final long upDiag;
   private final long downDiag;
 
@@ -119,21 +141,52 @@ public enum Square {
       S, SW, W, NW
   };
 
+  // @formatter:on
   static {
     values = Square.values();
+    //    System.out.println();
+    //    System.out.println(Arrays.toString(values));
+
+    // pre-compute valid squares as an array
     validSquares = Collections.unmodifiableList(
       Arrays.stream(values()).filter(Square::isValidSquare).collect(Collectors.toList()));
-  } // @formatter:on
+    //    System.out.println(Arrays.toString(validSquares.toArray()));
+
+    // pre-compute mappings to quickly get from an index64 to a square
+    // pre-compute mappings to quickly get from an single bit bitboard to a square
+    // pre-compute neighbours
+    for (Square s : validSquares) {
+      int idx = s.ordinal() / 16 * 8 + s.ordinal() % 16;
+      index64Map[idx] = s;
+      int leadingZeros = Long.numberOfTrailingZeros(s.bitBoard);
+      bitCountMap[leadingZeros] = s;
+      if ((s.ordinal() + N & 0x88) == 0) s.north = Square.values()[s.ordinal() + N];
+      else s.north = NOSQUARE;
+      if ((s.ordinal() + E & 0x88) == 0) s.east = Square.values()[s.ordinal() + E];
+      else s.east = NOSQUARE;
+      if ((s.ordinal() + S & 0x88) == 0) s.south = Square.values()[s.ordinal() + S];
+      else s.south = NOSQUARE;
+      if ((s.ordinal() + W & 0x88) == 0) s.west = Square.values()[s.ordinal() + W];
+      else s.west = NOSQUARE;
+    }
+    bitCountMap[64] = NOSQUARE;
+    //    System.out.println(Arrays.toString(index64Map));
+    //    System.out.println(Arrays.toString(bitCountMap));
+    //    System.out.println();
+  }
 
   /**
    * Contructor
-   * Computes all relevant precompeted indexes and bitboards
+   * Computes all relevant pre-competed indexes and bitboards
    */
   Square() {
+    // pre-compute valid flag, index64 and bitboards for squares
     if ((this.ordinal() & 0x88) == 0) {
       validSquare = true;
+      // index should have same order then the original index
       index64 = this.ordinal() / 16 * 8 + this.ordinal() % 16;
-      // set bit for bitboard
+      // System.out.print(index64 + ", ");
+      // set bit for bitboard0
       bitBoard = 1L << index64;
     }
     else {
@@ -141,6 +194,17 @@ public enum Square {
       index64 = -1;
       bitBoard = 0L;
     }
+
+    // pre-compute file and rank
+    if (validSquare) {
+      file = File.values[this.ordinal() % 16];
+      rank = Rank.values[this.ordinal() >>> 4];
+    }
+    else {
+      file = File.NOFILE;
+      rank = Rank.NORANK;
+    }
+
     // pre-compute diagonals for squares
     if ((this.bitBoard & a8UpDiag) != 0) this.upDiag = a8UpDiag;
     else if ((this.bitBoard & a7UpDiag) != 0) this.upDiag = a7UpDiag;
@@ -175,6 +239,7 @@ public enum Square {
     else if ((this.bitBoard & g8DownDiag) != 0) this.downDiag = g8DownDiag;
     else if ((this.bitBoard & h8DownDiag) != 0) this.downDiag = h8DownDiag;
     else this.downDiag = 0;
+
   }
 
   /**
@@ -213,15 +278,14 @@ public enum Square {
 
   /**
    * Returns the Square for the given file and rank
-   * @param file
-   * @param rank
+   * @param f
+   * @param r
    * @return the Square for the given file and rank
    */
-  public static Square getSquare(int file, int rank) {
-    if (file < 1 || file > 8 || rank < 1 || rank > 8) return Square.NOSQUARE;
+  public static Square getSquare(int f, int r) {
+    if (f < 1 || f > 8 || r < 1 || r > 8) return Square.NOSQUARE;
     // index starts with 0 while file and rank start with 1 - decrease
-    final int index = (rank - 1) * 16 + (file - 1);
-    return Square.values[index];
+    return Square.values[(r - 1) * 16 + (f - 1)];
   }
 
   /**
@@ -230,9 +294,7 @@ public enum Square {
    * @return square north
    */
   public Square getNorth() {
-    int index = this.ordinal() + N;
-    if ((index & 0x88) != 0) return NOSQUARE;
-    return Square.values[index];
+    return north;
   }
 
   /**
@@ -241,9 +303,7 @@ public enum Square {
    * @return square north
    */
   public Square getSouth() {
-    int index = this.ordinal() + S;
-    if ((index & 0x88) != 0) return NOSQUARE;
-    return Square.values[index];
+    return south;
   }
 
   /**
@@ -252,9 +312,7 @@ public enum Square {
    * @return square north
    */
   public Square getEast() {
-    int index = this.ordinal() + E;
-    if ((index & 0x88) != 0) return NOSQUARE;
-    return Square.values[index];
+    return east;
   }
 
   /**
@@ -263,27 +321,21 @@ public enum Square {
    * @return square north
    */
   public Square getWest() {
-    int index = this.ordinal() + W;
-    if ((index & 0x88) != 0) return NOSQUARE;
-    return Square.values[index];
+    return west;
   }
 
   /**
    * @return Square.File for this Square
    */
   public File getFile() {
-    if (!this.validSquare) return File.NOFILE;
-    // TODO precompute this
-    return File.values[this.ordinal() % 16];
+    return file;
   }
 
   /**
    * @return Square.Rank for this Square
    */
   public Rank getRank() {
-    if (!this.validSquare) return Rank.NORANK;
-    // TODO precompute this
-    return Rank.values[this.ordinal() >>> 4];
+    return rank;
   }
 
   /**

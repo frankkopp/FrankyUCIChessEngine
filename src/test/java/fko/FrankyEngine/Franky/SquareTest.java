@@ -49,6 +49,7 @@ public class SquareTest {
       if (f.isEnumConstant()) {
         final Square square = (Square) f.get(null);
         System.out.println(Bitboard.toString(square.bitBoard));
+        System.out.println(Bitboard.printBitString(square.bitBoard));
         System.out.printf("upDiag %d%n", square.getUpDiag());
         System.out.printf("downDiag %d%n", square.getDownDiag());
       }
@@ -59,6 +60,15 @@ public class SquareTest {
   /**
    * Tests basic Square operations
    */
+  @Test
+  public void listSquareBitboards() {
+    for (Square square : validSquares) {
+      System.out.println(square);
+      System.out.println(Bitboard.toString(square.bitBoard));
+      System.out.println(Bitboard.printBitString(square.bitBoard));
+    }
+  }
+
   @Test
   public void testSquares() {
     // Square addressing
@@ -166,7 +176,7 @@ public class SquareTest {
   @Test
   public void diagonalBitboardTest() {
     for (Square sq : validSquares) {
-      System.out.printf("%s: %s  on up diagonal: %s down diagonal: %s%n", sq,
+      System.out.printf("%s:%n%s%non up diagonal:%n%s%ndown diagonal:%n%s%n", sq,
                         Bitboard.toString(sq.bitBoard), Bitboard.toString(sq.getUpDiag()),
                         Bitboard.toString(sq.getDownDiag()));
     }

@@ -39,7 +39,8 @@ class BitboardTest {
       f.setAccessible(true);
       if (!(f.get(null) instanceof Long)) continue;
       long bitboard = (long) f.get(null);
-      System.out.printf("%s %s %n%s%n", f.getName(), bitboard, Bitboard.toString(bitboard));
+      System.out.printf("%s %s %n%s%n%s%n", f.getName(), bitboard,
+                        Bitboard.printBitString(bitboard), Bitboard.toString(bitboard));
     }
   }
 
@@ -190,6 +191,18 @@ class BitboardTest {
         System.out.printf("From: %s To:%s%n%s%n%n", from, to,
                           Bitboard.toString(Bitboard.intermediate[from.index64][to.index64]));
       }
+    }
+  }
+
+  @Test
+  void rays() {
+    for (Square square : Square.validSquares) {
+      System.out.println("Square: " + square);
+      for (int d = 0; d < 8; d++) {
+        System.out.println("Direction: " + d);
+        System.out.println(Bitboard.toString(Bitboard.rays[d][square.index64]));
+      }
+
     }
   }
 

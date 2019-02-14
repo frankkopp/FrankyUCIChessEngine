@@ -181,7 +181,7 @@ public class EvaluationTest {
 
     // white gives check to black
     position = new Position("r2R3k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2K5 b - - 0 1");
-    assertEquals(-234, evaluation.evaluate(position));
+    assertEquals(-293, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
 
     // black gives check to white

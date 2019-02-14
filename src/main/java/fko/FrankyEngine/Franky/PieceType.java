@@ -49,40 +49,40 @@ public enum PieceType {
             KING  ,
     };
 
-    private final String _shortName;
-    private final int _value;
-    private boolean _sliding;
+    private final String  shortName;
+    private final int     value;
+    private       boolean sliding;
 
     PieceType(String shortName, boolean sliding, int value) {
-        _shortName = shortName;
-        _sliding = sliding;
-        _value = value;
+        this.shortName = shortName;
+        this.sliding = sliding;
+        this.value = value;
     }
 
     /**
      * @return the shortName
      */
     protected String getShortName() {
-        return this._shortName;
+        return this.shortName;
     }
 
     /**
      * @return the sliding
      */
     public boolean isSliding() {
-        return _sliding;
+        return sliding;
     }
 
     /**
      * @return the value
      */
     protected int getValue() {
-        return this._value;
+        return this.value;
     }
 
     @Override
     public String toString() {
-        return _shortName;
+        return shortName;
     }
 
 }

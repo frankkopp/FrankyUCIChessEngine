@@ -70,7 +70,7 @@ public class Bitboard {
   public static final long h8DownDiag = 0b10000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000L;
   // @formatter:on
 
-  // attack bitboards
+  // proto attack bitboards - for the sliding pieces these are not attacks but rays
   public static final long[][] pawnAttacks   = new long[2][64];
   public static final long[]   knightAttacks = new long[64];
   public static final long[]   bishopAttacks = new long[64];
@@ -78,11 +78,32 @@ public class Bitboard {
   public static final long[]   queenAttacks  = new long[64];
   public static final long[]   kingAttacks   = new long[64];
 
+  // rays for sliding pieces in each direction
+  // NorthWest = 0 ...clockwise... West = 7
+  public static final int      NORTHWEST  = 0;
+  public static final int      NORTH      = 1;
+  public static final int      NORTHEAST  = 2;
+  public static final int      EAST       = 3;
+  public static final int      SOUTHEAST  = 4;
+  public static final int      SOUTH      = 5;
+  public static final int      SOUTHWEST  = 6;
+  public static final int      WEST       = 7;
+  public static final int[]    queenRays  = {0, 1, 2, 3, 4, 5, 6, 7};
+  public static final int[]    bishopRays = {0, 2, 4, 6};
+  public static final int[]    rookRays   = {1, 3, 5, 7};
+  /**
+   * All queen rays from a certain square.
+   * When determining closest piece (bit) use lowest bit for rays 0-3,
+   * highest bit for 4-7
+   */
+  public static final long[][] rays       = new long[8][64];
+
   /** king ring (is identical to king attacks) */
-  public static final long[]   kingRing      = kingAttacks;
+  public static final long[] kingRing = kingAttacks;
 
   /** pawn squares on file in front of each pawn */
   public static final long[][] pawnFrontLines = new long[2][64];
+  // TODO add passed pawn
 
   /** all direction from sq1 to sq2 along queen movements */
   public static final int[][] direction = new int[64][64];
@@ -96,95 +117,142 @@ public class Bitboard {
     //.parallelStream() // does not work in static initializer deadlock (Java Issue)
 
     // white pawn attacks - ignore that pawns can'*t be on all squares
-    Square.validSquares
-      .forEach(square -> {
-        int[] directions = Square.pawnAttackDirections;
-        for (int d : directions) {
-          final int to = square.ordinal() + d * Color.WHITE.direction;
-          if ((to & 0x88) != 0) continue;
-          pawnAttacks[Color.WHITE.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
-        }
-      });
+    Square.validSquares.forEach(square -> {
+      int[] directions = Square.pawnAttackDirections;
+      for (int d : directions) {
+        final int to = square.ordinal() + d * Color.WHITE.direction;
+        if ((to & 0x88) != 0) continue;
+        pawnAttacks[Color.WHITE.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
+      }
+    });
     // black pawn attacks - ignore that pawns can'*t be on all squares
-    Square.validSquares
-      .forEach(square -> {
-        int[] directions = Square.pawnAttackDirections;
-        for (int d : directions) {
-          final int to = square.ordinal() + d * Color.BLACK.direction;
-          if ((to & 0x88) != 0) continue;
-          pawnAttacks[Color.BLACK.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
-        }
-      });
+    Square.validSquares.forEach(square -> {
+      int[] directions = Square.pawnAttackDirections;
+      for (int d : directions) {
+        final int to = square.ordinal() + d * Color.BLACK.direction;
+        if ((to & 0x88) != 0) continue;
+        pawnAttacks[Color.BLACK.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
+      }
+    });
     // knight attacks
-    Square.validSquares
-      .forEach(square -> {
-        int[] directions = Square.knightDirections;
-        for (int d : directions) {
-          final int to = square.ordinal() + d;
-          if ((to & 0x88) != 0) continue;
-          knightAttacks[square.index64] |= Square.getSquare(to).bitBoard;
-        }
-      });
+    Square.validSquares.forEach(square -> {
+      int[] directions = Square.knightDirections;
+      for (int d : directions) {
+        final int to = square.ordinal() + d;
+        if ((to & 0x88) != 0) continue;
+        knightAttacks[square.index64] |= Square.getSquare(to).bitBoard;
+      }
+    });
     // bishop attacks
-    Square.validSquares
-      .forEach(square -> {
-        int[] directions = Square.bishopDirections;
-        for (int d : directions) {
-          int to = square.ordinal() + d;
-          while ((to & 0x88) == 0) { // slide while valid square
-            bishopAttacks[square.index64] |= Square.getSquare(to).bitBoard;
-            to += d; // next sliding field in this direction
+    Square.validSquares.forEach(square -> {
+      int[] directions = Square.bishopDirections;
+      for (int d : directions) {
+        int to = square.ordinal() + d;
+        while ((to & 0x88) == 0) { // slide while valid square
+          final long toBitboard = Square.getSquare(to).bitBoard;
+          final int sqIdx = square.index64;
+          bishopAttacks[sqIdx] |= toBitboard;
+          switch (d) {
+            case Square.NW:
+              rays[NORTHWEST][sqIdx] |= toBitboard;
+              break;
+            case Square.N:
+              rays[NORTH][sqIdx] |= toBitboard;
+              break;
+            case Square.NE:
+              rays[NORTHEAST][sqIdx] |= toBitboard;
+              break;
+            case Square.E:
+              rays[EAST][sqIdx] |= toBitboard;
+              break;
+            case Square.SE:
+              rays[SOUTHEAST][sqIdx] |= toBitboard;
+              break;
+            case Square.S:
+              rays[SOUTH][sqIdx] |= toBitboard;
+              break;
+            case Square.SW:
+              rays[SOUTHWEST][sqIdx] |= toBitboard;
+              break;
+            case Square.W:
+              rays[WEST][sqIdx] |= toBitboard;
+              break;
           }
+          to += d; // next sliding field in this direction
         }
-      });
+      }
+    });
     // rook attacks
-    Square.validSquares
-      .forEach(square -> {
-        int[] directions = Square.rookDirections;
-        for (int d : directions) {
-          int to = square.ordinal() + d;
-          while ((to & 0x88) == 0) { // slide while valid square
-            rookAttacks[square.index64] |= Square.getSquare(to).bitBoard;
-            to += d; // next sliding field in this direction
+    Square.validSquares.forEach(square -> {
+      int[] directions = Square.rookDirections;
+      for (int d : directions) {
+        int to = square.ordinal() + d;
+        while ((to & 0x88) == 0) { // slide while valid square
+          final long toBitboard = Square.getSquare(to).bitBoard;
+          final int sqIdx = square.index64;
+          rookAttacks[square.index64] |= Square.getSquare(to).bitBoard;
+          switch (d) {
+            case Square.NW:
+              rays[NORTHWEST][sqIdx] |= toBitboard;
+              break;
+            case Square.N:
+              rays[NORTH][sqIdx] |= toBitboard;
+              break;
+            case Square.NE:
+              rays[NORTHEAST][sqIdx] |= toBitboard;
+              break;
+            case Square.E:
+              rays[EAST][sqIdx] |= toBitboard;
+              break;
+            case Square.SE:
+              rays[SOUTHEAST][sqIdx] |= toBitboard;
+              break;
+            case Square.S:
+              rays[SOUTH][sqIdx] |= toBitboard;
+              break;
+            case Square.SW:
+              rays[SOUTHWEST][sqIdx] |= toBitboard;
+              break;
+            case Square.W:
+              rays[WEST][sqIdx] |= toBitboard;
+              break;
           }
+          to += d; // next sliding field in this direction
         }
-      });
+      }
+    });
     // quuen attacks
-    Square.validSquares
-      .forEach(square -> {
-        queenAttacks[square.index64] = rookAttacks[square.index64] | bishopAttacks[square.index64];
-      });
+    Square.validSquares.forEach(square -> {
+      queenAttacks[square.index64] = rookAttacks[square.index64] | bishopAttacks[square.index64];
+    });
     // king attacks
-    Square.validSquares
-      .forEach(square -> {
-        int[] directions = Square.kingDirections;
-        for (int d : directions) {
-          final int to = square.ordinal() + d;
-          if ((to & 0x88) != 0) continue;
-          kingAttacks[square.index64] |= Square.getSquare(to).bitBoard;
-        }
-      });
+    Square.validSquares.forEach(square -> {
+      int[] directions = Square.kingDirections;
+      for (int d : directions) {
+        final int to = square.ordinal() + d;
+        if ((to & 0x88) != 0) continue;
+        kingAttacks[square.index64] |= Square.getSquare(to).bitBoard;
+      }
+    });
 
     // Pawn front line - all squares north of the square for white, south for black
     // white pawn - ignore that pawns can'*t be on all squares
     // TODO precompute passed pawn masks
-    Square.validSquares
-      .forEach(square -> {
-        int to = square.ordinal() + Square.N;
-        while ((to & 0x88) == 0) {
-          pawnFrontLines[Color.WHITE.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
-          to += Square.N;
-        }
-      });
+    Square.validSquares.forEach(square -> {
+      int to = square.ordinal() + Square.N;
+      while ((to & 0x88) == 0) {
+        pawnFrontLines[Color.WHITE.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
+        to += Square.N;
+      }
+    });
     // black pawn - ignore that pawns can'*t be on all squares
-    Square.validSquares
-      .forEach(square -> {
-        int to = square.ordinal() + Square.S;
-        while ((to & 0x88) == 0) {
-          pawnFrontLines[Color.BLACK.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
-          to += Square.S;
-        }
-      });
+    Square.validSquares.forEach(square -> {
+      int to = square.ordinal() + Square.S;
+      while ((to & 0x88) == 0) {
+        pawnFrontLines[Color.BLACK.ordinal()][square.index64] |= Square.getSquare(to).bitBoard;
+        to += Square.S;
+      }
+    });
 
     // directions and intermediate
     for (Square from : Square.validSquares) {
@@ -231,7 +299,9 @@ public class Bitboard {
     StringBuilder output = new StringBuilder();
     for (int r = 0; r <= 7; r++) {
       for (int f = 7; f >= 0; f--) {
-        output.append(bitBoardLine.charAt(r * 8 + f));
+        int idx = r * 8 + f;
+        // output.append("(" + r + "," + f + ")");
+        output.append(bitBoardLine.charAt(idx));
         output.append(" ");
       }
       output.append(System.lineSeparator());
@@ -251,4 +321,5 @@ public class Bitboard {
     if (binaryString.equals("0")) binaryString = "";
     return bitBoardLine.append(binaryString).toString();
   }
+
 }

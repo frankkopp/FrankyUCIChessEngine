@@ -834,22 +834,158 @@ public class PositionTest {
 
   @Test
   void bitBoardsCalculations() {
-
     String testFen = "rnbqkbnr/1ppppppp/8/p7/2P1Q3/8/PP1PPPPP/RNB1KBNR b KQkq - 1 2";
     Position position = new Position(testFen);
     System.out.println(position);
     assertFalse(position.isAttacked(Color.WHITE, Square.e8));
 
     System.out.println(Bitboard.toString(
-      (position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(
-        Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
-                                          | Square.e8.getRank().bitBoard)));
+      (position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
+                                                                                                                                | Square.e8.getRank().bitBoard)));
 
     System.out.println(
-      ((position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(
-        Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
-                                          | Square.e8.getRank().bitBoard)) > 0);
+      ((position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
+                                                                                                                                 | Square.e8.getRank().bitBoard)) > 0);
+  }
 
+  @Test
+  void bitBoardsAttacksDev() {
+
+    System.out.println(Bitboard.printBitString(Square.a1.bitBoard));
+    System.out.println(Bitboard.printBitString(Square.h8.bitBoard));
+
+    String testFen = "rnbqkb2/1ppppp1r/6p1/p7/1PP1Q1np/8/P1NPPPPP/1RB1KBNR b Kq -";
+    Position position = new Position(testFen);
+    System.out.println(position);
+
+    long allPieces = position.getAllOccupiedBitboard();
+    long whitePieces = position.getOccupiedBitboards(Color.WHITE);
+    long blackPieces = position.getOccupiedBitboards(Color.BLACK);
+
+    Square queenSquare = Square.e4;
+    int queenSquareIdx = queenSquare.index64;
+
+    long queenRays = Bitboard.queenAttacks[queenSquareIdx];
+    System.out.println("All Queen rays");
+    System.out.println(Bitboard.toString(queenRays));
+    System.out.println();
+
+    //    System.out.println("All queen rays without white pieces");
+    //    long queenNoOwn = ~whitePieces & queenRays;
+    //    System.out.println(Bitboard.toString(queenNoOwn));
+    //    System.out.println();
+
+    System.out.println("All queen rays attacks");
+    long queenAttacks = 0L;
+    for (int d : Bitboard.queenRays) {
+      System.out.println("===================================================");
+      long ray = Bitboard.rays[d][queenSquareIdx];
+
+      System.out.println("Ray: " + d);
+      System.out.println(Bitboard.toString(ray));
+      System.out.println();
+
+      long rayHits = (ray & allPieces);
+      System.out.println("Ray hits pieces");
+      System.out.println(Bitboard.toString(rayHits));
+      System.out.println(Bitboard.printBitString(rayHits));
+      System.out.println();
+
+      if (rayHits == 0) continue;
+
+      //      queenAttacks ^= rayHits;
+
+      // diag_attacks=plus7[F5];
+      //	blockers=diag_attacks & occupied_squares;
+      //	blocking_square=FirstOne(blockers);
+      //	diag_attacks^=plus7[blocking_square];
+
+      long firstRayHit;
+      int hitIdx;
+      if (d <= 3) {
+        firstRayHit = Long.lowestOneBit(rayHits);
+        hitIdx = Long.numberOfTrailingZeros(firstRayHit);
+      }
+      else {
+        firstRayHit = Long.highestOneBit(rayHits);
+        hitIdx = Long.numberOfLeadingZeros(firstRayHit);
+      }
+      Square hitSquare = Square.bitCountMap[hitIdx];
+
+      System.out.println("Ray hits first piece");
+      System.out.println(Bitboard.toString(firstRayHit));
+      System.out.println(Bitboard.printBitString(firstRayHit));
+      System.out.println();
+
+      long blockerRay = Bitboard.rays[d][hitSquare.index64];
+      long rayAttacks = ray ^ blockerRay;
+      System.out.println("Ray attacks from " + queenSquare + " blocked on " + hitSquare);
+      System.out.println(Bitboard.toString(rayAttacks));
+      System.out.println();
+
+      queenAttacks |= rayAttacks;
+
+    }
+    System.out.println("Queen Attacks:");
+    System.out.println(Bitboard.toString(queenAttacks));
+    System.out.println();
+
+    long queenMoves = queenAttacks & ~whitePieces;
+    System.out.println("Queen Moves:");
+    System.out.println(Bitboard.toString(queenMoves));
+    System.out.println();
+
+  }
+
+  @Test
+  void bitBoardsAttacks() {
+
+    String testFen = "rnbqkb2/1ppppp1r/6p1/p7/1PP1Q1np/8/P1NPPPPP/1RB1KBNR b Kq -";
+    Position position = new Position(testFen);
+
+    Color myColor = Color.BLACK;
+    Square square = Square.h7;
+    int[] rays = Bitboard.rookRays;
+
+    long myPieces = position.getOccupiedBitboards(myColor);
+    long oppPieces = position.getOccupiedBitboards(myColor.getInverseColor());
+    long attacks = getAttacks(position, square, rays);
+
+    System.out.println(position);
+    System.out.println();
+    System.out.println("Attacks:");
+    System.out.println(Bitboard.toString(attacks));
+    System.out.println();
+
+    long queenMoves = attacks & ~myPieces;
+    System.out.println("Moves:");
+    System.out.println(Bitboard.toString(queenMoves));
+    System.out.println();
+
+    long queenCaptures = queenMoves & oppPieces;
+    System.out.println("Captures:");
+    System.out.println(Bitboard.toString(queenCaptures));
+    System.out.println();
+
+    long queenNonCaptures = queenMoves & ~oppPieces;
+    System.out.println("Non Captures:");
+    System.out.println(Bitboard.toString(queenNonCaptures));
+    System.out.println();
+
+  }
+
+  private long getAttacks(Position position, Square square, int[] rays) {
+    long attacks = 0L;
+    for (int d : rays) {
+      long rayHits = (Bitboard.rays[d][square.index64] & position.getAllOccupiedBitboard());
+      if (rayHits == 0) continue;
+      int hitIdx;
+      if (d <= 3) hitIdx = Long.numberOfTrailingZeros(Long.lowestOneBit(rayHits));
+      else hitIdx = Long.numberOfTrailingZeros(Long.highestOneBit(rayHits));
+      attacks |=
+        Bitboard.rays[d][square.index64] ^ Bitboard.rays[d][Square.bitCountMap[hitIdx].index64];
+    }
+    return attacks;
   }
 
   /** Tests the timing */
@@ -974,6 +1110,5 @@ public class PositionTest {
   private void test2(final Position position, int move) {
     //position.givesCheck2(move);
   }
-
 
 }
