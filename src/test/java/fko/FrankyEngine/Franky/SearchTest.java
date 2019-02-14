@@ -122,7 +122,7 @@ public class SearchTest {
 
   @Test
   public void testNodesSearch() {
-    final int nodes = 500000;
+    final int nodes = 100_000_000;
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
     SearchMode searchMode =

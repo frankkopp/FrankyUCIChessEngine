@@ -1847,27 +1847,29 @@ public class Search implements Runnable {
       return 1;
     }
 
+    int evalFromCache;
+    final int value;
+
     // timing
     long start = System.nanoTime();
 
     // check cache
-    if (config.USE_EVAL_CACHE) {
-      int evalFromCache = evalCache.get(position.getZobristKey());
-      if (evalFromCache != Evaluation.NOVALUE) return evalFromCache;
+    if (config.USE_EVAL_CACHE
+        && (evalFromCache = evalCache.get(position.getZobristKey())) != Evaluation.NOVALUE) {
+      value = evalFromCache;
     }
-
     // do evaluation
-    final int value = evaluator.evaluate(position);
-
-    if (config.USE_EVAL_CACHE) {
-      assert value >= Short.MIN_VALUE;
-      assert value <= Short.MAX_VALUE;
+    else {
+      value = evaluator.evaluate(position);
+      // assert value >= Short.MIN_VALUE;
+      // assert value <= Short.MAX_VALUE;
       // store value int cache
-      evalCache.put(position.getZobristKey(), (short) value);
+      if (config.USE_EVAL_CACHE) evalCache.put(position.getZobristKey(), (short) value);
     }
 
     evalTime += System.nanoTime() - start;
 
+    // DEBUG
     if (searchCounter.leafPositionsEvaluated % 10000 == 0)
       System.out.printf("Evals: %,d Avg time: %,d%n", searchCounter.leafPositionsEvaluated,
                         evalTime / searchCounter.leafPositionsEvaluated);
