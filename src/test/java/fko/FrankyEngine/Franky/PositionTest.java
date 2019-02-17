@@ -696,24 +696,23 @@ public class PositionTest {
         final long bitboard = pos.getPiecesBitboards(c, pt);
         //        System.out.printf("%s %s %d %n", c.name(), pt.name(), bitboard);
         //        System.out.println(Bitboard.toString(bitboard));
-        if (c == Color.WHITE && pt == PieceType.PAWN) assertEquals(65280L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.KNIGHT) assertEquals(66L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.BISHOP) assertEquals(36L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.ROOK) assertEquals(129L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.QUEEN) assertEquals(8L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.KING) assertEquals(16L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.PAWN)
-          assertEquals(71776119061217280L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.KNIGHT)
+        if (c == Color.WHITE && pt == PieceType.PAWN) assertEquals(71776119061217280L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.KNIGHT)
           assertEquals(4755801206503243776L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.BISHOP)
+        else if (c == Color.WHITE && pt == PieceType.BISHOP)
           assertEquals(2594073385365405696L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.ROOK)
+        else if (c == Color.WHITE && pt == PieceType.ROOK)
           assertEquals(-9151314442816847872L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.QUEEN)
+        else if (c == Color.WHITE && pt == PieceType.QUEEN)
           assertEquals(576460752303423488L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.KING)
+        else if (c == Color.WHITE && pt == PieceType.KING)
           assertEquals(1152921504606846976L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.PAWN) assertEquals(65280L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KNIGHT) assertEquals(66L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.BISHOP) assertEquals(36L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.ROOK) assertEquals(129L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.QUEEN) assertEquals(8L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KING) assertEquals(16L, bitboard);
       }
     }
   }
@@ -739,23 +738,23 @@ public class PositionTest {
         final long bitboard = pos.getPiecesBitboards(c, pt);
         //        System.out.printf("%s %s %d %n", c.name(), pt.name(), bitboard);
         //        System.out.println(Bitboard.toString(bitboard));
-        if (c == Color.WHITE && pt == PieceType.PAWN) assertEquals(61184L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.KNIGHT) assertEquals(2359296L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.BISHOP) assertEquals(4100L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.ROOK) assertEquals(33L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.QUEEN) assertEquals(8L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.KING) assertEquals(64L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.PAWN)
-          assertEquals(69524319247532032L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.KNIGHT)
-          assertEquals(4611690416473899008L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.BISHOP)
-          assertEquals(2594073385365405696L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.ROOK)
-          assertEquals(-9151314442816847872L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.QUEEN) assertEquals(274877906944L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.KING)
+        if (c == Color.WHITE && pt == PieceType.PAWN) assertEquals(67272519433846784L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.KNIGHT)
+          assertEquals(39582418599936L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.BISHOP)
+          assertEquals(292733975779082240L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.ROOK)
+          assertEquals(2377900603251621888L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.QUEEN)
           assertEquals(576460752303423488L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.KING)
+          assertEquals(4611686018427387904L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.PAWN) assertEquals(63232L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KNIGHT) assertEquals(262208L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.BISHOP) assertEquals(36L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.ROOK) assertEquals(129L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.QUEEN) assertEquals(1073741824L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KING) assertEquals(8L, bitboard);
       }
     }
 
@@ -765,23 +764,23 @@ public class PositionTest {
         final long bitboard = posCopy.getPiecesBitboards(c, pt);
         //        System.out.printf("%s %s %d %n", c.name(), pt.name(), bitboard);
         //        System.out.println(Bitboard.toString(bitboard));
-        if (c == Color.WHITE && pt == PieceType.PAWN) assertEquals(61184L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.KNIGHT) assertEquals(2359296L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.BISHOP) assertEquals(4100L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.ROOK) assertEquals(33L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.QUEEN) assertEquals(8L, bitboard);
-        else if (c == Color.WHITE && pt == PieceType.KING) assertEquals(64L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.PAWN)
-          assertEquals(69524319247532032L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.KNIGHT)
-          assertEquals(4611690416473899008L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.BISHOP)
-          assertEquals(2594073385365405696L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.ROOK)
-          assertEquals(-9151314442816847872L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.QUEEN) assertEquals(274877906944L, bitboard);
-        else if (c == Color.BLACK && pt == PieceType.KING)
+        if (c == Color.WHITE && pt == PieceType.PAWN) assertEquals(67272519433846784L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.KNIGHT)
+          assertEquals(39582418599936L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.BISHOP)
+          assertEquals(292733975779082240L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.ROOK)
+          assertEquals(2377900603251621888L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.QUEEN)
           assertEquals(576460752303423488L, bitboard);
+        else if (c == Color.WHITE && pt == PieceType.KING)
+          assertEquals(4611686018427387904L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.PAWN) assertEquals(63232L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KNIGHT) assertEquals(262208L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.BISHOP) assertEquals(36L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.ROOK) assertEquals(129L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.QUEEN) assertEquals(1073741824L, bitboard);
+        else if (c == Color.BLACK && pt == PieceType.KING) assertEquals(8L, bitboard);
       }
     }
   }
@@ -793,8 +792,8 @@ public class PositionTest {
     final long black = pos.getOccupiedBitboards(Color.BLACK);
     //    System.out.printf("%s %d%n%s%n", Color.WHITE, white, Bitboard.toString(white));
     //    System.out.printf("%s %d%n%S%n", Color.BLACK, black, Bitboard.toString(black));
-    assertEquals(65535L, white);
-    assertEquals(-281474976710656L, black);
+    assertEquals(-281474976710656L, white);
+    assertEquals(65535L, black);
     long occupiedSquares = (white | black);
     //    System.out.println("All occupoied squares: "+occupiedSquares);
     //    System.out.println(Bitboard.toString(occupiedSquares));
@@ -840,12 +839,14 @@ public class PositionTest {
     assertFalse(position.isAttacked(Color.WHITE, Square.e8));
 
     System.out.println(Bitboard.toString(
-      (position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
-                                                                                                                                | Square.e8.getRank().bitBoard)));
+      (position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(
+        Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
+                                          | Square.e8.getRank().bitBoard)));
 
     System.out.println(
-      ((position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
-                                                                                                                                 | Square.e8.getRank().bitBoard)) > 0);
+      ((position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(
+        Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
+                                          | Square.e8.getRank().bitBoard)) > 0);
   }
 
   @Test
