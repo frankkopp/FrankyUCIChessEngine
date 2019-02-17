@@ -26,12 +26,9 @@
 package fko.FrankyEngine.Franky;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static fko.FrankyEngine.Franky.Bitboard.*;
 
 /**
  * This enumeration class represents all squares on a chess board.
@@ -57,34 +54,164 @@ public enum Square {
   a8, b8, c8, d8, e8, f8, g8, h8, i8, j8, k8, l8, m8, n8, o8, p8, // 112-127
   NOSQUARE;
 
+  private static final boolean UP   = true;
+  private static final boolean DOWN = false;
+
   // pre-filled list with all squares
   public static final Square[] values;
-
-  /**
-   * pre-computed if square is valid
-   */
-  public final boolean validSquare;
-
-  /**
-   * pre-computed index for a 64bit index a1=0, h8=63
-   */
-  public final int index64;
 
   /**
    * pre computed mapping from index64 to square
    */
   public static final Square[] index64Map = new Square[64];
 
+
   /**
+   * pre-filled list with all valid squares
+   */
+  public static final List<Square> validSquares;
+  static final        int          N  = 16;
+  static final        int          E  = 1;
+  static final        int          S  = -16;
+  static final        int          W  = -1;
+  static final        int          NE = N + E;
+  static final        int          SE = S + E;
+  static final        int          SW = S + W;
+
+  static final   int      NW                   = N + W;
+  static final   int[]    pawnDirections       = {N, NW, NE};
+  static final   int[]    pawnAttackDirections = {NW, NE};
+  static final   int[]    knightDirections     =
+    {N + N + E, N + E + E, S + E + E, S + S + E, S + S + W, S + W + W, N + W + W, N + N + W};
+  static final   int[]    bishopDirections     = {NE, SE, SW, NW};
+  static final   int[]    rookDirections       = {N, E, S, W};
+  static final   int[]    queenDirections      = {N, NE, E, SE, S, SW, W, NW};
+  static final   int[]    kingDirections       = {N, NE, E, SE, S, SW, W, NW};
+  /*
    * pre computed mapping from position of bit in bitboard to square
    * To get position use <code>Long.numberOfLeadingZeros</code>
    */
-  public static Square[] bitCountMap = new Square[65];
+  private static Square[] trailingZerosMap     = new Square[65];
 
-  /**
-   * pre-computed bitBoard representation
-   */
-  public final long bitBoard;
+  /*
+   Due to the weired way Java initializes Enums you can't access static values
+   from the constructor as the constructor is executed first. This forces this
+   construct which has the consequence of not being able to use final fields!
+   Therefore we need to make them private (with Getter) to protect them from
+   external change.
+    */
+  // 1st static block
+  static {
+    values = Square.values();
+    // pre-compute fields
+    for (Square s : values) {
+      // valid squares
+      if ((s.ordinal() & 0x88) == 0) {
+        s.validSquare = true;
+
+        // index64 is order a8=0 to h1=63
+        s.index64 = ((7 - (s.ordinal() / 16)) * 8) + (s.ordinal() % 16);
+        //      System.out.printf("%s=%d ", this.name(), index64);
+
+        // set bit for bitboard
+        final long bit = 0b1L; //1L;
+        s.bitBoard = bit << s.index64;
+
+        // mapping between enum ordinal and index64
+        index64Map[s.index64] = s;
+        trailingZerosMap[Long.numberOfTrailingZeros(s.bitBoard)] = s;
+
+        // pre compute neighbours
+        if ((s.ordinal() + N & 0x88) == 0) s.north = Square.values()[s.ordinal() + N];
+        else s.north = NOSQUARE;
+        if ((s.ordinal() + E & 0x88) == 0) s.east = Square.values()[s.ordinal() + E];
+        else s.east = NOSQUARE;
+        if ((s.ordinal() + S & 0x88) == 0) s.south = Square.values()[s.ordinal() + S];
+        else s.south = NOSQUARE;
+        if ((s.ordinal() + W & 0x88) == 0) s.west = Square.values()[s.ordinal() + W];
+        else s.west = NOSQUARE;
+
+        // pre-compute file and rank
+        s.file = File.values[s.ordinal() % 16];
+        s.rank = Rank.values[s.ordinal() >>> 4];
+      }
+      // invalid squares
+      else {
+        s.validSquare = false;
+        s.index64 = -1;
+        s.bitBoard = 0L;
+        s.file = File.NOFILE;
+        s.rank = Rank.NORANK;
+      }
+    }
+
+    // When we have to find a bit in a zero-bitmap the number of trailingZeros
+    // is 64 and would lead to an out of array range. Therefore this array has
+    // 65 elements and the last is NOSQUARE
+    trailingZerosMap[64] = NOSQUARE;
+
+    // pre-compute valid squares as an array
+    validSquares =
+      Arrays.stream(values()).filter(Square::isValidSquare).collect(Collectors.toList());
+  }
+
+  // upward diagonal bitboards @formatter:off
+  // @formatter:on
+  // Move deltas north, south, east, west and combinations
+  public static final long a1UpDiag   = computeDiag(a1, UP);
+  public static final long a8UpDiag   = computeDiag(a8, UP);
+  public static final long a7UpDiag   = computeDiag(a7, UP);
+  public static final long a6UpDiag   = computeDiag(a6, UP);
+  public static final long a5UpDiag   = computeDiag(a5, UP);
+  public static final long a4UpDiag   = computeDiag(a4, UP);
+  public static final long a3UpDiag   = computeDiag(a3, UP);
+  public static final long a2UpDiag   = computeDiag(a2, UP);
+  public static final long b1UpDiag   = computeDiag(b1, UP);
+  public static final long c1UpDiag   = computeDiag(c1, UP);
+  public static final long d1UpDiag   = computeDiag(d1, UP);
+  public static final long e1UpDiag   = computeDiag(e1, UP);
+  public static final long f1UpDiag   = computeDiag(f1, UP);
+  public static final long g1UpDiag   = computeDiag(g1, UP);
+  public static final long h1UpDiag   = computeDiag(h1, UP);
+  // downward diagonal bitboards
+  public static final long a1DownDiag = computeDiag(a1, DOWN);
+  public static final long a2DownDiag = computeDiag(a2, DOWN);
+  public static final long a3DownDiag = computeDiag(a3, DOWN);
+  public static final long a4DownDiag = computeDiag(a4, DOWN);
+  public static final long a5DownDiag = computeDiag(a5, DOWN);
+  public static final long a6DownDiag = computeDiag(a6, DOWN);
+  public static final long a7DownDiag = computeDiag(a7, DOWN);
+  public static final long a8DownDiag = computeDiag(a8, DOWN);
+  public static final long b8DownDiag = computeDiag(b8, DOWN);
+  public static final long c8DownDiag = computeDiag(c8, DOWN);
+  public static final long d8DownDiag = computeDiag(d8, DOWN);
+  public static final long e8DownDiag = computeDiag(e8, DOWN);
+  public static final long f8DownDiag = computeDiag(f8, DOWN);
+  public static final long g8DownDiag = computeDiag(g8, DOWN);
+  public static final long h8DownDiag = computeDiag(h8, DOWN);
+  // computing the diagonals
+  private static long computeDiag(Square square, boolean up) {
+    long bitboard = 0L;
+    do {
+      bitboard |= square.bitBoard;
+      if (up) {
+        if (square.getNorth() != NOSQUARE && square.getEast() != NOSQUARE)
+          square = square.getEast().getNorth();
+        else break;
+      }
+      else {
+        if (square.getSouth() != NOSQUARE && square.getEast() != NOSQUARE)
+          square = square.getEast().getSouth();
+        else break;
+      }
+    } while (((square.ordinal() & 0x88) == 0));
+    return bitboard;
+  }
+
+  // precomputed values
+  private boolean validSquare;
+  private int     index64;
+  private long    bitBoard;
 
   // precomputed neighbours
   private Square north;
@@ -93,153 +220,75 @@ public enum Square {
   private Square west;
 
   // precomputed file and rank
-  private final File file;
-  private final Rank rank;
+  private File file;
+  private Rank rank;
 
   // precomputed diagonals
-  private final long upDiag;
-  private final long downDiag;
-
-  /**
-   * pre-filled list with all valid squares
-   */
-  public static final List<Square> validSquares;
-  // Move deltas north, south, east, west and combinations
-  static final int N = 16;
-  static final int E = 1;
-  static final int S = -16;
-  static final int W = -1;
-  static final int NE = N + E;
-  static final int SE = S + E;
-  static final int SW = S + W;
-
-  static final int NW = N + W;
-  static final int[] pawnDirections = {N, NW, NE};
-  static final int[] pawnAttackDirections = {NW, NE};
-  static final int[] knightDirections = {
-      N + N + E,
-      N + E + E,
-      S + E + E,
-      S + S + E,
-      S + S + W,
-      S + W + W,
-      N + W + W,
-      N + N + W
-  };
-  static final int[] bishopDirections = {
-      NE, SE, SW, NW
-  };
-  static final int[] rookDirections = {
-      N, E, S, W
-  };
-  static final int[] queenDirections = {
-      N, NE, E, SE,
-      S, SW, W, NW
-  };
-  static final int[] kingDirections = {
-      N, NE, E, SE,
-      S, SW, W, NW
-  };
+  private long upDiag;
+  private long downDiag;
 
   // @formatter:on
+
+  /**
+   * Default enum constructor
+   */
+  Square() {
+  }
+
+  /*
+    Due to the weired way Java initializes Enums you can't access static values
+    from the constructor as the constructor is executed first. This forces this
+    construct which has the consequence of not being able to use final fields!
+    Therefore we need to make them private (with Getter) to protect them from
+    external change.
+     */
+  // 2nd static block
   static {
-    values = Square.values();
-    //    System.out.println();
-    //    System.out.println(Arrays.toString(values));
-
-    // pre-compute valid squares as an array
-    validSquares = Collections.unmodifiableList(
-      Arrays.stream(values()).filter(Square::isValidSquare).collect(Collectors.toList()));
-    //    System.out.println(Arrays.toString(validSquares.toArray()));
-
-    // pre-compute mappings to quickly get from an index64 to a square
-    // pre-compute mappings to quickly get from an single bit bitboard to a square
-    // pre-compute neighbours
+    // pre-compute fields
     for (Square s : validSquares) {
-      int idx = s.ordinal() / 16 * 8 + s.ordinal() % 16;
-      index64Map[idx] = s;
-      int leadingZeros = Long.numberOfTrailingZeros(s.bitBoard);
-      bitCountMap[leadingZeros] = s;
-      if ((s.ordinal() + N & 0x88) == 0) s.north = Square.values()[s.ordinal() + N];
-      else s.north = NOSQUARE;
-      if ((s.ordinal() + E & 0x88) == 0) s.east = Square.values()[s.ordinal() + E];
-      else s.east = NOSQUARE;
-      if ((s.ordinal() + S & 0x88) == 0) s.south = Square.values()[s.ordinal() + S];
-      else s.south = NOSQUARE;
-      if ((s.ordinal() + W & 0x88) == 0) s.west = Square.values()[s.ordinal() + W];
-      else s.west = NOSQUARE;
+      // pre-compute diagonals for squares
+      if ((s.bitBoard & a8UpDiag) != 0) s.upDiag = a8UpDiag;
+      else if ((s.bitBoard & a7UpDiag) != 0) s.upDiag = a7UpDiag;
+      else if ((s.bitBoard & a6UpDiag) != 0) s.upDiag = a6UpDiag;
+      else if ((s.bitBoard & a5UpDiag) != 0) s.upDiag = a5UpDiag;
+      else if ((s.bitBoard & a4UpDiag) != 0) s.upDiag = a4UpDiag;
+      else if ((s.bitBoard & a3UpDiag) != 0) s.upDiag = a3UpDiag;
+      else if ((s.bitBoard & a2UpDiag) != 0) s.upDiag = a2UpDiag;
+      else if ((s.bitBoard & a1UpDiag) != 0) s.upDiag = a1UpDiag;
+      else if ((s.bitBoard & b1UpDiag) != 0) s.upDiag = b1UpDiag;
+      else if ((s.bitBoard & c1UpDiag) != 0) s.upDiag = c1UpDiag;
+      else if ((s.bitBoard & d1UpDiag) != 0) s.upDiag = d1UpDiag;
+      else if ((s.bitBoard & e1UpDiag) != 0) s.upDiag = e1UpDiag;
+      else if ((s.bitBoard & f1UpDiag) != 0) s.upDiag = f1UpDiag;
+      else if ((s.bitBoard & g1UpDiag) != 0) s.upDiag = g1UpDiag;
+      else if ((s.bitBoard & h1UpDiag) != 0) s.upDiag = h1UpDiag;
+      else s.upDiag = 0;
+
+      if ((s.bitBoard & a1DownDiag) != 0) s.downDiag = a1DownDiag;
+      else if ((s.bitBoard & a2DownDiag) != 0) s.downDiag = a2DownDiag;
+      else if ((s.bitBoard & a3DownDiag) != 0) s.downDiag = a3DownDiag;
+      else if ((s.bitBoard & a4DownDiag) != 0) s.downDiag = a4DownDiag;
+      else if ((s.bitBoard & a5DownDiag) != 0) s.downDiag = a5DownDiag;
+      else if ((s.bitBoard & a6DownDiag) != 0) s.downDiag = a6DownDiag;
+      else if ((s.bitBoard & a7DownDiag) != 0) s.downDiag = a7DownDiag;
+      else if ((s.bitBoard & a8DownDiag) != 0) s.downDiag = a8DownDiag;
+      else if ((s.bitBoard & b8DownDiag) != 0) s.downDiag = b8DownDiag;
+      else if ((s.bitBoard & c8DownDiag) != 0) s.downDiag = c8DownDiag;
+      else if ((s.bitBoard & d8DownDiag) != 0) s.downDiag = d8DownDiag;
+      else if ((s.bitBoard & e8DownDiag) != 0) s.downDiag = e8DownDiag;
+      else if ((s.bitBoard & f8DownDiag) != 0) s.downDiag = f8DownDiag;
+      else if ((s.bitBoard & g8DownDiag) != 0) s.downDiag = g8DownDiag;
+      else if ((s.bitBoard & h8DownDiag) != 0) s.downDiag = h8DownDiag;
+      else s.downDiag = 0;
     }
-    bitCountMap[64] = NOSQUARE;
-    //    System.out.println(Arrays.toString(index64Map));
-    //    System.out.println(Arrays.toString(bitCountMap));
-    //    System.out.println();
   }
 
   /**
-   * Contructor
-   * Computes all relevant pre-competed indexes and bitboards
+   * @param bitboard
+   * @return the first Square of the given Bitboard from a8-h8-h1
    */
-  Square() {
-    // pre-compute valid flag, index64 and bitboards for squares
-    if ((this.ordinal() & 0x88) == 0) {
-      validSquare = true;
-      // index should have same order then the original index
-      index64 = this.ordinal() / 16 * 8 + this.ordinal() % 16;
-      // System.out.print(index64 + ", ");
-      // set bit for bitboard0
-      bitBoard = 1L << index64;
-    }
-    else {
-      validSquare = false;
-      index64 = -1;
-      bitBoard = 0L;
-    }
-
-    // pre-compute file and rank
-    if (validSquare) {
-      file = File.values[this.ordinal() % 16];
-      rank = Rank.values[this.ordinal() >>> 4];
-    }
-    else {
-      file = File.NOFILE;
-      rank = Rank.NORANK;
-    }
-
-    // pre-compute diagonals for squares
-    if ((this.bitBoard & a8UpDiag) != 0) this.upDiag = a8UpDiag;
-    else if ((this.bitBoard & a7UpDiag) != 0) this.upDiag = a7UpDiag;
-    else if ((this.bitBoard & a6UpDiag) != 0) this.upDiag = a6UpDiag;
-    else if ((this.bitBoard & a5UpDiag) != 0) this.upDiag = a5UpDiag;
-    else if ((this.bitBoard & a4UpDiag) != 0) this.upDiag = a4UpDiag;
-    else if ((this.bitBoard & a3UpDiag) != 0) this.upDiag = a3UpDiag;
-    else if ((this.bitBoard & a2UpDiag) != 0) this.upDiag = a2UpDiag;
-    else if ((this.bitBoard & a1UpDiag) != 0) this.upDiag = a1UpDiag;
-    else if ((this.bitBoard & b1UpDiag) != 0) this.upDiag = b1UpDiag;
-    else if ((this.bitBoard & c1UpDiag) != 0) this.upDiag = c1UpDiag;
-    else if ((this.bitBoard & d1UpDiag) != 0) this.upDiag = d1UpDiag;
-    else if ((this.bitBoard & e1UpDiag) != 0) this.upDiag = e1UpDiag;
-    else if ((this.bitBoard & f1UpDiag) != 0) this.upDiag = f1UpDiag;
-    else if ((this.bitBoard & g1UpDiag) != 0) this.upDiag = g1UpDiag;
-    else if ((this.bitBoard & h1UpDiag) != 0) this.upDiag = h1UpDiag;
-    else this.upDiag = 0;
-
-    if ((this.bitBoard & a1DownDiag) != 0) this.downDiag = a1DownDiag;
-    else if ((this.bitBoard & a2DownDiag) != 0) this.downDiag = a2DownDiag;
-    else if ((this.bitBoard & a3DownDiag) != 0) this.downDiag = a3DownDiag;
-    else if ((this.bitBoard & a4DownDiag) != 0) this.downDiag = a4DownDiag;
-    else if ((this.bitBoard & a5DownDiag) != 0) this.downDiag = a5DownDiag;
-    else if ((this.bitBoard & a6DownDiag) != 0) this.downDiag = a6DownDiag;
-    else if ((this.bitBoard & a7DownDiag) != 0) this.downDiag = a7DownDiag;
-    else if ((this.bitBoard & a8DownDiag) != 0) this.downDiag = a8DownDiag;
-    else if ((this.bitBoard & b8DownDiag) != 0) this.downDiag = b8DownDiag;
-    else if ((this.bitBoard & c8DownDiag) != 0) this.downDiag = c8DownDiag;
-    else if ((this.bitBoard & d8DownDiag) != 0) this.downDiag = d8DownDiag;
-    else if ((this.bitBoard & e8DownDiag) != 0) this.downDiag = e8DownDiag;
-    else if ((this.bitBoard & f8DownDiag) != 0) this.downDiag = f8DownDiag;
-    else if ((this.bitBoard & g8DownDiag) != 0) this.downDiag = g8DownDiag;
-    else if ((this.bitBoard & h8DownDiag) != 0) this.downDiag = h8DownDiag;
-    else this.downDiag = 0;
-
+  public static Square getFirstSquare(long bitboard) {
+    return trailingZerosMap[Long.numberOfTrailingZeros(bitboard)];
   }
 
   /**
@@ -266,7 +315,7 @@ public enum Square {
     } catch (IllegalArgumentException e) {
       return NOSQUARE;
     }
-    return square.isValidSquare() ? square : NOSQUARE;
+    return square.validSquare ? square : NOSQUARE;
   }
 
   /**
@@ -358,6 +407,18 @@ public enum Square {
   public long getDownDiag() {
     return downDiag;
   }
+  /**
+   * pre-computed index for a 64bit index a8=0, b8=1,...h1=63
+   */
+  public int getIndex64() {
+    return index64;
+  }
+  /**
+   * pre-computed bitBoard representation
+   */
+  public long getBitBoard() {
+    return bitBoard;
+  }
 
   /**
    * This enum represents all files of a chess board. If used in a loop via values() omit NOFILE.
@@ -419,8 +480,8 @@ public enum Square {
     }
 
     Rank() {
-      final long a = 0b11111111L;
-      if (ordinal() < 8) this.bitBoard = a << 8 * ordinal();
+      final long mask = 0b11111111L;
+      if (ordinal() < 8) this.bitBoard = mask << (8 * (7 - ordinal()));
       else bitBoard = 0;
     }
 

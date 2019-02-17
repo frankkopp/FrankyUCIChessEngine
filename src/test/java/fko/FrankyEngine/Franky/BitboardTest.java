@@ -27,21 +27,112 @@ package fko.FrankyEngine.Franky;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.openjdk.jol.info.ClassLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
+import java.util.function.Function;
 
+import static fko.FrankyEngine.Franky.Bitboard.*;
+import static fko.FrankyEngine.Franky.Square.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@SuppressWarnings("unchecked")
 class BitboardTest {
 
+  private static final Logger LOG = LoggerFactory.getLogger(BitboardTest.class);
+
   @Test
-  void listFields() throws IllegalAccessException {
-    for (Field f : Bitboard.class.getFields()) {
-      f.setAccessible(true);
-      if (!(f.get(null) instanceof Long)) continue;
-      long bitboard = (long) f.get(null);
-      System.out.printf("%s %s %n%s%n%s%n", f.getName(), bitboard,
-                        Bitboard.printBitString(bitboard), Bitboard.toString(bitboard));
-    }
+  void toStringTest() {
+    // @formatter:off
+    Square square;
+    String actual;
+    String expected;
+
+    square = a1;
+    actual = Bitboard.toString(square.getBitBoard());
+    LOG.debug("{}\n{}", square, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "1 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    square = a8;
+    actual = Bitboard.toString(square.getBitBoard());
+    LOG.debug("{}\n{}", square, actual);
+    expected =  "1 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    square = h1;
+    actual = Bitboard.toString(square.getBitBoard());
+    LOG.debug("{}\n{}", square, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 1";
+    assertEquals(expected, actual);
+
+    square = h8;
+    actual = Bitboard.toString(square.getBitBoard());
+    LOG.debug("{}\n{}", square, actual);
+    expected =  "0 0 0 0 0 0 0 1 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    square = e4;
+    actual = Bitboard.toString(square.getBitBoard());
+    LOG.debug("{}\n{}", square, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+    // @formatter:on
+  }
+
+  @Test
+  void printBitStringTest() {
+    // @formatter:off
+    Square square;
+    String actual;
+    String expected;
+
+    square = b1;
+    actual = Bitboard.printBitString(square.getBitBoard());
+    LOG.debug("{}\n{}", square, actual);
+    expected =  "00000010.00000000.00000000.00000000.00000000.00000000.00000000.00000000";
+    assertEquals(expected, actual);
+
+    actual = Bitboard.printBitString(square.getRank().bitBoard);
+    LOG.debug("{}\n{}", square, actual);
+    expected =  "11111111.00000000.00000000.00000000.00000000.00000000.00000000.00000000";
+    assertEquals(expected, actual);
+    // @formatter:on
   }
 
   @Test
@@ -72,67 +163,67 @@ class BitboardTest {
 
     // White Pawns
     System.out.println("WHITE PAWNS");
-    for (Square square : Square.validSquares) {
+    for (Square square : validSquares) {
       System.out.println(square);
       System.out.println(
-        Bitboard.printBitString(Bitboard.pawnAttacks[Color.WHITE.ordinal()][square.index64]));
+        printBitString(Bitboard.pawnAttacks[Color.WHITE.ordinal()][square.getIndex64()]));
       System.out.println(
-        Bitboard.toString(Bitboard.pawnAttacks[Color.WHITE.ordinal()][square.index64]));
+        Bitboard.toString(Bitboard.pawnAttacks[Color.WHITE.ordinal()][square.getIndex64()]));
       System.out.println();
     }
     // Black Pawns
     System.out.println("BLACK PAWN");
-    for (Square square : Square.validSquares) {
+    for (Square square : validSquares) {
       System.out.println(square);
       System.out.println(
-        Bitboard.printBitString(Bitboard.pawnAttacks[Color.BLACK.ordinal()][square.index64]));
+        printBitString(Bitboard.pawnAttacks[Color.BLACK.ordinal()][square.getIndex64()]));
       System.out.println(
-        Bitboard.toString(Bitboard.pawnAttacks[Color.BLACK.ordinal()][square.index64]));
+        Bitboard.toString(Bitboard.pawnAttacks[Color.BLACK.ordinal()][square.getIndex64()]));
       System.out.println();
     }
 
     // Knight
     System.out.println("KNIGHTS");
-    for (Square square : Square.validSquares) {
+    for (Square square : validSquares) {
       System.out.println(square);
-      System.out.println(Bitboard.printBitString(Bitboard.knightAttacks[square.index64]));
-      System.out.println(Bitboard.toString(Bitboard.knightAttacks[square.index64]));
+      System.out.println(printBitString(Bitboard.knightAttacks[square.getIndex64()]));
+      System.out.println(Bitboard.toString(Bitboard.knightAttacks[square.getIndex64()]));
       System.out.println();
     }
 
     // Bishop
     System.out.println("BISHOPS\n");
-    for (Square square : Square.validSquares) {
+    for (Square square : validSquares) {
       System.out.println(square);
-      System.out.println(Bitboard.printBitString(Bitboard.bishopAttacks[square.index64]));
-      System.out.println(Bitboard.toString(Bitboard.bishopAttacks[square.index64]));
+      System.out.println(printBitString(Bitboard.bishopAttacks[square.getIndex64()]));
+      System.out.println(Bitboard.toString(Bitboard.bishopAttacks[square.getIndex64()]));
       System.out.println();
     }
 
     // Bishop
     System.out.println("ROOKS\n");
-    for (Square square : Square.validSquares) {
+    for (Square square : validSquares) {
       System.out.println(square);
-      System.out.println(Bitboard.printBitString(Bitboard.rookAttacks[square.index64]));
-      System.out.println(Bitboard.toString(Bitboard.rookAttacks[square.index64]));
+      System.out.println(printBitString(Bitboard.rookAttacks[square.getIndex64()]));
+      System.out.println(Bitboard.toString(Bitboard.rookAttacks[square.getIndex64()]));
       System.out.println();
     }
 
     // Queen
     System.out.println("QUEEN\n");
-    for (Square square : Square.validSquares) {
+    for (Square square : validSquares) {
       System.out.println(square);
-      System.out.println(Bitboard.printBitString(Bitboard.queenAttacks[square.index64]));
-      System.out.println(Bitboard.toString(Bitboard.queenAttacks[square.index64]));
+      System.out.println(printBitString(Bitboard.queenAttacks[square.getIndex64()]));
+      System.out.println(Bitboard.toString(Bitboard.queenAttacks[square.getIndex64()]));
       System.out.println();
     }
 
     // King
     System.out.println("KING\n");
-    for (Square square : Square.validSquares) {
+    for (Square square : validSquares) {
       System.out.println(square);
-      System.out.println(Bitboard.printBitString(Bitboard.kingAttacks[square.index64]));
-      System.out.println(Bitboard.toString(Bitboard.kingAttacks[square.index64]));
+      System.out.println(printBitString(Bitboard.kingAttacks[square.getIndex64()]));
+      System.out.println(Bitboard.toString(Bitboard.kingAttacks[square.getIndex64()]));
       System.out.println();
     }
   }
@@ -142,22 +233,22 @@ class BitboardTest {
 
     // White Pawns
     System.out.println("WHITE PAWNS");
-    for (Square square : Square.validSquares) {
+    for (Square square : validSquares) {
       System.out.println(square);
       System.out.println(
-        Bitboard.printBitString(Bitboard.passedPawnMask[Color.WHITE.ordinal()][square.index64]));
+        printBitString(Bitboard.passedPawnMask[Color.WHITE.ordinal()][square.getIndex64()]));
       System.out.println(
-        Bitboard.toString(Bitboard.passedPawnMask[Color.WHITE.ordinal()][square.index64]));
+        Bitboard.toString(Bitboard.passedPawnMask[Color.WHITE.ordinal()][square.getIndex64()]));
       System.out.println();
     }
     // Black Pawns
     System.out.println("BLACK PAWN");
-    for (Square square : Square.validSquares) {
+    for (Square square : validSquares) {
       System.out.println(square);
       System.out.println(
-        Bitboard.printBitString(Bitboard.passedPawnMask[Color.BLACK.ordinal()][square.index64]));
+        printBitString(Bitboard.passedPawnMask[Color.BLACK.ordinal()][square.getIndex64()]));
       System.out.println(
-        Bitboard.toString(Bitboard.passedPawnMask[Color.BLACK.ordinal()][square.index64]));
+        Bitboard.toString(Bitboard.passedPawnMask[Color.BLACK.ordinal()][square.getIndex64()]));
       System.out.println();
     }
   }
@@ -166,41 +257,41 @@ class BitboardTest {
   public void testKingRing() {
     // King
     System.out.println("KING\n");
-    for (Square square : Square.validSquares) {
+    for (Square square : validSquares) {
       System.out.println(square);
-      System.out.println(Bitboard.printBitString(Bitboard.kingRing[square.index64]));
-      System.out.println(Bitboard.toString(Bitboard.kingRing[square.index64]));
+      System.out.println(printBitString(Bitboard.kingRing[square.getIndex64()]));
+      System.out.println(Bitboard.toString(Bitboard.kingRing[square.getIndex64()]));
       System.out.println();
     }
   }
 
-  @Test
-  public void directions() {
-    for (Square from : Square.validSquares) {
-      for (Square to : Square.validSquares) {
-        System.out.printf("From: %s To:%s = %s%n", from, to,
-                          Bitboard.direction[from.index64][to.index64]);
-      }
-    }
-  }
+  //  @Test
+  //  public void directions() {
+  //    for (Square from : validSquares) {
+  //      for (Square to : validSquares) {
+  //        System.out.printf("From: %s To: %s = %s%n", from, to,
+  //                          Bitboard.direction[from.getIndex64()][to.getIndex64()]);
+  //      }
+  //    }
+  //  }
 
   @Test
   public void intermediates() {
-    for (Square from : Square.validSquares) {
-      for (Square to : Square.validSquares) {
-        System.out.printf("From: %s To:%s%n%s%n%n", from, to,
-                          Bitboard.toString(Bitboard.intermediate[from.index64][to.index64]));
+    for (Square from : validSquares) {
+      for (Square to : validSquares) {
+        System.out.printf("From: %s To: %s%n%s%n%n", from, to, Bitboard.toString(
+          Bitboard.intermediate[from.getIndex64()][to.getIndex64()]));
       }
     }
   }
 
   @Test
   void rays() {
-    for (Square square : Square.validSquares) {
+    for (Square square : validSquares) {
       System.out.println("Square: " + square);
       for (int d = 0; d < 8; d++) {
         System.out.println("Direction: " + d);
-        System.out.println(Bitboard.toString(Bitboard.rays[d][square.index64]));
+        System.out.println(Bitboard.toString(Bitboard.rays[d][square.getIndex64()]));
       }
 
     }
@@ -208,9 +299,916 @@ class BitboardTest {
 
   @Test
   @Disabled
-  public void showSize() {
-    //System.out.println(VM.current().details());
-    System.out.println(ClassLayout.parseClass(Bitboard.class).toPrintable());
+  void bitboardRotations() {
+
+    System.out.println("File ================================================");
+    System.out.println("=====================================================");
+    System.out.println(Bitboard.toString(File.d.bitBoard));
+    System.out.println(printBitString(File.d.bitBoard));
+    System.out.println("R90");
+    System.out.println(Bitboard.toString(rotateR90(File.d.bitBoard)));
+    System.out.println(printBitString(rotateR90(File.d.bitBoard)));
+    System.out.println(printBitString(rotateR90(File.d.bitBoard) >>> ((File.d.ordinal() + 1) * 8)));
+    System.out.println(
+      printBitString((rotateR90(File.d.bitBoard) >>> ((File.d.ordinal() + 1) * 8)) & 255));
+    System.out.println("L90");
+    System.out.println(Bitboard.toString(rotateL90(File.d.bitBoard)));
+    System.out.println(printBitString(rotateL90(File.d.bitBoard)));
+    System.out.println("R45");
+    System.out.println(Bitboard.toString(rotateR45(File.d.bitBoard)));
+    System.out.println(printBitString(rotateR45(File.d.bitBoard)));
+    System.out.println("L45");
+    System.out.println(Bitboard.toString(rotateL45(File.d.bitBoard)));
+    System.out.println(printBitString(rotateL45(a1UpDiag)));
+    System.out.println();
+
+    System.out.println("Rank ================================================");
+    System.out.println("=====================================================");
+    System.out.println(Bitboard.toString(Rank.r4.bitBoard));
+    System.out.println(printBitString(Rank.r4.bitBoard));
+    System.out.println(printBitString(Rank.r4.bitBoard >>> (Rank.r4.ordinal()) * 8));
+    System.out.println(printBitString((Rank.r4.bitBoard >>> (Rank.r4.ordinal()) * 8) & 255));
+    System.out.println("R90");
+    System.out.println(Bitboard.toString(rotateR90(Rank.r4.bitBoard)));
+    System.out.println(printBitString(rotateR90(Rank.r4.bitBoard)));
+    System.out.println("L90");
+    System.out.println(Bitboard.toString(rotateL90(Rank.r4.bitBoard)));
+    System.out.println(printBitString(rotateL90(Rank.r4.bitBoard)));
+    System.out.println("R45");
+    System.out.println(Bitboard.toString(rotateR45(Rank.r4.bitBoard)));
+    System.out.println(printBitString(rotateR45(Rank.r4.bitBoard)));
+    System.out.println("L45");
+    System.out.println(Bitboard.toString(rotateL45(Rank.r4.bitBoard)));
+    System.out.println(printBitString(rotateL45(a1UpDiag)));
+    System.out.println();
+
+    System.out.println("diag ==============================================");
+    System.out.println("=====================================================");
+    Square square1 = e5;
+    long diag = square1.getUpDiag();
+    System.out.println(Bitboard.toString(diag));
+    System.out.println(printBitString(diag));
+    System.out.println("R90");
+    System.out.println(Bitboard.toString(rotateR90(diag)));
+    System.out.println(printBitString(rotateR90(diag)));
+    System.out.println("L90");
+    System.out.println(Bitboard.toString(rotateL90(diag)));
+    System.out.println(printBitString(rotateL90(diag)));
+    System.out.println("R45");
+    long rotateR45 = rotateR45(diag);
+    System.out.println(Bitboard.toString(rotateR45));
+    System.out.println("Rot:  " + printBitString(rotateR45));
+    int index64 = square1.getIndex64();
+    int shift = getShiftUp(index64);
+    long shiftBitboard = rotateR45 >>> shift;
+    System.out.println("Shif: " + printBitString(shiftBitboard));
+    long mask = getLengthMaskUp(index64);
+    System.out.println("Mask: " + printBitString(mask));
+    System.out.println("MBit: " + printBitString(shiftBitboard & mask));
+    System.out.println("L45");
+    System.out.println(Bitboard.toString(rotateL45(diag)));
+    System.out.println(printBitString(rotateL45(diag)));
+    System.out.println();
+
+    System.out.println("downDiag ============================================");
+    System.out.println("=====================================================");
+    square1 = a2;
+    diag = square1.getDownDiag();
+    System.out.println(Bitboard.toString(diag));
+    System.out.println(printBitString(diag));
+    System.out.println("R90");
+    System.out.println(Bitboard.toString(rotateR90(diag)));
+    System.out.println(printBitString(rotateR90(diag)));
+    System.out.println("L90");
+    System.out.println(Bitboard.toString(rotateL90(diag)));
+    System.out.println(printBitString(rotateL90(diag)));
+    System.out.println("R45");
+    long rotateL45 = rotateL45(diag);
+    System.out.println(Bitboard.toString(rotateL45));
+    System.out.println("L45");
+    System.out.println(Bitboard.toString(rotateL45));
+    System.out.println("Rot:  " + printBitString(rotateL45));
+    index64 = square1.getIndex64();
+    shift = getShiftDown(index64);
+    shiftBitboard = rotateL45 >>> shift;
+    System.out.println("Shif: " + printBitString(shiftBitboard));
+    mask = getLengthMaskDown(index64);
+    System.out.println("Mask: " + printBitString(mask));
+    System.out.println("MBit: " + printBitString(shiftBitboard & mask));
+    System.out.println();
+  }
+
+  @Test
+  void rotateR90Test() {
+    // @formatter:off
+    long bitboard;
+    String expected, actual, rotation;
+
+    Function f = b -> rotateR90((long) b);
+    rotation = "R90";
+
+    bitboard = File.d.bitBoard;
+    actual = rotation(bitboard, rotation, f);
+    expected = "0 0 0 0 0 0 0 0 \n" +
+               "0 0 0 0 0 0 0 0 \n" +
+               "0 0 0 0 0 0 0 0 \n" +
+               "1 1 1 1 1 1 1 1 \n" +
+               "0 0 0 0 0 0 0 0 \n" +
+               "0 0 0 0 0 0 0 0 \n" +
+               "0 0 0 0 0 0 0 0 \n" +
+               "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = Rank.r4.bitBoard;
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = Square.e5.getUpDiag();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "1 0 0 0 0 0 0 0 \n"
+              + "0 1 0 0 0 0 0 0 \n"
+              + "0 0 1 0 0 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 0 1 0 0 \n"
+              + "0 0 0 0 0 0 1 0 \n"
+              + "0 0 0 0 0 0 0 1";
+    assertEquals(expected, actual);
+
+    bitboard = Square.e5.getDownDiag();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 1 \n"
+              + "0 0 0 0 0 0 1 0 \n"
+              + "0 0 0 0 0 1 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 1 0 0 0 0 0 \n"
+              + "0 1 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = new Position("PPPPPPPP/1PPPPPPP/2PPPPPP/3PPPPP/4PPPP/5PPP/6PP/7P b - -").getAllOccupiedBitboard();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 0 1 \n"
+              + "0 0 0 0 0 0 1 1 \n"
+              + "0 0 0 0 0 1 1 1 \n"
+              + "0 0 0 0 1 1 1 1 \n"
+              + "0 0 0 1 1 1 1 1 \n"
+              + "0 0 1 1 1 1 1 1 \n"
+              + "0 1 1 1 1 1 1 1 \n"
+              + "1 1 1 1 1 1 1 1";
+    assertEquals(expected, actual);
+
+    bitboard = ~new Position("PPPPPPPP/1PPPPPPP/2PPPPPP/3PPPPP/4PPPP/5PPP/6PP/7P b - -").getAllOccupiedBitboard();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "1 1 1 1 1 1 1 0 \n"
+              + "1 1 1 1 1 1 0 0 \n"
+              + "1 1 1 1 1 0 0 0 \n"
+              + "1 1 1 1 0 0 0 0 \n"
+              + "1 1 1 0 0 0 0 0 \n"
+              + "1 1 0 0 0 0 0 0 \n"
+              + "1 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+    // @formatter:on
+  }
+
+  @Test
+  void rotateL90Test() {
+    // @formatter:off
+    long bitboard;
+    String expected, actual, rotation;
+
+    Function f = b -> rotateL90((long) b);
+    rotation = "L90";
+
+    bitboard = File.d.bitBoard;
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "1 1 1 1 1 1 1 1 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = Rank.r4.bitBoard;
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = Square.e5.getUpDiag();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "1 0 0 0 0 0 0 0 \n"
+              + "0 1 0 0 0 0 0 0 \n"
+              + "0 0 1 0 0 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 0 1 0 0 \n"
+              + "0 0 0 0 0 0 1 0 \n"
+              + "0 0 0 0 0 0 0 1";
+    assertEquals(expected, actual);
+
+    bitboard = Square.e5.getDownDiag();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 1 0 \n"
+              + "0 0 0 0 0 1 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 1 0 0 0 0 0 \n"
+              + "0 1 0 0 0 0 0 0 \n"
+              + "1 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = new Position("PPPPPPPP/1PPPPPPP/2PPPPPP/3PPPPP/4PPPP/5PPP/6PP/7P b - -").getAllOccupiedBitboard();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "1 1 1 1 1 1 1 1 \n"
+              + "1 1 1 1 1 1 1 0 \n"
+              + "1 1 1 1 1 1 0 0 \n"
+              + "1 1 1 1 1 0 0 0 \n"
+              + "1 1 1 1 0 0 0 0 \n"
+              + "1 1 1 0 0 0 0 0 \n"
+              + "1 1 0 0 0 0 0 0 \n"
+              + "1 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = ~new Position("PPPPPPPP/1PPPPPPP/2PPPPPP/3PPPPP/4PPPP/5PPP/6PP/7P b - -").getAllOccupiedBitboard();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 1 \n"
+              + "0 0 0 0 0 0 1 1 \n"
+              + "0 0 0 0 0 1 1 1 \n"
+              + "0 0 0 0 1 1 1 1 \n"
+              + "0 0 0 1 1 1 1 1 \n"
+              + "0 0 1 1 1 1 1 1 \n"
+              + "0 1 1 1 1 1 1 1";
+    assertEquals(expected, actual);
+     // @formatter:on
+  }
+
+  @Test
+  void rotateR45Test() {
+    // @formatter:off
+    long bitboard, rotated;
+    String expected, actual, rotation;
+
+    Function f = b -> rotateR45((long) b);
+    rotation = "R45";
+
+    bitboard = Square.a1.getUpDiag();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 1 1 1 1 \n"
+              + "1 1 1 1 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = Square.a5.getUpDiag();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = Square.a8.getUpDiag();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "1 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = Square.f3.getUpDiag();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 1 1 1 1 1 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard =  e2.getBitBoard() | g4.getBitBoard();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 1 0 1 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    // @formatter:on
+  }
+
+  @Test
+  void rotateL45Test() {
+    // @formatter:off
+    long bitboard;
+    String expected, actual, rotation;
+
+    Function f = b -> rotateL45((long) b);
+    rotation = "R45";
+
+    bitboard = Square.a8.getDownDiag();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 1 1 1 1 \n"
+              + "1 1 1 1 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = Square.a1.getDownDiag();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 1";
+    assertEquals(expected, actual);
+
+    bitboard = Square.a5.getDownDiag();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 1 1 1 1 1 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = Square.h5.getDownDiag();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard =  g5.getBitBoard() | e7.getBitBoard();
+    actual = rotation(bitboard, rotation, f);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 1 0 1 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+    // @formatter:on
+  }
+
+  private String rotation(long bitboard, String rotation, Function f) {
+    long rotated;
+    String actual;
+    LOG.debug("Origin:\n{}", Bitboard.toString(bitboard));
+    rotated = (long) f.apply(bitboard);
+    actual = Bitboard.toString(rotated);
+    LOG.debug("Rotated {}:\n{}", rotation, actual);
+    LOG.debug("Origin:  {}", Bitboard.printBitString(bitboard));
+    LOG.debug("Rotated: {}", Bitboard.printBitString(rotated));
+    return actual;
+  }
+
+  @Test
+  @Disabled
+  void horizontalSlidingAttackBitboards() {
+    for (int i = 0b0000_0000; i <= 0b1111_1111; i++) {
+      System.out.printf("Blocker : %s%n", printBitString(i));
+      System.out.printf(
+        "=================================================================================%n");
+
+      for (Square square : validSquares) {
+
+        final int rank = square.getRank().ordinal();
+        long rankMask = square.getRank().bitBoard;
+        System.out.printf("RankMask: %s%n", printBitString(rankMask));
+
+        long blocker = i;
+        blocker = blocker << ((7 - rank) * 8);
+        blocker = rankMask & blocker;
+        System.out.printf("Blocker : %s%n", printBitString(blocker));
+
+        long shifted = blocker >>> ((7 - rank) * 8);
+        System.out.printf("Blocker>: %s%n", printBitString(shifted));
+
+        final int pieceBitmap = (int) ((shifted & 255));
+        System.out.printf("Masked  : %s%n", printBitString(pieceBitmap));
+
+        System.out.printf("Square  : %s%n", square);
+        System.out.printf("Square  : %s%n", printBitString((square.getBitBoard())));
+
+        long bitboard = movesRank[square.getIndex64()][pieceBitmap];
+        System.out.printf("Moves   : %s%n", printBitString(bitboard));
+        System.out.printf("Moves   : %n%s%n", Bitboard.toString(bitboard));
+        System.out.println();
+      }
+    }
+  }
+
+  @Test
+  void horizontalSlidingAttackBitboardsTests() {
+    // @formatter:off
+    long blocker, moves;
+    String expected, actual;
+    Square square;
+
+    square = b1;
+    blocker = e1.getBitBoard();
+    moves = getSlidingMovesRank(square, blocker);
+    actual = Bitboard.toString(moves);
+    LOG.debug("\n{}", actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "1 0 1 1 1 0 0 0";
+    assertEquals(expected, actual);
+    assertEquals(2089670227099910144L, moves);
+
+    square = e5;
+    blocker = b5.getBitBoard();
+    moves = getSlidingMovesRank(square, blocker);
+    actual = Bitboard.toString(moves);
+    LOG.debug("\n{}", actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 1 1 1 0 1 1 1 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+    assertEquals(3992977408L, moves);
+   // @formatter:on
+  }
+
+  @Test
+  @Disabled
+  void verticalSlidingAttackBitboards() {
+    for (int i = 0b0000_0000; i <= 0b1111_1111; i++) {
+      System.out.printf("Blocker : %s%n", printBitString(i));
+      System.out.printf(
+        "=================================================================================%n");
+      for (Square square : validSquares) {
+        long fileMask = square.getFile().bitBoard;
+        System.out.printf("FileMask: %s%n", printBitString(fileMask));
+        System.out.printf("Square  : %s%n", square);
+        System.out.printf("Square  : %s%n", printBitString((square.getBitBoard())));
+        long bitboard = movesFile[square.getIndex64()][i];
+        System.out.printf("Moves   : %s%n", printBitString(bitboard));
+        System.out.printf("Moves   : %n%s%n", Bitboard.toString(bitboard));
+        System.out.println();
+      }
+    }
+  }
+
+  @Test
+  void verticalSlidingAttackBitboardsTests() {
+    // @formatter:off
+    long blocker, moves;
+    String expected, actual;
+    Square square;
+
+    square = b1;
+    blocker = b5.getBitBoard();
+    moves = getSlidingMovesFile(square, blocker);
+    actual = Bitboard.toString(moves);
+    LOG.debug("\n{}", actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 1 0 0 0 0 0 0 \n"
+              + "0 1 0 0 0 0 0 0 \n"
+              + "0 1 0 0 0 0 0 0 \n"
+              + "0 1 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+    assertEquals(565157600165888L, moves);
+
+    square = e5;
+    blocker = e3.getBitBoard();
+    moves = getSlidingMovesFile(square, blocker);
+    actual = Bitboard.toString(moves);
+    LOG.debug("\n{}", actual);
+    expected =  "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+    assertEquals(17660906573840L, moves);
+
+    square = e5;
+    blocker = e3.getBitBoard() | e1.getBitBoard();
+    moves = getSlidingMovesFile(square, blocker);
+    actual = Bitboard.toString(moves);
+    LOG.debug("\n{}", actual);
+    expected =  "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+    assertEquals(17660906573840L, moves);
+   // @formatter:on
+  }
+
+  @Test
+  @Disabled
+  void diagUpSlidingAttackBitboards() {
+    for (int i = 0b0000_0000; i <= 0b1111_1111; i++) {
+      for (Square square : validSquares) {
+        String bitString = printBitString(i);
+        System.out.printf("Square %s: Length: %d movesUpDiag[ %2d ][ %8s ] = %s (%d)%n", square,
+                          lengthDiagUp[square.getIndex64()], square.getIndex64(),
+                          bitString.substring(bitString.length() - 8),
+                          Bitboard.printBitString(movesUpDiag[square.getIndex64()][i]),
+                          movesUpDiag[square.getIndex64()][i]);
+
+        long bitboard = movesUpDiag[square.getIndex64()][i];
+        System.out.printf("%s%n", Bitboard.toString(bitboard));
+        System.out.println();
+      }
+    }
+  }
+
+  @Test
+  void diagUpSlidingAttackBitmapTest() {
+    // @formatter:off
+    String actual, expected;
+    Square square;
+    long blockers, bitboard;
+
+    // the square we are on
+    square = Square.a1;
+    // the pieces currently on the board and maybe blocking the moves
+    blockers = h8.getBitBoard() | g7.getBitBoard() | f6.getBitBoard() | e5.getBitBoard()
+                    | b7.getBitBoard() | g2.getBitBoard();
+    // expected output
+    expected =    "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 1 0 0 0 \n"
+                + "0 0 0 1 0 0 0 0 \n"
+                + "0 0 1 0 0 0 0 0 \n"
+                + "0 1 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0";
+
+    LOG.debug("{}",String.format("UpDiag : %s", Bitboard.printBitString(square.getUpDiag())));
+    LOG.debug("{}",String.format("UpDiag : %s", Bitboard.printBitString(square.getUpDiag())));
+    LOG.debug("{}",String.format("Content: %s", Bitboard.printBitString(blockers)));
+    LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
+
+    // retrieve all possible moves for this square with the current content
+    bitboard = getSlidingMovesDiagUp(square, blockers);
+
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("{}",String.format("%n%s", actual));
+    assertEquals(expected, actual);
+    System.out.println();
+
+     // the square we are on
+    square = Square.a4;
+    // the pieces currently on the board and maybe blocking the moves
+    blockers = c6.getBitBoard() | d7.getBitBoard() | f6.getBitBoard() | e5.getBitBoard()
+                    | b7.getBitBoard() | g2.getBitBoard();
+    // expected output
+    expected =    "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 1 0 0 0 0 0 \n"
+                + "0 1 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0";
+
+    LOG.debug("{}",String.format("UpDiag : %s", Bitboard.printBitString(square.getUpDiag())));
+    LOG.debug("{}",String.format("Content: %s", Bitboard.printBitString(blockers)));
+    LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
+
+    // retrieve all possible moves for this square with the current content
+    bitboard = getSlidingMovesDiagUp(square, blockers);
+
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("{}",String.format("%n%s", actual));
+    assertEquals(expected, actual);
+    System.out.println();
+
+    // the square we are on
+    square = Square.f3;
+    // the pieces currently on the board and maybe blocking the moves
+    blockers = e2.getBitBoard() | g4.getBitBoard();
+                    // | f6.getBitBoard() | e5.getBitBoard()
+                    // | b7.getBitBoard() | g2.getBitBoard();
+    // expected output
+    expected =    "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 1 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 1 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0";
+
+    LOG.debug("{}",String.format("UpDiag : %s", Bitboard.printBitString(square.getUpDiag())));
+    LOG.debug("{}",String.format("Content: %s", Bitboard.printBitString(blockers)));
+    LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
+
+    // retrieve all possible moves for this square with the current content
+    bitboard = getSlidingMovesDiagUp(square, blockers);
+
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("{}",String.format("%n%s", actual));
+    assertEquals(expected, actual);
+    System.out.println();
+    // @formatter:on
+  }
+
+  @Test
+  void diagDownSlidingAttackBitmapTest() {
+    // @formatter:off
+    String actual, expected;
+    Square square;
+    long blockers, bitboard;
+
+    // the square we are on
+    square = Square.a8;
+    // the pieces currently on the board and maybe blocking the moves
+    blockers = h1.getBitBoard() | g2.getBitBoard() | f3.getBitBoard() | e4.getBitBoard()
+                    | b2.getBitBoard() | g7.getBitBoard();
+    // expected output
+    expected =    "0 0 0 0 0 0 0 0 \n"
+                + "0 1 0 0 0 0 0 0 \n"
+                + "0 0 1 0 0 0 0 0 \n"
+                + "0 0 0 1 0 0 0 0 \n"
+                + "0 0 0 0 1 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0";
+
+    LOG.debug("{}",String.format("UpDiag : %s", Bitboard.printBitString(square.getUpDiag())));
+    LOG.debug("{}",String.format("UpDiag : %s", Bitboard.printBitString(square.getUpDiag())));
+    LOG.debug("{}",String.format("Content: %s", Bitboard.printBitString(blockers)));
+    LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
+
+    // retrieve all possible moves for this square with the current content
+    bitboard = getSlidingMovesDiagDown(square, blockers);
+
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("{}",String.format("%n%s", actual));
+    assertEquals(expected, actual);
+    System.out.println();
+
+    // the square we are on
+    square = Square.d8;
+    // the pieces currently on the board and maybe blocking the moves
+    blockers = f6.getBitBoard() | g5.getBitBoard() | f3.getBitBoard() | e4.getBitBoard()
+                    | b2.getBitBoard() | g7.getBitBoard();
+    // expected output
+    expected =    "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 1 0 0 0 \n"
+                + "0 0 0 0 0 1 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0";
+
+    LOG.debug("{}",String.format("UpDiag : %s", Bitboard.printBitString(square.getUpDiag())));
+    LOG.debug("{}",String.format("UpDiag : %s", Bitboard.printBitString(square.getUpDiag())));
+    LOG.debug("{}",String.format("Content: %s", Bitboard.printBitString(blockers)));
+    LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
+
+    // retrieve all possible moves for this square with the current content
+    bitboard = getSlidingMovesDiagDown(square, blockers);
+
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("{}",String.format("%n%s", actual));
+    assertEquals(expected, actual);
+    System.out.println();
+
+    // the square we are on
+    square = Square.a4;
+    // the pieces currently on the board and maybe blocking the moves
+    blockers = c2.getBitBoard() | g5.getBitBoard() | f3.getBitBoard() | e4.getBitBoard()
+                    | b2.getBitBoard() | g7.getBitBoard();
+    // expected output
+    expected =    "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 1 0 0 0 0 0 0 \n"
+                + "0 0 1 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0";
+
+    LOG.debug("{}",String.format("UpDiag : %s", Bitboard.printBitString(square.getUpDiag())));
+    LOG.debug("{}",String.format("UpDiag : %s", Bitboard.printBitString(square.getUpDiag())));
+    LOG.debug("{}",String.format("Content: %s", Bitboard.printBitString(blockers)));
+    LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
+
+    // retrieve all possible moves for this square with the current content
+    bitboard = getSlidingMovesDiagDown(square, blockers);
+
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("{}",String.format("%n%s", actual));
+    assertEquals(expected, actual);
+    System.out.println();
+    // @formatter:on
+  }
+
+  @Test
+  void slidingAttackBitboardTest() {
+    Position position = new Position("4r3/1pn3k1/4p1b1/p1Pp1P1r/3P2NR/1P3B2/3K2P1/4R3 w - -");
+    System.out.println(position);
+    Square square;
+    long slidingMoves;
+
+    // horizontal on rank
+    square = e1;
+    slidingMoves = getSlidingMovesRank(square, position.getAllOccupiedBitboard());
+    System.out.printf("Horizontal Rank Attacks for %s%n", square);
+    System.out.printf("Moves Rank %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(-1224979098644774912L, slidingMoves);
+
+    square = e8;
+    slidingMoves = getSlidingMovesRank(square, position.getAllOccupiedBitboard());
+    System.out.printf("Horizontal Rank Attacks for %s%n", square);
+    System.out.printf("Moves Rank %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(239L, slidingMoves);
+
+    square = h4;
+    slidingMoves = getSlidingMovesRank(square, position.getAllOccupiedBitboard());
+    System.out.printf("Horizontal Rank Attacks for %s%n", square);
+    System.out.printf("Moves Rank %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(274877906944L, slidingMoves);
+
+    square = h5;
+    slidingMoves = getSlidingMovesRank(square, position.getAllOccupiedBitboard());
+    System.out.printf("Horizontal Rank Attacks for %s%n", square);
+    System.out.printf("Moves Rank %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(1610612736L, slidingMoves);
+
+    // vertical on file
+    square = e1;
+    slidingMoves = getSlidingMovesFile(square, position.getAllOccupiedBitboard());
+    System.out.printf("Vertical File Attacks for %s%n", square);
+    System.out.printf("Moves File %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(4521260802375680L, slidingMoves);
+
+    square = e8;
+    slidingMoves = getSlidingMovesFile(square, position.getAllOccupiedBitboard());
+    System.out.printf("Vertical File Attacks for %s%n", square);
+    System.out.printf("Moves File %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(1052672L, slidingMoves);
+
+    square = h4;
+    slidingMoves = getSlidingMovesFile(square, position.getAllOccupiedBitboard());
+    System.out.printf("Vertical File Attacks for %s%n", square);
+    System.out.printf("Moves File %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(-9187202500199972864L, slidingMoves);
+
+    square = h5;
+    slidingMoves = getSlidingMovesFile(square, position.getAllOccupiedBitboard());
+    System.out.printf("Vertical File Attacks for %s%n", square);
+    System.out.printf("Moves File %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(549764235392L, slidingMoves);
+
+    // diagonal upwards
+    square = f3;
+    System.out.printf("Diag Up Attacks for %s%n", square);
+    slidingMoves = getSlidingMovesDiagUp(square, position.getAllOccupiedBitboard());
+    System.out.printf("Moves Diag Up %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(580964626808700928L, slidingMoves);
+
+    square = g6;
+    slidingMoves = getSlidingMovesDiagUp(square, position.getAllOccupiedBitboard());
+    System.out.printf("Diag Up Attacks for %s%n", square);
+    System.out.printf("Moves Diag Up %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(536903680L, slidingMoves);
+
+    square = h4;
+    slidingMoves = getSlidingMovesDiagUp(square, position.getAllOccupiedBitboard());
+    System.out.printf("Diag Up Attacks for %s%n", square);
+    System.out.printf("Moves Diag Up %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(1161999072605765632L, slidingMoves);
+
+    square = h5;
+    slidingMoves = getSlidingMovesDiagUp(square, position.getAllOccupiedBitboard());
+    System.out.printf("Diag Up Attacks for %s%n", square);
+    System.out.printf("Moves Diag Up %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(274877906944L, slidingMoves);
+
+    position = new Position("1r2kb1r/2Rn4/p4p2/4pN1p/4N1p1/6B1/P4PPP/3R2K1 b k -");
+
+    // diagonal downwards
+    square = f8;
+    System.out.printf("Diag Down Attacks for %s%n", square);
+    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard());
+    System.out.printf("Moves Diag Down %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(8404992L, slidingMoves);
+
+    square = g3;
+    System.out.printf("Diag Down Attacks for %s%n", square);
+    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard());
+    System.out.printf("Moves Diag Down %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(36028934726352896L, slidingMoves);
+
+    square = f5;
+    System.out.printf("Diag Down  Attacks for %s%n", square);
+    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard());
+    System.out.printf("Moves Diag Down %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(274878957568L, slidingMoves);
+
+    square = h4;
+    System.out.printf("Diag Down Attacks for %s%n", square);
+    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard());
+    System.out.printf("Moves Diag Down %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(1075838976L, slidingMoves);
+
+    square = e4;
+    System.out.printf("Diag Down Attacks for %s%n", square);
+    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard());
+    System.out.printf("Moves Diag Down %s: %n%s%n", square, Bitboard.toString(slidingMoves));
+    System.out.println();
+    assertEquals(18049583016051201l, slidingMoves);
+
   }
 
 }

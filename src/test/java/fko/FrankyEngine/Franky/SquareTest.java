@@ -26,13 +26,17 @@
 package fko.FrankyEngine.Franky;
 
 import fko.FrankyEngine.Franky.Square.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
 import static fko.FrankyEngine.Franky.Bitboard.*;
 import static fko.FrankyEngine.Franky.Square.*;
+import static fko.FrankyEngine.Franky.Square.a8UpDiag;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -41,31 +45,22 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class SquareTest {
 
+  private static final Logger LOG = LoggerFactory.getLogger(SquareTest.class);
+
   @Test
+  @Disabled
   void listFields() throws IllegalAccessException {
     for (Field f : Square.class.getFields()) {
       f.setAccessible(true);
       System.out.println(f.getName());
       if (f.isEnumConstant()) {
         final Square square = (Square) f.get(null);
-        System.out.println(Bitboard.toString(square.bitBoard));
-        System.out.println(Bitboard.printBitString(square.bitBoard));
+        System.out.println(Bitboard.toString(square.getBitBoard()));
+        System.out.println(printBitString(square.getBitBoard()));
         System.out.printf("upDiag %d%n", square.getUpDiag());
         System.out.printf("downDiag %d%n", square.getDownDiag());
       }
       System.out.println();
-    }
-  }
-
-  /**
-   * Tests basic Square operations
-   */
-  @Test
-  public void listSquareBitboards() {
-    for (Square square : validSquares) {
-      System.out.println(square);
-      System.out.println(Bitboard.toString(square.bitBoard));
-      System.out.println(Bitboard.printBitString(square.bitBoard));
     }
   }
 
@@ -163,21 +158,304 @@ public class SquareTest {
   }
 
   @Test
+  public void validSquaresTest() {
+    assertTrue(Square.a1.isValidSquare());
+    assertTrue(Square.h1.isValidSquare());
+    assertTrue(Square.a8.isValidSquare());
+    assertTrue(Square.h8.isValidSquare());
+    assertFalse(Square.i1.isValidSquare());
+    assertFalse(Square.i8.isValidSquare());
+    assertFalse(Square.o1.isValidSquare());
+    assertFalse(Square.o8.isValidSquare());
+  }
+
+  @Test
   public void index64Test() {
-    assertEquals(0, a1.index64);
-    assertEquals(7, h1.index64);
-    assertEquals(8, a2.index64);
-    assertEquals(56, a8.index64);
-    assertEquals(63, h8.index64);
-    assertEquals(-1, i1.index64);
-    assertEquals(-1, p8.index64);
+    assertEquals(56, a1.getIndex64());
+    assertEquals(63, h1.getIndex64());
+    assertEquals(48, a2.getIndex64());
+    assertEquals(0, a8.getIndex64());
+    assertEquals(7, h8.getIndex64());
+    assertEquals(-1, i1.getIndex64());
+    assertEquals(-1, p8.getIndex64());
+  }
+
+  @Test
+  public void index64MapTest() {
+    assertEquals(a1, Square.index64Map[56]);
+    assertEquals(a8, Square.index64Map[0]);
+    assertEquals(h1, Square.index64Map[63]);
+    assertEquals(h8, Square.index64Map[7]);
+  }
+
+  @Test
+  public void fileRankTest() {
+    assertEquals(File.c, Square.c3.getFile());
+    assertEquals(2, Square.c3.getFile().ordinal());
+    assertEquals(File.g, Square.g8.getFile());
+    assertEquals(6, Square.g8.getFile().ordinal());
+
+    assertEquals(Rank.r3, Square.c3.getRank());
+    assertEquals(2, Square.c3.getRank().ordinal());
+    assertEquals(Rank.r8, Square.g8.getRank());
+    assertEquals(7, Square.g8.getRank().ordinal());
+  }
+
+  @Test
+  public void fileRankBitboardsTest() {
+    Square square;
+    String actual;
+    String expected;
+
+    square = b1;
+    actual = Bitboard.printBitString(square.getRank().bitBoard);
+    LOG.debug("{}\n{}", square, actual);
+    expected = "11111111.00000000.00000000.00000000.00000000.00000000.00000000.00000000";
+    assertEquals(expected, actual);
+    assertEquals(-72057594037927936L, square.getRank().bitBoard);
+
+    square = c8;
+    actual = Bitboard.printBitString(square.getRank().bitBoard);
+    LOG.debug("{}\n{}", square, actual);
+    expected = "00000000.00000000.00000000.00000000.00000000.00000000.00000000.11111111";
+    assertEquals(expected, actual);
+
+    square = a1;
+    actual = Bitboard.printBitString(square.getFile().bitBoard);
+    LOG.debug("{}\n{}", square, actual);
+    expected = "00000001.00000001.00000001.00000001.00000001.00000001.00000001.00000001";
+    assertEquals(expected, actual);
+
+    square = b1;
+    actual = Bitboard.printBitString(square.getFile().bitBoard);
+    LOG.debug("{}\n{}", square, actual);
+    expected = "00000010.00000010.00000010.00000010.00000010.00000010.00000010.00000010";
+    assertEquals(expected, actual);
+
+    square = f7;
+    actual = Bitboard.printBitString(square.getFile().bitBoard);
+    LOG.debug("{}\n{}", square, actual);
+    expected = "00100000.00100000.00100000.00100000.00100000.00100000.00100000.00100000";
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  void getFirstSquareTest() {
+    assertEquals(a1, Square.getFirstSquare(a1.getBitBoard()));
+    assertEquals(a8, Square.getFirstSquare(a8.getBitBoard()));
+    assertEquals(h1, Square.getFirstSquare(h1.getBitBoard()));
+    assertEquals(h8, Square.getFirstSquare(h8.getBitBoard()));
+
+    assertEquals(h8, Square.getFirstSquare(h8.getBitBoard() | h1.getBitBoard()));
+    assertEquals(a8, Square.getFirstSquare(h8.getBitBoard() | a8.getBitBoard()));
+    assertEquals(g1, Square.getFirstSquare(g1.getBitBoard() | h1.getBitBoard()));
+    assertEquals(e4, Square.getFirstSquare(e4.getBitBoard() | e3.getBitBoard()));
+  }
+
+  @Test
+  void loopThroughPieces() {
+    long bitboard = new Position().getAllOccupiedBitboard();
+    Square square;
+    int counter = 0;
+    while ((square = Square.getFirstSquare(bitboard)) != NOSQUARE) {
+      LOG.debug("{}", square);
+      counter++;
+      bitboard ^= Square.getFirstSquare(bitboard).getBitBoard();
+    }
+    assertEquals(32, counter);
+  }
+
+  /**
+   * Tests basic Square operations
+   */
+  @Test
+  @Disabled
+  public void listSquareBitboards() {
+    for (Square square : validSquares) {
+      System.out.println(square);
+      System.out.println(Bitboard.toString(square.getBitBoard()));
+      System.out.println(printBitString(square.getBitBoard()));
+    }
+  }
+
+  @Test
+  void squareBitboardTest() {
+    // @formatter:off
+    long bitboard;
+    String expected, actual;
+    Square square;
+
+    square = Square.b1;
+    bitboard = square.getBitBoard();
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("Square {} Index64 {}", square, square.getIndex64());
+    LOG.debug("\n{}", actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 1 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+    assertEquals(144115188075855872L, bitboard);
+
+    square = Square.d8;
+    bitboard = square.getBitBoard();
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("Square {} Index64 {}", square, square.getIndex64());
+    LOG.debug("\n{}", actual);
+    expected =  "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    square = Square.h5;
+    bitboard = square.getBitBoard();
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("Square {} Index64 {}", square, square.getIndex64());
+    LOG.debug("\n{}", actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 1 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+    // @formatter:on
+
+  }
+
+  @Test
+  void diagonalBitboards() {
+    // @formatter:off
+    long bitboard;
+    String expected, actual;
+
+    // UP
+    bitboard = Square.a8UpDiag;
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("\n{}", actual);
+    expected =   "1 0 0 0 0 0 0 0 \n"
+               + "0 0 0 0 0 0 0 0 \n"
+               + "0 0 0 0 0 0 0 0 \n"
+               + "0 0 0 0 0 0 0 0 \n"
+               + "0 0 0 0 0 0 0 0 \n"
+               + "0 0 0 0 0 0 0 0 \n"
+               + "0 0 0 0 0 0 0 0 \n"
+               + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = Square.a1UpDiag;
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("\n{}", actual);
+    expected =    "0 0 0 0 0 0 0 1 \n"
+                + "0 0 0 0 0 0 1 0 \n"
+                + "0 0 0 0 0 1 0 0 \n"
+                + "0 0 0 0 1 0 0 0 \n"
+                + "0 0 0 1 0 0 0 0 \n"
+                + "0 0 1 0 0 0 0 0 \n"
+                + "0 1 0 0 0 0 0 0 \n"
+                + "1 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+
+    bitboard = Square.c1UpDiag;
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("\n{}", actual);
+    expected =    "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 1 \n"
+                + "0 0 0 0 0 0 1 0 \n"
+                + "0 0 0 0 0 1 0 0 \n"
+                + "0 0 0 0 1 0 0 0 \n"
+                + "0 0 0 1 0 0 0 0 \n"
+                + "0 0 1 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+
+    bitboard = Square.h1UpDiag;
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("\n{}", actual);
+    expected =    "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 1";
+    assertEquals(expected, actual);
+
+    // DOWN
+    bitboard = a8DownDiag;
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("\n{}", actual);
+    expected =    "1 0 0 0 0 0 0 0 \n"
+                + "0 1 0 0 0 0 0 0 \n"
+                + "0 0 1 0 0 0 0 0 \n"
+                + "0 0 0 1 0 0 0 0 \n"
+                + "0 0 0 0 1 0 0 0 \n"
+                + "0 0 0 0 0 1 0 0 \n"
+                + "0 0 0 0 0 0 1 0 \n"
+                + "0 0 0 0 0 0 0 1";
+    assertEquals(expected, actual);
+
+    bitboard = a1DownDiag;
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("\n{}", actual);
+    expected =    "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "1 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = c8DownDiag;
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("\n{}", actual);
+    expected =    "0 0 1 0 0 0 0 0 \n"
+                + "0 0 0 1 0 0 0 0 \n"
+                + "0 0 0 0 1 0 0 0 \n"
+                + "0 0 0 0 0 1 0 0 \n"
+                + "0 0 0 0 0 0 1 0 \n"
+                + "0 0 0 0 0 0 0 1 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = h8DownDiag;
+    actual = Bitboard.toString(bitboard);
+    LOG.debug("\n{}", actual);
+    expected =    "0 0 0 0 0 0 0 1 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0 \n"
+                + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    // @formatter:on
   }
 
   @Test
   public void diagonalBitboardTest() {
     for (Square sq : validSquares) {
       System.out.printf("%s:%n%s%non up diagonal:%n%s%ndown diagonal:%n%s%n", sq,
-                        Bitboard.toString(sq.bitBoard), Bitboard.toString(sq.getUpDiag()),
+                        Bitboard.toString(sq.getBitBoard()), Bitboard.toString(sq.getUpDiag()),
                         Bitboard.toString(sq.getDownDiag()));
     }
     System.out.println();
@@ -216,39 +494,6 @@ public class SquareTest {
                       b7.getDownDiag() == a6UpDiag ? "TRUE" : "FALSE");
     assertNotEquals(b7.getDownDiag(), a6DownDiag);
 
-  }
-
-  @Test
-  void fileBitBoard() {
-    System.out.println(File.a.bitBoard);
-    System.out.println(Bitboard.toString(File.a.bitBoard));
-    assertEquals(72340172838076673L, File.a.bitBoard);
-    System.out.println(File.e.bitBoard);
-    System.out.println(Bitboard.toString(File.e.bitBoard));
-    assertEquals(1157442765409226768L, File.e.bitBoard);
-    System.out.println(File.h.bitBoard);
-    System.out.println(Bitboard.toString(File.h.bitBoard));
-    assertEquals(-9187201950435737472L, File.h.bitBoard);
-    System.out.println(File.NOFILE.bitBoard);
-    System.out.println(Bitboard.toString(File.NOFILE.bitBoard));
-    assertEquals(0, File.NOFILE.bitBoard);
-
-  }
-
-  @Test
-  void rankBitBoard() {
-    System.out.println(Rank.r1.bitBoard);
-    System.out.println(Bitboard.toString(Rank.r1.bitBoard));
-    assertEquals(255L, Rank.r1.bitBoard);
-    System.out.println(Rank.r4.bitBoard);
-    System.out.println(Bitboard.toString(Rank.r4.bitBoard));
-    assertEquals(4278190080L, Rank.r4.bitBoard);
-    System.out.println(Rank.r8.bitBoard);
-    System.out.println(Bitboard.toString(Rank.r8.bitBoard));
-    assertEquals(-72057594037927936L, Rank.r8.bitBoard);
-    System.out.println(Rank.NORANK.bitBoard);
-    System.out.println(Bitboard.toString(Rank.NORANK.bitBoard));
-    assertEquals(0, Rank.NORANK.bitBoard);
   }
 
 }

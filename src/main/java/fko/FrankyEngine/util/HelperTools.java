@@ -35,55 +35,71 @@ import java.util.Locale;
  */
 public final class HelperTools {
 
-    private final static Format digitFormat = new DecimalFormat("00");
-    private final static Format milliFormat = new DecimalFormat("000");
+  private final static Format digitFormat = new DecimalFormat("00");
+  private final static Format milliFormat = new DecimalFormat("000");
 
-    private HelperTools() {}
+  private HelperTools() {}
 
-    /**
-     * get a MByte String from a byte input
-     * @param digit
-     * @return String
-     */
-    public static String getDigit(long digit) {
-        Locale.setDefault(new Locale("de", "DE"));
-        NumberFormat f = NumberFormat.getInstance();
-        if (f instanceof DecimalFormat) {
-            f.setMaximumFractionDigits(1);
-        }
-        return f.format(digit);
+  /**
+   * get a MByte String from a byte input
+   * @param digit
+   * @return String
+   */
+  public static String getDigit(long digit) {
+    Locale.setDefault(new Locale("de", "DE"));
+    NumberFormat f = NumberFormat.getInstance();
+    if (f instanceof DecimalFormat) {
+      f.setMaximumFractionDigits(1);
     }
+    return f.format(digit);
+  }
 
-    /**
-     * get a MByte String from a byte input
-     * @param bytes
-     * @return String
-     */
-    public static String getMBytes(long bytes) {
-        double d = (Long.valueOf(bytes)).doubleValue() / (1024.0 * 1024.0);
-        NumberFormat f = NumberFormat.getInstance();
-        if (f instanceof DecimalFormat) {
-            f.setMaximumFractionDigits(1);
-        }
-        return f.format(d);
+  /**
+   * get a MByte String from a byte input
+   * @param bytes
+   * @return String
+   */
+  public static String getMBytes(long bytes) {
+    double d = (Long.valueOf(bytes)).doubleValue() / (1024.0 * 1024.0);
+    NumberFormat f = NumberFormat.getInstance();
+    if (f instanceof DecimalFormat) {
+      f.setMaximumFractionDigits(1);
     }
+    return f.format(d);
+  }
 
-    /**
-     * format a given time into 00:00:00
-     * @param time
-     * @param milliseconds
-     * @return formatted string
-     */
-    public static String formatTime(long time, boolean milliseconds) {
-        StringBuilder sb = new StringBuilder(digitFormat.format((time / 1000 / 60 / 60)));
-        sb.append(':');
-        sb.append(digitFormat.format((time / 1000 / 60) % 60));
-        sb.append(':');
-        sb.append(digitFormat.format((time / 1000) % 60));
-        if (milliseconds) {
-            sb.append('.');
-            sb.append(milliFormat.format(time % 1000));
-        }
-        return sb.toString();
+  /**
+   * format a given time into 00:00:00
+   * @param time
+   * @param milliseconds
+   * @return formatted string
+   */
+  public static String formatTime(long time, boolean milliseconds) {
+    StringBuilder sb = new StringBuilder(digitFormat.format((time / 1000 / 60 / 60)));
+    sb.append(':');
+    sb.append(digitFormat.format((time / 1000 / 60) % 60));
+    sb.append(':');
+    sb.append(digitFormat.format((time / 1000) % 60));
+    if (milliseconds) {
+      sb.append('.');
+      sb.append(milliFormat.format(time % 1000));
     }
+    return sb.toString();
+  }
+
+  public static String insertPeriodically(String text, String insert, int period) {
+    StringBuilder builder =
+      new StringBuilder(text.length() + insert.length() * (text.length() / period) + 1);
+    int index = 0;
+    String prefix = "";
+    while (index < text.length()) {
+      // Don't put the insert in the very first iteration.
+      // This is easier than appending it *after* each substring
+      builder.append(prefix);
+      prefix = insert;
+      builder.append(text.substring(index, Math.min(index + period, text.length())));
+      index += period;
+    }
+    return builder.toString();
+  }
 }
