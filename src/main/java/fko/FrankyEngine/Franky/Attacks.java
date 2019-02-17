@@ -56,8 +56,10 @@ public class Attacks {
   }
 
   public void computeAttacks(Position position) {
-    //if (this.position != null && this.position.getZobristKey() == position.getZobristKey())
-    // return;
+    // if we already computed this position we can simply return
+    if (this.position != null && this.position.getZobristKey() == position.getZobristKey()) return;
+
+    // new position - reset values and start
     resetAttacks();
     this.position = position;
 

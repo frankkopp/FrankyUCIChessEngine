@@ -302,6 +302,7 @@ public class EvaluationTest {
       do {
         ITERATIONS++;
         // ### TEST CODE
+        //testCode();
         test3(position);
         // ### /TEST CODE
       } while (Duration.between(start, Instant.now()).getSeconds() < DURATION);
