@@ -265,16 +265,6 @@ class BitboardTest {
     }
   }
 
-  //  @Test
-  //  public void directions() {
-  //    for (Square from : validSquares) {
-  //      for (Square to : validSquares) {
-  //        System.out.printf("From: %s To: %s = %s%n", from, to,
-  //                          Bitboard.direction[from.getIndex64()][to.getIndex64()]);
-  //      }
-  //    }
-  //  }
-
   @Test
   public void intermediates() {
     for (Square from : validSquares) {

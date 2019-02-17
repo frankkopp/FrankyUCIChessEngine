@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -43,6 +45,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class EvaluationTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(EvaluationTest.class);
+
+  private static final int WHITE = Color.WHITE.ordinal();
+  private static final int BLACK = Color.BLACK.ordinal();
 
   private String fenStandard;
 
@@ -181,7 +186,7 @@ public class EvaluationTest {
 
     // white gives check to black
     position = new Position("r2R3k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2K5 b - - 0 1");
-    assertEquals(-293, evaluation.evaluate(position));
+    assertEquals(-234, evaluation.evaluate(position));
     LOG.info(evaluation.toString());
 
     // black gives check to white
@@ -221,32 +226,32 @@ public class EvaluationTest {
     LOG.info(evaluation.toString());
   }
 
- @Test
- public void testPositionValue() {
-   position = new Position();
-   int move;
+  @Test
+  public void testPositionValue() {
+    position = new Position();
+    int move;
 
-   move = Move.fromSANNotation(position, "e4");
-   assertEquals(25, Evaluation.getPositionValue(position, move));
+    move = Move.fromSANNotation(position, "e4");
+    assertEquals(25, Evaluation.getPositionValue(position, move));
 
-   move = Move.fromSANNotation(position, "c3");
-   assertEquals(-10, Evaluation.getPositionValue(position, move));
+    move = Move.fromSANNotation(position, "c3");
+    assertEquals(-10, Evaluation.getPositionValue(position, move));
 
-   move = Move.fromSANNotation(position, "Na3");
-   assertEquals(-30, Evaluation.getPositionValue(position, move));
+    move = Move.fromSANNotation(position, "Na3");
+    assertEquals(-30, Evaluation.getPositionValue(position, move));
 
-   position = new Position("r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq -");
+    position = new Position("r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq -");
 
-   move = Move.fromSANNotation(position, "a6");
-   assertEquals(5, Evaluation.getPositionValue(position, move));
+    move = Move.fromSANNotation(position, "a6");
+    assertEquals(5, Evaluation.getPositionValue(position, move));
 
-   move = Move.fromSANNotation(position, "Qh4");
-   assertEquals(-5, Evaluation.getPositionValue(position, move));
+    move = Move.fromSANNotation(position, "Qh4");
+    assertEquals(-5, Evaluation.getPositionValue(position, move));
 
-   move = Move.fromSANNotation(position, "Ke7");
-   assertEquals(-20, Evaluation.getPositionValue(position, move));
+    move = Move.fromSANNotation(position, "Ke7");
+    assertEquals(-20, Evaluation.getPositionValue(position, move));
 
- }
+  }
 
   @Test
   void pawnStructure() {
@@ -277,12 +282,11 @@ public class EvaluationTest {
 
   @Test
   @Disabled
-  public void testTiming() {
+  public void testAbsoluteTiming() {
 
     int ROUNDS = 10;
-    int DURATION = 3;
-
-    int ITERATIONS = 0;
+    int DURATION = 30;
+    int ITERATIONS;
 
     Instant start;
 
@@ -298,7 +302,7 @@ public class EvaluationTest {
       do {
         ITERATIONS++;
         // ### TEST CODE
-        testCode();
+        test3(position);
         // ### /TEST CODE
       } while (Duration.between(start, Instant.now()).getSeconds() < DURATION);
       System.out.println(String.format("Timing: %,7d runs/s", ITERATIONS / DURATION));
@@ -310,5 +314,152 @@ public class EvaluationTest {
     evaluation.evaluate(position);
   }
 
+  @Test
+  @Disabled
+  public void testTiming() {
+
+    ArrayList<String> result = new ArrayList<>();
+
+    int ROUNDS = 5;
+    int ITERATIONS = 10;
+    int REPETITIONS = 1_000_000;
+
+    final Position position = new Position(
+      "1qr1r1k1/5pp1/1p2p2p/1Qbn3b/2R5/3P1NPP/3NPPB1/1R4K1 w - -");
+
+    for (int round = 1; round <= ROUNDS; round++) {
+      long start, end, sum, i;
+
+      System.out.printf("Running round %d of Timing%n", round);
+
+      System.gc();
+      i = 0;
+      sum = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          test1(position);
+        }
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg1 = ((float) sum / ITERATIONS) / 1e9f;
+      result.add(String.format("Round %d Test 1 avg: %,.3f sec for %,d repetitions", round, avg1,
+                               REPETITIONS));
+
+      System.gc();
+      i = 0;
+      sum = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          test2(position);
+        }
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg2 = ((float) sum / ITERATIONS) / 1e9f;
+
+      result.add(String.format("Round %d Test 2 avg: %,.3f sec for %,d repetitions", round, avg2,
+                               REPETITIONS));
+
+      System.gc();
+      i = 0;
+      sum = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          test3(position);
+        }
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg3 = ((float) sum / ITERATIONS) / 1e9f;
+
+      result.add(String.format("Round %d Test 3 avg: %,.3f sec for %,d repetitions", round, avg3,
+                               REPETITIONS));
+    }
+
+    System.out.println();
+    for (String s : result) {
+      System.out.println(s);
+    }
+  }
+
+  Attacks attacks = new Attacks();
+
+  private void test1(final Position position) {
+    int m = 0;
+    List<Square> validSquares = Square.validSquares;
+    for (int i = 0, validSquaresSize = validSquares.size(); i < validSquaresSize; i++) {
+      Square sq = validSquares.get(i);
+      Piece pc = position.getPiece(sq);
+      if (pc.getColor().isBlack()) continue;
+      switch (pc.getType()) {
+        case NOTYPE:
+          break;
+        case PAWN:
+          break;
+        case KNIGHT:
+          m += Evaluation.mobilityForPiece(PieceType.KNIGHT, sq, Square.knightDirections, position);
+          break;
+        case BISHOP:
+          m += Evaluation.mobilityForPiece(PieceType.BISHOP, sq, Square.bishopDirections, position);
+          break;
+        case ROOK:
+          m += Evaluation.mobilityForPiece(PieceType.ROOK, sq, Square.rookDirections, position);
+          break;
+        case QUEEN:
+          m += Evaluation.mobilityForPiece(PieceType.QUEEN, sq, Square.queenDirections, position);
+          break;
+        case KING:
+          break;
+        default:
+          break;
+      }
+    }
+    //    System.out.println("Mob1=" + m);
+  }
+
+  private void test2(final Position position) {
+    int m = 0;
+    List<Square> validSquares = Square.validSquares;
+    for (int i = 0, validSquaresSize = validSquares.size(); i < validSquaresSize; i++) {
+      Square sq = validSquares.get(i);
+      Piece pc = position.getPiece(sq);
+      if (pc.getColor().isBlack()) continue;
+      switch (pc.getType()) {
+        case NOTYPE:
+          break;
+        case PAWN:
+          break;
+        case KNIGHT:
+          m += Evaluation.mobilityForPiece2(PieceType.KNIGHT, sq, Square.knightDirections,
+                                            position);
+          break;
+        case BISHOP:
+          m += Evaluation.mobilityForPiece2(PieceType.BISHOP, sq, Square.bishopDirections,
+                                            position);
+          break;
+        case ROOK:
+          m += Evaluation.mobilityForPiece2(PieceType.ROOK, sq, Square.rookDirections, position);
+          break;
+        case QUEEN:
+          m += Evaluation.mobilityForPiece2(PieceType.QUEEN, sq, Square.queenDirections, position);
+          break;
+        case KING:
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  private void test3(final Position position) {
+    int m;
+    attacks.computeAttacks(position);
+    m = attacks.mobility[WHITE];
+    //    System.out.println("Mob3=" + m);
+  }
 
 }

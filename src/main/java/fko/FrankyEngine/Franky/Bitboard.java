@@ -254,8 +254,8 @@ public class Bitboard {
   private static long rotate(long bitboard, int[] rotMap) {
     long rotated = 0L;
     for (int i = 0; i < 64; i++) {
-      Square oldSquare = index64Map[rotMap[i]];
-      Square newSquare = index64Map[i];
+      final Square oldSquare = index64Map[rotMap[i]];
+      final Square newSquare = index64Map[i];
 
       //      System.out.printf("Square %s (%2d) bitboard        %s%n",
       //                        oldSquare, rotMap[i], Bitboard.printBitString(bitboard));
@@ -354,10 +354,14 @@ public class Bitboard {
    * Bitboards for all possible horizontal moves on the rank of the square with
    * the rank content (blocking pieces) determined from the given pieces bitboard.
    */
-  public static long getSlidingMovesRank(Square square, long occupiedBitboard) {
+  public static long getSlidingMovesRank(Square square, long content) {
+    // content = the pieces currently on the board and maybe blocking the moves
     final Rank rank = square.getRank();
-    final long piecesOnRank = rank.bitBoard & occupiedBitboard;
-    final long pieceBitmap = piecesOnRank >>> ((7 - rank.ordinal()) * 8);
+    // no rotation necessary for ranks - their squares are already in a row
+    // shift to the first byte (to the right in Java)
+    final long pieceBitmap = content >>> ((7 - rank.ordinal()) * 8);
+    // retrieve all possible moves for this square with the current content
+    // and mask with the first row to erase any other pieces
     return movesRank[square.getIndex64()][(int) pieceBitmap & 255];
   }
   static final long[][] movesRank = new long[64][256];
@@ -366,14 +370,17 @@ public class Bitboard {
    * Bitboards for all possible horizontal moves on the rank of the square with
    * the rank content (blocking pieces) determined from the given pieces bitboard.
    */
-  public static long getSlidingMovesFile(Square square, long occupiedBitboard) {
+  public static long getSlidingMovesFile(Square square, long content) {
+    // content = the pieces currently on the board and maybe blocking the moves
+    // rotate the content of the board to get all file squares in a row
     final File file = square.getFile();
-    final long piecesOnFile = file.bitBoard & occupiedBitboard;
-    long rotateL90 = rotateR90(piecesOnFile);
+    final long rotateL90 = rotateR90(content);
+    // shift to the first byte (to the right in Java)
     final long pieceBitmap = (int) ((rotateL90 >>> (((file.ordinal()) * 8))));
+    // retrieve all possible moves for this square with the current content
+    // and mask with the first row to erase any other pieces not erased by shift
     return movesFile[square.getIndex64()][(int) pieceBitmap & 255];
   }
-
   static final long[][] movesFile = new long[64][256];
 
   /**
@@ -381,22 +388,18 @@ public class Bitboard {
    * the rank content (blocking pieces) determined from the given pieces bitboard.
    */
   public static long getSlidingMovesDiagUp(Square square, long content) {
-    System.out.printf("Content: %s%n", Bitboard.printBitString(content));
-
+    //    System.out.printf("Content: %s%n", Bitboard.printBitString(content));
     // content = the pieces currently on the board and maybe blocking the moves
     // rotate the content of the board to get all diagonals in a row
     final long rotated = rotateR45(content);
-    System.out.printf("Rotated: %s%n", Bitboard.printBitString(rotated));
-
+    //    System.out.printf("Rotated: %s%n", Bitboard.printBitString(rotated));
     // shift the correct row to the first byte (to the right in Java)
     final long shifted = rotated >>> getShiftUp(square);
-    System.out.printf("Shifted: %s%n", Bitboard.printBitString(shifted));
-
+    //    System.out.printf("Shifted: %s%n", Bitboard.printBitString(shifted));
     // mask the content with the length of the diagonal to erase any other pieces
     // which have not been erased by the shift
     final long contentReMasked = shifted & getLengthMaskUp(square);
-    System.out.printf("Masked : %s%n", Bitboard.printBitString(contentReMasked));
-
+    //    System.out.printf("Masked : %s%n", Bitboard.printBitString(contentReMasked));
     // retrieve all possible moves for this square with the current content
     return movesUpDiag[square.getIndex64()][(int) contentReMasked];
   }
@@ -408,22 +411,18 @@ public class Bitboard {
    * the rank content (blocking pieces) determined from the given pieces bitboard.
    */
   public static long getSlidingMovesDiagDown(Square square, long content) {
-    System.out.printf("Content: %s%n", Bitboard.printBitString(content));
-
+    //    System.out.printf("Content: %s%n", Bitboard.printBitString(content));
     // content = the pieces currently on the board and maybe blocking the moves
     // rotate the content of the board to get all diagonals in a row
     final long rotated = rotateL45(content);
-    System.out.printf("Rotated: %s%n", Bitboard.printBitString(rotated));
-
+    //    System.out.printf("Rotated: %s%n", Bitboard.printBitString(rotated));
     // shift the correct row to the first byte (to the right in Java)
     final long shifted = rotated >>> getShiftDown(square);
-    System.out.printf("Shifted: %s%n", Bitboard.printBitString(shifted));
-
+    //    System.out.printf("Shifted: %s%n", Bitboard.printBitString(shifted));
     // mask the content with the length of the diagonal to erase any other pieces
     // which have not been erased by the shift
     final long contentReMasked = shifted & getLengthMaskDown(square);
-    System.out.printf("Masked : %s%n", Bitboard.printBitString(contentReMasked));
-
+    //    System.out.printf("Masked : %s%n", Bitboard.printBitString(contentReMasked));
     // retrieve all possible moves for this square with the current content
     return movesDownDiag[square.getIndex64()][(int) contentReMasked];
   }
@@ -433,7 +432,8 @@ public class Bitboard {
   static {
 
     // Pre compute all attack bitboards for all squares
-    //.parallelStream() // does not work in static initializer deadlock (Java Issue)
+    // .parallelStream() // does not work in static initializer deadlock (Java Issue)
+
     // white pawn attacks - ignore that pawns can'*t be on all squares
     validSquares.forEach(square -> {
       for (int d : pawnAttackDirections) {
@@ -536,8 +536,8 @@ public class Bitboard {
     });
     // queen attacks
     validSquares.forEach(square -> {
-      queenAttacks[square.getIndex64()] =
-        rookAttacks[square.getIndex64()] | bishopAttacks[square.getIndex64()];
+      queenAttacks[square.getIndex64()] = rookAttacks[square.getIndex64()]
+        | bishopAttacks[square.getIndex64()];
     });
     // king attacks
     validSquares.forEach(square -> {
@@ -555,10 +555,14 @@ public class Bitboard {
       passedPawnMask[WHITE][square.getIndex64()] |= rays[NORTH][squareIdx];
       final int file = square.getFile().ordinal();
       final int rank = square.getRank().ordinal();
-      if (file > 0 && rank < 7) passedPawnMask[WHITE][square.getIndex64()] |=
-        rays[NORTH][square.getWest().getNorth().getIndex64()];
-      if (file < 7 && rank < 7) passedPawnMask[WHITE][square.getIndex64()] |=
-        rays[NORTH][square.getEast().getNorth().getIndex64()];
+      if (file > 0 && rank < 7)
+        passedPawnMask[WHITE][square.getIndex64()] |= rays[NORTH][square.getWest()
+                                                                        .getNorth()
+                                                                        .getIndex64()];
+      if (file < 7 && rank < 7)
+        passedPawnMask[WHITE][square.getIndex64()] |= rays[NORTH][square.getEast()
+                                                                        .getNorth()
+                                                                        .getIndex64()];
     });
     // black pawn - ignore that pawns can'*t be on all squares
     validSquares.forEach(square -> {
@@ -566,13 +570,17 @@ public class Bitboard {
       passedPawnMask[BLACK][square.getIndex64()] |= rays[SOUTH][squareIdx];
       final int file = square.getFile().ordinal();
       final int rank = square.getRank().ordinal();
-      if (file > 0 && rank > 0) passedPawnMask[BLACK][square.getIndex64()] |=
-        rays[SOUTH][square.getWest().getSouth().getIndex64()];
-      if (file < 7 && rank > 0) passedPawnMask[BLACK][square.getIndex64()] |=
-        rays[SOUTH][square.getEast().getSouth().getIndex64()];
+      if (file > 0 && rank > 0)
+        passedPawnMask[BLACK][square.getIndex64()] |= rays[SOUTH][square.getWest()
+                                                                        .getSouth()
+                                                                        .getIndex64()];
+      if (file < 7 && rank > 0)
+        passedPawnMask[BLACK][square.getIndex64()] |= rays[SOUTH][square.getEast()
+                                                                        .getSouth()
+                                                                        .getIndex64()];
     });
 
-    // directions and intermediate
+    // intermediate
     for (Square from : validSquares) {
       for (Square to : validSquares) {
         boolean found = false;
@@ -581,7 +589,6 @@ public class Bitboard {
           while ((t & 0x88) == 0) { // slide while valid square
             Square square = getSquare(t);
             if (square == to) {
-              //              direction[from.getIndex64()][to.getIndex64()] = d;
               found = true;
               break;
             }
@@ -713,8 +720,10 @@ public class Bitboard {
         //        long output = movesDownDiag[i][j];
         //        String bitString = printBitString(j);
         //        Square square = index64Map[i];
-        //        System.out.printf(">Square %s: Length: %d movesUpDiag[ %2d ][ %8s ] = %s (%d)%n", square,
-        //                          dl, square.getIndex64(), bitString.substring(bitString.length() - 8),
+        //        System.out.printf(">Square %s: Length: %d movesUpDiag[ %2d ][ %8s ] = %s (%d)
+        //        %n", square,
+        //                          dl, square.getIndex64(), bitString.substring(bitString.length
+        //                          () - 8),
         //                          Bitboard.printBitString(output), output);
       }
       //      System.out.println();
