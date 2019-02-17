@@ -849,10 +849,11 @@ public class PositionTest {
   }
 
   @Test
+  @Disabled
   void bitBoardsAttacksDev() {
 
-    System.out.println(Bitboard.printBitString(Square.a1.bitBoard));
-    System.out.println(Bitboard.printBitString(Square.h8.bitBoard));
+    System.out.println(Bitboard.printBitString(Square.a1.getBitBoard()));
+    System.out.println(Bitboard.printBitString(Square.h8.getBitBoard()));
 
     String testFen = "rnbqkb2/1ppppp1r/6p1/p7/1PP1Q1np/8/P1NPPPPP/1RB1KBNR b Kq -";
     Position position = new Position(testFen);
@@ -863,7 +864,7 @@ public class PositionTest {
     long blackPieces = position.getOccupiedBitboards(Color.BLACK);
 
     Square queenSquare = Square.e4;
-    int queenSquareIdx = queenSquare.index64;
+    int queenSquareIdx = queenSquare.getIndex64();
 
     long queenRays = Bitboard.queenAttacks[queenSquareIdx];
     System.out.println("All Queen rays");
@@ -902,22 +903,17 @@ public class PositionTest {
 
       long firstRayHit;
       int hitIdx;
-      if (d <= 3) {
-        firstRayHit = Long.lowestOneBit(rayHits);
-        hitIdx = Long.numberOfTrailingZeros(firstRayHit);
-      }
-      else {
-        firstRayHit = Long.highestOneBit(rayHits);
-        hitIdx = Long.numberOfLeadingZeros(firstRayHit);
-      }
-      Square hitSquare = Square.bitCountMap[hitIdx];
+      if (d <= 3) firstRayHit = Long.lowestOneBit(rayHits);
+      else firstRayHit = Long.highestOneBit(rayHits);
+      // DEBUG
+      Square hitSquare = Square.getFirstSquare(firstRayHit);
 
       System.out.println("Ray hits first piece");
       System.out.println(Bitboard.toString(firstRayHit));
       System.out.println(Bitboard.printBitString(firstRayHit));
       System.out.println();
 
-      long blockerRay = Bitboard.rays[d][hitSquare.index64];
+      long blockerRay = Bitboard.rays[d][hitSquare.getIndex64()];
       long rayAttacks = ray ^ blockerRay;
       System.out.println("Ray attacks from " + queenSquare + " blocked on " + hitSquare);
       System.out.println(Bitboard.toString(rayAttacks));
@@ -976,14 +972,18 @@ public class PositionTest {
 
   private long getSlidingAttacks(Position position, Square square, int[] rays) {
     long attacks = 0L;
+    int sIdx = square.getIndex64();
     for (int d : rays) {
-      long rayHits = (Bitboard.rays[d][square.index64] & position.getAllOccupiedBitboard());
-      if (rayHits == 0) continue;
-      int hitIdx;
-      if (d <= 3) hitIdx = Long.numberOfTrailingZeros(Long.lowestOneBit(rayHits));
-      else hitIdx = Long.numberOfTrailingZeros(Long.highestOneBit(rayHits));
-      attacks |=
-        Bitboard.rays[d][square.index64] ^ Bitboard.rays[d][Square.bitCountMap[hitIdx].index64];
+      long rayHits = (Bitboard.rays[d][sIdx] & position.getAllOccupiedBitboard());
+      if (rayHits == 0) attacks |= Bitboard.rays[d][sIdx];
+      else {
+        long hitSquare;
+        if (d <= 3) hitSquare = Long.numberOfTrailingZeros(Long.lowestOneBit(rayHits));
+        else hitSquare = Long.numberOfTrailingZeros(Long.highestOneBit(rayHits));
+        // TODO TEST & DEBUG
+        attacks |=
+          Bitboard.rays[d][sIdx] ^ Bitboard.rays[d][Square.getFirstSquare(hitSquare).getIndex64()];
+      }
     }
     return attacks;
   }
