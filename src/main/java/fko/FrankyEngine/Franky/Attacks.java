@@ -95,11 +95,9 @@ public class Attacks {
       // rooks and queens
       final long rqMoves = Bitboard.getSlidingMovesRank(square, allOccupiedBitboard)
                            | Bitboard.getSlidingMovesFile(square, allOccupiedBitboard);
-
       attacksTo[WHITE][sIdx] |= rqMoves &
                                  (whitePieces[PieceType.ROOK.ordinal()]
                                   | whitePieces[PieceType.QUEEN.ordinal()]);
-
       attacksTo[BLACK][sIdx] |= rqMoves &
                                  (blackPieces[PieceType.ROOK.ordinal()]
                                   | blackPieces[PieceType.QUEEN.ordinal()]);
@@ -107,16 +105,13 @@ public class Attacks {
       // bishop and queens
       final long bqMoves = Bitboard.getSlidingMovesDiagUp(square, allOccupiedBitboard)
                       | Bitboard.getSlidingMovesDiagDown(square, allOccupiedBitboard);
-
       attacksTo[WHITE][sIdx] |= bqMoves & (whitePieces[PieceType.BISHOP.ordinal()]
                                 | whitePieces[PieceType.QUEEN.ordinal()]);
-
       attacksTo[BLACK][sIdx] |= bqMoves & (blackPieces[PieceType.BISHOP.ordinal()]
                                 | blackPieces[PieceType.QUEEN.ordinal()]);
 
-//      System.out.println("Black Attacks\n" + Bitboard.toString(attacksTo[BLACK][sIdx]));
-//      System.out.println("White Attacks\n" + Bitboard.toString(attacksTo[WHITE][sIdx]));
-
+      // System.out.println("Black Attacks\n" + Bitboard.toString(attacksTo[BLACK][sIdx]));
+      // System.out.println("White Attacks\n" + Bitboard.toString(attacksTo[WHITE][sIdx]));
       // @formatter:on
 
       // skip rest if there is no piece on square
@@ -169,19 +164,20 @@ public class Attacks {
       }
     }
 
+    // pre-compute if position has check
     hasCheck = (allAttacks[position.getOpponent().ordinal()] & position.getPiecesBitboards(
       position.getNextPlayer().ordinal(), PieceType.KING)) != 0;
   }
 
   public boolean isAttacked(Square square) {
     checkPosition();
-
+    // TODO
     return false;
   }
 
   public boolean isAttackedBy(Color attacker, Square square) {
     checkPosition();
-
+    // TODO
     return false;
   }
 
@@ -202,5 +198,4 @@ public class Attacks {
       throw e;
     }
   }
-
 }

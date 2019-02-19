@@ -161,6 +161,7 @@ public class Bitboard {
     62,	54,	46,	38,	30,	22,	14,	6,
     63,	55,	47,	39,	31,	23,	15,	7
   };
+  private static int[] indexR90 = new int[64];
 
   private static int[] rotateL90 = new int[] {
     7, 15,	23,	31,	39,	47,	55,	63,
@@ -172,6 +173,7 @@ public class Bitboard {
     1,  9,	17,	25,	33,	41,	49,	57,
     0,  8,	16,	24,	32,	40,	48,	56
   };
+  private static int[] indexL90 = new int[64];
 
   private static int[] rotateR45 = new int[] {
      0,
@@ -190,6 +192,7 @@ public class Bitboard {
     62,	55,
     63
   };
+  private static int[] indexR45 = new int[64];
 
   private static int[] rotateL45 = new int[] {
      7,
@@ -208,8 +211,18 @@ public class Bitboard {
     48,	55,
     56
   };
-
+  private static int[] indexL45 = new int[64];
   // @formatter:on
+
+  // Reverse index to quickly calculate the index of a square in the rotated board
+  static {
+    for (int i = 0; i < 64; i++) {
+      indexR90[rotateR90[i]] = i;
+      indexL90[rotateL90[i]] = i;
+      indexR45[rotateR45[i]] = i;
+      indexL45[rotateL45[i]] = i;
+    }
+  }
 
   /**
    * Generates a clockwise 90° rotated bitboard
@@ -218,7 +231,7 @@ public class Bitboard {
    * @return clockwise 90° rotated bitboard
    */
   public static long rotateR90(long bitboard) {
-    return rotate(bitboard, Bitboard.rotateR90);
+    return rotate(bitboard, rotateR90);
   }
 
   /**
@@ -254,23 +267,60 @@ public class Bitboard {
   private static long rotate(long bitboard, int[] rotMap) {
     long rotated = 0L;
     for (int i = 0; i < 64; i++) {
-      final Square oldSquare = index64Map[rotMap[i]];
-      final Square newSquare = index64Map[i];
-
-      //      System.out.printf("Square %s (%2d) bitboard        %s%n",
-      //                        oldSquare, rotMap[i], Bitboard.printBitString(bitboard));
-      //      System.out.printf("Square %s (%2d) becomes %s (%2d) %s%n",
-      //                        oldSquare, rotMap[i], newSquare, i,
-      //                        Bitboard.printBitString(oldSquare.getBitBoard()));
-
-      if ((bitboard & oldSquare.getBitBoard()) != 0) {
-        rotated |= newSquare.getBitBoard();
-        //        System.out.printf("Bit on %2d goes to %2d           %s%n",
-        //                          i, rotMap[i], Bitboard.printBitString(rotated));
-      }
-      //      System.out.println();
+      if ((bitboard & index64Map[rotMap[i]].getBitBoard()) != 0)
+        rotated |= index64Map[i].getBitBoard();
     }
     return rotated;
+  }
+
+  /**
+   * Returns the clockwise 90° rotated index of a bitboard entry
+   *
+   * @param index64
+   * @return clockwise 90° rotated index
+   */
+  public static int rotateIndexR90(int index64) {
+    return rotateIndex(index64, indexR90);
+  }
+
+  /**
+   * Returns the counter-clockwise 90° rotated index of a bitboard entry
+   *
+   * @param index64
+   * @return counter clockwise 90° rotated index
+   */
+  public static int rotateIndexL90(int index64) {
+    return rotateIndex(index64, indexL90);
+  }
+
+  /**
+   * Generates a clockwise 45° rotated index
+   *
+   * @param index64
+   * @return clockwise 45° rotated index
+   */
+  public static int rotateIndexR45(int index64) {
+    return rotateIndex(index64, indexR45);
+  }
+
+  /**
+   * Generates a counter clockwise 45° rotated index
+   *
+   * @param index64
+   * @return counter clockwise 45° rotated index
+   */
+  public static int rotateIndexL45(int index64) {
+    return rotateIndex(index64, indexL45);
+  }
+
+  /**
+   * Returns the index of a bit in the rotated bitboard
+   * @param index64
+   * @param rotMap
+   * @return
+   */
+  private static int rotateIndex(int index64, int[] rotMap) {
+    return rotMap[index64];
   }
 
   /* These store the number of bits rotated bitboards need to be shifted to extract

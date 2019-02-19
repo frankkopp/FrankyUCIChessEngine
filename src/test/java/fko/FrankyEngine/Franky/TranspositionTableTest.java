@@ -182,7 +182,7 @@ public class TranspositionTableTest {
     engine = new FrankyEngine();
     search = ((FrankyEngine) engine).getSearch();
 
-    final int depth = 8;
+    final int depth = 6;
 
     LOG.info("Start COLLISION Test for depth {}", depth);
 

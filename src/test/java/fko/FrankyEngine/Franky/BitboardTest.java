@@ -710,6 +710,211 @@ class BitboardTest {
   }
 
   @Test
+  void rotateIndexR90() { // @formatter:off
+    Square square, newSquare;
+    String actual, expected;
+
+    square = a1;
+    expected =  "1 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    LOG.debug("{}", String.format("%s:%n%s%n", square, Bitboard.toString(square.getBitBoard())));
+    newSquare = Square.index64Map[Bitboard.rotateIndexR90(square.getIndex64())];
+    LOG.debug("{}", String.format("Rotated: %n%s%n", Bitboard.toString(newSquare.getBitBoard())));
+    actual = Bitboard.toString(newSquare.getBitBoard());
+    assertEquals(expected, actual);
+
+    square = h1;
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "1 0 0 0 0 0 0 0";
+    LOG.debug("{}", String.format("%s:%n%s%n", square, Bitboard.toString(square.getBitBoard())));
+    newSquare = Square.index64Map[Bitboard.rotateIndexR90(square.getIndex64())];
+    LOG.debug("{}", String.format("Rotated: %n%s%n", Bitboard.toString(newSquare.getBitBoard())));
+    actual = Bitboard.toString(newSquare.getBitBoard());
+    assertEquals(expected, actual);
+
+    square = g7;
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 1 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    LOG.debug("{}", String.format("%s:%n%s%n", square, Bitboard.toString(square.getBitBoard())));
+    newSquare = Square.index64Map[Bitboard.rotateIndexR90(square.getIndex64())];
+    LOG.debug("{}", String.format("Rotated: %n%s%n", Bitboard.toString(newSquare.getBitBoard())));
+    actual = Bitboard.toString(newSquare.getBitBoard());
+    assertEquals(expected, actual);
+  } // @formatter:on
+
+  @Test
+  void rotateIndexL90() { // @formatter:off
+    Square square, newSquare;
+    String actual, expected;
+
+    square = a1;
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 1";
+    LOG.debug("{}", String.format("%s:%n%s%n", square, Bitboard.toString(square.getBitBoard())));
+    newSquare = Square.index64Map[Bitboard.rotateIndexL90(square.getIndex64())];
+    LOG.debug("{}", String.format("Rotated: %n%s%n", Bitboard.toString(newSquare.getBitBoard())));
+    actual = Bitboard.toString(newSquare.getBitBoard());
+    assertEquals(expected, actual);
+
+    square = h1;
+    expected =  "0 0 0 0 0 0 0 1 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    LOG.debug("{}", String.format("%s:%n%s%n", square, Bitboard.toString(square.getBitBoard())));
+    newSquare = Square.index64Map[Bitboard.rotateIndexL90(square.getIndex64())];
+    LOG.debug("{}", String.format("Rotated: %n%s%n", Bitboard.toString(newSquare.getBitBoard())));
+    actual = Bitboard.toString(newSquare.getBitBoard());
+    assertEquals(expected, actual);
+
+    square = g7;
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 1 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    LOG.debug("{}", String.format("%s:%n%s%n", square, Bitboard.toString(square.getBitBoard())));
+    newSquare = Square.index64Map[Bitboard.rotateIndexL90(square.getIndex64())];
+    LOG.debug("{}", String.format("Rotated: %n%s%n", Bitboard.toString(newSquare.getBitBoard())));
+    actual = Bitboard.toString(newSquare.getBitBoard());
+    assertEquals(expected, actual);
+  } // @formatter:on
+
+  @Test
+  void rotateIndexR45() { // @formatter:off
+    Square square, newSquare;
+    String actual, expected;
+
+    square = a1;
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    LOG.debug("{}", String.format("%s:%n%s%n", square, Bitboard.toString(square.getBitBoard())));
+    newSquare = Square.index64Map[Bitboard.rotateIndexR45(square.getIndex64())];
+    LOG.debug("{}", String.format("Rotated: %n%s%n", Bitboard.toString(newSquare.getBitBoard())));
+    actual = Bitboard.toString(newSquare.getBitBoard());
+    assertEquals(expected, actual);
+
+    square = h1;
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 1";
+    LOG.debug("{}", String.format("%s:%n%s%n", square, Bitboard.toString(square.getBitBoard())));
+    newSquare = Square.index64Map[Bitboard.rotateIndexR45(square.getIndex64())];
+    LOG.debug("{}", String.format("Rotated: %n%s%n", Bitboard.toString(newSquare.getBitBoard())));
+    actual = Bitboard.toString(newSquare.getBitBoard());
+    assertEquals(expected, actual);
+
+    square = g7;
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 1 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    LOG.debug("{}", String.format("%s:%n%s%n", square, Bitboard.toString(square.getBitBoard())));
+    newSquare = Square.index64Map[Bitboard.rotateIndexR45(square.getIndex64())];
+    LOG.debug("{}", String.format("Rotated: %n%s%n", Bitboard.toString(newSquare.getBitBoard())));
+    actual = Bitboard.toString(newSquare.getBitBoard());
+    assertEquals(expected, actual);
+  } // @formatter:on
+
+  @Test
+  void rotateIndexL45() { // @formatter:off
+    Square square, newSquare;
+    String actual, expected;
+
+    square = a1;
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 1";
+    LOG.debug("{}", String.format("%s:%n%s%n", square, Bitboard.toString(square.getBitBoard())));
+    newSquare = Square.index64Map[Bitboard.rotateIndexL45(square.getIndex64())];
+    LOG.debug("{}", String.format("Rotated: %n%s%n", Bitboard.toString(newSquare.getBitBoard())));
+    actual = Bitboard.toString(newSquare.getBitBoard());
+    assertEquals(expected, actual);
+
+    square = h1;
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    LOG.debug("{}", String.format("%s:%n%s%n", square, Bitboard.toString(square.getBitBoard())));
+    newSquare = Square.index64Map[Bitboard.rotateIndexL45(square.getIndex64())];
+    LOG.debug("{}", String.format("Rotated: %n%s%n", Bitboard.toString(newSquare.getBitBoard())));
+    actual = Bitboard.toString(newSquare.getBitBoard());
+    assertEquals(expected, actual);
+
+    square = g7;
+    expected =  "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    LOG.debug("{}", String.format("%s:%n%s%n", square, Bitboard.toString(square.getBitBoard())));
+    newSquare = Square.index64Map[Bitboard.rotateIndexL45(square.getIndex64())];
+    LOG.debug("{}", String.format("Rotated: %n%s%n", Bitboard.toString(newSquare.getBitBoard())));
+    actual = Bitboard.toString(newSquare.getBitBoard());
+    assertEquals(expected, actual);
+  } // @formatter:on
+
+
+  @Test
   @Disabled
   void horizontalSlidingAttackBitboards() {
     for (int i = 0b0000_0000; i <= 0b1111_1111; i++) {

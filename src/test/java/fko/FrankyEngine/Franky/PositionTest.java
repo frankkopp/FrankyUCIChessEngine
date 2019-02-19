@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /** @author fkopp */
 public class PositionTest {
 
-  private static final int ITERATIONS = 999;
+  private static final int ITERATIONS = 0;
 
   /** Test insufficient material */
   @Test
@@ -316,6 +316,7 @@ public class PositionTest {
 
   /** Some timings to find fastest code - so nfr test */
   @Test
+  @Disabled
   public void testTimings() {
 
     Piece[] x88Board = new Piece[129];
@@ -1043,48 +1044,71 @@ public class PositionTest {
   @Disabled
   public void testTiming() {
 
+    Position pos = new Position();
+    final int e2e4 = Move.fromUCINotation(pos, "e2e4");
+    pos.makeMove(e2e4);
+    final int d7d5 = Move.fromUCINotation(pos, "d7d5");
+    pos.makeMove(d7d5);
+    final int e4d5 = Move.fromUCINotation(pos, "e4d5");
+    pos.makeMove(e4d5);
+    final int d8d5 = Move.fromUCINotation(pos, "d8d5");
+    pos.makeMove(d8d5);
+    final int b1c3 = Move.fromUCINotation(pos, "b1c3");
+    pos.makeMove(b1c3);
+    final int d5e5 = Move.fromUCINotation(pos, "d5e5");
+    pos.makeMove(d5e5);
+    final int f1e2 = Move.fromUCINotation(pos, "f1e2");
+    pos.makeMove(f1e2);
+    final int e8d8 = Move.fromUCINotation(pos, "e8d8");
+    pos.makeMove(e8d8);
+    final int g1f3 = Move.fromUCINotation(pos, "g1f3");
+    pos.makeMove(g1f3);
+    final int e5g5 = Move.fromUCINotation(pos, "e5g5");
+    pos.makeMove(e5g5);
+    final int e1g1 = Move.fromUCINotation(pos, "e1g1");
+    pos.makeMove(e1g1);
+    final int b8c6 = Move.fromUCINotation(pos, "b8c6");
+    int[] moves = new int[]{e2e4, d7d5, e4d5, d8d5, b1c3, d5e5, f1e2, e8d8, g1f3, e5g5, e1g1, b8c6};
+
     ArrayList<String> result = new ArrayList<>();
 
     int ROUNDS = 5;
     int ITERATIONS = 10;
-    int REPETITIONS = 10_000_000;
+    int REPETITIONS = 20_000;
 
-    final Position position = new Position("8/b2r1pk1/p1R2p2/1p5p/r2p4/PRP3P1/5K1P/8 b - - 0 1");
-    final int move = Move.fromUCINotation(position, "d4d3");
-
-    for (int round = 0; round < ROUNDS; round++) {
-      long start = 0, end = 0, sum = 0;
+    for (int round = 1; round <= ROUNDS; round++) {
+      long start, end, sum, i;
 
       System.out.printf("Running round %d of Timing Test Test 1 vs. Test 2%n", round);
+
       System.gc();
-
-      int i = 0;
-      while (++i <= ITERATIONS) {
-        start = System.nanoTime();
-        for (int j = 0; j < REPETITIONS; j++) {
-          test1(position, move);
-          //          test1(position, Color.BLACK, Square.f2);
-        }
-        end = System.nanoTime();
-        sum += end - start;
-      }
-      float avg1 = ((float) sum / ITERATIONS) / 1e9f;
-
       i = 0;
       sum = 0;
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
         for (int j = 0; j < REPETITIONS; j++) {
-          test2(position, move);
-          //          test2(position, Color.BLACK, Square.f2);
+          test1(new Position(), moves);
+        }
+        end = System.nanoTime();
+        sum += end - start;
+      }
+      float avg1 = ((float) sum / ITERATIONS) / 1e9f;
+      result.add(String.format("Round %d Test 1 avg: %,.3f sec for %,d repetitions", round, avg1,
+                               REPETITIONS));
+
+      System.gc();
+      i = 0;
+      sum = 0;
+      while (++i <= ITERATIONS) {
+        start = System.nanoTime();
+        for (int j = 0; j < REPETITIONS; j++) {
+          test2(new Position(), moves);
         }
         end = System.nanoTime();
         sum += end - start;
       }
       float avg2 = ((float) sum / ITERATIONS) / 1e9f;
 
-      result.add(String.format("Round %d Test 1 avg: %,.3f sec for %,d repetitions", round, avg1,
-                               REPETITIONS));
       result.add(String.format("Round %d Test 2 avg: %,.3f sec for %,d repetitions", round, avg2,
                                REPETITIONS));
     }
@@ -1095,21 +1119,15 @@ public class PositionTest {
     }
 
   }
-  //
-  //  private void test1(final Position position, Color c, Square s) {
-  //    position.isAttacked(c, s);
-  //  }
-  //
-  //  private void test2(final Position position, Color c, Square s) {
-  //    position.isAttacked2(c, s);
-  //  }
 
-  private void test1(final Position position, int move) {
-    position.givesCheck(move);
+  private void test1(final Position position, int[] moves) {
+    for (int i = 0; i < moves.length; i++) position.makeMove(moves[i]);
+    for (int i = 0; i < moves.length; i++) position.undoMove();
   }
 
-  private void test2(final Position position, int move) {
-    //position.givesCheck2(move);
+  private void test2(final Position position, int[] moves) {
+    for (int i = 0; i < moves.length; i++) position.makeMove(moves[i]);
+    for (int i = 0; i < moves.length; i++) position.undoMove();
   }
 
 }
