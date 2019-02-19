@@ -429,7 +429,7 @@ public class Bitboard {
    * the file content (blocking pieces) determined from the given position.
    */
   public static long getSlidingMovesFile(Square square, Position position) {
-    return _getSlidingMovesFile(square, position.getAllOccupiedBitboardR90());
+    return getSlidingMoves(square, position.getAllOccupiedBitboardR90());
   }
 
   /**
@@ -440,10 +440,10 @@ public class Bitboard {
     // content = the pieces currently on the board and maybe blocking the moves
     // rotate the content of the board to get all file squares in a row
     final long rotated = rotateR90(content);
-    return _getSlidingMovesFile(square, rotated);
+    return getSlidingMoves(square, rotated);
   }
 
-  private static long _getSlidingMovesFile(Square square, long rotated) {
+  private static long getSlidingMoves(Square square, long rotated) {
     // shift to the first byte (to the right in Java)
     final File file = square.getFile();
     final long pieceBitmap = (int) ((rotated >>> (((file.ordinal()) * 8))));
@@ -458,8 +458,8 @@ public class Bitboard {
    * the content (blocking pieces) determined from the given pieces position.
    */
   public static long getSlidingMovesDiagUp(Square square, Position position) {
-    return _getSlidingMovesDiag(square, position.getAllOccupiedBitboardR45(), getShiftUp(square),
-                                getLengthMaskUp(square), movesUpDiag);
+    return getSlidingMovesDiag(square, position.getAllOccupiedBitboardR45(), getShiftUp(square),
+                               getLengthMaskUp(square), movesUpDiag);
   }
   /**
    * Bitboards for all possible diagonal up moves of the square with
@@ -470,8 +470,8 @@ public class Bitboard {
     // rotate the content of the board to get all diagonals in a row
     final long rotated = rotateR45(content);
     //    System.out.printf("Rotated: %s%n", Bitboard.printBitString(rotated));
-    return _getSlidingMovesDiag(square, rotated, getShiftUp(square), getLengthMaskUp(square),
-                                movesUpDiag);
+    return getSlidingMovesDiag(square, rotated, getShiftUp(square), getLengthMaskUp(square),
+                               movesUpDiag);
   }
   static final long[][] movesUpDiag = new long[64][256];
 
@@ -480,8 +480,8 @@ public class Bitboard {
    * the rank content (blocking pieces) determined from the given pieces position.
    */
   public static long getSlidingMovesDiagDown(Square square, Position position) {
-    return _getSlidingMovesDiag(square, position.getAllOccupiedBitboardL45(), getShiftDown(square),
-                                getLengthMaskDown(square), movesDownDiag);
+    return getSlidingMovesDiag(square, position.getAllOccupiedBitboardL45(), getShiftDown(square),
+                               getLengthMaskDown(square), movesDownDiag);
   }
 
   /**
@@ -494,13 +494,13 @@ public class Bitboard {
     final long rotated = rotateL45(content);
     //    System.out.printf("Rotated: %s%n", Bitboard.printBitString(rotated));
     // shift the correct row to the first byte (to the right in Java)
-    return _getSlidingMovesDiag(square, rotated, getShiftDown(square), getLengthMaskDown(square),
-                                movesDownDiag);
+    return getSlidingMovesDiag(square, rotated, getShiftDown(square), getLengthMaskDown(square),
+                               movesDownDiag);
   }
   static final long[][] movesDownDiag = new long[64][256];
 
-  private static long _getSlidingMovesDiag(Square square, long rotated, int shift, long lengthMask,
-                                           long[][] moves) {
+  private static long getSlidingMovesDiag(Square square, long rotated, int shift, long lengthMask,
+                                          long[][] moves) {
     // shift the correct row to the first byte (to the right in Java)
     final long shifted = rotated >>> shift;
     // mask the content with the length of the diagonal to erase any other pieces

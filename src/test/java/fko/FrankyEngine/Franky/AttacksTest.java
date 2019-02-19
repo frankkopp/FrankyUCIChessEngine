@@ -227,6 +227,4 @@ class AttacksTest {
     attacks.computeAttacks(position);
   }
 
-
-
 }
