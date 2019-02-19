@@ -27,6 +27,8 @@ package fko.FrankyEngine.Franky;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -37,6 +39,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /** @author fkopp */
 public class PositionTest {
+
+  private static final Logger LOG = LoggerFactory.getLogger(PositionTest.class);
 
   private static final int ITERATIONS = 0;
 
@@ -851,6 +855,152 @@ public class PositionTest {
   }
 
   @Test
+  void rotatedBitboardsTest() { // @formatter:off
+
+    Position position;
+    String actual, expected;
+
+    position = new Position();
+    actual = Bitboard.toString(position.getAllOccupiedBitboardR90());
+    LOG.debug("{}", String.format("%n%s%n", actual));
+    expected =  "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1";
+    assertEquals(expected, actual);
+        actual = Bitboard.toString(position.getAllOccupiedBitboardL90());
+    LOG.debug("{}", String.format("%n%s%n", actual));
+    expected =  "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1";
+    assertEquals(expected, actual);
+        actual = Bitboard.toString(position.getAllOccupiedBitboardR45());
+    LOG.debug("{}", String.format("%n%s%n", actual));
+    expected =  "1 1 1 0 1 1 0 0 \n"
+              + "1 1 0 0 0 1 1 0 \n"
+              + "0 0 0 1 1 1 0 0 \n"
+              + "0 0 1 1 1 1 0 0 \n"
+              + "0 0 1 1 1 1 0 0 \n"
+              + "0 0 1 1 1 0 0 0 \n"
+              + "0 1 1 0 0 0 1 1 \n"
+              + "0 0 1 1 0 1 1 1";
+    assertEquals(expected, actual);
+        actual = Bitboard.toString(position.getAllOccupiedBitboardL45());
+    LOG.debug("{}", String.format("%n%s%n", actual));
+    expected =  "1 1 1 1 1 0 1 1 \n"
+              + "0 0 1 1 0 0 0 1 \n"
+              + "1 0 0 0 0 1 1 0 \n"
+              + "0 0 0 0 1 1 0 0 \n"
+              + "0 0 1 1 1 0 0 0 \n"
+              + "0 1 1 0 0 0 0 1 \n"
+              + "1 0 0 0 1 1 0 0 \n"
+              + "1 1 0 1 1 1 1 1";
+    assertEquals(expected, actual);
+
+    position.makeMove(Move.fromUCINotation(position, "e2e4"));
+    actual = Bitboard.toString(position.getAllOccupiedBitboardR90());
+    LOG.debug("{}", String.format("%n%s%n", actual));
+    expected =  "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 0 0 1 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1";
+    assertEquals(expected, actual);
+        actual = Bitboard.toString(position.getAllOccupiedBitboardL90());
+    LOG.debug("{}", String.format("%n%s%n", actual));
+    expected =  "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 1 0 0 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1";
+    assertEquals(expected, actual);
+        actual = Bitboard.toString(position.getAllOccupiedBitboardR45());
+    LOG.debug("{}", String.format("%n%s%n", actual));
+    expected =  "1 1 1 0 1 1 0 0 \n"
+              + "1 1 0 0 0 1 1 0 \n"
+              + "0 0 0 1 1 1 0 0 \n"
+              + "0 0 1 1 1 1 0 0 \n"
+              + "0 0 1 1 1 1 0 1 \n"
+              + "0 0 1 1 1 0 0 0 \n"
+              + "0 1 0 0 0 0 1 1 \n"
+              + "0 0 1 1 0 1 1 1";
+    assertEquals(expected, actual);
+        actual = Bitboard.toString(position.getAllOccupiedBitboardL45());
+    LOG.debug("{}", String.format("%n%s%n", actual));
+    expected =  "1 1 1 1 1 0 1 1 \n"
+              + "0 0 1 1 0 0 0 1 \n"
+              + "1 0 0 0 0 1 1 0 \n"
+              + "0 0 0 0 1 1 0 0 \n"
+              + "1 0 1 1 1 0 0 0 \n"
+              + "0 1 1 0 0 0 0 0 \n"
+              + "1 0 0 0 1 1 0 0 \n"
+              + "1 1 0 1 1 1 1 1";
+    assertEquals(expected, actual);
+
+    position.undoMove();
+    actual = Bitboard.toString(position.getAllOccupiedBitboardR90());
+    LOG.debug("{}", String.format("%n%s%n", actual));
+    expected =  "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1";
+    assertEquals(expected, actual);
+        actual = Bitboard.toString(position.getAllOccupiedBitboardL90());
+    LOG.debug("{}", String.format("%n%s%n", actual));
+    expected =  "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1 \n"
+              + "1 1 0 0 0 0 1 1";
+    assertEquals(expected, actual);
+        actual = Bitboard.toString(position.getAllOccupiedBitboardR45());
+    LOG.debug("{}", String.format("%n%s%n", actual));
+    expected =  "1 1 1 0 1 1 0 0 \n"
+              + "1 1 0 0 0 1 1 0 \n"
+              + "0 0 0 1 1 1 0 0 \n"
+              + "0 0 1 1 1 1 0 0 \n"
+              + "0 0 1 1 1 1 0 0 \n"
+              + "0 0 1 1 1 0 0 0 \n"
+              + "0 1 1 0 0 0 1 1 \n"
+              + "0 0 1 1 0 1 1 1";
+    assertEquals(expected, actual);
+        actual = Bitboard.toString(position.getAllOccupiedBitboardL45());
+    LOG.debug("{}", String.format("%n%s%n", actual));
+    expected =  "1 1 1 1 1 0 1 1 \n"
+              + "0 0 1 1 0 0 0 1 \n"
+              + "1 0 0 0 0 1 1 0 \n"
+              + "0 0 0 0 1 1 0 0 \n"
+              + "0 0 1 1 1 0 0 0 \n"
+              + "0 1 1 0 0 0 0 1 \n"
+              + "1 0 0 0 1 1 0 0 \n"
+              + "1 1 0 1 1 1 1 1";
+    assertEquals(expected, actual);
+  } // @formatter:on
+
+
+  @Test
   @Disabled
   void bitBoardsAttacksDev() {
 
@@ -1013,8 +1163,6 @@ public class PositionTest {
         test = board.isAttacked(Color.WHITE, Square.d4);
       } while (Duration.between(start, Instant.now()).getSeconds() != DURATION);
 
-      //            System.out.println(board);
-      //            System.out.println(moves);
       System.out.println(
         String.format("%,d runs/s for %s (%b)", ITERATIONS / DURATION, fens[i], test));
       i++;

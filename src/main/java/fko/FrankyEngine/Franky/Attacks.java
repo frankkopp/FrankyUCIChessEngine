@@ -55,7 +55,121 @@ public class Attacks {
   public Attacks() {
   }
 
+
   public void computeAttacks(Position position) {
+    // if we already computed this position we can simply return
+    if (this.position != null && this.position.getZobristKey() == position.getZobristKey()) return;
+
+    // new position - reset values and start
+    resetAttacks();
+    this.position = position;
+
+    List<Square> validSquares = Square.validSquares;
+    for (int i = 0, validSquaresSize = validSquares.size(); i < validSquaresSize; i++) {
+
+      final Square square = validSquares.get(i);
+      final Piece pc = position.getPiece(square);
+      final int sIdx = square.getIndex64();
+      final long[] whitePieces = position.getPiecesBitboards(Color.WHITE);
+      final long[] blackPieces = position.getPiecesBitboards(Color.WHITE);
+
+      //      System.out.println("Square: " + square);
+
+      // AttacksTo    @formatter:off
+      // ===================
+      // Non-Sliding
+      attacksTo[WHITE][sIdx] |= Bitboard.pawnAttacks[BLACK][sIdx]
+                                & whitePieces[PieceType.PAWN.ordinal()];
+      attacksTo[BLACK][sIdx] |= Bitboard.pawnAttacks[WHITE][sIdx]
+                                & blackPieces[PieceType.PAWN.ordinal()];
+      attacksTo[WHITE][sIdx] |= Bitboard.knightAttacks[sIdx]
+                                & whitePieces[PieceType.KNIGHT.ordinal()];
+      attacksTo[BLACK][sIdx] |= Bitboard.knightAttacks[sIdx]
+                                & blackPieces[PieceType.KNIGHT.ordinal()];
+      attacksTo[WHITE][sIdx] |= Bitboard.kingAttacks[sIdx]
+                                & whitePieces[PieceType.KING.ordinal()];
+      attacksTo[BLACK][sIdx] |= Bitboard.kingAttacks[sIdx]
+                                & blackPieces[PieceType.KING.ordinal()];
+      // Sliding - test reverse from the target square outgoing
+      // does not matter for non pawns
+      // rooks and queens
+      final long rqMoves = Bitboard.getSlidingMovesRank(square, position)
+                           | Bitboard.getSlidingMovesFile(square, position);
+      attacksTo[WHITE][sIdx] |= rqMoves &
+                                 (whitePieces[PieceType.ROOK.ordinal()]
+                                  | whitePieces[PieceType.QUEEN.ordinal()]);
+      attacksTo[BLACK][sIdx] |= rqMoves &
+                                 (blackPieces[PieceType.ROOK.ordinal()]
+                                  | blackPieces[PieceType.QUEEN.ordinal()]);
+
+      // bishop and queens
+      final long bqMoves = Bitboard.getSlidingMovesDiagUp(square, position)
+                      | Bitboard.getSlidingMovesDiagDown(square, position);
+      attacksTo[WHITE][sIdx] |= bqMoves & (whitePieces[PieceType.BISHOP.ordinal()]
+                                | whitePieces[PieceType.QUEEN.ordinal()]);
+      attacksTo[BLACK][sIdx] |= bqMoves & (blackPieces[PieceType.BISHOP.ordinal()]
+                                | blackPieces[PieceType.QUEEN.ordinal()]);
+
+      // System.out.println("Black Attacks\n" + Bitboard.toString(attacksTo[BLACK][sIdx]));
+      // System.out.println("White Attacks\n" + Bitboard.toString(attacksTo[WHITE][sIdx]));
+      // @formatter:on
+
+      // skip rest if there is no piece on square
+      if (pc == Piece.NOPIECE) continue;
+
+      final int color = pc.getColor().ordinal();
+      final PieceType type = pc.getType();
+
+      // AllAttacks, AttacksFrom, mobility
+      long tmpAttacks;
+      switch (type) {
+        case PAWN:
+          tmpAttacks = Bitboard.pawnAttacks[color][sIdx];
+          allAttacks[color] |= tmpAttacks;
+          attacksFrom[color][sIdx] |= tmpAttacks;
+          break;
+        case KNIGHT:
+          tmpAttacks = Bitboard.knightAttacks[sIdx];
+          allAttacks[color] |= tmpAttacks;
+          attacksFrom[color][sIdx] |= tmpAttacks;
+          mobility[color] += Long.bitCount(tmpAttacks);
+          break;
+        case ROOK:
+          tmpAttacks = rqMoves;
+          allAttacks[color] |= tmpAttacks;
+          attacksFrom[color][sIdx] |= tmpAttacks;
+          mobility[color] += Long.bitCount(tmpAttacks);
+          break;
+        case BISHOP:
+          tmpAttacks = bqMoves;
+          allAttacks[color] |= tmpAttacks;
+          attacksFrom[color][sIdx] |= tmpAttacks;
+          mobility[color] += Long.bitCount(tmpAttacks);
+          break;
+        case QUEEN:
+          tmpAttacks = rqMoves | bqMoves;
+          allAttacks[color] |= tmpAttacks;
+          attacksFrom[color][sIdx] |= tmpAttacks;
+          mobility[color] += Long.bitCount(tmpAttacks);
+          break;
+        case KING:
+          tmpAttacks = Bitboard.kingAttacks[sIdx];
+          allAttacks[color] |= tmpAttacks;
+          attacksFrom[color][sIdx] |= tmpAttacks;
+          break;
+        case NOTYPE:
+          break;
+        default:
+          break;
+      }
+    }
+
+    // pre-compute if position has check
+    hasCheck = (allAttacks[position.getOpponent().ordinal()] & position.getPiecesBitboards(
+      position.getNextPlayer().ordinal(), PieceType.KING)) != 0;
+  }
+  /* OLD VERSION */
+  public void computeAttacks2(Position position) {
     // if we already computed this position we can simply return
     if (this.position != null && this.position.getZobristKey() == position.getZobristKey()) return;
 
