@@ -199,6 +199,15 @@ public class SquareTest {
     assertEquals(2, Square.c3.getRank().ordinal());
     assertEquals(Rank.r8, Square.g8.getRank());
     assertEquals(7, Square.g8.getRank().ordinal());
+
+    assertTrue(Square.a2.isWhitePawnBaseRow());
+    assertTrue(Square.e2.isWhitePawnBaseRow());
+    assertTrue(Square.h2.isWhitePawnBaseRow());
+    assertFalse(Square.b3.isWhitePawnBaseRow());
+    assertFalse(Square.a2.isBlackPawnBaseRow());
+    assertTrue(Square.a7.isBlackPawnBaseRow());
+    assertTrue(Square.e7.isBlackPawnBaseRow());
+    assertFalse(Square.h6.isWhitePawnBaseRow());
   }
 
   @Test

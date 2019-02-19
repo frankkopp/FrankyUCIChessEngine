@@ -1146,7 +1146,7 @@ public class PositionTest {
   public void testIsAttackedTiming() {
 
     int ITERATIONS = 0;
-    int DURATION = 2;
+    int DURATION = 20;
 
     Position board = null;
 
@@ -1174,6 +1174,20 @@ public class PositionTest {
 
     int i = 0;
     String[] fen = new String[200];
+    fen[i++] = "r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3";
+    fen[i++] = "R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"; // 218 moves to make
+    fen[i++] = "r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 b kq e3";
+    fen[i++] = "r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq -";
+    fen[i++] = "8/1P6/6k1/8/8/8/p1K5/8 w - -";
+    fen[i++] = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -";
+    fen[i++] = "4rk2/p5p1/1p2P2N/7R/nP5P/5PQ1/b6K/q7 w - -";
+    fen[i++] = "4k2r/1q1p1pp1/p3p3/1pb1P3/2r3P1/P1N1P2p/1PP1Q2P/2R1R1K1 b k -";
+    fen[i++] = "r2r1n2/pp2bk2/2p1p2p/3q4/3PN1QP/2P3R1/P4PP1/5RK1 w - -";
+    fen[i++] = "1kr4r/ppp2bq1/4n3/4P1pp/1NP2p2/2PP2PP/5Q1K/4R2R w - -";
+    fen[i++] = "1k1r4/pp1b1R2/3q2pp/4p3/2B5/4Q3/PPP2B2/2K5 b - -";
+    fen[i++] = "8/5k2/8/8/2N2N2/2B5/2K5/8 w - -";
+    fen[i++] = "8/8/6k1/8/8/8/P1K5/8 w - -";
+    fen[i++] = "8/5k2/8/8/8/8/1BK5/1B6 w - -";
     fen[i++] = "8/8/8/8/8/8/8/8 w - - 0 1";
     fen[i++] = "8/8/8/8/8/8/8/8 w - - 0 1";
     fen[i++] = "8/8/8/8/8/8/8/7B w - - 0 1";

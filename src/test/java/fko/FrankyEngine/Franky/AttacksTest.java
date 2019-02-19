@@ -36,6 +36,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AttacksTest {
 
@@ -61,10 +62,10 @@ class AttacksTest {
     attacks.computeAttacks(position);
     System.out.printf("White Attacks: %n%s%n", Bitboard.toString(attacks.allAttacks[WHITE]));
     System.out.printf("Black Attacks: %n%s%n", Bitboard.toString(attacks.allAttacks[BLACK]));
-    System.out.printf("Has check: %s", attacks.hasCheck);
+    System.out.printf("Has check: %s%n", attacks.hasCheck());
     System.out.printf("Mobility White: %d Mobility Black: %d%n", attacks.mobility[WHITE],
                       attacks.mobility[BLACK]);
-    assertEquals(position.hasCheck(), attacks.hasCheck);
+    assertEquals(position.hasCheck(), attacks.hasCheck());
     // TODO additional asserts
 
     testFen = "4r3/1pn3k1/4pPb1/p1Pp3r/3P2NR/1P3B2/3K2P1/4R3 b - -";
@@ -73,10 +74,10 @@ class AttacksTest {
     attacks.computeAttacks(position);
     System.out.printf("White Attacks: %n%s%n", Bitboard.toString(attacks.allAttacks[WHITE]));
     System.out.printf("Black Attacks: %n%s%n", Bitboard.toString(attacks.allAttacks[BLACK]));
-    System.out.printf("Has check: %s", attacks.hasCheck);
+    System.out.printf("Has check: %s%n", attacks.hasCheck());
     System.out.printf("Mobility White: %d Mobility Black: %d%n", attacks.mobility[WHITE],
                       attacks.mobility[BLACK]);
-    assertEquals(position.hasCheck(), attacks.hasCheck);
+    assertEquals(position.hasCheck(), attacks.hasCheck());
     // TODO additional asserts
 
     testFen = "4r3/1pn3k1/4p1b1/p1Pp1P1r/3P2NR/1P3B2/3K2P1/4R3 w - -";
@@ -85,11 +86,24 @@ class AttacksTest {
     attacks.computeAttacks(position);
     System.out.printf("White Attacks: %n%s%n", Bitboard.toString(attacks.allAttacks[WHITE]));
     System.out.printf("Black Attacks: %n%s%n", Bitboard.toString(attacks.allAttacks[BLACK]));
-    System.out.printf("Has check: %s", attacks.hasCheck);
+    System.out.printf("Has check: %s%n", attacks.hasCheck());
     System.out.printf("Mobility White: %d Mobility Black: %d%n", attacks.mobility[WHITE],
                       attacks.mobility[BLACK]);
-    assertEquals(position.hasCheck(), attacks.hasCheck);
+    assertEquals(position.hasCheck(), attacks.hasCheck());
     // TODO additional asserts
+
+  }
+
+  @Test
+  void attacksToTest() {
+    position = new Position("rnbqkbnr/1pp1pppp/3p4/p7/Q1P5/8/PP1PPPPP/RNB1KBNR b KQkq -");
+    System.out.println(position);
+
+    boolean expected = position.hasCheck();
+    System.out.println(expected);
+
+    long attacks = Attacks.attacksTo(position, Square.e8, Color.WHITE);
+    assertTrue(attacks != 0);
 
   }
 
@@ -128,8 +142,8 @@ class AttacksTest {
     ArrayList<String> result = new ArrayList<>();
 
     int ROUNDS = 5;
-    int ITERATIONS = 20;
-    int REPETITIONS = 50_000;
+    int ITERATIONS = 10;
+    int REPETITIONS = 10_000;
 
     for (int round = 1; round <= ROUNDS; round++) {
       long start, end, sum, i;

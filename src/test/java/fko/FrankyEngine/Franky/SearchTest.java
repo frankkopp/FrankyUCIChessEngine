@@ -611,7 +611,7 @@ public class SearchTest {
 
   @Test
   @Disabled
-  public void testInfiniteSearch() throws InterruptedException {
+  public void testInfiniteSearch() {
     Position position = new Position();
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 0, 0, null, false, true, false);
     search.startSearch(position, searchMode);
