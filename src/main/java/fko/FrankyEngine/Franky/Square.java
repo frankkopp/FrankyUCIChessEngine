@@ -26,7 +26,6 @@
 package fko.FrankyEngine.Franky;
 
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +53,8 @@ public enum Square {
   a8, b8, c8, d8, e8, f8, g8, h8, i8, j8, k8, l8, m8, n8, o8, p8, // 112-127
   NOSQUARE;
 
+  private static final int WHITE = 0;
+  private static final int BLACK = 1;
   private static final boolean UP   = true;
   private static final boolean DOWN = false;
 
@@ -65,11 +66,11 @@ public enum Square {
    */
   public static final Square[] index64Map = new Square[64];
 
-
   /**
    * pre-filled list with all valid squares
    */
   public static final List<Square> validSquares;
+
   static final        int          N  = 16;
   static final        int          E  = 1;
   static final        int          S  = -16;
@@ -77,8 +78,8 @@ public enum Square {
   static final        int          NE = N + E;
   static final        int          SE = S + E;
   static final        int          SW = S + W;
-
   static final   int      NW                   = N + W;
+
   static final   int[]    pawnDirections       = {N, NW, NE};
   static final   int[]    pawnAttackDirections = {NW, NE};
   static final   int[]    knightDirections     =
@@ -87,6 +88,7 @@ public enum Square {
   static final   int[]    rookDirections       = {N, E, S, W};
   static final   int[]    queenDirections      = {N, NE, E, SE, S, SW, W, NW};
   static final   int[]    kingDirections       = {N, NE, E, SE, S, SW, W, NW};
+
   /*
    * pre computed mapping from position of bit in bitboard to square
    * To get position use <code>Long.numberOfLeadingZeros</code>
@@ -94,12 +96,12 @@ public enum Square {
   private static Square[] trailingZerosMap     = new Square[65];
 
   /*
-   Due to the weired way Java initializes Enums you can't access static values
-   from the constructor as the constructor is executed first. This forces this
-   construct which has the consequence of not being able to use final fields!
-   Therefore we need to make them private (with Getter) to protect them from
-   external change.
-    */
+     Due to the weired way Java initializes Enums you can't access static values
+     from the constructor as the constructor is executed first. This forces this
+     construct which has the consequence of not being able to use final fields!
+     Therefore we need to make them private (with Getter) to protect them from
+     external change.
+      */
   // 1st static block
   static {
     values = Square.values();
@@ -134,6 +136,9 @@ public enum Square {
         // pre-compute file and rank
         s.file = File.values[s.ordinal() % 16];
         s.rank = Rank.values[s.ordinal() >>> 4];
+
+        s.isPawnBaseRow[WHITE] = (s.rank.ordinal() == 1);
+        s.isPawnBaseRow[BLACK] = (s.rank.ordinal() == 7);
       }
       // invalid squares
       else {
@@ -222,6 +227,8 @@ public enum Square {
   // precomputed file and rank
   private File file;
   private Rank rank;
+
+  private boolean[] isPawnBaseRow;
 
   // precomputed diagonals
   private long upDiag;
@@ -420,6 +427,18 @@ public enum Square {
     return bitBoard;
   }
 
+  public boolean isWhitePawnBaseRow() {
+    return this.isPawnBaseRow[WHITE];
+  }
+
+  public boolean isBlackPawnBaseRow() {
+    return this.isPawnBaseRow[BLACK];
+  }
+
+  public boolean isPawnBaseRow(Color c) {
+    return this.isPawnBaseRow[c.ordinal()];
+  }
+
   /**
    * This enum represents all files of a chess board. If used in a loop via values() omit NOFILE.
    */
@@ -510,33 +529,6 @@ public enum Square {
         return "-";
       }
       return "" + (this.ordinal() + 1);
-    }}
-
-  public static final EnumSet<Square> WHITE_PAWNBASE_ROW  =
-    EnumSet.of(a2, b2, c2, d2, e2, f2, g2, h2);
-  public static final EnumSet<Square> BLACK_PAWNBASE_ROW  =
-    EnumSet.of(a7, b7, c7, d7, e7, f7, g7, h7);
-  public static final EnumSet<Square> WHITE_PROMOTION_ROW =
-    EnumSet.of(a8, b8, c8, d8, e8, f8, g8, h8);
-  public static final EnumSet<Square> BLACK_PROMOTION_ROW =
-    EnumSet.of(a1, b1, c1, d1, e1, f1, g1, h1);
-
-  public boolean isWhitePawnBaseRow() {
-    return WHITE_PAWNBASE_ROW.contains(this);
-  }
-
-  public boolean isBlackPawnBaseRow() {
-    return BLACK_PAWNBASE_ROW.contains(this);
-  }
-
-  public boolean isPawnBaseRow(Color c) {
-    switch (c) {
-      case WHITE:
-        return isWhitePawnBaseRow();
-      case BLACK:
-        return isBlackPawnBaseRow();
-      default:
-        throw new RuntimeException("Invalid Color");
     }
   }
 

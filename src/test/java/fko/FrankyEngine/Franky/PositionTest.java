@@ -1217,12 +1217,13 @@ public class PositionTest {
     pos.makeMove(e1g1);
     final int b8c6 = Move.fromUCINotation(pos, "b8c6");
     int[] moves = new int[]{e2e4, d7d5, e4d5, d8d5, b1c3, d5e5, f1e2, e8d8, g1f3, e5g5, e1g1, b8c6};
+    pos = new Position();
 
     ArrayList<String> result = new ArrayList<>();
 
     int ROUNDS = 5;
-    int ITERATIONS = 10;
-    int REPETITIONS = 20_000;
+    int ITERATIONS = 20;
+    int REPETITIONS = 1_000_000;
 
     for (int round = 1; round <= ROUNDS; round++) {
       long start, end, sum, i;
@@ -1235,7 +1236,7 @@ public class PositionTest {
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
         for (int j = 0; j < REPETITIONS; j++) {
-          test1(new Position(), moves);
+          test1(pos, moves);
         }
         end = System.nanoTime();
         sum += end - start;
@@ -1250,7 +1251,7 @@ public class PositionTest {
       while (++i <= ITERATIONS) {
         start = System.nanoTime();
         for (int j = 0; j < REPETITIONS; j++) {
-          test2(new Position(), moves);
+          test2(pos, moves);
         }
         end = System.nanoTime();
         sum += end - start;

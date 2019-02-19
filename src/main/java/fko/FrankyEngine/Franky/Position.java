@@ -369,8 +369,8 @@ public class Position {
         clearEnPassant();
         break;
       case PAWNDOUBLE:
-        assert fromSquare.isPawnBaseRow(piece.getColor());
         assert !piece.getColor().isNone();
+        assert fromSquare.isPawnBaseRow(piece.getColor());
         movePiece(fromSquare, toSquare, piece);
         clearEnPassant();
         // set new en passant target field - always one "behind" the toSquare

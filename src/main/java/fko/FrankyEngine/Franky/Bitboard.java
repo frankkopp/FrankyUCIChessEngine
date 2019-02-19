@@ -280,7 +280,7 @@ public class Bitboard {
    * @return clockwise 90° rotated index
    */
   public static int rotateIndexR90(int index64) {
-    return rotateIndex(index64, indexR90);
+    return indexR90[index64];
   }
 
   /**
@@ -290,7 +290,7 @@ public class Bitboard {
    * @return counter clockwise 90° rotated index
    */
   public static int rotateIndexL90(int index64) {
-    return rotateIndex(index64, indexL90);
+    return indexL90[index64];
   }
 
   /**
@@ -300,7 +300,7 @@ public class Bitboard {
    * @return clockwise 45° rotated index
    */
   public static int rotateIndexR45(int index64) {
-    return rotateIndex(index64, indexR45);
+    return indexR45[index64];
   }
 
   /**
@@ -310,17 +310,7 @@ public class Bitboard {
    * @return counter clockwise 45° rotated index
    */
   public static int rotateIndexL45(int index64) {
-    return rotateIndex(index64, indexL45);
-  }
-
-  /**
-   * Returns the index of a bit in the rotated bitboard
-   * @param index64
-   * @param rotMap
-   * @return
-   */
-  private static int rotateIndex(int index64, int[] rotMap) {
-    return rotMap[index64];
+    return indexL45[index64];
   }
 
   /* These store the number of bits rotated bitboards need to be shifted to extract
