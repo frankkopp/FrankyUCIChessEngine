@@ -55,7 +55,6 @@ class AttacksTest {
   @Test
   void computeAttacks() {
     String testFen;
-    Position position;
 
     position = new Position();
     System.out.println(position);
