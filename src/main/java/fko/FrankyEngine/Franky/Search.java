@@ -155,6 +155,8 @@ public class Search implements Runnable {
   private long         uciUpdateTicker;
   private boolean      hadBookMove          = false;
 
+  private Attacks attacks = new Attacks();
+
   // DEBUG
   private long evalTime;
 

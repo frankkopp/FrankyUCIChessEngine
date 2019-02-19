@@ -71,29 +71,31 @@ public enum Square {
    */
   public static final List<Square> validSquares;
 
-  static final        int          N  = 16;
-  static final        int          E  = 1;
-  static final        int          S  = -16;
-  static final        int          W  = -1;
-  static final        int          NE = N + E;
-  static final        int          SE = S + E;
-  static final        int          SW = S + W;
-  static final   int      NW                   = N + W;
+  // @formatter:on
+  // Move deltas north, south, east, west and combinations
+  static final int N  = 16;
+  static final int E  = 1;
+  static final int S  = -16;
+  static final int W  = -1;
+  static final int NE = N + E;
+  static final int SE = S + E;
+  static final int SW = S + W;
+  static final int NW = N + W;
 
-  static final   int[]    pawnDirections       = {N, NW, NE};
-  static final   int[]    pawnAttackDirections = {NW, NE};
-  static final   int[]    knightDirections     =
-    {N + N + E, N + E + E, S + E + E, S + S + E, S + S + W, S + W + W, N + W + W, N + N + W};
-  static final   int[]    bishopDirections     = {NE, SE, SW, NW};
-  static final   int[]    rookDirections       = {N, E, S, W};
-  static final   int[]    queenDirections      = {N, NE, E, SE, S, SW, W, NW};
-  static final   int[]    kingDirections       = {N, NE, E, SE, S, SW, W, NW};
+  static final int[] pawnDirections       = {N, NW, NE};
+  static final int[] pawnAttackDirections = {NW, NE};
+  static final int[] knightDirections     = {N + N + E, N + E + E, S + E + E, S + S + E, S + S + W,
+                                             S + W + W, N + W + W, N + N + W};
+  static final int[] bishopDirections     = {NE, SE, SW, NW};
+  static final int[] rookDirections       = {N, E, S, W};
+  static final int[] queenDirections      = {N, NE, E, SE, S, SW, W, NW};
+  static final int[] kingDirections       = {N, NE, E, SE, S, SW, W, NW};
 
   /*
    * pre computed mapping from position of bit in bitboard to square
    * To get position use <code>Long.numberOfLeadingZeros</code>
    */
-  private static Square[] trailingZerosMap     = new Square[65];
+  private static Square[] trailingZerosMap = new Square[65];
 
   /*
      Due to the weired way Java initializes Enums you can't access static values
@@ -105,6 +107,7 @@ public enum Square {
   // 1st static block
   static {
     values = Square.values();
+
     // pre-compute fields
     for (Square s : values) {
       // valid squares
@@ -137,8 +140,9 @@ public enum Square {
         s.file = File.values[s.ordinal() % 16];
         s.rank = Rank.values[s.ordinal() >>> 4];
 
+        // pre-compute base row squares
         s.isPawnBaseRow[WHITE] = (s.rank.ordinal() == 1);
-        s.isPawnBaseRow[BLACK] = (s.rank.ordinal() == 7);
+        s.isPawnBaseRow[BLACK] = (s.rank.ordinal() == 6);
       }
       // invalid squares
       else {
@@ -156,13 +160,12 @@ public enum Square {
     trailingZerosMap[64] = NOSQUARE;
 
     // pre-compute valid squares as an array
-    validSquares =
-      Arrays.stream(values()).filter(Square::isValidSquare).collect(Collectors.toList());
+    validSquares = Arrays.stream(values())
+                         .filter(Square::isValidSquare)
+                         .collect(Collectors.toList());
   }
 
   // upward diagonal bitboards @formatter:off
-  // @formatter:on
-  // Move deltas north, south, east, west and combinations
   public static final long a1UpDiag   = computeDiag(a1, UP);
   public static final long a8UpDiag   = computeDiag(a8, UP);
   public static final long a7UpDiag   = computeDiag(a7, UP);
@@ -228,7 +231,7 @@ public enum Square {
   private File file;
   private Rank rank;
 
-  private boolean[] isPawnBaseRow;
+  private boolean[] isPawnBaseRow = new boolean[2];
 
   // precomputed diagonals
   private long upDiag;
@@ -529,7 +532,6 @@ public enum Square {
         return "-";
       }
       return "" + (this.ordinal() + 1);
-    }
-  }
+    }}
 
 }

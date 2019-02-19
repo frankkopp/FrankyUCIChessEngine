@@ -384,9 +384,7 @@ public class Evaluation {
       this.endGamePawnStructure -= count * DOUBLED_PAWN_PENALTY;
 
       // bonus for passed pawn (no opponent pawn on file and neighbour file
-      // TODO: optimize this with better mask
       // @formatter:off
-      // bonus for passed pawn (no opponent pawn on file and neighbour files
       if ((Bitboard.passedPawnMask[opponent][square.getIndex64()]
          & position.getPiecesBitboards(nextToMove, PAWN)) == 0
       ) {

@@ -148,7 +148,8 @@ public class Position {
   private final Square[]     kingSquares   = new Square[Color.values.length];
 
   // bitboards
-  private final long[][] piecesBitboards      = new long[Color.values.length][PieceType.values.length];
+  private final long[][] piecesBitboards      =
+    new long[Color.values.length][PieceType.values.length];
   private final long[]   occupiedBitboards    = new long[Color.values.length];
   private final long[]   occupiedBitboardsR90 = new long[Color.values.length];
   private final long[]   occupiedBitboardsL90 = new long[Color.values.length];
@@ -1090,75 +1091,83 @@ public class Position {
     final int squareIndex = square.ordinal();
     final boolean isWhite = attackerColor.isWhite();
 
-    final int attackerColorIndex = attackerColor.ordinal();
-    final int opponentColorIndex = attackerColor.getInverseColor().ordinal();
+    final int attacker = attackerColor.ordinal();
+    final int opponent = attackerColor.getInverseColor().ordinal();
 
     final int squareIdx = square.getIndex64();
 
-    /*
-     * Checks are ordered for likelihood to return from this as fast as possible
-     */
-
+    // @formatter:off
     // check pawns
-    // reverse direction to look for pawns which could attack
-    if ((Bitboard.pawnAttacks[opponentColorIndex][squareIdx]
-      & piecesBitboards[attackerColorIndex][PieceType.PAWN.ordinal()]) != 0) {
-      return true;
-    }
+    if ((Bitboard.pawnAttacks[opponent][squareIdx]
+      & piecesBitboards[attacker][PieceType.PAWN.ordinal()]) != 0) return true;
 
     // check knights
     if ((Bitboard.knightAttacks[squareIdx]
-      & piecesBitboards[attackerColorIndex][PieceType.KNIGHT.ordinal()]) != 0) {
-      return true;
-    }
-
-    // get all pieces to check occupied intermediate squares
-    final long occupiedSquares = getAllOccupiedBitboard();
-
-    // @formatter:off
-    // rooks
-    // Check if there are any rooks on possible attack squares
-    if ((Bitboard.rookAttacks[squareIdx] &
-      piecesBitboards[attackerColorIndex][PieceType.ROOK.ordinal()]) != 0
-    ) {
-      // iterate over all pieces
-      for (int s = 0, size = rookSquares[attackerColorIndex].size(); s < size; s++) {
-        final int sqIdx = rookSquares[attackerColorIndex].get(s).getIndex64();
-        // if the square is not reachable from the piece's square we can skip this
-        if ((Bitboard.rookAttacks[sqIdx] & square.getBitBoard()) == 0) continue;
-        // if there are no occupied squares between the piece square and the
-        // target square we have a check
-        if ((Bitboard.intermediate[sqIdx][squareIdx] & occupiedSquares) == 0) return true;
-      }
-    }
-
-    // bishops
-    if ((Bitboard.bishopAttacks[squareIdx] &
-         piecesBitboards[attackerColorIndex][PieceType.BISHOP.ordinal()]
-      ) != 0) {
-      for (int s = 0, size = bishopSquares[attackerColorIndex].size(); s < size; s++) {
-        final int sqIdx = bishopSquares[attackerColorIndex].get(s).getIndex64();
-        if ((Bitboard.bishopAttacks[sqIdx] & square.getBitBoard()) == 0) continue;
-        if ((Bitboard.intermediate[sqIdx][squareIdx] & occupiedSquares) == 0) return true;
-      }
-    }
-
-    // queen
-    if ((Bitboard.queenAttacks[squareIdx] &
-         piecesBitboards[attackerColorIndex][PieceType.QUEEN.ordinal()]) != 0
-    ) {
-      for (int s = 0, size = queenSquares[attackerColorIndex].size(); s < size; s++) {
-        int sqIdx = queenSquares[attackerColorIndex].get(s).getIndex64();
-        if ((Bitboard.queenAttacks[sqIdx] & square.getBitBoard()) == 0) continue;
-        if ((Bitboard.intermediate[sqIdx][squareIdx] & occupiedSquares) == 0) return true;
-      }
-    }
+      & piecesBitboards[attacker][PieceType.KNIGHT.ordinal()]) != 0) return true;
 
     // check king
     if ((Bitboard.kingAttacks[squareIdx]
-         & piecesBitboards[attackerColorIndex][PieceType.KING.ordinal()]) != 0) {
-      return true;
+         & piecesBitboards[attacker][PieceType.KING.ordinal()]) != 0) return true;
+
+    // Sliding
+    // rooks and queens
+    if ((Bitboard.rookAttacks[squareIdx] & piecesBitboards[attacker][PieceType.ROOK.ordinal()]) != 0
+       || ((Bitboard.queenAttacks[squareIdx] & piecesBitboards[attacker][PieceType.QUEEN.ordinal()]) != 0)) {
+
+      if (((Bitboard.getSlidingMovesRank(square, this) | Bitboard.getSlidingMovesFile(square, this))
+      & (piecesBitboards[attacker][PieceType.ROOK.ordinal()]
+         | piecesBitboards[attacker][PieceType.QUEEN.ordinal()])) != 0) return true;
+    }
+
+    // bishop and queens
+    if ((Bitboard.bishopAttacks[squareIdx] & piecesBitboards[attacker][PieceType.BISHOP.ordinal()]) != 0
+      || ((Bitboard.queenAttacks[squareIdx] & piecesBitboards[attacker][PieceType.QUEEN.ordinal()]) != 0)) {
+
+    if (((Bitboard.getSlidingMovesDiagUp(square, this) | Bitboard.getSlidingMovesDiagDown(square, this))
+      & (piecesBitboards[attacker][PieceType.BISHOP.ordinal()]
+         | piecesBitboards[attacker][PieceType.QUEEN.ordinal()])) != 0) return true;
     } // @formatter:on
+
+    // OLD CODE
+    //    // get all pieces to check occupied intermediate squares
+    //    final long occupiedSquares = getAllOccupiedBitboard();
+    //    // rooks
+    //    // Check if there are any rooks on possible attack squares
+    //    if ((Bitboard.rookAttacks[squareIdx] & piecesBitboards[attacker][PieceType.ROOK.ordinal
+    //    ()])
+    //      != 0) {
+    //      // iterate over all pieces
+    //      for (int s = 0, size = rookSquares[attacker].size(); s < size; s++) {
+    //        final int sqIdx = rookSquares[attacker].get(s).getIndex64();
+    //        // if the square is not reachable from the piece's square we can skip this
+    //        if ((Bitboard.rookAttacks[sqIdx] & square.getBitBoard()) == 0) continue;
+    //        // if there are no occupied squares between the piece square and the
+    //        // target square we have a check
+    //        if ((Bitboard.intermediate[sqIdx][squareIdx] & occupiedSquares) == 0) return true;
+    //      }
+    //    }
+    //
+    //    // bishops
+    //    if ((Bitboard.bishopAttacks[squareIdx] & piecesBitboards[attacker][PieceType.BISHOP
+    //    .ordinal()])
+    //      != 0) {
+    //      for (int s = 0, size = bishopSquares[attacker].size(); s < size; s++) {
+    //        final int sqIdx = bishopSquares[attacker].get(s).getIndex64();
+    //        if ((Bitboard.bishopAttacks[sqIdx] & square.getBitBoard()) == 0) continue;
+    //        if ((Bitboard.intermediate[sqIdx][squareIdx] & occupiedSquares) == 0) return true;
+    //      }
+    //    }
+    //
+    //    // queen
+    //    if ((Bitboard.queenAttacks[squareIdx] & piecesBitboards[attacker][PieceType.QUEEN
+    //    .ordinal()])
+    //      != 0) {
+    //      for (int s = 0, size = queenSquares[attacker].size(); s < size; s++) {
+    //        int sqIdx = queenSquares[attacker].get(s).getIndex64();
+    //        if ((Bitboard.queenAttacks[sqIdx] & square.getBitBoard()) == 0) continue;
+    //        if ((Bitboard.intermediate[sqIdx][squareIdx] & occupiedSquares) == 0) return true;
+    //      }
+    //    }
 
     // check en passant
     if (this.enPassantSquare != Square.NOSQUARE) {
@@ -1442,25 +1451,33 @@ public class Position {
 
   public long getOccupiedBitboardsR90(Color c) { return occupiedBitboardsR90[c.ordinal()]; }
 
-  public long getAllOccupiedBitboardR90() { return occupiedBitboardsR90[0] | occupiedBitboardsR90[1]; }
+  public long getAllOccupiedBitboardR90() {
+    return occupiedBitboardsR90[0] | occupiedBitboardsR90[1];
+  }
 
   public long[] getOccupiedBitboardsL90() { return occupiedBitboardsL90; }
 
   public long getOccupiedBitboardsL90(Color c) { return occupiedBitboardsL90[c.ordinal()]; }
 
-  public long getAllOccupiedBitboardL90() { return occupiedBitboardsL90[0] | occupiedBitboardsL90[1]; }
+  public long getAllOccupiedBitboardL90() {
+    return occupiedBitboardsL90[0] | occupiedBitboardsL90[1];
+  }
 
   public long[] getOccupiedBitboardsR45() { return occupiedBitboardsR45; }
 
   public long getOccupiedBitboardsR45(Color c) { return occupiedBitboardsR45[c.ordinal()]; }
 
-  public long getAllOccupiedBitboardR45() { return occupiedBitboardsR45[0] | occupiedBitboardsR45[1]; }
+  public long getAllOccupiedBitboardR45() {
+    return occupiedBitboardsR45[0] | occupiedBitboardsR45[1];
+  }
 
   public long[] getOccupiedBitboardsL45() { return occupiedBitboardsL45; }
 
   public long getOccupiedBitboardsL45(Color c) { return occupiedBitboardsL45[c.ordinal()]; }
 
-  public long getAllOccupiedBitboardL45() { return occupiedBitboardsL45[0] | occupiedBitboardsL45[1]; }
+  public long getAllOccupiedBitboardL45() {
+    return occupiedBitboardsL45[0] | occupiedBitboardsL45[1];
+  }
 
   /**
    * Initialize the lists for the pieces and the material counter

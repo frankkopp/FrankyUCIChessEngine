@@ -88,9 +88,6 @@ public class Bitboard {
   /** array of rook directions used in <code>rays[dir][square]</code> */
   public static final int[] rookRays   = {1, 3, 5, 7};
 
-  /** all direction from sq1 to sq2 along queen movements */
-  //  public static final int[][] direction = new int[64][64];
-
   /**
    * All sliding rays from a certain square.
    * When trying to determine closest piece (bit) use lowest bit for rays 0-3,
