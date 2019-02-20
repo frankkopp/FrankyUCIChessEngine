@@ -49,28 +49,30 @@ public enum Color {
    * This is 1 for white and -1 for black. Useful in evaluation and pawn directions
    */
   public final int   direction;
-  private      Color oppenentColor;
+  private      Color opponentColor;
   private      char  shortName;
 
   Color(int factor) {
     this.direction = factor;
-
   }
 
   public static final Color[] values = {WHITE, BLACK};
 
   static {
-    for (Color c : values) {
+    for (Color c : Color.values()) {
       switch (c) {
         case WHITE:
-          c.oppenentColor = BLACK;
+          c.opponentColor = BLACK;
           c.shortName = 'w';
+          break;
         case BLACK:
-          c.oppenentColor = WHITE;
+          c.opponentColor = WHITE;
           c.shortName = 'b';
+          break;
         case NOCOLOR:
-          c.oppenentColor = NOCOLOR;
+          c.opponentColor = NOCOLOR;
           c.shortName = '-';
+          break;
       }
     }
   }
@@ -80,7 +82,7 @@ public enum Color {
    * @return int - as defined in ChesslyColor
    */
   public Color getInverseColor() {
-    return oppenentColor;
+    return opponentColor;
   }
 
   /**
