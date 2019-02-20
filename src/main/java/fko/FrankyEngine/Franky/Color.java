@@ -27,9 +27,12 @@ package fko.FrankyEngine.Franky;
 
 /**
  * <p>
- * The Color class represents the two colors of a Chessly game and a special color for empty fields (NONE).
- * This class can not be instantiated. It keeps public references to the only possible instances BLACK, WHITE, NONE.
- * These instances are immutable. As it is not possible to have any other instances of ChesslyColors the use of
+ * The Color class represents the two colors of a Chessly game and a special color for empty
+ * fields (NONE).
+ * This class can not be instantiated. It keeps public references to the only possible instances
+ * BLACK, WHITE, NONE.
+ * These instances are immutable. As it is not possible to have any other instances of
+ * ChesslyColors the use of
  * these instances is as fast as if using an int.
  * </p>
  *
@@ -37,90 +40,92 @@ package fko.FrankyEngine.Franky;
  */
 public enum Color {
 
-    // order has influence on Piece
-    WHITE       (1),      // 0
-    BLACK       (-1),     // 1
-    NOCOLOR     (0);      // 2
+  // order has influence on Piece
+  WHITE(1),      // 0
+  BLACK(-1),     // 1
+  NOCOLOR(0);      // 2
 
-    /**
-     * This is 1 for white and -1 for black. Useful in evaluation and pawn directions
-     */
-    public final int direction;
+  /**
+   * This is 1 for white and -1 for black. Useful in evaluation and pawn directions
+   */
+  public final int   direction;
+  private      Color oppenentColor;
+  private      char  shortName;
 
-    Color(int factor) {
-        this.direction = factor;
+  Color(int factor) {
+    this.direction = factor;
+
+  }
+
+  public static final Color[] values = {WHITE, BLACK};
+
+  static {
+    for (Color c : values) {
+      switch (c) {
+        case WHITE:
+          c.oppenentColor = BLACK;
+          c.shortName = 'w';
+        case BLACK:
+          c.oppenentColor = WHITE;
+          c.shortName = 'b';
+        case NOCOLOR:
+          c.oppenentColor = NOCOLOR;
+          c.shortName = '-';
+      }
     }
+  }
 
-    public static final Color[] values = {
-            WHITE, BLACK
-    };
+  /**
+   * Returns the other ChesslyColor.
+   * @return int - as defined in ChesslyColor
+   */
+  public Color getInverseColor() {
+    return oppenentColor;
+  }
 
-    /**
-     * Returns the other ChesslyColor.
-     * @return int - as defined in ChesslyColor
-     */
-    public Color getInverseColor() {
-        switch (this) {
-            case BLACK:
-                return WHITE;
-            case WHITE:
-                return BLACK;
-            case NOCOLOR:
-                throw new UnsupportedOperationException("Color.NONE has no inverse color");
-        }
-        return NOCOLOR;
-    }
+  /**
+   * Returns a character to use for a String representation of the field.<br>
+   * It accepts ChesslyColor.BLACK (X), ChesslyColor.WHITE (O), ChesslyColor.EMPTY (-) otherwise
+   * returns
+   * an empty character.
+   * @return char - one of 'X', '-', 'O' or ' '
+   */
+  public char toCharSymbol() {
+    return shortName;
+  }
 
-    /**
-     * Returns a character to use for a String representation of the field.<br>
-     * It accepts ChesslyColor.BLACK (X), ChesslyColor.WHITE (O), ChesslyColor.EMPTY (-) otherwise returns
-     * an empty character.
-     * @return char - one of 'X', '-', 'O' or ' '
-     */
-    public char toCharSymbol() {
-        return toChar();
-    }
+  /**
+   * Returns a character to use for a String representation of the field.<br>
+   * It accepts ChesslyColor.BLACK (X), ChesslyColor.WHITE (O), ChesslyColor.EMPTY (-) otherwise
+   * returns
+   * an empty character.
+   * @return char - one of 'b', '-', 'w' or ' '
+   */
+  public char toChar() {
+    return shortName;
+  }
 
+  /**
+   * Convenience method to check if the instance is BLACK
+   * @return true if black
+   */
+  public boolean isBlack() {
+    return this == BLACK;
+  }
 
-    /**
-     * Returns a character to use for a String representation of the field.<br>
-     * It accepts ChesslyColor.BLACK (X), ChesslyColor.WHITE (O), ChesslyColor.EMPTY (-) otherwise returns
-     * an empty character.
-     * @return char - one of 'b', '-', 'w' or ' '
-     */
-    public char toChar() {
-        switch (this) {
-            case WHITE: return 'w';
-            case BLACK: return 'b';
-            case NOCOLOR:
-            default: return ' ';
-        }
-    }
+  /**
+   * Convenience method to check if the instance is WHITE
+   * @return true if white
+   */
+  public boolean isWhite() {
+    return this == WHITE;
+  }
 
-    /**
-     * Convenience method to check if the instance is BLACK
-     * @return true if black
-     */
-    public boolean isBlack() {
-        return this==BLACK;
-    }
-
-    /**
-     * Convenience method to check if the instance is WHITE
-     * @return true if white
-     */
-    public boolean isWhite() {
-        return this==WHITE;
-    }
-
-    /**
-     * Convenience method to check if the instance is NONE
-     * @return true if neither white nor black
-     */
-    public boolean isNone() {
-        return this==NOCOLOR;
-    }
-
-//    }
-
+  /**
+   * Convenience method to check if the instance is NONE
+   * @return true if neither white nor black
+   */
+  public boolean isNone() {
+    return this == NOCOLOR;
+  }
 }
