@@ -284,6 +284,11 @@ public class Position {
       this.kingSquares[i] = op.kingSquares[i];
       // bitboards
       this.occupiedBitboards[i] = op.occupiedBitboards[i];
+      this.occupiedBitboardsR90[i] = op.occupiedBitboardsR90[i];
+      this.occupiedBitboardsL90[i] = op.occupiedBitboardsL90[i];
+      this.occupiedBitboardsR45[i] = op.occupiedBitboardsR45[i];
+      this.occupiedBitboardsL45[i] = op.occupiedBitboardsL45[i];
+
       System.arraycopy(op.piecesBitboards[i], 0, this.piecesBitboards[i], 0,
                        PieceType.values.length);
     }
@@ -1051,7 +1056,7 @@ public class Position {
    * @return true if current position has check for next player
    */
   public boolean hasCheck() {
-    if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
+    //if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
     boolean check = isAttacked(nextPlayer.getInverseColor(), kingSquares[nextPlayer.ordinal()]);
     hasCheck = check ? Flag.TRUE : Flag.FALSE;
     return check;
@@ -1123,9 +1128,11 @@ public class Position {
     if ((Bitboard.bishopAttacks[squareIdx] & piecesBitboards[attacker][PieceType.BISHOP.ordinal()]) != 0
       || ((Bitboard.queenAttacks[squareIdx] & piecesBitboards[attacker][PieceType.QUEEN.ordinal()]) != 0)) {
 
-    if (((Bitboard.getSlidingMovesDiagUp(square, this) | Bitboard.getSlidingMovesDiagDown(square, this))
-      & (piecesBitboards[attacker][PieceType.BISHOP.ordinal()]
-         | piecesBitboards[attacker][PieceType.QUEEN.ordinal()])) != 0) return true;
+      long slidingMovesDiagUp = Bitboard.getSlidingMovesDiagUp(square, this);
+      long slidingMovesDiagDown = Bitboard.getSlidingMovesDiagDown(square, this);
+      long b = piecesBitboards[attacker][PieceType.BISHOP.ordinal()];
+      long q = piecesBitboards[attacker][PieceType.QUEEN.ordinal()];
+      if (((slidingMovesDiagUp | slidingMovesDiagDown) & (b | q)) != 0) return true;
     } // @formatter:on
 
     // OLD CODE
@@ -1491,6 +1498,10 @@ public class Position {
       queenSquares[i] = new SquareList();
       kingSquares[i] = Square.NOSQUARE;
       occupiedBitboards[i] = 0L;
+      occupiedBitboardsR90[i] = 0L;
+      occupiedBitboardsL90[i] = 0L;
+      occupiedBitboardsR45[i] = 0L;
+      occupiedBitboardsL45[i] = 0L;
       piecesBitboards[i] = new long[PieceType.values.length];
     }
     material = new int[2];

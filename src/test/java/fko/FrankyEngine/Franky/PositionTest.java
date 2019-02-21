@@ -525,6 +525,12 @@ public class PositionTest {
     assertFalse(position.isAttacked(Color.WHITE, Square.e8));
     assertFalse(position.isAttacked(Color.BLACK, Square.e1));
 
+    testFen = "rnbqkbnr/ppp1pppp/8/1B6/3Pp3/8/PPP2PPP/RNBQK1NR b KQkq -";
+    position = new Position(testFen);
+    System.out.println(position);
+    assertTrue(position.isAttacked(Color.WHITE, Square.e8));
+    assertFalse(position.isAttacked(Color.BLACK, Square.e1));
+
   }
 
   @Test
