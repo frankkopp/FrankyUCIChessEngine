@@ -1128,11 +1128,10 @@ public class Position {
     if ((Bitboard.bishopAttacks[squareIdx] & piecesBitboards[attacker][PieceType.BISHOP.ordinal()]) != 0
       || ((Bitboard.queenAttacks[squareIdx] & piecesBitboards[attacker][PieceType.QUEEN.ordinal()]) != 0)) {
 
-      long slidingMovesDiagUp = Bitboard.getSlidingMovesDiagUp(square, this);
-      long slidingMovesDiagDown = Bitboard.getSlidingMovesDiagDown(square, this);
-      long b = piecesBitboards[attacker][PieceType.BISHOP.ordinal()];
-      long q = piecesBitboards[attacker][PieceType.QUEEN.ordinal()];
-      if (((slidingMovesDiagUp | slidingMovesDiagDown) & (b | q)) != 0) return true;
+      if (((Bitboard.getSlidingMovesDiagUp(square, this)
+        | Bitboard.getSlidingMovesDiagDown(square, this))
+        & (piecesBitboards[attacker][PieceType.BISHOP.ordinal()]
+        | piecesBitboards[attacker][PieceType.QUEEN.ordinal()])) != 0) return true;
     } // @formatter:on
 
     // OLD CODE
@@ -1443,8 +1442,9 @@ public class Position {
 
   public long[] getPiecesBitboards(Color c) { return piecesBitboards[c.ordinal()]; }
 
-  public long getPiecesBitboards(Color c,
-                                 PieceType pt) { return piecesBitboards[c.ordinal()][pt.ordinal()]; }
+  public long getPiecesBitboards(Color c, PieceType pt) {
+    return piecesBitboards[c.ordinal()][pt.ordinal()];
+  }
 
   public long getPiecesBitboards(int c, PieceType pt) { return piecesBitboards[c][pt.ordinal()]; }
 

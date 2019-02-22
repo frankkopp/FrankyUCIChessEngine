@@ -155,8 +155,6 @@ public class Search implements Runnable {
   private long         uciUpdateTicker;
   private boolean      hadBookMove          = false;
 
-  private Attacks attacks = new Attacks();
-
   // DEBUG
   private long evalTime;
 
@@ -329,7 +327,7 @@ public class Search implements Runnable {
     // Each depth in search gets it own global field to avoid object creation
     // during search.
     for (int i = 0; i < MAX_SEARCH_DEPTH; i++) {
-      moveGenerators[i] = new MoveGenerator();
+      moveGenerators[i] = new MoveGenerator(config);
       moveGenerators[i].SORT_MOVES = config.USE_SORT_ALL_MOVES;
       // prepare principal variation lists
       pv[i] = new MoveList(MAX_SEARCH_DEPTH);
@@ -1294,7 +1292,12 @@ public class Search implements Runnable {
       // ###############################################
 
       // Check if our givesCheck(move) works correctly
-      assert position.hasCheck() == givesCheck
+      boolean check = position.hasCheck();
+      if (check != givesCheck){
+        System.out.println("BUG");
+        position.hasCheck();
+      }
+      assert check == givesCheck
         : "Position check after move not the same as before the move";
 
       if (TRACE) {
@@ -1705,8 +1708,6 @@ public class Search implements Runnable {
         }
       } // @formatter:on
       // ###############################################
-
-      // TODO: SEE test - skip loosing moves
 
       // ###############################################
       // Make the move and skip illegal moves

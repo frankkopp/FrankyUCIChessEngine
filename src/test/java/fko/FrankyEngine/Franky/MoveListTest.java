@@ -25,7 +25,7 @@
 
 package fko.FrankyEngine.Franky;
 
-
+import fko.FrankyEngine.util.SimpleIntList;
 import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
@@ -171,25 +171,33 @@ public class MoveListTest {
     MoveList moves = moveGenerator.getPseudoLegalQSearchMoves();
 
     // Comparator for move value victim least value attacker
-    Comparator<Integer> reverseMvvlvaComparator = Comparator.comparingInt(
-      (Integer a) -> (Move.getTarget(a).getType().getValue()) -
-                     Move.getPiece(a).getType().getValue());
+    SimpleIntList.IntComparator mvvlvaComparator = (move1, move2) ->
+      (Move.getPiece(move1).getType().getValue()
+        - Move.getPromotion(move1).getType().getValue()
+        - Move.getTarget(move1).getType().getValue())
+        - (Move.getPiece(move2).getType().getValue()
+        - Move.getPromotion(move2).getType().getValue()
+        - Move.getTarget(move2).getType().getValue());
 
-    // Comparator for move value victim least value attacker
-    Comparator<Integer> mvvlvaComparator = Comparator.comparingInt(
-      (Integer a) -> (Move.getPiece(a).getType().getValue() -
-                      Move.getTarget(a).getType().getValue()));
+    SimpleIntList.IntComparator reverseMvvlvaComparator = (move2, move1) ->
+      (Move.getPiece(move1).getType().getValue()
+        - Move.getPromotion(move1).getType().getValue()
+        - Move.getTarget(move1).getType().getValue())
+        - (Move.getPiece(move2).getType().getValue()
+        - Move.getPromotion(move2).getType().getValue()
+        - Move.getTarget(move2).getType().getValue());
 
     MoveList movesNew = new MoveList(moves);
     movesNew.sort(reverseMvvlvaComparator);
-
     for (int i = 0; i < moves.size(); i++) {
       System.out.printf("%-20s %-20s %n", Move.toString(moves.get(i)),
                         Move.toString(movesNew.get(i)));
     }
-
     movesNew.sort(mvvlvaComparator);
-
+    for (int i = 0; i < moves.size(); i++) {
+      System.out.printf("%-20s %-20s %n", Move.toString(moves.get(i)),
+                        Move.toString(movesNew.get(i)));
+    }
     assertEquals(moves, movesNew);
 
   }

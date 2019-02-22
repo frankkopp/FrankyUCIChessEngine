@@ -216,10 +216,14 @@ public class SearchTreeSizeTest {
 
     search.config.USE_QUIESCENCE = false;
     search.config.USE_QFUTILITY_PRUNING = false;
+    search.config.USE_SEE = false;
 
     // pure MiniMax
     search.config.USE_QUIESCENCE = true;
-    //result.tests.add(measureTreeSize(position, searchMode, "MINIMAX+QS", true));
+    //result.tests.add(measureTreeSize(search, position, searchMode, "MINIMAX+QS", true));
+    //
+    //    search.config.USE_SEE = true;
+    //    result.tests.add(measureTreeSize(search, position, searchMode, "+SEE", true));
 
     // AlphaBeta with TT and SORT
     search.config.USE_ALPHABETA_PRUNING = true;
@@ -288,11 +292,11 @@ public class SearchTreeSizeTest {
     search.config.USE_EXTENDED_FUTILITY_PRUNING = true;
     result.tests.add(measureTreeSize(search, position, searchMode, "EFP", true));
 
-    // Late Move Pruning
-    search.config.USE_LMP = true;
-    search.config.LMP_MIN_DEPTH = 3;
-    search.config.LMP_MIN_MOVES = 6;
-    result.tests.add(measureTreeSize(search, position, searchMode, "LMP", true));
+    //    // Late Move Pruning
+    //    search.config.USE_LMP = true;
+    //    search.config.LMP_MIN_DEPTH = 3;
+    //    search.config.LMP_MIN_MOVES = 6;
+    //    result.tests.add(measureTreeSize(search, position, searchMode, "LMP", true));
 
     // Late Move Reduction
     search.config.USE_LMR = true;
@@ -300,6 +304,9 @@ public class SearchTreeSizeTest {
     search.config.LMR_MIN_MOVES = 3;
     search.config.LMR_REDUCTION = 1;
     result.tests.add(measureTreeSize(search, position, searchMode, "LMR", true));
+
+    search.config.USE_SEE = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "+SEE", true));
 
     return result;
 

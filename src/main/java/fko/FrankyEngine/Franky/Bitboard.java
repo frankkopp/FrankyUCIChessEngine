@@ -261,6 +261,12 @@ public class Bitboard {
     return rotate(bitboard, rotateL45);
   }
 
+  /**
+   * Iterate over all squares and copy the set bits into the new board.
+   * @param bitboard
+   * @param rotMap
+   * @return
+   */
   private static long rotate(long bitboard, int[] rotMap) {
     long rotated = 0L;
     for (int i = 0; i < 64; i++) {
@@ -310,12 +316,6 @@ public class Bitboard {
     return indexL45[index64];
   }
 
-  /* These store the number of bits rotated bitboards need to be shifted to extract
-   * the required row.  For example, if I wanted the diagonal from a6-c8, which is in the
-   * a1h8 sense, I take the correct bitboard, namely the R45 one, and shift it right
-   * by the stated amount (3) and then and it with (2^l)-1 where l is the diagonal
-   * length. */
-
   // @formatter:off
   /**
    * To generate a bitboard where all diagonal squares are next to each other the
@@ -327,6 +327,15 @@ public class Bitboard {
    * @return
    */
   public static int getShiftUp(Square square) { return shiftsDiagUp[square.getIndex64()]; }
+   /**
+   * To generate a bitboard where all diagonal squares are next to each other the
+   * bitboard needs to be rotated. To get the diagonals squares into the lower
+   * 8-bits it needs to be shifted by a certain amount depending on the diagonal's
+   * length.
+   *
+   * @param idx
+   * @return
+   */
   public static int getShiftUp(int idx) { return shiftsDiagUp[idx]; }
   private static final int[] shiftsDiagUp = new int[] {
      0,  1,  3,  6, 10, 15, 21, 28,
@@ -339,7 +348,25 @@ public class Bitboard {
     28, 36, 43, 49, 54, 58, 61, 63
   };
 
+   /**
+   * To generate a bitboard where all diagonal squares are next to each other the
+   * bitboard needs to be rotated. To get the diagonals squares into the lower
+   * 8-bits it needs to be shifted by a certain amount depending on the diagonal's
+   * length.
+   *
+   * @param square
+   * @return
+   */
   public static int getShiftDown(Square square) { return shiftsDiagDown[square.getIndex64()]; }
+   /**
+   * To generate a bitboard where all diagonal squares are next to each other the
+   * bitboard needs to be rotated. To get the diagonals squares into the lower
+   * 8-bits it needs to be shifted by a certain amount depending on the diagonal's
+   * length.
+   *
+   * @param idx
+   * @return
+   */
   public static int getShiftDown(int idx) { return shiftsDiagDown[idx]; }
   private static final int[] shiftsDiagDown = new int[] {
     28, 21, 15, 10,  6,  3,  1,  0,
@@ -352,12 +379,29 @@ public class Bitboard {
     63, 61, 58, 54, 49, 43, 36, 28
   };
 
-  /* These simply store the length of the diagonal in the required sense */
+  /**
+   * To generate a bitboard where all diagonal squares are next to each other the
+   * bitboard needs to be rotated. To get the diagonals squares into the lower
+   * 8-bits it needs to be shifted by a certain amount depending on the diagonal's
+   * length. To mask these bits we need the exact length.
+   *
+   * @param idx
+   * @return
+   */
+  public static long getLengthMaskUp(int idx) { return (1L << lengthDiagUp[idx]) - 1; }
+  /**
+   * To generate a bitboard where all diagonal squares are next to each other the
+   * bitboard needs to be rotated. To get the diagonals squares into the lower
+   * 8-bits it needs to be shifted by a certain amount depending on the diagonal's
+   * length. To mask these bits we need the exact length.
+   *
+   * @param square
+   * @return
+   */
   public static long getLengthMaskUp(Square square) {
     return (1L << lengthDiagUp[square.getIndex64()]) - 1;
   }
-
-  public static long getLengthMaskUp(int idx) { return (1L << lengthDiagUp[idx]) - 1; }
+  /* These simply store the length of the diagonal in the required sense */
   static final int[] lengthDiagUp = new int[] {
     1, 2, 3, 4, 5, 6, 7, 8,
     2, 3, 4, 5, 6, 7, 8, 7,
@@ -370,11 +414,29 @@ public class Bitboard {
 
   };
 
+    /**
+   * To generate a bitboard where all diagonal squares are next to each other the
+   * bitboard needs to be rotated. To get the diagonals squares into the lower
+   * 8-bits it needs to be shifted by a certain amount depending on the diagonal's
+   * length. To mask these bits we need the exact length.
+   *
+   * @param square
+   * @return
+   */
   public static long getLengthMaskDown(Square square) {
     return (1L << lengthDiagDown[square.getIndex64()]) - 1;
   }
-
+  /**
+   * To generate a bitboard where all diagonal squares are next to each other the
+   * bitboard needs to be rotated. To get the diagonals squares into the lower
+   * 8-bits it needs to be shifted by a certain amount depending on the diagonal's
+   * length. To mask these bits we need the exact length.
+   *
+   * @param idx
+   * @return
+   */
   public static long getLengthMaskDown(int idx) { return (1L << lengthDiagDown[idx]) - 1; }
+  /* These simply store the length of the diagonal in the required sense */
   static final int[] lengthDiagDown = new int[] {
     8, 7, 6, 5, 4, 3, 2, 1,
     7, 8, 7, 6, 5, 4, 3, 2,

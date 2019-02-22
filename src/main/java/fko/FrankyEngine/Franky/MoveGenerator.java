@@ -50,6 +50,8 @@ public class MoveGenerator {
 
   private static final Logger LOG = LoggerFactory.getLogger(MoveGenerator.class);
 
+  private final Configuration config;
+
   boolean SORT_CAPTURING_MOVES = true;
   boolean SORT_MOVES           = false;
 
@@ -101,12 +103,30 @@ public class MoveGenerator {
    * Creates a new {@link MoveGenerator}
    */
   public MoveGenerator() {
+    this(new Configuration());
+  }
+
+  /**
+   * Creates a new {@link MoveGenerator}
+   * @param config
+   */
+  public MoveGenerator(Configuration config) {
+    this.config = config;
   }
 
   /**
    * Creates a new {@link MoveGenerator}
    */
   public MoveGenerator(Position position) {
+    this(new Configuration());
+    setPosition(position);
+  }
+
+  /**
+   * Creates a new {@link MoveGenerator}
+   */
+  public MoveGenerator(Position position, Configuration config) {
+    this(config);
     setPosition(position);
   }
 
@@ -336,7 +356,8 @@ public class MoveGenerator {
   }
 
   /**
-   * Generates <b>capturing</b> moves for a position. These moves may leave the king in check and may be
+   * Generates <b>capturing</b> moves for a position. These moves may leave the king in check and
+   * may be
    * illegal.<br>
    * Before committing them to a board they need to be checked if they leave the king in check.
    *
@@ -426,36 +447,41 @@ public class MoveGenerator {
     }
 
     // lower amount of captures searched in quiescence search by only looking at "good" captures
-    // TODO: is this good?? better implementing SEE?
     qSearchMoves.clear();
     for (int m = 0, size = capturingMoves.size(); m < size; m++) {
       int move = capturingMoves.get(m);
-      // all pawn captures - they never loose material
-      if (Move.getPiece(move).getType() == PieceType.PAWN) {
-        qSearchMoves.add(move);
-      }
-      // recaptures @// @formatter:off
-      else if (position.getLastMove() != Move.NOMOVE
-               && Move.getEnd(position.getLastMove()) == Move.getEnd(move)
-               && Move.getTarget(position.getLastMove()) != Piece.NOPIECE) {
-        qSearchMoves.add(move);
-      }
-      // Lower value piece captures higher value piece
-      // With a margin to also look at Bishop x Knight
-      else if (Move.getPiece(move).getType().getValue() + 50
-               <= Move.getTarget(move).getType().getValue()) {
-        qSearchMoves.add(move);
-      }
-      // @formatter:on
-      // undefended pieces captures are good
-      // If the defender is "behind" the attacker this will not be recognized here
-      // This is not too bad as it only adds a move to qsearch which we could otherwise ignore
-      else if (!position.isAttacked(position.getOpponent(), Move.getEnd(move))) {
-        qSearchMoves.add(move);
-      }
-      // ignore all other captures
-    }
 
+      // use full SEE to determine good captures
+      if (config.USE_SEE) {
+        if (Attacks.see(position, move) > 0) qSearchMoves.add(move);
+      }
+
+      // use simple good-capture filter
+      else {
+        // all pawn captures - they never loose material
+        if (Move.getPiece(move).getType() == PieceType.PAWN) qSearchMoves.add(move);
+          // recaptures
+        else if (position.getLastMove() != Move.NOMOVE
+          && Move.getEnd(position.getLastMove()) == Move.getEnd(move)
+          && Move.getTarget(position.getLastMove()) != Piece.NOPIECE) {
+          qSearchMoves.add(move);
+        }
+        // Lower value piece captures higher value piece
+        // With a margin to also look at Bishop x Knight
+        else if (Move.getPiece(move).getType().getValue() + 50
+          <= Move.getTarget(move).getType().getValue()) {
+          qSearchMoves.add(move);
+        }
+        // undefended pieces captures are good
+        // If the defender is "behind" the attacker this will not be recognized here
+        // This is not too bad as it only adds a move to qsearch which we could otherwise ignore
+        else if (!position.isAttacked(position.getOpponent(), Move.getEnd(move))) {
+          qSearchMoves.add(move);
+        }
+        // ignore all other captures
+      }
+    }
+    if (SORT_CAPTURING_MOVES) qSearchMoves.sort(mvvlvaComparator);
     // return a clone of the list as we will continue to reuse
     return qSearchMoves;
   }
@@ -504,7 +530,6 @@ public class MoveGenerator {
         pseudoLegalMoves.add(capturingMoves);
         pseudoLegalMoves.add(nonCapturingMoves);
         moveListSort(pseudoLegalMoves);
-
       }
       else {
         // sort only capturing moves mvvlva order
@@ -573,7 +598,7 @@ public class MoveGenerator {
     // capturing moves including capturing promotions
     if (Move.getTarget(move) != Piece.NOPIECE) {
       return Move.getPiece(move).getType().getValue() - Move.getPromotion(move).getType().getValue()
-             - Move.getTarget(move).getType().getValue();
+        - Move.getTarget(move).getType().getValue();
     }
     // non capturing
     else {
@@ -679,7 +704,7 @@ public class MoveGenerator {
           if (d != Square.N) { // not straight
             if ((genMode & GEN_CAPTURES) > 0) {  // generating captures?
               if (target != Piece.NOPIECE // not empty
-                  && (target.getColor() == activePlayer.getInverseColor())) { // opponents color
+                && (target.getColor() == activePlayer.getInverseColor())) { // opponents color
                 assert target.getType() != PieceType.KING; // did we miss a check?
                 // capture & promotion
                 if (to > 111) { // rank 8
@@ -733,7 +758,7 @@ public class MoveGenerator {
           // no capture
           else { // straight
             if ((genMode & GEN_NONCAPTURES) > 0 // generate non captures
-                && target == Piece.NOPIECE) { // way needs to be free
+              && target == Piece.NOPIECE) { // way needs to be free
               // promotion
               if (to > 111) { // rank 8
                 assert activePlayer.isWhite(); // checking for color is probably redundant
@@ -768,16 +793,16 @@ public class MoveGenerator {
               else {
                 // pawndouble
                 if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow()
-                    && (position.getPiece(fromSquare.ordinal() + (2 * Square.N)))
-                       == Piece.NOPIECE) {
+                  && (position.getPiece(fromSquare.ordinal() + (2 * Square.N)))
+                  == Piece.NOPIECE) {
                   // on rank 2 && rank 4 is free(rank 3 already checked via target)
                   nonCapturingMoves.add(
                     Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getNorth(), piece,
                                     target, promotion));
                 }
                 else if (activePlayer.isBlack() && fromSquare.isBlackPawnBaseRow()
-                         && position.getPiece(fromSquare.ordinal() + (2 * Square.S))
-                            == Piece.NOPIECE) {
+                  && position.getPiece(fromSquare.ordinal() + (2 * Square.S))
+                  == Piece.NOPIECE) {
                   // on rank 7 && rank 5 is free(rank 6 already checked via target)
                   nonCapturingMoves.add(
                     Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getSouth(), piece,
@@ -901,7 +926,7 @@ public class MoveGenerator {
   private void generateCastlingMoves() {
 
     if (position.hasCheck() // no castling if we are in check
-        || (genMode & GEN_NONCAPTURES) == 0) // only when generating non captures
+      || (genMode & GEN_NONCAPTURES) == 0) // only when generating non captures
     {
       return;
     }
@@ -913,9 +938,9 @@ public class MoveGenerator {
         // we will not check if g1 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
         if (position.getPiece(Square.f1.ordinal()) == Piece.NOPIECE // passing square free
-            && !position.isAttacked(activePlayer.getInverseColor(), Square.f1)
-            // passing square not attacked
-            && position.getPiece(Square.g1.ordinal()) == Piece.NOPIECE) // to square free
+          && !position.isAttacked(activePlayer.getInverseColor(), Square.f1)
+          // passing square not attacked
+          && position.getPiece(Square.g1.ordinal()) == Piece.NOPIECE) // to square free
         {
           nonCapturingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e1, Square.g1, Piece.WHITE_KING,
@@ -927,11 +952,11 @@ public class MoveGenerator {
         // we will not check if d1 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
         if (position.getPiece(Square.d1.ordinal()) == Piece.NOPIECE // passing square free
-            && position.getPiece(Square.b1.ordinal()) == Piece.NOPIECE
-            // rook passing square free
-            && !position.isAttacked(activePlayer.getInverseColor(), Square.d1)
-            // passing square not attacked
-            && position.getPiece(Square.c1.ordinal()) == Piece.NOPIECE) // to square free
+          && position.getPiece(Square.b1.ordinal()) == Piece.NOPIECE
+          // rook passing square free
+          && !position.isAttacked(activePlayer.getInverseColor(), Square.d1)
+          // passing square not attacked
+          && position.getPiece(Square.c1.ordinal()) == Piece.NOPIECE) // to square free
         {
           nonCapturingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e1, Square.c1, Piece.WHITE_KING,
@@ -945,9 +970,9 @@ public class MoveGenerator {
         // we will not check if g8 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
         if (position.getPiece(Square.f8.ordinal()) == Piece.NOPIECE // passing square free
-            && !position.isAttacked(activePlayer.getInverseColor(), Square.f8)
-            // passing square not attacked
-            && position.getPiece(Square.g8.ordinal()) == Piece.NOPIECE) // to square free
+          && !position.isAttacked(activePlayer.getInverseColor(), Square.f8)
+          // passing square not attacked
+          && position.getPiece(Square.g8.ordinal()) == Piece.NOPIECE) // to square free
         {
           nonCapturingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e8, Square.g8, Piece.BLACK_KING,
@@ -959,11 +984,11 @@ public class MoveGenerator {
         // we will not check if d8 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
         if (position.getPiece(Square.d8.ordinal()) == Piece.NOPIECE // passing square free
-            && position.getPiece(Square.b8.ordinal()) == Piece.NOPIECE
-            // rook passing square free
-            && !position.isAttacked(activePlayer.getInverseColor(), Square.d8)
-            // passing square not attacked
-            && position.getPiece(Square.c8.ordinal()) == Piece.NOPIECE) // to square free
+          && position.getPiece(Square.b8.ordinal()) == Piece.NOPIECE
+          // rook passing square free
+          && !position.isAttacked(activePlayer.getInverseColor(), Square.d8)
+          // passing square not attacked
+          && position.getPiece(Square.c8.ordinal()) == Piece.NOPIECE) // to square free
         {
           nonCapturingMoves.add(
             Move.createMove(MoveType.CASTLING, Square.e8, Square.c8, Piece.BLACK_KING,
@@ -1009,7 +1034,7 @@ public class MoveGenerator {
      * Find a move by finding at least one moves for a piece type
      */
     return findKingMove() || findPawnMove() || findKnightMove() || findQueenMove() || findRookMove()
-           || findBishopMove();
+      || findBishopMove();
   }
 
   /**
@@ -1166,7 +1191,7 @@ public class MoveGenerator {
           // capture
           if (d != Square.N) { // not straight
             if (target != Piece.NOPIECE // not empty
-                && (target.getColor() == activePlayer.getInverseColor())) { // opponents color
+              && (target.getColor() == activePlayer.getInverseColor())) { // opponents color
               move = Move.createMove(type, fromSquare, toSquare, piece, target, promotion);
               if (isLegalMove(move)) return true;
             }
