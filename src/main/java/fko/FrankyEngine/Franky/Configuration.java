@@ -114,6 +114,11 @@ public class Configuration {
   public boolean USE_QUIESCENCE = true;
 
   /**
+   * Uses SEE to determine QSearch moves
+   */
+  public boolean USE_SEE = true;
+
+  /**
    * Use AlphaBeta Pruning
    */
   public boolean USE_ALPHABETA_PRUNING = true;

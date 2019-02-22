@@ -133,6 +133,7 @@ public class FrankyEngine implements IUCIEngine {
     option("UCI_ShowCurrLine", UCIOptionType.check, Boolean.toString(config.UCI_ShowCurrLine), "", "", "");
     option("Use_TranspositionTable", UCIOptionType.check, Boolean.toString(config.USE_TRANSPOSITION_TABLE), "", "", "");
     option("Use_QSearch", UCIOptionType.check, Boolean.toString(config.USE_QUIESCENCE), "", "", "");
+    option("Use_SEE", UCIOptionType.check, Boolean.toString(config.USE_SEE), "", "", "");
     option("Use_AlphaBeta_Pruning", UCIOptionType.check, Boolean.toString(config.USE_ALPHABETA_PRUNING), "", "", "");
     option("Use_Killer_Moves", UCIOptionType.check, Boolean.toString(config.USE_KILLER_MOVES), "", "", "");
     option("Number_Killer_Moves", UCIOptionType.spin, Integer.toString(config.NO_KILLER_MOVES), "0", "10", "");
@@ -228,6 +229,12 @@ public class FrankyEngine implements IUCIEngine {
       case "Use_QSearch":
         config.USE_QUIESCENCE = Boolean.valueOf(value);
         msg = "Use Quiescence Search set to " + (config.USE_QUIESCENCE ? "On" : "Off");
+        LOG.info(msg);
+        uciProtocolHandler.sendInfoStringToUCI(msg);
+        break;
+      case "Use_SEE":
+        config.USE_SEE = Boolean.valueOf(value);
+        msg = "Use SEE set to " + (config.USE_SEE ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
