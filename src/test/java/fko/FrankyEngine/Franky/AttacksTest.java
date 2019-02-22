@@ -108,6 +108,243 @@ class AttacksTest {
   }
 
   @Test
+  void seeTest() {
+    int seeScore, move;
+
+    //    //     ---------------------------------
+    //    // 8: |   |   | b | r | r |   | k |   |
+    //    //    ---------------------------------
+    //    // 7: |   | p | q |   | b |   | p |   |
+    //    //    ---------------------------------
+    //    // 6: | p |   | n | p |   | p |   | p |
+    //    //    ---------------------------------
+    //    // 5: | P |   | p |   | p |   |   | n |
+    //    //    ---------------------------------
+    //    // 4: |   | P | N | P | P | P |   |   |
+    //    //    ---------------------------------
+    //    // 3: |   |   | P |   | B | N | P |   |
+    //    //    ---------------------------------
+    //    // 2: |   |   |   |   | Q |   | B | P |
+    //    //    ---------------------------------
+    //    // 1: | R |   |   | R |   |   | K |   |
+    //    //    ---------------------------------
+    //    //      A   B   C   D   E   F   G   H
+    //
+    //    // b4c5 - d6c5 - open rook line
+    //    position = new Position("2brr1k1/1pq1b1p1/p1np1p1p/P1p1p2n/1PNPPP2/2P1BNP1/4Q1BP/R2R2K1
+    //    w - -");
+    //    System.out.println(position);
+    //
+    //    move = Move.fromUCINotation(position, "a1b1");
+    //    seeScore = Attacks.see(position, move);
+    //    System.out.printf("Move: %s: gain=%d%n", Move.toSimpleString(move), seeScore);
+    //    assertEquals(0, seeScore);
+    //
+    //    move = Move.fromUCINotation(position, "f4e5");
+    //    seeScore = Attacks.see(position, move);
+    //    System.out.printf("Move: %s: gain=%d%n", Move.toSimpleString(move), seeScore);
+    //    assertEquals(0, seeScore);
+    //
+    //    //     ---------------------------------
+    //    // 8: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 7: |   |   | n |   | n |   |   |   |
+    //    //    ---------------------------------
+    //    // 6: |   |   | p | k | p |   |   |   |
+    //    //    ---------------------------------
+    //    // 5: |   | R |   | q |   |   | Q |   |
+    //    //    ---------------------------------
+    //    // 4: |   |   | P | K | P |   |   |   |
+    //    //    ---------------------------------
+    //    // 3: |   |   | N |   | N |   |   |   |
+    //    //    ---------------------------------
+    //    // 2: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 1: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    //      A   B   C   D   E   F   G   H
+    //
+    //    position = new Position("8/2n1n3/2pkp3/1R1q2Q1/2PKP3/2N1N3/8/8 w - -");
+    //    System.out.println(position);
+    //    move = Move.fromUCINotation(position, "e4d5");
+    //    seeScore = Attacks.see(position, move);
+    //    System.out.printf("Move: %s: gain=%d%n", Move.toSimpleString(move), seeScore);
+    //    assertEquals(900, seeScore);
+    //
+    //    //    ---------------------------------
+    //    // 8: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 7: |   |   | n |   | n |   |   |   |
+    //    //    ---------------------------------
+    //    // 6: |   |   | p | k | p |   |   |   |
+    //    //    ---------------------------------
+    //    // 5: |   | R |   | p |   |   | q |   |
+    //    //    ---------------------------------
+    //    // 4: |   |   | P | K | P |   |   |   |
+    //    //    ---------------------------------
+    //    // 3: |   |   | N |   | N |   |   |   |
+    //    //    ---------------------------------
+    //    // 2: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 1: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    //      A   B   C   D   E   F   G   H
+    //
+    //    position = new Position("8/2n1n3/2pkp3/1R1p2q1/2PKP3/2N1N3/8/8 w - -");
+    //    System.out.println(position);
+    //    move = Move.fromUCINotation(position, "e4d5");
+    //    seeScore = Attacks.see(position, move);
+    //    System.out.printf("Move: %s: gain=%d%n", Move.toSimpleString(move), seeScore);
+    //    assertEquals(0, seeScore);
+    //
+    //    //    ---------------------------------
+    //    // 8: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 7: |   | b | n |   | n |   |   |   |
+    //    //    ---------------------------------
+    //    // 6: |   |   | p | k | p |   |   |   |
+    //    //    ---------------------------------
+    //    // 5: |   | R |   | p |   |   | r | q |
+    //    //    ---------------------------------
+    //    // 4: |   |   | P | K | P |   |   |   |
+    //    //    ---------------------------------
+    //    // 3: |   | B | N |   | N |   |   |   |
+    //    //    ---------------------------------
+    //    // 2: | Q |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 1: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    //      A   B   C   D   E   F   G   H
+    //    // 1. exd5 cxd5 2. cxd5 exd5 3. Ncxd5 Ncxd5 4. Nxd5 Nxd5 5. Bxd5 Bxd5
+    //    // 6. Rxd5+ Rxd5+ 7. Qxd5+ Qxd5+
+    //    //
+    //    // 0. Move: WHITE_PAWN on e4 captures BLACK_PAWN on d5: score=100
+    //    // 1. Move: WHITE_PAWN on e4 captures BLACK_PAWN on d5: score=100 (risk=100)
+    //    // 2. Move: BLACK_PAWN on c6 captures WHITE_PAWN on d5: score=0 (risk=100)
+    //    // 3. Move: WHITE_PAWN on c4 captures BLACK_PAWN on d5: score=100 (risk=100)
+    //    // 4. Move: BLACK_PAWN on e6 captures WHITE_PAWN on d5: score=0 (risk=100)
+    //    // 5. Move: WHITE_KNIGHT on c3 captures BLACK_PAWN on d5: score=100 (risk=320)
+    //    // 6. Move: BLACK_KNIGHT on c7 captures WHITE_KNIGHT on d5: score=220 (risk=320)
+    //    // 7. Move: WHITE_KNIGHT on e3 captures BLACK_KNIGHT on d5: score=100 (risk=320)
+    //    // 8. Move: BLACK_KNIGHT on e7 captures WHITE_KNIGHT on d5: score=220 (risk=320)
+    //    // 9. Move: WHITE_BISHOP on b3 captures BLACK_KNIGHT on d5: score=100 (risk=330)
+    //    // 10. Move: BLACK_BISHOP on b7 captures WHITE_BISHOP on d5: score=230 (risk=330)
+    //    // 11. Move: WHITE_ROOK on b5 captures BLACK_BISHOP on d5: score=100 (risk=500)
+    //    // 12. Move: BLACK_ROOK on g5 captures WHITE_ROOK on d5: score=400 (risk=500)
+    //    // 13. Move: WHITE_QUEEN on a2 captures BLACK_ROOK on d5: score=100 (risk=900)
+    //    // 14. Move: BLACK_QUEEN on h5 captures WHITE_QUEEN on d5: score=800 (risk=900)
+    //    // Move: e4d5: gain=0
+    //    // gain[] = [0, 0, 0, 0, -220, 220, -220, 220, -230, 230, -400, 400, -800, 800, 100, 0,
+    //    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //
+    //    position = new Position("8/1bn1n3/2pkp3/1R1p2rq/2PKP3/1BN1N3/Q7/8 w - -");
+    //    System.out.println(position);
+    //    move = Move.fromUCINotation(position, "e4d5");
+    //    seeScore = Attacks.see(position, move);
+    //    System.out.printf("Move: %s: gain=%d%n", Move.toSimpleString(move), seeScore);
+    //    assertEquals(0, seeScore);
+    //
+    //    // EN PASSANT TEST
+    //    //    ---------------------------------
+    //    // 8: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 7: |   |   |   | r |   | p | k |   |
+    //    //    ---------------------------------
+    //    // 6: | p |   | R |   |   | p |   |   |
+    //    //    ---------------------------------
+    //    // 5: |   | p |   |   |   |   |   | p |
+    //    //    ---------------------------------
+    //    // 4: | r |   |   | P | p |   |   |   |
+    //    //    ---------------------------------
+    //    // 3: | P | R |   |   |   |   | P |   |
+    //    //    ---------------------------------
+    //    // 2: |   |   | P |   | K | P |   | P |
+    //    //    ---------------------------------
+    //    // 1: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    //      A   B   C   D   E   F   G   H
+    //
+    //    // en passant does not reveal attacks until now - needss to be added or
+    //    // forever ignored
+    //    position = new Position("8/3r1pk1/p1R2p2/1p5p/r2Pp3/PR4P1/2P1KP1P/8 b - d3");
+    //    System.out.println(position);
+    //    move = Move.fromUCINotation(position, "e4d3");
+    //    seeScore = Attacks.see(position, move);
+    //    System.out.printf("Move: %s: gain=%d%n", Move.toSimpleString(move), seeScore);
+    //    assertEquals(100, seeScore);
+    //
+    //    // King protection
+    //    //    ---------------------------------
+    //    // 8: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 7: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 6: |   |   |   | p |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 5: |   |   |   |   | r |   |   |   |
+    //    //    ---------------------------------
+    //    // 4: |   |   | R | K | P |   |   |   |
+    //    //    ---------------------------------
+    //    // 3: |   |   |   |   |   | k |   |   |
+    //    //    ---------------------------------
+    //    // 2: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 1: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    //      A   B   C   D   E   F   G   H
+    //    position = new Position("8/8/3p4/4r3/2RKP3/5k2/8/8 b - -");
+    //    System.out.println(position);
+    //    move = Move.fromUCINotation(position, "e5e4");
+    //    seeScore = Attacks.see(position, move);
+    //    System.out.printf("Move: %s: gain=%d%n", Move.toSimpleString(move), seeScore);
+    //    assertEquals(100, seeScore);
+    //
+    //    // Bad SEE example - see produces bad capture although it is a winning move
+    //    //    ---------------------------------
+    //    // 8: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 7: | r | n |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 6: | P |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 5: | K |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 4: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 3: |   |   |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    // 2: |   |   |   |   |   |   | k |   |
+    //    //    ---------------------------------
+    //    // 1: |   | Q |   |   |   |   |   |   |
+    //    //    ---------------------------------
+    //    //      A   B   C   D   E   F   G   H
+    //    position = new Position("8/rn6/P7/K7/8/8/6k1/1Q6 w - -");
+    //    System.out.println(position);
+    //    move = Move.fromUCINotation(position, "b1b7");
+    //    seeScore = Attacks.see(position, move);
+    //    System.out.printf("Move: %s: gain=%d%n", Move.toSimpleString(move), seeScore);
+    //    assertEquals(-80, seeScore);
+    //
+    //    // promotion tests
+    //    // TODO improve this - should count won promotion value
+    //    position = new Position("rn6/P7/K7/8/8/6k1/1Q6/8 w - -");
+    //    System.out.println(position);
+    //    move = Move.fromUCINotation(position, "b2b8");
+    //    seeScore = Attacks.see(position, move);
+    //    System.out.printf("Move: %s: gain=%d%n", Move.toSimpleString(move), seeScore);
+    //    assertEquals(-80, seeScore);
+
+    // bug fix
+    position = new Position("r1b1kbQr/ppp1p3/2nq4/3p4/8/3B4/PPPP1PPP/RNBQK1NR b KQkq -");
+    System.out.println(position);
+    move = Move.fromUCINotation(position, "d6h2");
+    seeScore = Attacks.see(position, move);
+    System.out.printf("Move: %s: gain=%d%n", Move.toSimpleString(move), seeScore);
+    assertEquals(-300, seeScore);
+
+  }
+
+  @Test
   @Disabled
   public void testTiming() {
 
@@ -199,7 +436,7 @@ class AttacksTest {
   private void test2(final Position position, int[] moves) {
     for (int i = 0; i < moves.length; i++) {
       position.makeMove(moves[i]);
-      attacks.computeAttacks2(position);
+      attacks.computeAttacks(position);
     }
     for (int i = 0; i < moves.length; i++) position.undoMove();
   }
@@ -209,35 +446,37 @@ class AttacksTest {
   public void testAbsoluteTiming() {
 
     int ROUNDS = 10;
-    int DURATION = 3;
+    int DURATION = 300;
     int ITERATIONS;
 
-    Instant start;
+    long start;
 
     System.out.println("Running Timing Test");
 
-    String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
-    position = new Position(fen);
+    position = new Position("2brr1k1/1pq1b1p1/p1np1p1p/P1p1p2n/1PNPPP2/2P1BNP1/4Q1BP/R2R2K1 w - -");
+    final int move = Move.fromUCINotation(position, "f4e5");
 
     for (int j = 0; j < ROUNDS; j++) {
       System.gc();
-      start = Instant.now();
+      start = System.nanoTime();
       ITERATIONS = 0;
       do {
         ITERATIONS++;
         // ### TEST CODE
         //testCode();
-        test3(position);
+        test3(position, move);
         // ### /TEST CODE
-      } while (Duration.between(start, Instant.now()).getSeconds() < DURATION);
+      } while ((System.nanoTime() - start) / 1e9 < DURATION);
       System.out.println(String.format("Timing: %,7d runs/s", ITERATIONS / DURATION));
 
     }
   }
 
-  private void test3(Position position) {
-    attacks = new Attacks();
-    attacks.computeAttacks(position);
+  private void test3(Position position, int move) {
+    Attacks.see(position, move);
   }
+
+
+
 
 }
