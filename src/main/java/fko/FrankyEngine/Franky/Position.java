@@ -852,7 +852,7 @@ public class Position {
 
   /**
    * Checks if move is giving check to the opponent.
-   * This method is faster than makeing the move and checking for legallity and giving check.
+   * This method is faster than making the move and checking for legality and giving check.
    * Needs to be a valid move for the position otherwise will crash.
    * For performance reason we do not want to check validity here.
    * Does NOT check if the move itself is legal (leaves the own king in check)
@@ -1056,7 +1056,7 @@ public class Position {
    * @return true if current position has check for next player
    */
   public boolean hasCheck() {
-    //if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
+    if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
     boolean check = isAttacked(nextPlayer.getInverseColor(), kingSquares[nextPlayer.ordinal()]);
     hasCheck = check ? Flag.TRUE : Flag.FALSE;
     return check;
@@ -1133,47 +1133,6 @@ public class Position {
         & (piecesBitboards[attacker][PieceType.BISHOP.ordinal()]
         | piecesBitboards[attacker][PieceType.QUEEN.ordinal()])) != 0) return true;
     } // @formatter:on
-
-    // OLD CODE
-    //    // get all pieces to check occupied intermediate squares
-    //    final long occupiedSquares = getAllOccupiedBitboard();
-    //    // rooks
-    //    // Check if there are any rooks on possible attack squares
-    //    if ((Bitboard.rookAttacks[squareIdx] & piecesBitboards[attacker][PieceType.ROOK.ordinal
-    //    ()])
-    //      != 0) {
-    //      // iterate over all pieces
-    //      for (int s = 0, size = rookSquares[attacker].size(); s < size; s++) {
-    //        final int sqIdx = rookSquares[attacker].get(s).getIndex64();
-    //        // if the square is not reachable from the piece's square we can skip this
-    //        if ((Bitboard.rookAttacks[sqIdx] & square.getBitBoard()) == 0) continue;
-    //        // if there are no occupied squares between the piece square and the
-    //        // target square we have a check
-    //        if ((Bitboard.intermediate[sqIdx][squareIdx] & occupiedSquares) == 0) return true;
-    //      }
-    //    }
-    //
-    //    // bishops
-    //    if ((Bitboard.bishopAttacks[squareIdx] & piecesBitboards[attacker][PieceType.BISHOP
-    //    .ordinal()])
-    //      != 0) {
-    //      for (int s = 0, size = bishopSquares[attacker].size(); s < size; s++) {
-    //        final int sqIdx = bishopSquares[attacker].get(s).getIndex64();
-    //        if ((Bitboard.bishopAttacks[sqIdx] & square.getBitBoard()) == 0) continue;
-    //        if ((Bitboard.intermediate[sqIdx][squareIdx] & occupiedSquares) == 0) return true;
-    //      }
-    //    }
-    //
-    //    // queen
-    //    if ((Bitboard.queenAttacks[squareIdx] & piecesBitboards[attacker][PieceType.QUEEN
-    //    .ordinal()])
-    //      != 0) {
-    //      for (int s = 0, size = queenSquares[attacker].size(); s < size; s++) {
-    //        int sqIdx = queenSquares[attacker].get(s).getIndex64();
-    //        if ((Bitboard.queenAttacks[sqIdx] & square.getBitBoard()) == 0) continue;
-    //        if ((Bitboard.intermediate[sqIdx][squareIdx] & occupiedSquares) == 0) return true;
-    //      }
-    //    }
 
     // check en passant
     if (this.enPassantSquare != Square.NOSQUARE) {

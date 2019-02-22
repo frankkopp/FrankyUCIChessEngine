@@ -112,7 +112,7 @@ public class Bitboard {
    * Returns a string representing a bitboard in a 8 by 8 matrix
    *
    * @param bitboard
-   * @return
+   * @return string representing a bitboard in a 8 by 8 matrix
    */
   public static String toString(long bitboard) {
     StringBuilder bitBoardLine = new StringBuilder();
@@ -263,9 +263,10 @@ public class Bitboard {
 
   /**
    * Iterate over all squares and copy the set bits into the new board.
+   *
    * @param bitboard
    * @param rotMap
-   * @return
+   * @return rotated bitboard
    */
   private static long rotate(long bitboard, int[] rotMap) {
     long rotated = 0L;
@@ -316,7 +317,6 @@ public class Bitboard {
     return indexL45[index64];
   }
 
-  // @formatter:off
   /**
    * To generate a bitboard where all diagonal squares are next to each other the
    * bitboard needs to be rotated. To get the diagonals squares into the lower
@@ -327,7 +327,7 @@ public class Bitboard {
    * @return
    */
   public static int getShiftUp(Square square) { return shiftsDiagUp[square.getIndex64()]; }
-   /**
+  /**
    * To generate a bitboard where all diagonal squares are next to each other the
    * bitboard needs to be rotated. To get the diagonals squares into the lower
    * 8-bits it needs to be shifted by a certain amount depending on the diagonal's
@@ -337,7 +337,7 @@ public class Bitboard {
    * @return
    */
   public static int getShiftUp(int idx) { return shiftsDiagUp[idx]; }
-  private static final int[] shiftsDiagUp = new int[] {
+  private static final int[] shiftsDiagUp = new int[]{ // @formatter:off
      0,  1,  3,  6, 10, 15, 21, 28,
      1,  3,  6, 10, 15, 21, 28, 36,
      3,  6, 10, 15, 21, 28, 36, 43,
@@ -346,9 +346,9 @@ public class Bitboard {
     15, 21, 28, 36, 43, 49, 54, 58,
     21, 28, 36, 43, 49, 54, 58, 61,
     28, 36, 43, 49, 54, 58, 61, 63
-  };
+  }; // @formatter:on
 
-   /**
+  /**
    * To generate a bitboard where all diagonal squares are next to each other the
    * bitboard needs to be rotated. To get the diagonals squares into the lower
    * 8-bits it needs to be shifted by a certain amount depending on the diagonal's
@@ -358,7 +358,7 @@ public class Bitboard {
    * @return
    */
   public static int getShiftDown(Square square) { return shiftsDiagDown[square.getIndex64()]; }
-   /**
+  /**
    * To generate a bitboard where all diagonal squares are next to each other the
    * bitboard needs to be rotated. To get the diagonals squares into the lower
    * 8-bits it needs to be shifted by a certain amount depending on the diagonal's
@@ -368,7 +368,7 @@ public class Bitboard {
    * @return
    */
   public static int getShiftDown(int idx) { return shiftsDiagDown[idx]; }
-  private static final int[] shiftsDiagDown = new int[] {
+  private static final int[] shiftsDiagDown = new int[]{ // @formatter:off
     28, 21, 15, 10,  6,  3,  1,  0,
     36, 28, 21, 15, 10,  6,  3,  1,
     43, 36, 28, 21, 15, 10,  6,  3,
@@ -377,7 +377,7 @@ public class Bitboard {
     58, 54, 49, 43, 36, 28, 21, 15,
     61, 58, 54, 49, 43, 36, 28, 21,
     63, 61, 58, 54, 49, 43, 36, 28
-  };
+  }; // @formatter:on
 
   /**
    * To generate a bitboard where all diagonal squares are next to each other the
@@ -401,8 +401,7 @@ public class Bitboard {
   public static long getLengthMaskUp(Square square) {
     return (1L << lengthDiagUp[square.getIndex64()]) - 1;
   }
-  /* These simply store the length of the diagonal in the required sense */
-  static final int[] lengthDiagUp = new int[] {
+  static final int[] lengthDiagUp = new int[]{ // @formatter:off
     1, 2, 3, 4, 5, 6, 7, 8,
     2, 3, 4, 5, 6, 7, 8, 7,
     3, 4, 5, 6, 7, 8, 7, 6,
@@ -411,10 +410,9 @@ public class Bitboard {
     6, 7, 8, 7, 6, 5, 4, 3,
     7, 8, 7, 6, 5, 4, 3, 2,
     8, 7, 6, 5, 4, 3, 2, 1
+  }; // @formatter:on
 
-  };
-
-    /**
+  /**
    * To generate a bitboard where all diagonal squares are next to each other the
    * bitboard needs to be rotated. To get the diagonals squares into the lower
    * 8-bits it needs to be shifted by a certain amount depending on the diagonal's
@@ -437,7 +435,7 @@ public class Bitboard {
    */
   public static long getLengthMaskDown(int idx) { return (1L << lengthDiagDown[idx]) - 1; }
   /* These simply store the length of the diagonal in the required sense */
-  static final int[] lengthDiagDown = new int[] {
+  static final int[] lengthDiagDown = new int[]{ // @formatter:off
     8, 7, 6, 5, 4, 3, 2, 1,
     7, 8, 7, 6, 5, 4, 3, 2,
     6, 7, 8, 7, 6, 5, 4, 3,
@@ -446,8 +444,7 @@ public class Bitboard {
     3, 4, 5, 6, 7, 8, 7, 6,
     2, 3, 4, 5, 6, 7, 8, 7,
     1, 2, 3, 4, 5, 6, 7, 8
-  };
-  // @formatter:on
+  }; // @formatter:on
 
   /**
    * Bitboards for all possible horizontal moves on the rank of the square with
@@ -458,7 +455,7 @@ public class Bitboard {
   }
 
   /**
-   * Bitboards for all possible horizontal moves on the rank of the square with
+   * Bitboard for all possible horizontal moves on the rank of the square with
    * the rank content (blocking pieces) determined from the given pieces bitboard.
    */
   public static long getSlidingMovesRank(Square square, long content) {
@@ -474,7 +471,7 @@ public class Bitboard {
   static final long[][] movesRank = new long[64][256];
 
   /**
-   * Bitboards for all possible horizontal moves on the file of the square with
+   * Bitboard for all possible horizontal moves on the file of the square with
    * the file content (blocking pieces) determined from the given position.
    */
   public static long getSlidingMovesFile(Square square, Position position) {
@@ -482,7 +479,7 @@ public class Bitboard {
   }
 
   /**
-   * Bitboards for all possible horizontal moves on the rank of the square with
+   * Bitboard for all possible horizontal moves on the rank of the square with
    * the rank content (blocking pieces) determined from the given pieces bitboard.
    */
   public static long getSlidingMovesFile(Square square, long content) {
@@ -503,7 +500,7 @@ public class Bitboard {
   static final long[][] movesFile = new long[64][256];
 
   /**
-   * Bitboards for all possible diagonal up moves of the square with
+   * Bitboard for all possible diagonal up moves of the square with
    * the content (blocking pieces) determined from the given pieces position.
    */
   public static long getSlidingMovesDiagUp(Square square, Position position) {
@@ -511,7 +508,7 @@ public class Bitboard {
                                getLengthMaskUp(square), movesUpDiag);
   }
   /**
-   * Bitboards for all possible diagonal up moves of the square with
+   * Bitboard for all possible diagonal up moves of the square with
    *    * the content (blocking pieces) determined from the given pieces bitboard.
    */
   public static long getSlidingMovesDiagUp(Square square, long content) {
@@ -525,7 +522,7 @@ public class Bitboard {
   static final long[][] movesUpDiag = new long[64][256];
 
   /**
-   * Bitboards for all possible diagonal down moves on the rank of the square with
+   * Bitboard for all possible diagonal down moves on the rank of the square with
    * the rank content (blocking pieces) determined from the given pieces position.
    */
   public static long getSlidingMovesDiagDown(Square square, Position position) {
@@ -534,7 +531,7 @@ public class Bitboard {
   }
 
   /**
-   * Bitboards for all possible horizontal moves on the rank of the square with
+   * Bitboard for all possible horizontal moves on the rank of the square with
    * the rank content (blocking pieces) determined from the given pieces bitboard.
    */
   public static long getSlidingMovesDiagDown(Square square, long content) {
@@ -546,7 +543,6 @@ public class Bitboard {
     return getSlidingMovesDiag(square, rotated, getShiftDown(square), getLengthMaskDown(square),
                                movesDownDiag);
   }
-  static final long[][] movesDownDiag = new long[64][256];
 
   private static long getSlidingMovesDiag(Square square, long rotated, int shift, long lengthMask,
                                           long[][] moves) {
@@ -558,10 +554,14 @@ public class Bitboard {
     // retrieve all possible moves for this square with the current content
     return moves[square.getIndex64()][(int) contentReMasked];
   }
+  static final long[][] movesDownDiag = new long[64][256];
 
   static {
 
     // Pre compute all attack bitboards for all squares
+    // As this is done only once speed is not an issue / readability and correctness
+    // have priority
+
     // .parallelStream() // does not work in static initializer deadlock (Java Issue)
 
     // white pawn attacks - ignore that pawns can'*t be on all squares
@@ -686,13 +686,11 @@ public class Bitboard {
       final int file = square.getFile().ordinal();
       final int rank = square.getRank().ordinal();
       if (file > 0 && rank < 7)
-        passedPawnMask[WHITE][square.getIndex64()] |= rays[NORTH][square.getWest()
-                                                                        .getNorth()
-                                                                        .getIndex64()];
+        passedPawnMask[WHITE][square.getIndex64()]
+          |= rays[NORTH][square.getWest().getNorth().getIndex64()];
       if (file < 7 && rank < 7)
-        passedPawnMask[WHITE][square.getIndex64()] |= rays[NORTH][square.getEast()
-                                                                        .getNorth()
-                                                                        .getIndex64()];
+        passedPawnMask[WHITE][square.getIndex64()]
+          |= rays[NORTH][square.getEast().getNorth().getIndex64()];
     });
     // black pawn - ignore that pawns can'*t be on all squares
     validSquares.forEach(square -> {
@@ -701,13 +699,11 @@ public class Bitboard {
       final int file = square.getFile().ordinal();
       final int rank = square.getRank().ordinal();
       if (file > 0 && rank > 0)
-        passedPawnMask[BLACK][square.getIndex64()] |= rays[SOUTH][square.getWest()
-                                                                        .getSouth()
-                                                                        .getIndex64()];
+        passedPawnMask[BLACK][square.getIndex64()]
+          |= rays[SOUTH][square.getWest().getSouth().getIndex64()];
       if (file < 7 && rank > 0)
-        passedPawnMask[BLACK][square.getIndex64()] |= rays[SOUTH][square.getEast()
-                                                                        .getSouth()
-                                                                        .getIndex64()];
+        passedPawnMask[BLACK][square.getIndex64()]
+          |= rays[SOUTH][square.getEast().getSouth().getIndex64()];
     });
 
     // intermediate
@@ -812,7 +808,6 @@ public class Bitboard {
         //                          bitString.substring(bitString.length() - 8),
         //                          Bitboard.printBitString(movesUpDiag[i][j]),
         //                          movesUpDiag[square.getIndex64()][j]);
-
       }
       //System.out.println();
     }

@@ -46,6 +46,7 @@ import java.util.stream.IntStream;
  *
  * @author Frank Kopp
  */
+@SuppressWarnings("ForLoopReplaceableByForEach")
 public class MoveGenerator {
 
   private static final Logger LOG = LoggerFactory.getLogger(MoveGenerator.class);
@@ -150,11 +151,11 @@ public class MoveGenerator {
   }
 
   /**
-   * Sets the PV move so it will be returned first. Need to be set after each call
+   * Sets the PV move so it will be returned first. Need to be set after each call to
    * <code>setPosition</code> as this reset the killer moves.
    * <p>
    * <b>Attention:</b> needs to be a valid move in the current position otherwise will break!
-   * This can be the case when TT Collision happend.
+   * This could be the case when an unlikely TT Collision happens.
    *
    * @param move
    */
@@ -209,14 +210,12 @@ public class MoveGenerator {
           genMode = GEN_CAPTURES;
           generateCapturingMoves();
 
-          if (SORT_CAPTURING_MOVES) {
-            capturingMoves.sort(mvvlvaComparator);
-          }
+          if (SORT_CAPTURING_MOVES) capturingMoves.sort(mvvlvaComparator);
 
           // Setting pv move
           // setting all pv moves for capturing and non capturing move
           // !!! must be valid move on the current position
-          // can't check/assert as this would be too expensive
+          // Won't check/assert it here as this would be too expensive
           if (pvMove != Move.NOMOVE) {
             // pvMove is capturing
             if (Move.isCapturing(pvMove)) {

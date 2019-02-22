@@ -100,6 +100,10 @@ public class Attacks {
     return attacksToTemp;
 
   }
+
+  // max 32 captures with 32 pieces
+  private static int[] gain = new int[32];
+
   /**
    * Evaluates the SEE score for the given move which has not been made on the position
    * yet.<p>
@@ -122,7 +126,8 @@ public class Attacks {
     Piece capturedPiece = Move.getTarget(move);
     if (capturedPiece == Piece.NOPIECE) return 0;
 
-    int[] gain = new int[32]; // max 32 captures with 32 pieces
+    // clear gain list
+    for (int i = 0, intListLength = gain.length; i < intListLength; i++) gain[i] = 0;
     int d = 0;
 
     final Square toSquare = Move.getEnd(move);

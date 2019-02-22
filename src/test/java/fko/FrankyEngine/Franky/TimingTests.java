@@ -42,7 +42,7 @@ public class TimingTests {
     int ITERATIONS = 50;
     int REPETITIONS = 5000000;
 
-    for (int round = 0; round < ROUNDS; round++) {
+    for (int round = 1; round <= ROUNDS; round++) {
       long start, end, sum;
 
       System.out.printf("Running round %d of Timing Test Test 1 vs. Test 2%n", round);
@@ -79,17 +79,18 @@ public class TimingTests {
     for (String s : result) {
       System.out.println(s);
     }
-    System.out.println(t);
 
   }
 
-  long t = 0;
+  int[] intList = new int[512];
 
   private void test1() {
-    t += Long.numberOfLeadingZeros((long) (2147483647L + Math.random()));
+    for (int i = 0, intListLength = intList.length; i < intListLength; i++) {
+      intList[i] = 0;
+    }
   }
 
   private void test2() {
-    t += Long.numberOfTrailingZeros((long) (2147483647L + Math.random()));
+    intList = new int[512];
   }
 }
