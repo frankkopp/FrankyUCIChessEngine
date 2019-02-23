@@ -1184,7 +1184,7 @@ public class Search implements Runnable {
       ) {
 
         final int materialEval
-          = position.getMaterial(myColor) - position.getMaterial(myColor.getInverseColor());
+          = position.getMaterial(myColor) - position.getMaterial(myColor.inverse());
         final int moveGain = Move.getTarget(move).getType().getValue();
 
         // ###############################################
@@ -1696,7 +1696,7 @@ public class Search implements Runnable {
           && !position.givesCheck(move)
       ) {
         final int materialEval = position.getMaterial(myColor)
-                                   - position.getMaterial(myColor.getInverseColor());
+                                   - position.getMaterial(myColor.inverse());
         final int moveGain = Move.getTarget(move).getType().getValue();
         final int deltaMargin = 2 * PieceType.PAWN.getValue();
         value = materialEval + moveGain + deltaMargin;

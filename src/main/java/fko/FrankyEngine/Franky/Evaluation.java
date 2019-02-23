@@ -136,7 +136,7 @@ public class Evaluation {
 
     // convenience fields
     nextToMove = position.getNextPlayer().ordinal();
-    opponent = position.getNextPlayer().getInverseColor().ordinal();
+    opponent = position.getNextPlayer().inverse().ordinal();
     pawnSquares = position.getPawnSquares();
     knightSquares = position.getKnightSquares();
     bishopSquares = position.getBishopSquares();

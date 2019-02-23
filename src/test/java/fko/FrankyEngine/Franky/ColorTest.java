@@ -34,8 +34,8 @@ class ColorTest {
 
   @Test
   void getInverseColor() {
-    assertEquals(Color.BLACK, Color.WHITE.getInverseColor());
-    assertEquals(Color.WHITE, Color.BLACK.getInverseColor());
+    assertEquals(Color.BLACK, Color.WHITE.inverse());
+    assertEquals(Color.WHITE, Color.BLACK.inverse());
   }
 
 }

@@ -852,12 +852,12 @@ public class PositionTest {
     System.out.println(Bitboard.toString(
       (position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(
         Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
-                                          | Square.e8.getRank().bitBoard)));
+        | Square.e8.getRank().bitBoard)));
 
     System.out.println(
       ((position.getPiecesBitboards(Color.WHITE, PieceType.ROOK) | position.getPiecesBitboards(
         Color.WHITE, PieceType.QUEEN)) & (Square.e8.getFile().bitBoard
-                                          | Square.e8.getRank().bitBoard)) > 0);
+        | Square.e8.getRank().bitBoard)) > 0);
   }
 
   @Test
@@ -1005,7 +1005,6 @@ public class PositionTest {
     assertEquals(expected, actual);
   } // @formatter:on
 
-
   @Test
   @Disabled
   void bitBoardsAttacksDev() {
@@ -1102,7 +1101,7 @@ public class PositionTest {
     int[] rays = Bitboard.rookRays;
 
     long myPieces = position.getOccupiedBitboards(myColor);
-    long oppPieces = position.getOccupiedBitboards(myColor.getInverseColor());
+    long oppPieces = position.getOccupiedBitboards(myColor.inverse());
     long attacks = getSlidingAttacks(position, square, rays);
 
     System.out.println(position);
@@ -1154,7 +1153,7 @@ public class PositionTest {
     int ITERATIONS = 0;
     int DURATION = 20;
 
-    Position board = null;
+    Position board;
 
     int i = 0;
     String[] fens = getFENs();
@@ -1162,7 +1161,7 @@ public class PositionTest {
       String testFen = fens[i];
       board = new Position(testFen);
 
-      boolean test = false;
+      boolean test;
       Instant start = Instant.now();
       do {
         ITERATIONS++;

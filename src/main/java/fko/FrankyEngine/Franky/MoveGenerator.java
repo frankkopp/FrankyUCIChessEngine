@@ -703,7 +703,7 @@ public class MoveGenerator {
           if (d != Square.N) { // not straight
             if ((genMode & GEN_CAPTURES) > 0) {  // generating captures?
               if (target != Piece.NOPIECE // not empty
-                && (target.getColor() == activePlayer.getInverseColor())) { // opponents color
+                && (target.getColor() == activePlayer.inverse())) { // opponents color
                 assert target.getType() != PieceType.KING; // did we miss a check?
                 // capture & promotion
                 if (to > 111) { // rank 8
@@ -903,7 +903,7 @@ public class MoveGenerator {
         // occupied square - capture if opponent and stop sliding
         else {
           if ((genMode & GEN_CAPTURES) > 0) { // generate captures
-            if (target.getColor() == activePlayer.getInverseColor()) { // opponents color
+            if (target.getColor() == activePlayer.inverse()) { // opponents color
               assert target.getType() != PieceType.KING; // did we miss a check?
               capturingMoves.add(Move.createMove(MoveType.NORMAL, square, Square.getSquare(to),
                                                  Piece.getPiece(type, activePlayer), target,
@@ -937,7 +937,7 @@ public class MoveGenerator {
         // we will not check if g1 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
         if (position.getPiece(Square.f1.ordinal()) == Piece.NOPIECE // passing square free
-          && !position.isAttacked(activePlayer.getInverseColor(), Square.f1)
+          && !position.isAttacked(activePlayer.inverse(), Square.f1)
           // passing square not attacked
           && position.getPiece(Square.g1.ordinal()) == Piece.NOPIECE) // to square free
         {
@@ -953,7 +953,7 @@ public class MoveGenerator {
         if (position.getPiece(Square.d1.ordinal()) == Piece.NOPIECE // passing square free
           && position.getPiece(Square.b1.ordinal()) == Piece.NOPIECE
           // rook passing square free
-          && !position.isAttacked(activePlayer.getInverseColor(), Square.d1)
+          && !position.isAttacked(activePlayer.inverse(), Square.d1)
           // passing square not attacked
           && position.getPiece(Square.c1.ordinal()) == Piece.NOPIECE) // to square free
         {
@@ -969,7 +969,7 @@ public class MoveGenerator {
         // we will not check if g8 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
         if (position.getPiece(Square.f8.ordinal()) == Piece.NOPIECE // passing square free
-          && !position.isAttacked(activePlayer.getInverseColor(), Square.f8)
+          && !position.isAttacked(activePlayer.inverse(), Square.f8)
           // passing square not attacked
           && position.getPiece(Square.g8.ordinal()) == Piece.NOPIECE) // to square free
         {
@@ -985,7 +985,7 @@ public class MoveGenerator {
         if (position.getPiece(Square.d8.ordinal()) == Piece.NOPIECE // passing square free
           && position.getPiece(Square.b8.ordinal()) == Piece.NOPIECE
           // rook passing square free
-          && !position.isAttacked(activePlayer.getInverseColor(), Square.d8)
+          && !position.isAttacked(activePlayer.inverse(), Square.d8)
           // passing square not attacked
           && position.getPiece(Square.c8.ordinal()) == Piece.NOPIECE) // to square free
         {
@@ -1138,7 +1138,7 @@ public class MoveGenerator {
         }
         // occupied square - capture if opponent and stop sliding
         else {
-          if (target.getColor() == activePlayer.getInverseColor()) { // opponents color
+          if (target.getColor() == activePlayer.inverse()) { // opponents color
             move = Move.createMove(MoveType.NORMAL, Square.getSquare(square.ordinal()),
                                    Square.getSquare(to), Piece.getPiece(type, activePlayer), target,
                                    Piece.NOPIECE);
@@ -1190,7 +1190,7 @@ public class MoveGenerator {
           // capture
           if (d != Square.N) { // not straight
             if (target != Piece.NOPIECE // not empty
-              && (target.getColor() == activePlayer.getInverseColor())) { // opponents color
+              && (target.getColor() == activePlayer.inverse())) { // opponents color
               move = Move.createMove(type, fromSquare, toSquare, piece, target, promotion);
               if (isLegalMove(move)) return true;
             }
@@ -1230,7 +1230,7 @@ public class MoveGenerator {
     // make the move on the position
     position.makeMove(move);
     // check if the move leaves the king in check
-    if (!position.isAttacked(activePlayer.getInverseColor(),
+    if (!position.isAttacked(activePlayer.inverse(),
                              position.getKingSquares()[activePlayer.ordinal()])) {
       position.undoMove();
       return true;

@@ -28,69 +28,77 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.function.Function;
 
 /** @author Frank */
+@SuppressWarnings("SameParameterValue")
 public class TimingTests {
+
+  int[] intList = new int[512];
 
   @Test
   @Disabled
-  public void testTiming() {
+  public void testTimingNewVsInit() {
+    Function f1 = o -> {
+      for (int i = 0, intListLength = intList.length; i < intListLength; i++) {
+        intList[i] = 0;
+      }
+      return null;
+    };
+    Function f2 = o -> {
+      intList = new int[512];
+      return null;
+    };
+    timingTest(5, 50, 100000, f1, f2);
+  }
+
+  @Test
+  @Disabled
+  public void testTimingIsAttacked() {
+    Position position = new Position();
+
+    Function f1 = o -> {
+      position.isAttacked(Color.BLACK, Square.e8);
+      return null;
+    };
+    Function f2 = o -> {
+      position.isAttacked2(Color.BLACK, Square.e8);
+      return null;
+    };
+    timingTest(5, 100, 10000000, f1, f2);
+  }
+
+  private void timingTest(final int rounds, final int iterations, final int repetitions,
+                          Function... functions) {
 
     ArrayList<String> result = new ArrayList<>();
 
-    int ROUNDS = 5;
-    int ITERATIONS = 50;
-    int REPETITIONS = 5000000;
-
-    for (int round = 1; round <= ROUNDS; round++) {
+    for (int round = 1; round <= rounds; round++) {
       long start, end, sum;
 
-      System.out.printf("Running round %d of Timing Test Test 1 vs. Test 2%n", round);
-      System.gc();
+      System.out.printf("Running round %d of Timing Test%n", round);
 
-      int i = 0;
-      sum = 0;
-      while (++i <= ITERATIONS) {
-        start = System.nanoTime();
-        for (int j = 0; j < REPETITIONS; j++) {
-          test1();
+      int testNr = 0;
+      for (Function f : functions) {
+        System.gc();
+        int i = 0;
+        sum = 0;
+        while (++i <= iterations) {
+          start = System.nanoTime();
+          for (int j = 0; j < repetitions; j++) {
+            f.apply(null);
+          }
+          end = System.nanoTime();
+          sum += end - start;
         }
-        end = System.nanoTime();
-        sum += end - start;
+        float avg1 = ((float) sum / iterations) / 1e9f;
+        result.add(String.format("Round %d Test %d avg: %,.3f sec", round, testNr++, avg1));
       }
-      float avg1 = ((float) sum / ITERATIONS) / 1e9f;
-      result.add(String.format("Round %d Test 1 avg: %,.3f sec", round, avg1));
-
-      i = 0;
-      sum = 0;
-      while (++i <= ITERATIONS) {
-        start = System.nanoTime();
-        for (int j = 0; j < REPETITIONS; j++) {
-          test2();
-        }
-        end = System.nanoTime();
-        sum += end - start;
-      }
-      float avg2 = ((float) sum / ITERATIONS) / 1e9f;
-      result.add(String.format("Round %d Test 2 avg: %,.3f sec", round, avg2));
     }
 
     System.out.println();
     for (String s : result) {
       System.out.println(s);
     }
-
-  }
-
-  int[] intList = new int[512];
-
-  private void test1() {
-    for (int i = 0, intListLength = intList.length; i < intListLength; i++) {
-      intList[i] = 0;
-    }
-  }
-
-  private void test2() {
-    intList = new int[512];
   }
 }

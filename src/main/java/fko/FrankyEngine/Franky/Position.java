@@ -418,7 +418,7 @@ public class Position {
     nextHalfMoveNumber++;
 
     // change color (active player)
-    nextPlayer = nextPlayer.getInverseColor();
+    nextPlayer = nextPlayer.inverse();
     zobristKey = this.zobristKey ^ nextPlayer_Zobrist;
   }
 
@@ -490,7 +490,7 @@ public class Position {
     nextHalfMoveNumber--;
 
     // change back color
-    nextPlayer = nextPlayer.getInverseColor();
+    nextPlayer = nextPlayer.inverse();
 
     // zobristKey - just overwrite - should be the same as before the move
     zobristKey = zobristKeyHistory[historyCounter];
@@ -525,7 +525,7 @@ public class Position {
     // increase halfMoveNumber
     nextHalfMoveNumber++;
     // change color (active player)
-    nextPlayer = nextPlayer.getInverseColor();
+    nextPlayer = nextPlayer.inverse();
     zobristKey = this.zobristKey ^ nextPlayer_Zobrist;
   }
 
@@ -547,7 +547,7 @@ public class Position {
     // decrease _halfMoveNumber
     nextHalfMoveNumber--;
     // change back color
-    nextPlayer = nextPlayer.getInverseColor();
+    nextPlayer = nextPlayer.inverse();
     // zobristKey - just overwrite - should be the same as before the move
     zobristKey = zobristKeyHistory[historyCounter];
     // get the check and mate flag from history
@@ -1057,7 +1057,7 @@ public class Position {
    */
   public boolean hasCheck() {
     if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
-    boolean check = isAttacked(nextPlayer.getInverseColor(), kingSquares[nextPlayer.ordinal()]);
+    boolean check = isAttacked(nextPlayer.inverse(), kingSquares[nextPlayer.ordinal()]);
     hasCheck = check ? Flag.TRUE : Flag.FALSE;
     return check;
   }
@@ -1086,53 +1086,61 @@ public class Position {
    * the square.
    *
    * @param attackerColor
-   * @param square
+   * @param attackedSquare
    * @return true if under attack
    */
-  public boolean isAttacked(Color attackerColor, Square square) {
-    assert (square != Square.NOSQUARE);
+  public boolean isAttacked(Color attackerColor, Square attackedSquare) {
+    assert (attackedSquare != Square.NOSQUARE);
     assert (!attackerColor.isNone());
 
-    final int squareIndex = square.ordinal();
+    final int squareOrdinal = attackedSquare.ordinal();
+    final int squareIndex64 = attackedSquare.getIndex64();
+
     final boolean isWhite = attackerColor.isWhite();
 
     final int attacker = attackerColor.ordinal();
-    final int opponent = attackerColor.getInverseColor().ordinal();
+    final int opponent = attackerColor.inverse().ordinal();
+    final long[] attackerPiecesBitboard = piecesBitboards[attacker];
 
-    final int squareIdx = square.getIndex64();
-
-    // @formatter:off
     // check pawns
-    if ((Bitboard.pawnAttacks[opponent][squareIdx]
-      & piecesBitboards[attacker][PieceType.PAWN.ordinal()]) != 0) return true;
+    if ((Bitboard.pawnAttacks[opponent][squareIndex64]
+      & attackerPiecesBitboard[PieceType.PAWN.ordinal()]) != 0) return true;
 
     // check knights
-    if ((Bitboard.knightAttacks[squareIdx]
-      & piecesBitboards[attacker][PieceType.KNIGHT.ordinal()]) != 0) return true;
+    if ((Bitboard.knightAttacks[squareIndex64]
+      & attackerPiecesBitboard[PieceType.KNIGHT.ordinal()]) != 0) return true;
 
     // check king
-    if ((Bitboard.kingAttacks[squareIdx]
-         & piecesBitboards[attacker][PieceType.KING.ordinal()]) != 0) return true;
+    if ((Bitboard.kingAttacks[squareIndex64]
+      & attackerPiecesBitboard[PieceType.KING.ordinal()]) != 0) return true;
 
     // Sliding
     // rooks and queens
-    if ((Bitboard.rookAttacks[squareIdx] & piecesBitboards[attacker][PieceType.ROOK.ordinal()]) != 0
-       || ((Bitboard.queenAttacks[squareIdx] & piecesBitboards[attacker][PieceType.QUEEN.ordinal()]) != 0)) {
+    if (
+      (Bitboard.rookAttacks[squareIndex64]
+        & attackerPiecesBitboard[PieceType.ROOK.ordinal()]) != 0
+        || ((Bitboard.queenAttacks[squareIndex64]
+        & attackerPiecesBitboard[PieceType.QUEEN.ordinal()]) != 0)) {
 
-      if (((Bitboard.getSlidingMovesRank(square, this) | Bitboard.getSlidingMovesFile(square, this))
-      & (piecesBitboards[attacker][PieceType.ROOK.ordinal()]
-         | piecesBitboards[attacker][PieceType.QUEEN.ordinal()])) != 0) return true;
+      if (((Bitboard.getSlidingMovesRank(attackedSquare, this) | Bitboard.getSlidingMovesFile(
+        attackedSquare, this))
+        & (attackerPiecesBitboard[PieceType.ROOK.ordinal()]
+        | attackerPiecesBitboard[PieceType.QUEEN.ordinal()])) != 0) return true;
     }
 
     // bishop and queens
-    if ((Bitboard.bishopAttacks[squareIdx] & piecesBitboards[attacker][PieceType.BISHOP.ordinal()]) != 0
-      || ((Bitboard.queenAttacks[squareIdx] & piecesBitboards[attacker][PieceType.QUEEN.ordinal()]) != 0)) {
+    if (
+      (Bitboard.bishopAttacks[squareIndex64] & attackerPiecesBitboard[PieceType.BISHOP.ordinal()])
+        != 0
+        || (
+        (Bitboard.queenAttacks[squareIndex64] & attackerPiecesBitboard[PieceType.QUEEN.ordinal()])
+          != 0)) {
 
-      if (((Bitboard.getSlidingMovesDiagUp(square, this)
-        | Bitboard.getSlidingMovesDiagDown(square, this))
-        & (piecesBitboards[attacker][PieceType.BISHOP.ordinal()]
-        | piecesBitboards[attacker][PieceType.QUEEN.ordinal()])) != 0) return true;
-    } // @formatter:on
+      if (((Bitboard.getSlidingMovesDiagUp(attackedSquare, this)
+        | Bitboard.getSlidingMovesDiagDown(attackedSquare, this))
+        & (attackerPiecesBitboard[PieceType.BISHOP.ordinal()]
+        | attackerPiecesBitboard[PieceType.QUEEN.ordinal()])) != 0) return true;
+    }
 
     // check en passant
     if (this.enPassantSquare != Square.NOSQUARE) {
@@ -1141,12 +1149,12 @@ public class Position {
         // black is target
         && x88Board[enPassantSquare.getSouth().ordinal()] == Piece.BLACK_PAWN
         // this is indeed the en passant attacked square
-        && this.enPassantSquare.getSouth() == square) {
+        && this.enPassantSquare.getSouth() == attackedSquare) {
         // left
-        int i = squareIndex + Square.W;
+        int i = squareOrdinal + Square.W;
         if ((i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN) return true;
         // right
-        i = squareIndex + Square.E;
+        i = squareOrdinal + Square.E;
         return (i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN;
       }
       // black is attacker (assume not noColor)
@@ -1154,12 +1162,86 @@ public class Position {
         // white is target
         && x88Board[enPassantSquare.getNorth().ordinal()] == Piece.WHITE_PAWN
         // this is indeed the en passant attacked square
-        && this.enPassantSquare.getNorth() == square) {
+        && this.enPassantSquare.getNorth() == attackedSquare) {
         // attack from left
-        int i = squareIndex + Square.W;
+        int i = squareOrdinal + Square.W;
         if ((i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN) return true;
         // attack from right
-        i = squareIndex + Square.E;
+        i = squareOrdinal + Square.E;
+        return (i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN;
+      }
+    }
+    return false;
+  }
+
+  public boolean isAttacked2(Color attackerColor, Square attackedSquare) {
+    assert (attackedSquare != Square.NOSQUARE);
+    assert (!attackerColor.isNone());
+
+    // check pawns
+    if (
+      (Bitboard.pawnAttacks[attackerColor.inverse().ordinal()][attackedSquare.getIndex64()]
+        & piecesBitboards[attackerColor.ordinal()][PieceType.PAWN.ordinal()]) != 0) return true;
+
+    // check knights
+    if ((Bitboard.knightAttacks[attackedSquare.getIndex64()]
+      & piecesBitboards[attackerColor.ordinal()][PieceType.KNIGHT.ordinal()]) != 0) return true;
+
+    // check king
+    if ((Bitboard.kingAttacks[attackedSquare.getIndex64()]
+      & piecesBitboards[attackerColor.ordinal()][PieceType.KING.ordinal()]) != 0) return true;
+
+    // Sliding
+    // rooks and queens
+    if ((Bitboard.rookAttacks[attackedSquare.getIndex64()]
+      & piecesBitboards[attackerColor.ordinal()][PieceType.ROOK.ordinal()]) != 0
+      || ((Bitboard.queenAttacks[attackedSquare.getIndex64()]
+      & piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()]) != 0)) {
+
+      if (((Bitboard.getSlidingMovesRank(attackedSquare, this)
+        | Bitboard.getSlidingMovesFile(attackedSquare, this))
+        & (piecesBitboards[attackerColor.ordinal()][PieceType.ROOK.ordinal()]
+        | piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()])) != 0) return true;
+    }
+
+    // bishop and queens
+    if ((Bitboard.bishopAttacks[attackedSquare.getIndex64()]
+      & piecesBitboards[attackerColor.ordinal()][PieceType.BISHOP.ordinal()]) != 0
+      || ((Bitboard.queenAttacks[attackedSquare.getIndex64()]
+      & piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()]) != 0)) {
+
+      if (((Bitboard.getSlidingMovesDiagUp(attackedSquare, this)
+        | Bitboard.getSlidingMovesDiagDown(attackedSquare, this))
+        & (piecesBitboards[attackerColor.ordinal()][PieceType.BISHOP.ordinal()]
+        | piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()])) != 0) return true;
+    }
+
+    // check en passant
+    if (this.enPassantSquare != Square.NOSQUARE) {
+      // white is attacker
+      if (attackerColor.isWhite()
+        // black is target
+        && x88Board[enPassantSquare.getSouth().ordinal()] == Piece.BLACK_PAWN
+        // this is indeed the en passant attacked square
+        && this.enPassantSquare.getSouth() == attackedSquare) {
+        // left
+        int i = attackedSquare.ordinal() + Square.W;
+        if ((i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN) return true;
+        // right
+        i = attackedSquare.ordinal() + Square.E;
+        return (i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN;
+      }
+      // black is attacker (assume not noColor)
+      else if (!attackerColor.isWhite()
+        // white is target
+        && x88Board[enPassantSquare.getNorth().ordinal()] == Piece.WHITE_PAWN
+        // this is indeed the en passant attacked square
+        && this.enPassantSquare.getNorth() == attackedSquare) {
+        // attack from left
+        int i = attackedSquare.ordinal() + Square.W;
+        if ((i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN) return true;
+        // attack from right
+        i = attackedSquare.ordinal() + Square.E;
         return (i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN;
       }
     }
@@ -1362,7 +1444,7 @@ public class Position {
    * @return color of opponent player
    */
   public Color getOpponent() {
-    return nextPlayer.getInverseColor();
+    return nextPlayer.inverse();
   }
 
   /**

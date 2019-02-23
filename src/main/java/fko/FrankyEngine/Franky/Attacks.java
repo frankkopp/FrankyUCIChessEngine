@@ -70,7 +70,7 @@ public class Attacks {
   public static long attacksTo(Position position, Square square, Color color) {
 
     final int sIdx = square.getIndex64();
-    final int opponent = color.getInverseColor().ordinal();
+    final int opponent = color.inverse().ordinal();
 
     final long[] piecesBitboards = position.getPiecesBitboards(color);
 
@@ -142,7 +142,7 @@ public class Attacks {
 
     // get the attacks from both colors
     long remainingAttacks = attacksTo(position, toSquare, nextPlayer)
-      | attacksTo(position, toSquare, nextPlayer.getInverseColor());
+      | attacksTo(position, toSquare, nextPlayer.inverse());
 
     final int capturedValue;
     final int promotionValue = Move.getPromotion(move).getType().getValue();
@@ -161,7 +161,7 @@ public class Attacks {
     while (remainingAttacks != 0) {
       // next depth and side
       d++;
-      nextPlayer = nextPlayer.getInverseColor();
+      nextPlayer = nextPlayer.inverse();
 
       // determine value also in case of promotion
       final int movedPieceValue;

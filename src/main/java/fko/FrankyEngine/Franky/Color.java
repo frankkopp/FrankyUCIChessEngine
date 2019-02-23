@@ -81,7 +81,7 @@ public enum Color {
    * Returns the other ChesslyColor.
    * @return int - as defined in ChesslyColor
    */
-  public Color getInverseColor() {
+  public Color inverse() {
     return opponentColor;
   }
 
