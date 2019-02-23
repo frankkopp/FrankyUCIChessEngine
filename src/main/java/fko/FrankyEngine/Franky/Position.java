@@ -1089,7 +1089,7 @@ public class Position {
    * @param attackedSquare
    * @return true if under attack
    */
-  public boolean isAttacked(Color attackerColor, Square attackedSquare) {
+  boolean isAttacked(Color attackerColor, Square attackedSquare) {
     assert (attackedSquare != Square.NOSQUARE);
     assert (!attackerColor.isNone());
 
@@ -1122,19 +1122,17 @@ public class Position {
         || ((Bitboard.queenAttacks[squareIndex64]
         & attackerPiecesBitboard[PieceType.QUEEN.ordinal()]) != 0)) {
 
-      if (((Bitboard.getSlidingMovesRank(attackedSquare, this) | Bitboard.getSlidingMovesFile(
-        attackedSquare, this))
+      if (((Bitboard.getSlidingMovesRank(attackedSquare, this)
+        | Bitboard.getSlidingMovesFile(attackedSquare, this))
         & (attackerPiecesBitboard[PieceType.ROOK.ordinal()]
         | attackerPiecesBitboard[PieceType.QUEEN.ordinal()])) != 0) return true;
     }
 
     // bishop and queens
-    if (
-      (Bitboard.bishopAttacks[squareIndex64] & attackerPiecesBitboard[PieceType.BISHOP.ordinal()])
-        != 0
-        || (
-        (Bitboard.queenAttacks[squareIndex64] & attackerPiecesBitboard[PieceType.QUEEN.ordinal()])
-          != 0)) {
+    if ((Bitboard.bishopAttacks[squareIndex64]
+      & attackerPiecesBitboard[PieceType.BISHOP.ordinal()]) != 0
+      || ((Bitboard.queenAttacks[squareIndex64]
+      & attackerPiecesBitboard[PieceType.QUEEN.ordinal()]) != 0)) {
 
       if (((Bitboard.getSlidingMovesDiagUp(attackedSquare, this)
         | Bitboard.getSlidingMovesDiagDown(attackedSquare, this))
@@ -1174,6 +1172,10 @@ public class Position {
     return false;
   }
 
+  /*
+  Test in TimeingTests show that using local temp variables is not faster - mostly even slower
+  probably due to JIT optimizations. Keep this function as a proof.
+   */
   public boolean isAttacked2(Color attackerColor, Square attackedSquare) {
     assert (attackedSquare != Square.NOSQUARE);
     assert (!attackerColor.isNone());

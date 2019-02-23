@@ -36,6 +36,10 @@ public class TimingTests {
 
   int[] intList = new int[512];
 
+  /**
+   * Is creating a new array fester than resetting all values in a loop?
+   * ==> Loop is faster than creating new
+   */
   @Test
   @Disabled
   public void testTimingNewVsInit() {
@@ -52,6 +56,10 @@ public class TimingTests {
     timingTest(5, 50, 100000, f1, f2);
   }
 
+  /**
+   * Is using local temp variables faster than getter/array accessors?
+   * ==> No - even a little slower
+   */
   @Test
   @Disabled
   public void testTimingIsAttacked() {
@@ -62,10 +70,10 @@ public class TimingTests {
       return null;
     };
     Function f2 = o -> {
-      position.isAttacked2(Color.BLACK, Square.e8);
+      position.isAttacked(Color.BLACK, Square.e8);
       return null;
     };
-    timingTest(5, 100, 10000000, f1, f2);
+    timingTest(5, 50, 20000000, f1, f2);
   }
 
   private void timingTest(final int rounds, final int iterations, final int repetitions,
