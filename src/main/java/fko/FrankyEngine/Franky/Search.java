@@ -58,7 +58,6 @@ import java.util.concurrent.CountDownLatch;
  *  Features
  *  --------------------------------
  * TODO: History Heuristic / http://www.frayn.net/beowulf/theory.html#history
- * TODO: SEE (https://www.chessprogramming.org/Static_Exchange_Evaluation)
  * TODO: Lazy SMP
  *
  */

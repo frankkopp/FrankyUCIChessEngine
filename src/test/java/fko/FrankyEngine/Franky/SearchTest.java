@@ -179,26 +179,26 @@ public class SearchTest {
     SearchMode searchMode;
 
     // mate
-//    fen = "8/8/8/8/8/3K4/8/R2k4 b - -"; // Position
-//    position = new Position(fen);
-//    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 3, null, false, false, false);
-//    search.startSearch(position, searchMode);
-//    search.waitWhileSearching();
-//    search.stopSearch();
-//    assertEquals(-Evaluation.CHECKMATE, search.getLastSearchResult().resultValue);
-//
-//    System.out.println();
-//
-//    // mate 1
-//    fen = "8/8/8/8/8/3K4/R7/3k4 w - -"; // Position
-//    position = new Position(fen);
-//    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 3, null, false, false, false);
-//    search.startSearch(position, searchMode);
-//    search.waitWhileSearching();
-//    search.stopSearch();
-//    assertEquals(Evaluation.CHECKMATE - 1, search.getLastSearchResult().resultValue);
-//
-//    System.out.println();
+    //    fen = "8/8/8/8/8/3K4/8/R2k4 b - -"; // Position
+    //    position = new Position(fen);
+    //    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 3, null, false, false, false);
+    //    search.startSearch(position, searchMode);
+    //    search.waitWhileSearching();
+    //    search.stopSearch();
+    //    assertEquals(-Evaluation.CHECKMATE, search.getLastSearchResult().resultValue);
+    //
+    //    System.out.println();
+    //
+    //    // mate 1
+    //    fen = "8/8/8/8/8/3K4/R7/3k4 w - -"; // Position
+    //    position = new Position(fen);
+    //    searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 3, null, false, false, false);
+    //    search.startSearch(position, searchMode);
+    //    search.waitWhileSearching();
+    //    search.stopSearch();
+    //    assertEquals(Evaluation.CHECKMATE - 1, search.getLastSearchResult().resultValue);
+    //
+    //    System.out.println();
 
     // mate in 2 (3 plys)
     fen = "8/8/8/8/8/5K2/R7/7k w - -"; // Position
@@ -288,7 +288,7 @@ public class SearchTest {
         System.out.println();
       }
       assertTrue(search.getLastSearchResult().bestMove != Move.NOMOVE
-                 || search.getLastSearchResult().resultValue == Evaluation.MIN);
+                   || search.getLastSearchResult().resultValue == Evaluation.MIN);
       assertTrue(search.getLastSearchResult().resultValue != Evaluation.MIN);
     }
   }
@@ -441,7 +441,8 @@ public class SearchTest {
       search.startSearch(position, searchMode);
       search.waitWhileSearching();
       assertEquals("e7e3", Move.toSimpleString(search.getLastSearchResult().bestMove));
-      //      assertEquals(-Evaluation.getGamePhaseValue(position) * EvaluationConfig.CONTEMPT_FACTOR,
+      //      assertEquals(-Evaluation.getGamePhaseValue(position) * EvaluationConfig
+      //      .CONTEMPT_FACTOR,
       //                   search.getLastSearchResult().resultValue);
       LOG.warn("Best Move: {} Value: {} Ponder {}",
                Move.toSimpleString(search.getLastSearchResult().bestMove),
@@ -458,7 +459,8 @@ public class SearchTest {
       search.startSearch(position, searchMode);
       search.waitWhileSearching();
       assertEquals("c6d6", Move.toSimpleString(search.getLastSearchResult().bestMove));
-      //      assertEquals(-Evaluation.getGamePhaseValue(position) * EvaluationConfig.CONTEMPT_FACTOR,
+      //      assertEquals(-Evaluation.getGamePhaseValue(position) * EvaluationConfig
+      //      .CONTEMPT_FACTOR,
       //                   search.getLastSearchResult().resultValue);
       LOG.warn("Best Move: {} Value: {} Ponder {}",
                Move.toSimpleString(search.getLastSearchResult().bestMove),
@@ -522,7 +524,7 @@ public class SearchTest {
                             Move.toString(search.getLastSearchResult().bestMove),
                             search.getLastSearchResult().resultValue,
                             (1e3 * search.getSearchCounter().nodesVisited)
-                            / search.getSearchCounter().lastSearchTime,
+                              / search.getSearchCounter().lastSearchTime,
                             search.getSearchCounter().toString());
 
     search.config.USE_ASPIRATION_WINDOW = true;
@@ -537,7 +539,7 @@ public class SearchTest {
                             Move.toString(search.getLastSearchResult().bestMove),
                             search.getLastSearchResult().resultValue,
                             (1e3 * search.getSearchCounter().nodesVisited)
-                            / search.getSearchCounter().lastSearchTime,
+                              / search.getSearchCounter().lastSearchTime,
                             search.getSearchCounter().toString());
 
     System.out.println(result);
@@ -582,8 +584,9 @@ public class SearchTest {
     LOG.info("TIME         : {}", String.format("%s", DurationFormatUtils.formatDurationHMS(
       search.getSearchCounter().lastSearchTime)));
     LOG.info("PERFT NPS    : {} ", String.format("%,.0f",
-                                             (1e3 * search.getSearchCounter().nodesVisited) / search
-                                               .getSearchCounter().lastSearchTime));
+                                                 (1e3 * search.getSearchCounter().nodesVisited)
+                                                   / search
+                                                   .getSearchCounter().lastSearchTime));
   }
 
   @Test
@@ -764,7 +767,7 @@ public class SearchTest {
                             Move.toString(search.getLastSearchResult().bestMove),
                             search.getLastSearchResult().resultValue,
                             (1e3 * search.getSearchCounter().nodesVisited)
-                            / search.getSearchCounter().lastSearchTime,
+                              / search.getSearchCounter().lastSearchTime,
                             search.getSearchCounter().toString());
 
     int bestMove1 = search.getLastSearchResult().bestMove;

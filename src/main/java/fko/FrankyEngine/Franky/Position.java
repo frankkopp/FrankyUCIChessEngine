@@ -53,8 +53,6 @@ import java.util.Random;
  * squares' coordinates uniquely determines whether those two squares are along the same row,
  * column, or diagonal (a common query used for determining check).
  *
- * TODO: add bitboards for pieces and test if expensive
- *
  * <p>https://www.chessprogramming.org/0x88
  */
 public class Position {
@@ -812,42 +810,50 @@ public class Position {
   }
 
   private void addToBitboards(Square toSquare, Piece piece, int color) {
+
     // update piece bitboards
-    assert (piecesBitboards[color][piece.getType().ordinal()] & toSquare.getBitBoard()) == 0;
+    assert (piecesBitboards[color][piece.getType().ordinal()] & toSquare.getBitBoard()) == 0
+      : "Bit to be set is already set!";
     piecesBitboards[color][piece.getType().ordinal()] |= toSquare.getBitBoard();
-    assert (occupiedBitboards[color] & toSquare.getBitBoard()) == 0;
+
+    assert (occupiedBitboards[color] & toSquare.getBitBoard()) == 0
+      : "Bit to be set is already set!";
     occupiedBitboards[color] |= toSquare.getBitBoard();
 
     // update rotated occupation bitboards
     final int toSquareIndex64 = toSquare.getIndex64();
-    occupiedBitboardsR90[color] |= Square.index64Map[Bitboard.rotateIndexR90(
-      toSquareIndex64)].getBitBoard();
-    occupiedBitboardsL90[color] |= Square.index64Map[Bitboard.rotateIndexL90(
-      toSquareIndex64)].getBitBoard();
-    occupiedBitboardsR45[color] |= Square.index64Map[Bitboard.rotateIndexR45(
-      toSquareIndex64)].getBitBoard();
-    occupiedBitboardsL45[color] |= Square.index64Map[Bitboard.rotateIndexL45(
-      toSquareIndex64)].getBitBoard();
+    occupiedBitboardsR90[color]
+      |= Square.index64Map[Bitboard.rotateIndexR90(toSquareIndex64)].getBitBoard();
+    occupiedBitboardsL90[color]
+      |= Square.index64Map[Bitboard.rotateIndexL90(toSquareIndex64)].getBitBoard();
+    occupiedBitboardsR45[color]
+      |= Square.index64Map[Bitboard.rotateIndexR45(toSquareIndex64)].getBitBoard();
+    occupiedBitboardsL45[color]
+      |= Square.index64Map[Bitboard.rotateIndexL45(toSquareIndex64)].getBitBoard();
   }
 
   private void removeFromBitboards(Square fromSquare, Piece piece, int color) {
     // update piece bitboards
-    assert (piecesBitboards[color][piece.getType().ordinal()] & fromSquare.getBitBoard())
-      == fromSquare.getBitBoard();
+    assert (piecesBitboards[color][piece.getType().ordinal()]
+      & fromSquare.getBitBoard()) == fromSquare.getBitBoard()
+      : "Bit to be removed is not set!";
+    ;
     piecesBitboards[color][piece.getType().ordinal()] ^= fromSquare.getBitBoard();
-    assert (occupiedBitboards[color] & fromSquare.getBitBoard()) == fromSquare.getBitBoard();
+
+    assert (occupiedBitboards[color] & fromSquare.getBitBoard()) == fromSquare.getBitBoard()
+      : "Bit to be removed is not set!";
     occupiedBitboards[color] ^= fromSquare.getBitBoard();
 
     // update rotated occupation bitboards
     final int toSquareIndex64 = fromSquare.getIndex64();
-    occupiedBitboardsR90[color] ^= Square.index64Map[Bitboard.rotateIndexR90(
-      toSquareIndex64)].getBitBoard();
-    occupiedBitboardsL90[color] ^= Square.index64Map[Bitboard.rotateIndexL90(
-      toSquareIndex64)].getBitBoard();
-    occupiedBitboardsR45[color] ^= Square.index64Map[Bitboard.rotateIndexR45(
-      toSquareIndex64)].getBitBoard();
-    occupiedBitboardsL45[color] ^= Square.index64Map[Bitboard.rotateIndexL45(
-      toSquareIndex64)].getBitBoard();
+    occupiedBitboardsR90[color]
+      ^= Square.index64Map[Bitboard.rotateIndexR90(toSquareIndex64)].getBitBoard();
+    occupiedBitboardsL90[color]
+      ^= Square.index64Map[Bitboard.rotateIndexL90(toSquareIndex64)].getBitBoard();
+    occupiedBitboardsR45[color]
+      ^= Square.index64Map[Bitboard.rotateIndexR45(toSquareIndex64)].getBitBoard();
+    occupiedBitboardsL45[color]
+      ^= Square.index64Map[Bitboard.rotateIndexL45(toSquareIndex64)].getBitBoard();
   }
 
   /**
@@ -933,15 +939,18 @@ public class Position {
     switch (pieceType) {
       case NOTYPE:
         break;
+
       case PAWN:
         // normal pawn direct chess include en passant captures
         if ((Bitboard.pawnAttacks[attackerColorIdx][targetSquare.getIndex64()]
           & kingSquare.getBitBoard()) != 0) return true;
         break;
+
       case KNIGHT:
         if ((Bitboard.knightAttacks[targetSquare.getIndex64()] & kingSquare.getBitBoard()) != 0)
           return true;
         break;
+
       case ROOK:
         // is attack even possible
         if ((Bitboard.rookAttacks[targetSquare.getIndex64()] & kingSquare.getBitBoard()) == 0)
@@ -955,6 +964,7 @@ public class Position {
         // if squares in between are not occupied then it is a check
         if ((intermediate & boardAfterMove) == 0) return true;
         break;
+
       case BISHOP:
         // is attack even possible
         if ((Bitboard.bishopAttacks[targetSquare.getIndex64()] & kingSquare.getBitBoard()) == 0)
