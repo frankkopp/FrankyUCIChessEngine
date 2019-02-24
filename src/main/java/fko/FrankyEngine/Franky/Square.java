@@ -73,23 +73,23 @@ public enum Square {
   public static final List<Square> validSquares;
 
   // Move deltas north, south, east, west and combinations
-  static final int N  = 16;
-  static final int E  = 1;
-  static final int S  = -16;
-  static final int W  = -1;
-  static final int NE = N + E;
-  static final int SE = S + E;
-  static final int SW = S + W;
-  static final int NW = N + W;
+  public static final int N  = 16;
+  public static final int E  = 1;
+  public static final int S  = -16;
+  public static final int W  = -1;
+  public static final int NE = N + E;
+  public static final int SE = S + E;
+  public static final int SW = S + W;
+  public static final int NW = N + W;
 
-  static final int[] pawnDirections       = {N, NW, NE};
-  static final int[] pawnAttackDirections = {NW, NE};
-  static final int[] knightDirections     = {N + N + E, N + E + E, S + E + E, S + S + E, S + S + W,
-                                             S + W + W, N + W + W, N + N + W};
-  static final int[] bishopDirections     = {NE, SE, SW, NW};
-  static final int[] rookDirections       = {N, E, S, W};
-  static final int[] queenDirections      = {N, NE, E, SE, S, SW, W, NW};
-  static final int[] kingDirections       = {N, NE, E, SE, S, SW, W, NW};
+  public static final int[] pawnDirections       = {N, NW, NE};
+  public static final int[] pawnAttackDirections = {NW, NE};
+  public static final int[] knightDirections     = {N + N + E, N + E + E, S + E + E, S + S + E,
+                                                    S + S + W, S + W + W, N + W + W, N + N + W};
+  public static final int[] bishopDirections     = {NE, SE, SW, NW};
+  public static final int[] rookDirections       = {N, E, S, W};
+  public static final int[] queenDirections      = {N, NE, E, SE, S, SW, W, NW};
+  public static final int[] kingDirections       = {N, NE, E, SE, S, SW, W, NW};
 
   /*
    * pre computed mapping from position of bit in bitboard to square
