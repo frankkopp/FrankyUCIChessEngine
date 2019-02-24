@@ -177,11 +177,11 @@ public class EvaluationTest {
 
     // All White pieces no Black pieces but King
     this.position = new Position("4k3/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1");
-    assertEquals(-117, evaluation.position(this.position));
+    assertEquals(-120, evaluation.position(this.position));
 
     // All Black pieces no White pieces but King
     this.position = new Position("rnbqkbnr/pppppppp/8/8/8/8/8/4K3 w kq - 0 1");
-    assertEquals(117, evaluation.position(this.position));
+    assertEquals(120, evaluation.position(this.position));
 
   }
 
@@ -205,20 +205,25 @@ public class EvaluationTest {
 
   @Test
   public final void testCheckPosition() {
+    int actual;
+
     // no in check
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
-    assertEquals(191, evaluation.evaluate(position));
-    LOG.info(evaluation.toString());
+    actual = evaluation.evaluate(position);
+    evaluation.printEvaluation();
+    assertEquals(242, actual);
 
     // white gives check to black
     position = new Position("r2R3k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2K5 b - - 0 1");
-    assertEquals(-234, evaluation.evaluate(position));
-    LOG.info(evaluation.toString());
+    actual = evaluation.evaluate(position);
+    evaluation.printEvaluation();
+    assertEquals(-310, actual);
 
     // black gives check to white
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1p1qPN2/6P1/1PPK4/3R4 w - - 0 2");
-    assertEquals(135, evaluation.evaluate(position));
-    LOG.info(evaluation.toString());
+    actual = evaluation.evaluate(position);
+    evaluation.printEvaluation();
+    assertEquals(180, actual);
   }
 
   @Test
@@ -227,10 +232,10 @@ public class EvaluationTest {
     // king values
     position = new Position("8/4k3/8/8/8/8/8/4K3 w - -");
     assertEquals(0, evaluation.evaluate(position));
-    LOG.info(evaluation.toString());
+    evaluation.printEvaluation();
     position = new Position("8/4k3/8/8/8/8/8/4K3 b - -");
     assertEquals(0, evaluation.evaluate(position));
-
+    evaluation.printEvaluation();
   }
 
   @Test
@@ -306,17 +311,9 @@ public class EvaluationTest {
   }
 
   @Test
-  void testAttacksTo() {
-    position = new Position("1qr1r1k1/5pp1/1p2p2p/1Qbn3b/2R5/3P1NPP/3NPPB1/1R4K1 w - -");
-    evaluation.evaluate(position);
-    evaluation.printEvaluation();
-
-  }
-
-  @Test
   @Disabled
   public final void testNewEvals() {
-    position = new Position("r1bq1rk1/pp1p1ppp/2n2b2/2p1p3/4P3/2NP1NP1/PPP1KPBP/R2Q3R b - - 1 1");
+    position = new Position("r1b2rk1/pp3ppp/1qpb4/3p2N1/3Pp3/P7/1PP1BKPP/RNBQ4 w - -");
     evaluation.evaluate(position);
     evaluation.printEvaluation();
   }
@@ -325,15 +322,15 @@ public class EvaluationTest {
   @Disabled
   public void testAbsoluteTiming() {
 
-    int ROUNDS = 10;
-    int DURATION = 3;
+    int ROUNDS = 5;
+    int DURATION = 5;
     int ITERATIONS;
 
     long start;
 
     System.out.println("Running Timing Test");
 
-    String fen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
+    String fen = "1qr1r1k1/5pp1/1p2p2p/1Qbn3b/2R5/3P1NPP/3NPPB1/1R4K1 w - -";
     position = new Position(fen);
 
     for (int j = 0; j < ROUNDS; j++) {

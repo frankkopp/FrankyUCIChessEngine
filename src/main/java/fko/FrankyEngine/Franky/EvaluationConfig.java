@@ -42,12 +42,12 @@ class EvaluationConfig {
   static final int ROOK_MOBILITY_FACTOR    = 2;
   static final int QUEEN_MOBILITY_FACTOR   = 1;
 
-  static final int MATERIAL_WEIGHT       = 1;
-  static final int POSITION_WEIGHT       = 1;
-  static final int MOBILITY_WEIGHT       = 2;
-  static final int KING_SAFETY_WEIGHT    = 1;
-  static final int PAWN_STRUCTURE_WEIGHT = 1;
-  static final int BOARDCONTROL_WEIGHT   = 5;
+  static final float MATERIAL_WEIGHT       = 1;
+  static final float POSITION_WEIGHT       = 0.5f;
+  static final float MOBILITY_WEIGHT       = 2;
+  static final float KING_SAFETY_WEIGHT    = 1;
+  static final float PAWN_STRUCTURE_WEIGHT = 1;
+  static final float BOARDCONTROL_WEIGHT   = 5;
 
   static final int KING_SAFETY_PAWNSHIELD   = 10;
   static final int KING_RING_ATTACK_PENALTY = -10;
@@ -175,7 +175,7 @@ class EvaluationConfig {
     -20,-30,-30,-40,-40,-30,-30,-20,
     -10,-20,-20,-30,-30,-30,-20,-10,
       0,  0,-20,-20,-20,-20,  0,  0,
-     20, 50,  0,-10,-10,   0, 50, 20
+     20, 50,  0,-20,-20,   0, 50, 20
   };
   static int[] kingEndGame   = new int[] {
     -50,-30,-30,-20,-20,-30,-30,-50,
@@ -189,11 +189,4 @@ class EvaluationConfig {
   };
   // @formatter:on
 
-  static int getWhiteTableIndex(final int index) {
-    return 56 - (8 * (index / 16)) + (index % 16);
-  }
-
-  static int getBlackTableIndex(final int index) {
-    return (8 * (index / 16)) + (index % 16);
-  }
 }
