@@ -53,7 +53,7 @@ public class TimingTests {
       intList = new int[512];
       return null;
     };
-    timingTest(5, 50, 100000, f1, f2);
+    timingTest(5, 50, 100_000, f1, f2);
   }
 
   /**
@@ -73,7 +73,23 @@ public class TimingTests {
       position.isAttacked(Color.BLACK, Square.e8);
       return null;
     };
-    timingTest(5, 50, 20000000, f1, f2);
+    timingTest(5, 50, 20_000_000, f1, f2);
+  }
+
+  @Test
+  @Disabled
+  public void testTimingBytevsInt() {
+    Position position = new Position();
+
+    Function f1 = o -> {
+      int[] test = new int[1024];
+      return null;
+    };
+    Function f2 = o -> {
+      byte[] test = new byte[1024];
+      return null;
+    };
+    timingTest(5, 50, 1_000_000, f1, f2);
   }
 
   private void timingTest(final int rounds, final int iterations, final int repetitions,

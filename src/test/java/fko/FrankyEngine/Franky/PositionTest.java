@@ -1009,8 +1009,8 @@ public class PositionTest {
   @Disabled
   void bitBoardsAttacksDev() {
 
-    System.out.println(Bitboard.printBitString(Square.a1.getBitBoard()));
-    System.out.println(Bitboard.printBitString(Square.h8.getBitBoard()));
+    System.out.println(Bitboard.printBitString(Square.a1.bitboard()));
+    System.out.println(Bitboard.printBitString(Square.h8.bitboard()));
 
     String testFen = "rnbqkb2/1ppppp1r/6p1/p7/1PP1Q1np/8/P1NPPPPP/1RB1KBNR b Kq -";
     Position position = new Position(testFen);
@@ -1021,7 +1021,7 @@ public class PositionTest {
     long blackPieces = position.getOccupiedBitboards(Color.BLACK);
 
     Square queenSquare = Square.e4;
-    int queenSquareIdx = queenSquare.getIndex64();
+    int queenSquareIdx = queenSquare.bbIndex();
 
     long queenRays = Bitboard.queenAttacks[queenSquareIdx];
     System.out.println("All Queen rays");
@@ -1070,7 +1070,7 @@ public class PositionTest {
       System.out.println(Bitboard.printBitString(firstRayHit));
       System.out.println();
 
-      long blockerRay = Bitboard.rays[d][hitSquare.getIndex64()];
+      long blockerRay = Bitboard.rays[d][hitSquare.bbIndex()];
       long rayAttacks = ray ^ blockerRay;
       System.out.println("Ray attacks from " + queenSquare + " blocked on " + hitSquare);
       System.out.println(Bitboard.toString(rayAttacks));
@@ -1129,7 +1129,7 @@ public class PositionTest {
 
   private long getSlidingAttacks(Position position, Square square, int[] rays) {
     long attacks = 0L;
-    int sIdx = square.getIndex64();
+    int sIdx = square.bbIndex();
     for (int d : rays) {
       long rayHits = (Bitboard.rays[d][sIdx] & position.getAllOccupiedBitboard());
       if (rayHits == 0) attacks |= Bitboard.rays[d][sIdx];
@@ -1139,7 +1139,7 @@ public class PositionTest {
         else hitSquare = Long.numberOfTrailingZeros(Long.highestOneBit(rayHits));
         // TODO TEST & DEBUG
         attacks |=
-          Bitboard.rays[d][sIdx] ^ Bitboard.rays[d][Square.getFirstSquare(hitSquare).getIndex64()];
+          Bitboard.rays[d][sIdx] ^ Bitboard.rays[d][Square.getFirstSquare(hitSquare).bbIndex()];
       }
     }
     return attacks;

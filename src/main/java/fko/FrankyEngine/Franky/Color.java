@@ -48,12 +48,12 @@ public enum Color {
   /**
    * This is 1 for white and -1 for black. Useful in evaluation and pawn directions
    */
-  public final int   direction;
+  public final int   factor;
   private      Color opponentColor;
   private      char  shortName;
 
   Color(int factor) {
-    this.direction = factor;
+    this.factor = factor;
   }
 
   public static final Color[] values = {WHITE, BLACK};

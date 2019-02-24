@@ -514,8 +514,8 @@ public class MoveGenerator {
       if (!pseudoLegalMoves.empty() && !capturingMoves.empty() && !nonCapturingMoves.empty()) {
         return;
       }
-      // pseudo list needs to be generated
 
+      // pseudo list needs to be generated
       if (capturingMoves.empty()) {
         generateCapturingMoves();
       }
@@ -688,7 +688,7 @@ public class MoveGenerator {
         int d = pawnDirections[j];
 
         // calculate the to square
-        final int to = square.ordinal() + d * activePlayer.direction;
+        final int to = square.ordinal() + d * activePlayer.factor;
 
         if ((to & 0x88) == 0) { // valid square
 
@@ -913,7 +913,7 @@ public class MoveGenerator {
           break;
         }
         if (type.isSliding()) {
-          to += d; // next sliding field in this direction
+          to += d; // next sliding field in this factor
         }
         else {
           break; // no sliding piece type
@@ -1147,7 +1147,7 @@ public class MoveGenerator {
           break; // stop sliding;
         }
         if (type.isSliding()) {
-          to += d; // next sliding field in this direction
+          to += d; // next sliding field in this factor
         }
         else {
           break; // no sliding piece type
@@ -1179,7 +1179,7 @@ public class MoveGenerator {
       for (int i1 = 0, directionsLength = directions.length; i1 < directionsLength; i1++) {
         int d = directions[i1];
         // calculate the to square
-        final int to = square.ordinal() + d * activePlayer.direction;
+        final int to = square.ordinal() + d * activePlayer.factor;
         if ((to & 0x88) == 0) { // valid square
           final MoveType type = MoveType.NORMAL;
           final Square fromSquare = Square.getSquare(square.ordinal());

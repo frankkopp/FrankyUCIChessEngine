@@ -67,6 +67,7 @@ public class EvaluationTest {
     // change if next player gets a bonus
     position = new Position(fenStandard);
     int value = evaluation.evaluate(position);
+    evaluation.printEvaluation();
     assertEquals(10, value, "Start Position should be 10 from TEMPO");
 
     // Mirrored position - should be equal
@@ -127,6 +128,31 @@ public class EvaluationTest {
     value = evaluation.mobility(position);
     //System.out.println(value);
     assertEquals(-4, value);
+  }
+
+  @Test
+  void positionTablesTest() {
+
+    // white
+    assertEquals(30, EvaluationConfig.pawnsMidGame[Square.e5.bbIndex()]);
+    assertEquals(-10, EvaluationConfig.pawnsMidGame[Square.c3.bbIndex()]);
+    assertEquals(0, EvaluationConfig.pawnsMidGame[Square.h8.bbIndex()]);
+
+    // black
+    assertEquals(25, EvaluationConfig.pawnsMidGame[63 - Square.e5.bbIndex()]);
+    assertEquals(5, EvaluationConfig.pawnsMidGame[63 - Square.c3.bbIndex()]);
+    assertEquals(0, EvaluationConfig.pawnsMidGame[63 - Square.h8.bbIndex()]);
+
+    // white
+    assertEquals(20, EvaluationConfig.knightMidGame[Square.e5.bbIndex()]);
+    assertEquals(10, EvaluationConfig.knightMidGame[Square.c3.bbIndex()]);
+    assertEquals(-50, EvaluationConfig.knightMidGame[Square.h8.bbIndex()]);
+
+    // black
+    assertEquals(20, EvaluationConfig.knightMidGame[63 - Square.e5.bbIndex()]);
+    assertEquals(10, EvaluationConfig.knightMidGame[63 - Square.c3.bbIndex()]);
+    assertEquals(-50, EvaluationConfig.knightMidGame[63 - Square.h8.bbIndex()]);
+
   }
 
   @Test
@@ -209,21 +235,27 @@ public class EvaluationTest {
 
   @Test
   public final void testKingSafety() {
+    int actual;
+
     position = new Position("rnbq1rk1/pppp1ppp/5n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w - -");
-    assertEquals(0, evaluation.kingSafety(position));
-    LOG.info(evaluation.toString());
+    actual = evaluation.kingSafety(position);
+    evaluation.printEvaluation();
+    assertEquals(0, actual);
 
     position = new Position("2kr1bnr/pppq1ppp/2np4/4p3/2B1P1b1/2NP1N2/PPP2PPP/R1BQ1RK1 w - -");
-    assertEquals(10, evaluation.kingSafety(position));
-    LOG.info(evaluation.toString());
+    actual = evaluation.kingSafety(position);
+    evaluation.printEvaluation();
+    assertEquals(10, actual);
 
     position = new Position("rnbq1rk1/pppp1ppp/5n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b - -");
-    assertEquals(0, evaluation.kingSafety(position));
-    LOG.info(evaluation.toString());
+    actual = evaluation.kingSafety(position);
+    evaluation.printEvaluation();
+    assertEquals(0, actual);
 
     position = new Position("2kr1bnr/pppq1ppp/2np4/4p3/2B1P1b1/2NP1N2/PPP2PPP/R1BQ1RK1 b - -");
-    assertEquals(-10, evaluation.kingSafety(position));
-    LOG.info(evaluation.toString());
+    actual = evaluation.kingSafety(position);
+    evaluation.printEvaluation();
+    assertEquals(-10, actual);
   }
 
   @Test
@@ -274,10 +306,19 @@ public class EvaluationTest {
   }
 
   @Test
+  void testAttacksTo() {
+    position = new Position("1qr1r1k1/5pp1/1p2p2p/1Qbn3b/2R5/3P1NPP/3NPPB1/1R4K1 w - -");
+    evaluation.evaluate(position);
+    evaluation.printEvaluation();
+
+  }
+
+  @Test
   @Disabled
   public final void testNewEvals() {
     position = new Position("r1bq1rk1/pp1p1ppp/2n2b2/2p1p3/4P3/2NP1NP1/PPP1KPBP/R2Q3R b - - 1 1");
     evaluation.evaluate(position);
+    evaluation.printEvaluation();
   }
 
   @Test
@@ -285,10 +326,10 @@ public class EvaluationTest {
   public void testAbsoluteTiming() {
 
     int ROUNDS = 10;
-    int DURATION = 30;
+    int DURATION = 3;
     int ITERATIONS;
 
-    Instant start;
+    long start;
 
     System.out.println("Running Timing Test");
 
@@ -297,15 +338,15 @@ public class EvaluationTest {
 
     for (int j = 0; j < ROUNDS; j++) {
       System.gc();
-      start = Instant.now();
+      start = System.nanoTime();
       ITERATIONS = 0;
       do {
         ITERATIONS++;
         // ### TEST CODE
-        //testCode();
-        test3(position);
+        testCode();
+        //test3(position);
         // ### /TEST CODE
-      } while (Duration.between(start, Instant.now()).getSeconds() < DURATION);
+      } while ((System.nanoTime() - start) / 1e9 < DURATION);
       System.out.println(String.format("Timing: %,7d runs/s", ITERATIONS / DURATION));
 
     }
@@ -364,21 +405,6 @@ public class EvaluationTest {
       result.add(String.format("Round %d Test 2 avg: %,.3f sec for %,d repetitions", round, avg2,
                                REPETITIONS));
 
-      System.gc();
-      i = 0;
-      sum = 0;
-      while (++i <= ITERATIONS) {
-        start = System.nanoTime();
-        for (int j = 0; j < REPETITIONS; j++) {
-          test3(position);
-        }
-        end = System.nanoTime();
-        sum += end - start;
-      }
-      float avg3 = ((float) sum / ITERATIONS) / 1e9f;
-
-      result.add(String.format("Round %d Test 3 avg: %,.3f sec for %,d repetitions", round, avg3,
-                               REPETITIONS));
     }
 
     System.out.println();
@@ -402,16 +428,20 @@ public class EvaluationTest {
         case PAWN:
           break;
         case KNIGHT:
-          m += Evaluation.mobilityForPiece(PieceType.KNIGHT, sq, Square.knightDirections, position);
+          m += evaluation.mobilityForPiece(position, sq, WHITE, PieceType.KNIGHT,
+                                           Square.knightDirections);
           break;
         case BISHOP:
-          m += Evaluation.mobilityForPiece(PieceType.BISHOP, sq, Square.bishopDirections, position);
+          m += evaluation.mobilityForPiece(position, sq, WHITE, PieceType.BISHOP,
+                                           Square.bishopDirections);
           break;
         case ROOK:
-          m += Evaluation.mobilityForPiece(PieceType.ROOK, sq, Square.rookDirections, position);
+          m += evaluation.mobilityForPiece(position, sq, WHITE, PieceType.ROOK,
+                                           Square.rookDirections);
           break;
         case QUEEN:
-          m += Evaluation.mobilityForPiece(PieceType.QUEEN, sq, Square.queenDirections, position);
+          m += evaluation.mobilityForPiece(position, sq, WHITE, PieceType.QUEEN,
+                                           Square.queenDirections);
           break;
         case KING:
           break;

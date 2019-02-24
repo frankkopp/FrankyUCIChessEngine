@@ -47,9 +47,11 @@ class EvaluationConfig {
   static final int MOBILITY_WEIGHT       = 2;
   static final int KING_SAFETY_WEIGHT    = 1;
   static final int PAWN_STRUCTURE_WEIGHT = 1;
+  static final int BOARDCONTROL_WEIGHT   = 5;
 
-  static final int KING_SAFETY_PAWNSHIELD = 10;
-  static final int CORNERED_ROOK_PENALTY  = -50;
+  static final int KING_SAFETY_PAWNSHIELD   = 10;
+  static final int KING_RING_ATTACK_PENALTY = -10;
+  static final int CORNERED_ROOK_PENALTY    = -50;
 
   static final int DOUBLED_PAWN_PENALTY = -10;
   static final int PASSED_PAWN          = 30;
@@ -58,6 +60,8 @@ class EvaluationConfig {
 
   // @formatter:off
   // PAWN Tables
+  // use the index64 for white and 63-index64 for black
+
   static int[] pawnsMidGame  = new int[] {
      0,  0,  0,  0,  0,  0,  0,  0,
      0,  0,  0,  0,  0,  0,  0,  0,
@@ -150,7 +154,7 @@ class EvaluationConfig {
      -5,  0,  5,  5,  5,  5,  0, -5,
     -10,  0,  5,  5,  5,  5,  0,-10,
     -10,  0,  5,  5,  5,  5,  0,-10,
-    -20,-10,-10,  0, -5,-10,-10,-20
+    -20,-10,-10, -5, -5,-10,-10,-20
   };
   static int[] queenEndGame  = new int[] {
     -20,-10,-10, -5, -5,-10,-10,-20,
@@ -170,8 +174,8 @@ class EvaluationConfig {
     -30,-40,-40,-50,-50,-40,-40,-30,
     -20,-30,-30,-40,-40,-30,-30,-20,
     -10,-20,-20,-30,-30,-30,-20,-10,
-      0,  0,  0,-20,-20,-20,  0,  0,
-     20, 50, 40,-10,  0,-10, 50, 20
+      0,  0,-20,-20,-20,-20,  0,  0,
+     20, 50,  0,-10,-10,   0, 50, 20
   };
   static int[] kingEndGame   = new int[] {
     -50,-30,-30,-20,-20,-30,-30,-50,

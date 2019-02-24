@@ -36,7 +36,6 @@ import java.util.List;
 
 import static fko.FrankyEngine.Franky.Bitboard.*;
 import static fko.FrankyEngine.Franky.Square.*;
-import static fko.FrankyEngine.Franky.Square.a8UpDiag;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -55,8 +54,8 @@ public class SquareTest {
       System.out.println(f.getName());
       if (f.isEnumConstant()) {
         final Square square = (Square) f.get(null);
-        System.out.println(Bitboard.toString(square.getBitBoard()));
-        System.out.println(printBitString(square.getBitBoard()));
+        System.out.println(Bitboard.toString(square.bitboard()));
+        System.out.println(printBitString(square.bitboard()));
         System.out.printf("upDiag %d%n", square.getUpDiag());
         System.out.printf("downDiag %d%n", square.getDownDiag());
       }
@@ -171,13 +170,13 @@ public class SquareTest {
 
   @Test
   public void index64Test() {
-    assertEquals(56, a1.getIndex64());
-    assertEquals(63, h1.getIndex64());
-    assertEquals(48, a2.getIndex64());
-    assertEquals(0, a8.getIndex64());
-    assertEquals(7, h8.getIndex64());
-    assertEquals(-1, i1.getIndex64());
-    assertEquals(-1, p8.getIndex64());
+    assertEquals(56, a1.bbIndex());
+    assertEquals(63, h1.bbIndex());
+    assertEquals(48, a2.bbIndex());
+    assertEquals(0, a8.bbIndex());
+    assertEquals(7, h8.bbIndex());
+    assertEquals(-1, i1.bbIndex());
+    assertEquals(-1, p8.bbIndex());
   }
 
   @Test
@@ -250,15 +249,15 @@ public class SquareTest {
 
   @Test
   void getFirstSquareTest() {
-    assertEquals(a1, Square.getFirstSquare(a1.getBitBoard()));
-    assertEquals(a8, Square.getFirstSquare(a8.getBitBoard()));
-    assertEquals(h1, Square.getFirstSquare(h1.getBitBoard()));
-    assertEquals(h8, Square.getFirstSquare(h8.getBitBoard()));
+    assertEquals(a1, Square.getFirstSquare(a1.bitboard()));
+    assertEquals(a8, Square.getFirstSquare(a8.bitboard()));
+    assertEquals(h1, Square.getFirstSquare(h1.bitboard()));
+    assertEquals(h8, Square.getFirstSquare(h8.bitboard()));
 
-    assertEquals(h8, Square.getFirstSquare(h8.getBitBoard() | h1.getBitBoard()));
-    assertEquals(a8, Square.getFirstSquare(h8.getBitBoard() | a8.getBitBoard()));
-    assertEquals(g1, Square.getFirstSquare(g1.getBitBoard() | h1.getBitBoard()));
-    assertEquals(e4, Square.getFirstSquare(e4.getBitBoard() | e3.getBitBoard()));
+    assertEquals(h8, Square.getFirstSquare(h8.bitboard() | h1.bitboard()));
+    assertEquals(a8, Square.getFirstSquare(h8.bitboard() | a8.bitboard()));
+    assertEquals(g1, Square.getFirstSquare(g1.bitboard() | h1.bitboard()));
+    assertEquals(e4, Square.getFirstSquare(e4.bitboard() | e3.bitboard()));
   }
 
   @Test
@@ -269,7 +268,7 @@ public class SquareTest {
     while ((square = Square.getFirstSquare(bitboard)) != NOSQUARE) {
       LOG.debug("{}", square);
       counter++;
-      bitboard ^= Square.getFirstSquare(bitboard).getBitBoard();
+      bitboard ^= Square.getFirstSquare(bitboard).bitboard();
     }
     assertEquals(32, counter);
   }
@@ -282,8 +281,8 @@ public class SquareTest {
   public void listSquareBitboards() {
     for (Square square : validSquares) {
       System.out.println(square);
-      System.out.println(Bitboard.toString(square.getBitBoard()));
-      System.out.println(printBitString(square.getBitBoard()));
+      System.out.println(Bitboard.toString(square.bitboard()));
+      System.out.println(printBitString(square.bitboard()));
     }
   }
 
@@ -295,9 +294,9 @@ public class SquareTest {
     Square square;
 
     square = Square.b1;
-    bitboard = square.getBitBoard();
+    bitboard = square.bitboard();
     actual = Bitboard.toString(bitboard);
-    LOG.debug("Square {} Index64 {}", square, square.getIndex64());
+    LOG.debug("Square {} Index64 {}", square, square.bbIndex());
     LOG.debug("\n{}", actual);
     expected =  "0 0 0 0 0 0 0 0 \n"
               + "0 0 0 0 0 0 0 0 \n"
@@ -311,9 +310,9 @@ public class SquareTest {
     assertEquals(144115188075855872L, bitboard);
 
     square = Square.d8;
-    bitboard = square.getBitBoard();
+    bitboard = square.bitboard();
     actual = Bitboard.toString(bitboard);
-    LOG.debug("Square {} Index64 {}", square, square.getIndex64());
+    LOG.debug("Square {} Index64 {}", square, square.bbIndex());
     LOG.debug("\n{}", actual);
     expected =  "0 0 0 1 0 0 0 0 \n"
               + "0 0 0 0 0 0 0 0 \n"
@@ -326,9 +325,9 @@ public class SquareTest {
     assertEquals(expected, actual);
 
     square = Square.h5;
-    bitboard = square.getBitBoard();
+    bitboard = square.bitboard();
     actual = Bitboard.toString(bitboard);
-    LOG.debug("Square {} Index64 {}", square, square.getIndex64());
+    LOG.debug("Square {} Index64 {}", square, square.bbIndex());
     LOG.debug("\n{}", actual);
     expected =  "0 0 0 0 0 0 0 0 \n"
               + "0 0 0 0 0 0 0 0 \n"
@@ -464,7 +463,7 @@ public class SquareTest {
   public void diagonalBitboardTest() {
     for (Square sq : validSquares) {
       System.out.printf("%s:%n%s%non up diagonal:%n%s%ndown diagonal:%n%s%n", sq,
-                        Bitboard.toString(sq.getBitBoard()), Bitboard.toString(sq.getUpDiag()),
+                        Bitboard.toString(sq.bitboard()), Bitboard.toString(sq.getUpDiag()),
                         Bitboard.toString(sq.getDownDiag()));
     }
     System.out.println();

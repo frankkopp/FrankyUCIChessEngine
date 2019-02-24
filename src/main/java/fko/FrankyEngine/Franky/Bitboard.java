@@ -62,23 +62,23 @@ public class Bitboard {
   /** king ring (is identical to king attacks) */
   public static final long[] kingRing = kingAttacks;
 
-  // rays for sliding pieces in each direction
+  // rays for sliding pieces in each factor
   // NorthWest = 0 ...clockwise... West = 7
-  /** direction used in <code>rays[dir][square]</code> */
+  /** factor used in <code>rays[dir][square]</code> */
   public static final int NORTHWEST = 0;
-  /** direction used in <code>rays[dir][square]</code> */
+  /** factor used in <code>rays[dir][square]</code> */
   public static final int NORTH     = 1;
-  /** direction used in <code>rays[dir][square]</code> */
+  /** factor used in <code>rays[dir][square]</code> */
   public static final int NORTHEAST = 2;
-  /** direction used in <code>rays[dir][square]</code> */
+  /** factor used in <code>rays[dir][square]</code> */
   public static final int EAST      = 3;
-  /** direction used in <code>rays[dir][square]</code> */
+  /** factor used in <code>rays[dir][square]</code> */
   public static final int SOUTHEAST = 4;
-  /** direction used in <code>rays[dir][square]</code> */
+  /** factor used in <code>rays[dir][square]</code> */
   public static final int SOUTH     = 5;
-  /** direction used in <code>rays[dir][square]</code> */
+  /** factor used in <code>rays[dir][square]</code> */
   public static final int SOUTHWEST = 6;
-  /** direction used in <code>rays[dir][square]</code> */
+  /** factor used in <code>rays[dir][square]</code> */
   public static final int WEST      = 7;
 
   /** array of all directions used in <code>rays[dir][square]</code> */
@@ -271,8 +271,8 @@ public class Bitboard {
   private static long rotate(long bitboard, int[] rotMap) {
     long rotated = 0L;
     for (int i = 0; i < 64; i++) {
-      if ((bitboard & index64Map[rotMap[i]].getBitBoard()) != 0)
-        rotated |= index64Map[i].getBitBoard();
+      if ((bitboard & index64Map[rotMap[i]].bitboard()) != 0)
+        rotated |= index64Map[i].bitboard();
     }
     return rotated;
   }
@@ -326,7 +326,7 @@ public class Bitboard {
    * @param square
    * @return
    */
-  public static int getShiftUp(Square square) { return shiftsDiagUp[square.getIndex64()]; }
+  public static int getShiftUp(Square square) { return shiftsDiagUp[square.bbIndex()]; }
   /**
    * To generate a bitboard where all diagonal squares are next to each other the
    * bitboard needs to be rotated. To get the diagonals squares into the lower
@@ -357,7 +357,7 @@ public class Bitboard {
    * @param square
    * @return
    */
-  public static int getShiftDown(Square square) { return shiftsDiagDown[square.getIndex64()]; }
+  public static int getShiftDown(Square square) { return shiftsDiagDown[square.bbIndex()]; }
   /**
    * To generate a bitboard where all diagonal squares are next to each other the
    * bitboard needs to be rotated. To get the diagonals squares into the lower
@@ -399,7 +399,7 @@ public class Bitboard {
    * @return
    */
   public static long getLengthMaskUp(Square square) {
-    return (1L << lengthDiagUp[square.getIndex64()]) - 1;
+    return (1L << lengthDiagUp[square.bbIndex()]) - 1;
   }
   static final int[] lengthDiagUp = new int[]{ // @formatter:off
     1, 2, 3, 4, 5, 6, 7, 8,
@@ -422,7 +422,7 @@ public class Bitboard {
    * @return
    */
   public static long getLengthMaskDown(Square square) {
-    return (1L << lengthDiagDown[square.getIndex64()]) - 1;
+    return (1L << lengthDiagDown[square.bbIndex()]) - 1;
   }
   /**
    * To generate a bitboard where all diagonal squares are next to each other the
@@ -466,7 +466,7 @@ public class Bitboard {
     final long pieceBitmap = content >>> ((7 - rank.ordinal()) * 8);
     // retrieve all possible moves for this square with the current content
     // and mask with the first row to erase any other pieces
-    return movesRank[square.getIndex64()][(int) pieceBitmap & 255];
+    return movesRank[square.bbIndex()][(int) pieceBitmap & 255];
   }
   static final long[][] movesRank = new long[64][256];
 
@@ -495,7 +495,7 @@ public class Bitboard {
     final long pieceBitmap = (int) ((rotated >>> (((file.ordinal()) * 8))));
     // retrieve all possible moves for this square with the current content
     // and mask with the first row to erase any other pieces not erased by shift
-    return movesFile[square.getIndex64()][(int) pieceBitmap & 255];
+    return movesFile[square.bbIndex()][(int) pieceBitmap & 255];
   }
   static final long[][] movesFile = new long[64][256];
 
@@ -552,7 +552,7 @@ public class Bitboard {
     // which have not been erased by the shift
     final long contentReMasked = shifted & lengthMask;
     // retrieve all possible moves for this square with the current content
-    return moves[square.getIndex64()][(int) contentReMasked];
+    return moves[square.bbIndex()][(int) contentReMasked];
   }
   static final long[][] movesDownDiag = new long[64][256];
 
@@ -567,17 +567,17 @@ public class Bitboard {
     // white pawn attacks - ignore that pawns can'*t be on all squares
     validSquares.forEach(square -> {
       for (int d : pawnAttackDirections) {
-        final int to = square.ordinal() + d * Color.WHITE.direction;
+        final int to = square.ordinal() + d * Color.WHITE.factor;
         if ((to & 0x88) != 0) continue;
-        pawnAttacks[WHITE][square.getIndex64()] |= getSquare(to).getBitBoard();
+        pawnAttacks[WHITE][square.bbIndex()] |= getSquare(to).bitboard();
       }
     });
     // black pawn attacks - ignore that pawns can'*t be on all squares
     validSquares.forEach(square -> {
       for (int d : pawnAttackDirections) {
-        final int to = square.ordinal() + d * Color.BLACK.direction;
+        final int to = square.ordinal() + d * Color.BLACK.factor;
         if ((to & 0x88) != 0) continue;
-        pawnAttacks[BLACK][square.getIndex64()] |= getSquare(to).getBitBoard();
+        pawnAttacks[BLACK][square.bbIndex()] |= getSquare(to).bitboard();
       }
     });
     // knight attacks
@@ -585,7 +585,7 @@ public class Bitboard {
       for (int d : knightDirections) {
         final int to = square.ordinal() + d;
         if ((to & 0x88) != 0) continue;
-        knightAttacks[square.getIndex64()] |= getSquare(to).getBitBoard();
+        knightAttacks[square.bbIndex()] |= getSquare(to).bitboard();
       }
     });
     // bishop attacks
@@ -593,8 +593,8 @@ public class Bitboard {
       for (int d : bishopDirections) {
         int to = square.ordinal() + d;
         while ((to & 0x88) == 0) { // slide while valid square
-          final long toBitboard = getSquare(to).getBitBoard();
-          final int sqIdx = square.getIndex64();
+          final long toBitboard = getSquare(to).bitboard();
+          final int sqIdx = square.bbIndex();
           bishopAttacks[sqIdx] |= toBitboard;
           switch (d) {
             case NW:
@@ -622,7 +622,7 @@ public class Bitboard {
               rays[WEST][sqIdx] |= toBitboard;
               break;
           }
-          to += d; // next sliding field in this direction
+          to += d; // next sliding field in this factor
         }
       }
     });
@@ -631,9 +631,9 @@ public class Bitboard {
       for (int d : rookDirections) {
         int to = square.ordinal() + d;
         while ((to & 0x88) == 0) { // slide while valid square
-          final long toBitboard = getSquare(to).getBitBoard();
-          final int sqIdx = square.getIndex64();
-          rookAttacks[square.getIndex64()] |= getSquare(to).getBitBoard();
+          final long toBitboard = getSquare(to).bitboard();
+          final int sqIdx = square.bbIndex();
+          rookAttacks[square.bbIndex()] |= getSquare(to).bitboard();
           switch (d) {
             case NW:
               rays[NORTHWEST][sqIdx] |= toBitboard;
@@ -660,50 +660,50 @@ public class Bitboard {
               rays[WEST][sqIdx] |= toBitboard;
               break;
           }
-          to += d; // next sliding field in this direction
+          to += d; // next sliding field in this factor
         }
       }
     });
     // queen attacks
     validSquares.forEach(square -> {
-      queenAttacks[square.getIndex64()] = rookAttacks[square.getIndex64()]
-        | bishopAttacks[square.getIndex64()];
+      queenAttacks[square.bbIndex()] = rookAttacks[square.bbIndex()]
+        | bishopAttacks[square.bbIndex()];
     });
     // king attacks
     validSquares.forEach(square -> {
       for (int d : kingDirections) {
         final int to = square.ordinal() + d;
         if ((to & 0x88) != 0) continue;
-        kingAttacks[square.getIndex64()] |= getSquare(to).getBitBoard();
+        kingAttacks[square.bbIndex()] |= getSquare(to).bitboard();
       }
     });
 
     // Pawn front line - all squares north of the square for white, south for black
     // white pawn - ignore that pawns can'*t be on all squares
     validSquares.forEach(square -> {
-      int squareIdx = square.getIndex64();
-      passedPawnMask[WHITE][square.getIndex64()] |= rays[NORTH][squareIdx];
+      int squareIdx = square.bbIndex();
+      passedPawnMask[WHITE][square.bbIndex()] |= rays[NORTH][squareIdx];
       final int file = square.getFile().ordinal();
       final int rank = square.getRank().ordinal();
       if (file > 0 && rank < 7)
-        passedPawnMask[WHITE][square.getIndex64()]
-          |= rays[NORTH][square.getWest().getNorth().getIndex64()];
+        passedPawnMask[WHITE][square.bbIndex()]
+          |= rays[NORTH][square.getWest().getNorth().bbIndex()];
       if (file < 7 && rank < 7)
-        passedPawnMask[WHITE][square.getIndex64()]
-          |= rays[NORTH][square.getEast().getNorth().getIndex64()];
+        passedPawnMask[WHITE][square.bbIndex()]
+          |= rays[NORTH][square.getEast().getNorth().bbIndex()];
     });
     // black pawn - ignore that pawns can'*t be on all squares
     validSquares.forEach(square -> {
-      int squareIdx = square.getIndex64();
-      passedPawnMask[BLACK][square.getIndex64()] |= rays[SOUTH][squareIdx];
+      int squareIdx = square.bbIndex();
+      passedPawnMask[BLACK][square.bbIndex()] |= rays[SOUTH][squareIdx];
       final int file = square.getFile().ordinal();
       final int rank = square.getRank().ordinal();
       if (file > 0 && rank > 0)
-        passedPawnMask[BLACK][square.getIndex64()]
-          |= rays[SOUTH][square.getWest().getSouth().getIndex64()];
+        passedPawnMask[BLACK][square.bbIndex()]
+          |= rays[SOUTH][square.getWest().getSouth().bbIndex()];
       if (file < 7 && rank > 0)
-        passedPawnMask[BLACK][square.getIndex64()]
-          |= rays[SOUTH][square.getEast().getSouth().getIndex64()];
+        passedPawnMask[BLACK][square.bbIndex()]
+          |= rays[SOUTH][square.getEast().getSouth().bbIndex()];
     });
 
     // intermediate
@@ -719,12 +719,12 @@ public class Bitboard {
               break;
             }
             else {
-              intermediate[from.getIndex64()][to.getIndex64()] |= square.getBitBoard();
+              intermediate[from.bbIndex()][to.bbIndex()] |= square.bitboard();
             }
-            t += d; // next sliding field in this direction
+            t += d; // next sliding field in this factor
           }
           if (found) break;
-          intermediate[from.getIndex64()][to.getIndex64()] = 0L;
+          intermediate[from.bbIndex()][to.bbIndex()] = 0L;
         }
       }
     }
@@ -858,7 +858,7 @@ public class Bitboard {
     // generated Attack lists of the sliding pieces (which we could replace now
     // with the lists but we keep them for now)
     validSquares.forEach(square -> {
-      int i = square.getIndex64();
+      int i = square.bbIndex();
       long rookLike = movesRank[i][0] | movesFile[i][0];
       long bishopLike = movesUpDiag[i][0] | movesDownDiag[i][0];
       long queenLike = rookLike | bishopLike;

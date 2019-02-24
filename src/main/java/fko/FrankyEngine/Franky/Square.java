@@ -420,13 +420,13 @@ public enum Square {
   /**
    * pre-computed index for a 64bit index a8=0, b8=1,...h1=63
    */
-  public int getIndex64() {
+  public int bbIndex() {
     return index64;
   }
   /**
    * pre-computed bitBoard representation
    */
-  public long getBitBoard() {
+  public long bitboard() {
     return bitBoard;
   }
 

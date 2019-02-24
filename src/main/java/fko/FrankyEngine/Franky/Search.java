@@ -1860,7 +1860,7 @@ public class Search implements Runnable {
     }
     // do evaluation
     else {
-      value = evaluator.evaluate(position);
+      value = evaluator.evaluate(position, alpha, beta);
       assert value >= Short.MIN_VALUE;
       assert value <= Short.MAX_VALUE;
       // store value int cache
@@ -2086,14 +2086,14 @@ public class Search implements Runnable {
   }
 
   /**
-   * Changes the time limit by the given direction and also sets the soft time limit
+   * Changes the time limit by the given factor and also sets the soft time limit
    * to 0.8 of the hard time limit.
    * Factor 1 is neutral. <1 shortens the time, >1 adds time<br/>
-   * Example: direction 0.8 is 20% less time. Factor 1.2 is 20% additional time
+   * Example: factor 0.8 is 20% less time. Factor 1.2 is 20% additional time
    * Always calculated from the initial time budget.
    * *
    *
-   * @param factor direction for changing the time for the current search
+   * @param factor factor for changing the time for the current search
    */
   private void addExtraTime(double factor) {
 

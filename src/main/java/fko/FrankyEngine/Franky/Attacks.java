@@ -69,7 +69,7 @@ public class Attacks {
    */
   public static long attacksTo(Position position, Square square, Color color) {
 
-    final int sIdx = square.getIndex64();
+    final int sIdx = square.bbIndex();
     final int opponent = color.inverse().ordinal();
 
     final long[] piecesBitboards = position.getPiecesBitboards(color);
@@ -137,7 +137,7 @@ public class Attacks {
     Piece movedPiece = Move.getPiece((move));
 
     // get the initial bitboards
-    long fromSet = fromSquare.getBitBoard();
+    long fromSet = fromSquare.bitboard();
     long occSet = position.getAllOccupiedBitboard();
 
     // get the attacks from both colors
@@ -194,7 +194,7 @@ public class Attacks {
       // determine next capture
       fromSquare = getLeastValuablePiece(position, remainingAttacks, nextPlayer);
       if (fromSquare == NOSQUARE) break;
-      fromSet = fromSquare.getBitBoard();
+      fromSet = fromSquare.bitboard();
       movedPiece = position.getPiece(fromSquare);
 
       // kings are checked last and should not move into check
@@ -285,7 +285,7 @@ public class Attacks {
 
       final Square square = validSquares.get(i);
       final Piece pc = position.getPiece(square);
-      final int sIdx = square.getIndex64();
+      final int sIdx = square.bbIndex();
       final long[] whitePieces = position.getPiecesBitboards(Color.WHITE);
       final long[] blackPieces = position.getPiecesBitboards(Color.WHITE);
 
