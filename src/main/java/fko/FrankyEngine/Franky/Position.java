@@ -145,14 +145,15 @@ public class Position {
   private final SquareList[] queenSquares  = new SquareList[Color.values.length];
   private final Square[]     kingSquares   = new Square[Color.values.length];
 
-  // bitboards
-  private final long[][] piecesBitboards      =
-    new long[Color.values.length][PieceType.values.length];
-  private final long[]   occupiedBitboards    = new long[Color.values.length];
-  private final long[]   occupiedBitboardsR90 = new long[Color.values.length];
-  private final long[]   occupiedBitboardsL90 = new long[Color.values.length];
-  private final long[]   occupiedBitboardsR45 = new long[Color.values.length];
-  private final long[]   occupiedBitboardsL45 = new long[Color.values.length];
+  // piece bitboards
+  private final long[][] piecesBitboards = new long[Color.values.length][PieceType.values.length];
+
+  // occupied bitboards with rotations
+  private final long[] occupiedBitboards    = new long[Color.values.length];
+  private final long[] occupiedBitboardsR90 = new long[Color.values.length];
+  private final long[] occupiedBitboardsL90 = new long[Color.values.length];
+  private final long[] occupiedBitboardsR45 = new long[Color.values.length];
+  private final long[] occupiedBitboardsL45 = new long[Color.values.length];
 
   // Material value will always be up to date
   private int[] material;
@@ -168,7 +169,7 @@ public class Position {
   private Flag[] hasMateFlagHistory  = new Flag[MAX_HISTORY];
 
   // internal move generator for check if position is mate - might not be good place
-  // as it couples this class to the MoveGernerator class
+  // as it couples this class to the Move Generator class
   private final MoveGenerator mateCheckMG = new MoveGenerator();
 
   // Flag for boolean states with undetermined state
@@ -1159,11 +1160,11 @@ public class Position {
         // this is indeed the en passant attacked square
         && this.enPassantSquare.getSouth() == attackedSquare) {
         // left
-        int i = squareOrdinal + Square.W;
-        if ((i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN) return true;
+        if ((squareOrdinal + Square.W & 0x88) == 0
+          && x88Board[squareOrdinal + Square.W] == Piece.WHITE_PAWN) return true;
         // right
-        i = squareOrdinal + Square.E;
-        return (i & 0x88) == 0 && x88Board[i] == Piece.WHITE_PAWN;
+        return (squareOrdinal + Square.E & 0x88) == 0
+          && x88Board[squareOrdinal + Square.E] == Piece.WHITE_PAWN;
       }
       // black is attacker (assume not noColor)
       else if (!isWhite
@@ -1172,11 +1173,11 @@ public class Position {
         // this is indeed the en passant attacked square
         && this.enPassantSquare.getNorth() == attackedSquare) {
         // attack from left
-        int i = squareOrdinal + Square.W;
-        if ((i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN) return true;
+        if ((squareOrdinal + Square.W & 0x88) == 0
+          && x88Board[squareOrdinal + Square.W] == Piece.BLACK_PAWN) return true;
         // attack from right
-        i = squareOrdinal + Square.E;
-        return (i & 0x88) == 0 && x88Board[i] == Piece.BLACK_PAWN;
+        return (squareOrdinal + Square.E & 0x88) == 0
+          && x88Board[squareOrdinal + Square.E] == Piece.BLACK_PAWN;
       }
     }
     return false;

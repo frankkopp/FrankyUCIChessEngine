@@ -62,7 +62,7 @@ public enum Square {
   public static final Square[] values;
 
   /**
-   * pre computed mapping from index64 to square
+   * pre computed mapping from bbIndex to square
    */
   public static final Square[] index64Map = new Square[64];
 
@@ -114,16 +114,16 @@ public enum Square {
       if ((s.ordinal() & 0x88) == 0) {
         s.validSquare = true;
 
-        // index64 is order a8=0 to h1=63
-        s.index64 = ((7 - (s.ordinal() / 16)) * 8) + (s.ordinal() % 16);
-        //      System.out.printf("%s=%d ", this.name(), index64);
+        // bbIndex is order a8=0 to h1=63
+        s.bbIndex = ((7 - (s.ordinal() / 16)) * 8) + (s.ordinal() % 16);
+        //      System.out.printf("%s=%d ", this.name(), bbIndex);
 
         // set bit for bitboard
         final long bit = 0b1L; //1L;
-        s.bitBoard = bit << s.index64;
+        s.bitBoard = bit << s.bbIndex;
 
-        // mapping between enum ordinal and index64
-        index64Map[s.index64] = s;
+        // mapping between enum ordinal and bbIndex
+        index64Map[s.bbIndex] = s;
         trailingZerosMap[Long.numberOfTrailingZeros(s.bitBoard)] = s;
 
         // pre compute neighbours
@@ -147,7 +147,7 @@ public enum Square {
       // invalid squares
       else {
         s.validSquare = false;
-        s.index64 = -1;
+        s.bbIndex = -1;
         s.bitBoard = 0L;
         s.file = File.NOFILE;
         s.rank = Rank.NORANK;
@@ -218,7 +218,7 @@ public enum Square {
 
   // precomputed values
   private boolean validSquare;
-  private int     index64;
+  private int     bbIndex;
   private long    bitBoard;
 
   // precomputed neighbours
@@ -421,7 +421,7 @@ public enum Square {
    * pre-computed index for a 64bit index a8=0, b8=1,...h1=63
    */
   public int bbIndex() {
-    return index64;
+    return bbIndex;
   }
   /**
    * pre-computed bitBoard representation

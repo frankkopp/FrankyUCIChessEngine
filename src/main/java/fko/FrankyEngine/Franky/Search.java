@@ -484,10 +484,12 @@ public class Search implements Runnable {
           // commented out as other programs don't do this.
           // if (ttEntry.depth >= depth) {
           //   depth = ttEntry.depth + 1;
-          //   LOG.debug("TT cached result of depth {}. Start depth is now {}", ttEntry.depth, depth);
+          //   LOG.debug("TT cached result of depth {}. Start depth is now {}", ttEntry.depth,
+          //   depth);
           //   // send info to UCI to let the user know that we have a result for the cached depth
           //   engine.sendInfoToUCI(String.format("depth %d %s time %d pv %s", ttEntry.depth,
-          //                                      getScoreString(currentBestRootValue), elapsedTime(),
+          //                                      getScoreString(currentBestRootValue),
+          //                                      elapsedTime(),
           //                                      pv[ROOT_PLY].toNotationString()));
           // }
         }
@@ -821,7 +823,7 @@ public class Search implements Runnable {
     // also go into quiescence when depth is 1 deeper than current
     // iteration to avoid search explosion through extensions
     if (depth <= LEAF || ply >= MAX_SEARCH_DEPTH - 1
-        || ply - 1 >= searchCounter.currentIterationDepth) {
+      || ply - 1 >= searchCounter.currentIterationDepth) {
       if (TRACE) trace("%sSearch in ply %d for depth %d: LEAF NODE", getSpaces(ply), ply, depth);
       return qsearch(position, ply, alpha, beta, pvNode);
     }
@@ -912,9 +914,9 @@ public class Search implements Runnable {
           boolean cut = false;
           if (TranspositionTable.getType(ttEntry) == TT_EntryType.EXACT) cut = true;
           else if (!pvNode && TranspositionTable.getType(ttEntry) == TT_EntryType.ALPHA
-                   && value <= alpha) cut = true;
+            && value <= alpha) cut = true;
           else if (!pvNode && TranspositionTable.getType(ttEntry) == TT_EntryType.BETA
-                   && value >= beta) cut = true;
+            && value >= beta) cut = true;
           if (cut) {
             if (TRACE) {
               trace("%sSearch in ply %d for depth %d: TT CUT value=%d", getSpaces(ply), ply, depth,
@@ -1292,7 +1294,7 @@ public class Search implements Runnable {
 
       // Check if our givesCheck(move) works correctly
       boolean check = position.hasCheck();
-      if (check != givesCheck){
+      if (check != givesCheck) {
         System.out.println("BUG");
         position.hasCheck();
       }
@@ -1588,9 +1590,9 @@ public class Search implements Runnable {
         boolean cut = false;
         if (TranspositionTable.getType(ttEntry) == TT_EntryType.EXACT) cut = true;
         else if (!pvNode && TranspositionTable.getType(ttEntry) == TT_EntryType.ALPHA
-                 && value <= alpha) cut = true;
+          && value <= alpha) cut = true;
         else if (!pvNode && TranspositionTable.getType(ttEntry) == TT_EntryType.BETA
-                 && value >= beta) cut = true;
+          && value >= beta) cut = true;
         if (cut) {
           if (TRACE) {
             trace("%sSearch in ply %d: TT CUT value=%d", getSpaces(ply), ply, value);
@@ -1851,11 +1853,11 @@ public class Search implements Runnable {
     final int value;
 
     // timing
-    // long start = System.nanoTime();
+    //    long start = System.nanoTime();
 
     // check cache
     if (config.USE_EVAL_CACHE
-        && (evalFromCache = evalCache.get(position.getZobristKey())) != Evaluation.NOVALUE) {
+      && (evalFromCache = evalCache.get(position.getZobristKey())) != Evaluation.NOVALUE) {
       value = evalFromCache;
     }
     // do evaluation
@@ -1867,13 +1869,13 @@ public class Search implements Runnable {
       if (config.USE_EVAL_CACHE) evalCache.put(position.getZobristKey(), (short) value);
     }
 
-    // evalTime += System.nanoTime() - start;
+    //    evalTime += System.nanoTime() - start;
 
     // DEBUG
-    //    if (searchCounter.leafPositionsEvaluated % 10000 == 0)
-    //      System.out.printf("Evals: %,d Avg time: %,d%n", searchCounter.leafPositionsEvaluated,
+    //    if (searchCounter.leafPositionsEvaluated % 100000 == 0)
+    //      System.out.printf("Evals: %,d Avg time: %,d ns %n", searchCounter
+    //      .leafPositionsEvaluated,
     //                        evalTime / searchCounter.leafPositionsEvaluated);
-
 
     if (TRACE) {
       trace("%SEvaluation: %s = %d  ply: %d  currline: <%s>  position: %s", getSpaces(ply),
@@ -1991,9 +1993,9 @@ public class Search implements Runnable {
   private static boolean bigPiecePresent(Position position) {
     final int activePlayer = position.getNextPlayer().ordinal();
     return !(position.getKnightSquares()[activePlayer].isEmpty()
-             && position.getBishopSquares()[activePlayer].isEmpty()
-             && position.getRookSquares()[activePlayer].isEmpty()
-             && position.getQueenSquares()[activePlayer].isEmpty());
+      && position.getBishopSquares()[activePlayer].isEmpty()
+      && position.getRookSquares()[activePlayer].isEmpty()
+      && position.getQueenSquares()[activePlayer].isEmpty());
   }
 
   /**
@@ -2105,7 +2107,8 @@ public class Search implements Runnable {
   }
 
   /**
-   * Soft time limit is used in iterative deepening to decide if an new depth should even be started.
+   * Soft time limit is used in iterative deepening to decide if an new depth should even be
+   * started.
    *
    * @return true if soft time limit is reached, false otherwise
    */
@@ -2156,7 +2159,8 @@ public class Search implements Runnable {
         searchCounter.nodesVisited, searchCounter.tt_Hits, searchCounter.tt_Misses,
         searchCounter.tt_Cuts, searchCounter.tt_Ignored));
       LOG.info("{}", String.format(
-        "Search complete. Nodes visited: %,d Boards Evaluated: %,d (+%,d) re-pvs-root=%d re-asp=%d betaCutOffs=%s",
+        "Search complete. Nodes visited: %,d Boards Evaluated: %,d (+%,d) re-pvs-root=%d "
+          + "re-asp=%d betaCutOffs=%s",
         searchCounter.nodesVisited, searchCounter.leafPositionsEvaluated,
         searchCounter.nonLeafPositionsEvaluated, searchCounter.pvs_root_researches,
         searchCounter.aspirationResearches, Arrays.toString(searchCounter.betaCutOffs)));
@@ -2425,7 +2429,7 @@ public class Search implements Runnable {
     @Override
     public String toString() {
       return "Best Move: " + Move.toString(bestMove) + " (" + getScoreString(resultValue) + ") "
-             + " Ponder Move: " + Move.toString(ponderMove) + " Depth: " + depth + "/" + extraDepth;
+        + " Ponder Move: " + Move.toString(ponderMove) + " Depth: " + depth + "/" + extraDepth;
     }
   }
 

@@ -51,8 +51,7 @@ public class Attacks {
 
   private boolean hasCheck = false;
 
-  long[][] attacksTo = new long[2][64];
-
+  long[][] attacksTo   = new long[2][64];
   long[][] attacksFrom = new long[2][64];
   long[]   allAttacks  = new long[2];
   int[]    mobility    = new int[2];
@@ -72,30 +71,25 @@ public class Attacks {
     final int sIdx = square.bbIndex();
     final int opponent = color.inverse().ordinal();
 
-    final long[] piecesBitboards = position.getPiecesBitboards(color);
+    final long[] pBB = position.getPiecesBitboards(color);
 
     long attacksToTemp = 0L;
 
     // Non-Sliding
-    attacksToTemp |= Bitboard.pawnAttacks[opponent][sIdx]
-      & piecesBitboards[PieceType.PAWN.ordinal()];
-    attacksToTemp |= Bitboard.knightAttacks[sIdx] & piecesBitboards[PieceType.KNIGHT.ordinal()];
-    attacksToTemp |= Bitboard.kingAttacks[sIdx] & piecesBitboards[PieceType.KING.ordinal()];
+    attacksToTemp |= Bitboard.pawnAttacks[opponent][sIdx] & pBB[PieceType.PAWN.ordinal()];
+    attacksToTemp |= Bitboard.knightAttacks[sIdx] & pBB[PieceType.KNIGHT.ordinal()];
+    attacksToTemp |= Bitboard.kingAttacks[sIdx] & pBB[PieceType.KING.ordinal()];
 
     // Sliding
-    // test reverse from the target square outgoing
-    // does not matter for non pawns
     // rooks and queens
-    final long rqMoves = Bitboard.getSlidingMovesRank(square, position)
-      | Bitboard.getSlidingMovesFile(square, position);
-    attacksToTemp |= rqMoves & (piecesBitboards[PieceType.ROOK.ordinal()]
-      | piecesBitboards[PieceType.QUEEN.ordinal()]);
+    attacksToTemp |= (Bitboard.getSlidingMovesRank(square, position)
+      | Bitboard.getSlidingMovesFile(square, position))
+      & (pBB[PieceType.ROOK.ordinal()] | pBB[PieceType.QUEEN.ordinal()]);
 
     // bishop and queens
-    final long bqMoves = Bitboard.getSlidingMovesDiagUp(square, position)
-      | Bitboard.getSlidingMovesDiagDown(square, position);
-    attacksToTemp |= bqMoves & (piecesBitboards[PieceType.BISHOP.ordinal()]
-      | piecesBitboards[PieceType.QUEEN.ordinal()]);
+    attacksToTemp |= (Bitboard.getSlidingMovesDiagUp(square, position)
+      | Bitboard.getSlidingMovesDiagDown(square, position))
+      & (pBB[PieceType.BISHOP.ordinal()] | pBB[PieceType.QUEEN.ordinal()]);
 
     return attacksToTemp;
 
@@ -176,7 +170,10 @@ public class Attacks {
       gain[d] = movedPieceValue - gain[d - 1];
 
       //      System.out.printf("%d. Move: %12s on %s captures %12s on %s: score=%d (risk=%d)%n", d,
-      //                        movedPiece.name(), fromSquare, capturedPiece.name(), toSquare,
+      //                        movedPiece.name(),
+      //                        fromSquare,
+      //                        capturedPiece.name(),
+      //                        toSquare,
       //                        gain[d - 1],
       //                        movedPieceValue);
       //      capturedPiece = movedPiece;
