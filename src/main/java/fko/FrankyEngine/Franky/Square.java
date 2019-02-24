@@ -116,7 +116,7 @@ public enum Square {
 
         // bbIndex is order a8=0 to h1=63
         s.bbIndex = ((7 - (s.ordinal() / 16)) * 8) + (s.ordinal() % 16);
-        //      System.out.printf("%s=%d ", this.name(), bbIndex);
+        // System.out.printf("%s=%d ", this.name(), bbIndex);
 
         // set bit for bitboard
         final long bit = 0b1L; //1L;
