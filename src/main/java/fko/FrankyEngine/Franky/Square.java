@@ -481,12 +481,14 @@ public enum Square {
   public long getDownDiag() {
     return downDiag;
   }
+
   /**
    * pre-computed index for a 64bit index a8=0, b8=1,...h1=63
    */
   public int bbIndex() {
     return bbIndex;
   }
+
   /**
    * pre-computed bitBoard representation
    */
@@ -494,14 +496,23 @@ public enum Square {
     return bitBoard;
   }
 
+  /**
+   * @return true if this square is on the 2nd rank
+   */
   public boolean isWhitePawnBaseRow() {
     return this.isPawnBaseRow[WHITE];
   }
 
+  /**
+   * @return true if this square is on the 7th rank
+   */
   public boolean isBlackPawnBaseRow() {
     return this.isPawnBaseRow[BLACK];
   }
 
+  /**
+   * @return true if this square is on the 2nd (white) or 7th (black) rank
+   */
   public boolean isPawnBaseRow(Color c) {
     return this.isPawnBaseRow[c.ordinal()];
   }
