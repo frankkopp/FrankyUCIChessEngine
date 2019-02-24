@@ -52,11 +52,12 @@ public enum Square {
   a7, b7, c7, d7, e7, f7, g7, h7, i7, j7, k7, l7, m7, n7, o7, p7, // 96-111
   a8, b8, c8, d8, e8, f8, g8, h8, i8, j8, k8, l8, m8, n8, o8, p8, // 112-127
   NOSQUARE;
+  // @formatter:on
 
-  private static final int WHITE = 0;
-  private static final int BLACK = 1;
-  private static final boolean UP   = true;
-  private static final boolean DOWN = false;
+  private static final int     WHITE = 0;
+  private static final int     BLACK = 1;
+  private static final boolean UP    = true;
+  private static final boolean DOWN  = false;
 
   // pre-filled list with all squares
   public static final Square[] values;
@@ -71,7 +72,6 @@ public enum Square {
    */
   public static final List<Square> validSquares;
 
-  // @formatter:on
   // Move deltas north, south, east, west and combinations
   static final int N  = 16;
   static final int E  = 1;
