@@ -149,6 +149,17 @@ public class SuiteTestsTest {
 
   @Test
   @Disabled
+  void startSTSSuite() {
+    /*
+
+     */
+    testSuite = new TestSuite("./testsets/STS1-STS15_LAN.EPD");
+    testSuite.setSearchTime(10000);
+    testSuite.startTests();
+  }
+
+  @Test
+  @Disabled
   void startDefaultTestSuite() {
     /*
     Franky-0.10 - 10sec
@@ -157,6 +168,9 @@ public class SuiteTestsTest {
     Franky-0.11 - 10sec
     Successful: 155 (44 Prozent)
     Failed:     191 (55 Prozent)
+    Franky-1.1
+    Successful: 172 (49 Prozent)
+    Failed:     174 (50 Prozent)
     */
     // ./testsets/crafty_test.epd
     testSuite.setSearchTime(5000);
@@ -253,6 +267,7 @@ public class SuiteTestsTest {
     config.USE_PVS_ORDERING = true;
     config.USE_KILLER_MOVES = true;
     config.USE_QUIESCENCE = true;
+    config.USE_SEE = true;
     config.USE_TRANSPOSITION_TABLE = true;
     config.USE_TT_ROOT = true;
     config.USE_ASPIRATION_WINDOW = true;

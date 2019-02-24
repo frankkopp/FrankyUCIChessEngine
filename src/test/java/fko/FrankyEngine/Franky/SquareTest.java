@@ -268,7 +268,7 @@ public class SquareTest {
     while ((square = Square.getFirstSquare(bitboard)) != NOSQUARE) {
       LOG.debug("{}", square);
       counter++;
-      bitboard ^= Square.getFirstSquare(bitboard).bitboard();
+      bitboard = removeFirstSquare(bitboard);
     }
     assertEquals(32, counter);
   }

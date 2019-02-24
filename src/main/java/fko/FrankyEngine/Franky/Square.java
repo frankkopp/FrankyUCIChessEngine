@@ -129,12 +129,20 @@ public enum Square {
         // pre compute neighbours
         if ((s.ordinal() + N & 0x88) == 0) s.north = Square.values()[s.ordinal() + N];
         else s.north = NOSQUARE;
+        if ((s.ordinal() + NE & 0x88) == 0) s.northEast = Square.values()[s.ordinal() + NE];
+        else s.northEast = NOSQUARE;
         if ((s.ordinal() + E & 0x88) == 0) s.east = Square.values()[s.ordinal() + E];
         else s.east = NOSQUARE;
+        if ((s.ordinal() + SE & 0x88) == 0) s.southEast = Square.values()[s.ordinal() + SE];
+        else s.southEast = NOSQUARE;
         if ((s.ordinal() + S & 0x88) == 0) s.south = Square.values()[s.ordinal() + S];
         else s.south = NOSQUARE;
+        if ((s.ordinal() + SW & 0x88) == 0) s.southWest = Square.values()[s.ordinal() + SW];
+        else s.southWest = NOSQUARE;
         if ((s.ordinal() + W & 0x88) == 0) s.west = Square.values()[s.ordinal() + W];
         else s.west = NOSQUARE;
+        if ((s.ordinal() + NW & 0x88) == 0) s.northWest = Square.values()[s.ordinal() + NW];
+        else s.northWest = NOSQUARE;
 
         // pre-compute file and rank
         s.file = File.values[s.ordinal() % 16];
@@ -223,9 +231,13 @@ public enum Square {
 
   // precomputed neighbours
   private Square north;
+  private Square northEast;
   private Square east;
+  private Square southEast;
   private Square south;
+  private Square southWest;
   private Square west;
+  private Square northWest;
 
   // precomputed file and rank
   private File file;
@@ -294,6 +306,18 @@ public enum Square {
   }
 
   /**
+   * @param x88index
+   * @return the Square for the given index of a 0x88 board or NOSQUARE if not a valid index
+   */
+  public static Square getSquare(int x88index) {
+    if ((x88index & 0x88) != 0) return NOSQUARE;
+    return Square.values[x88index];
+  }
+  /**
+   * Finds the first set bit in a bitboard and returns the according Square.
+   * Can be used to loop through all set squares in a bitboard in conjunction
+   * with removeFirstSquare()
+   *
    * @param bitboard
    * @return the first Square of the given Bitboard from a8-h8-h1
    */
@@ -302,13 +326,17 @@ public enum Square {
   }
 
   /**
-   * @param index
-   * @return the Square for the given index of a 0x88 board - returns NOSQUARE if not a valid
-   * index
+   * Finds the first set bit in a bitboard and removes it.
+   * Can be used to loop through all set squares in a bitboard in conjunction
+   * with getFirstSquare()
+   *
+   * @param bitboard
+   * @return the bitboard without the removed square
    */
-  public static Square getSquare(int index) {
-    if ((index & 0x88) != 0) return NOSQUARE;
-    return Square.values[index];
+  public static long removeFirstSquare(long bitboard) {
+    final long bit = trailingZerosMap[Long.numberOfTrailingZeros(bitboard)].bitboard();
+    assert (bitboard & bit) != 0 : "Bit to be removed not set.";
+    return bitboard ^ bit;
   }
 
   /**
@@ -361,8 +389,8 @@ public enum Square {
    *
    * @return square north
    */
-  public Square getSouth() {
-    return south;
+  public Square getNorthEast() {
+    return northEast;
   }
 
   /**
@@ -379,8 +407,44 @@ public enum Square {
    *
    * @return square north
    */
+  public Square getSouthEast() {
+    return southEast;
+  }
+
+  /**
+   * Returns the square north of this square. as seen from the white side.
+   *
+   * @return square north
+   */
+  public Square getSouth() {
+    return south;
+  }
+
+  /**
+   * Returns the square north of this square. as seen from the white side.
+   *
+   * @return square north
+   */
+  public Square getSouthWest() {
+    return southWest;
+  }
+
+  /**
+   * Returns the square north of this square. as seen from the white side.
+   *
+   * @return square north
+   */
   public Square getWest() {
     return west;
+  }
+
+  /**
+   * Returns the square north of this square. as seen from the white side.
+   *
+   * @return square north
+   */
+  public Square getNorthWest() {
+    return northWest;
   }
 
   /**
