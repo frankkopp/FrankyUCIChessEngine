@@ -138,6 +138,9 @@ public class SuiteTestsTest {
     Franky-0.11 - 10sec
     Successful: 376 (48 Prozent)
     Failed:     393 (51 Prozent)
+    Franky-1.1
+    Successful: 478 (62 Prozent)
+    Failed:     291 (37 Prozent)
     */
     testSuite = new TestSuite("./testsets/ecm98.epd");
     testSuite.setSearchTime(10000);
@@ -281,18 +284,21 @@ public class SuiteTestsTest {
 
     // bm test time limited
     //    assertTrue(
-    //      testSuite.startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
+    //      testSuite.startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm
+    //      Bh1;",
     //                             5000, 0));
 
     // bm test depth limited
-    assertTrue(
-      testSuite.startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;", 0,
-                             8));
+    //    assertTrue(
+    //      testSuite.startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm
+    //      Bh1;", 0,
+    //                             8));
 
     // bm test time & depth limited
-    assertTrue(
-      testSuite.startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm Bh1;",
-                             5000, 8));
+    //    assertTrue(
+    //      testSuite.startOneTest("r7/2r1kpp1/1p6/pB1Pp1P1/Pbp1P3/2N2b1P/1PPK1P2/R6R b - - bm
+    //      Bh1;",
+    //                             5000, 8));
 
   }
 
@@ -356,7 +362,8 @@ public class SuiteTestsTest {
 
     // difficult for LMR because of Queen sacrifice
     //    assertTrue(
-    //      testSuite.startOneTest("6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - - dm 3;",
+    //      testSuite.startOneTest("6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - - dm
+    //      3;",
     //                             15000, 0));
 
   }

@@ -621,65 +621,10 @@ public class SearchTest {
     search.waitWhileSearching();
   }
 
-  /**
-   * Razor and LMR make the search miss this mate at higher depths
-   * Might be a consequence from these "optimizations" might be a bug
-   * TODO: investigate more
-   */
-  @Test
-  @Disabled
-  public void mateSearchIssueTest() {
-
-    boolean infinite = false;
-    int maxDepth = 0;
-    int moveTime = 10000;
-    int mateIn = 5;
-    int pliesToMate = 7;
-    String fen = "6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - -";
-
-    // these should not change result
-    search.config.USE_ALPHABETA_PRUNING = true;
-    search.config.USE_PVS = true;
-    search.config.USE_PVS_ORDERING = true;
-    search.config.USE_KILLER_MOVES = true;
-    search.config.USE_TRANSPOSITION_TABLE = true;
-    search.config.USE_MDP = true;
-    search.config.USE_MPP = true;
-
-    // these can change result
-    // some of these make the search miss this mate at higher depths
-    // might be a consequence from these "optimizations" might be a bug
-    search.config.USE_NMP = true;
-    search.config.NMP_DEPTH = 2;
-    search.config.USE_VERIFY_NMP = true;
-    search.config.NMP_VERIFICATION_DEPTH = 3;
-
-    search.config.USE_RAZOR_PRUNING = true;
-    search.config.USE_LMR = true;
-    search.config.USE_QUIESCENCE = true;
-
-    Position position = new Position(fen);
-    SearchMode searchMode =
-      new SearchMode(0, 0, 0, 0, 0, moveTime, 0, maxDepth, mateIn, null, false, infinite, false);
-
-    search.startSearch(position, searchMode);
-    search.waitWhileSearching();
-
-    LOG.warn("Best Move: {} Value: {} Ponder {}",
-             Move.toSimpleString(search.getLastSearchResult().bestMove),
-             search.getLastSearchResult().resultValue / 100f,
-             Move.toSimpleString(search.getLastSearchResult().ponderMove));
-
-    LOG.warn(search.getSearchCounter().toString());
-
-    assertEquals(Evaluation.CHECKMATE - pliesToMate, search.getLastSearchResult().resultValue);
-
-  }
-
   @Test
   @Disabled
   public void evaluationTest() {
-    String fen = Position.STANDARD_BOARD_FEN;
+    String fen;
     SearchMode searchMode;
     Position position;
 

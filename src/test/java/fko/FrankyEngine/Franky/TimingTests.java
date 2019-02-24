@@ -57,8 +57,8 @@ public class TimingTests {
   }
 
   /**
-   * Is using local temp variables faster than getter/array accessors?
-   * ==> No - even a little slower
+   * Testing two versions of {@link Position#isAttacked(Color, Square)}
+   * ==> New is faster (2 is slower)
    */
   @Test
   @Disabled
@@ -70,7 +70,7 @@ public class TimingTests {
       return null;
     };
     Function f2 = o -> {
-      position.isAttacked(Color.BLACK, Square.e8);
+      position.isAttacked2(Color.BLACK, Square.e8);
       return null;
     };
     timingTest(5, 50, 20_000_000, f1, f2);
