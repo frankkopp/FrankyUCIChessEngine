@@ -96,7 +96,7 @@ public class EvalCache {
                                   Runtime.getRuntime().totalMemory() / MB));
     LOG.debug("{}", String.format("Current used memory:         %,5d MB", usedMemory / MB));
     LOG.debug("{}", String.format("Current free memory:         %,5d MB", freeMemory / MB));
-    LOG.debug("{}", String.format("Memory available for TT:     %,5d MB", ttMemory / MB));
+    LOG.debug("{}", String.format("Memory for Eval Cache:       %,5d MB", ttMemory / MB));
 
     if (ttMemory < sizeInByte) {
       LOG.warn("{}", String.format("Not enough memory for a %,dMB eval cache - reducing to %,dMB",
@@ -112,8 +112,8 @@ public class EvalCache {
     keys = new long[maxNumberOfEntries];
     data = new short[maxNumberOfEntries];
 
-    LOG.info("{}", String.format("EvalCache Size:    %,5d MB", sizeInByte / (KB * KB)));
-    LOG.info("{}", String.format("EvalCache Entries: %,d", maxNumberOfEntries));
+    LOG.info("{}", String.format("EvalCache Size:              %,5d MB", sizeInByte / (KB * KB)));
+    LOG.info("{}", String.format("EvalCache Entries:           %,d", maxNumberOfEntries));
   }
 
   /**

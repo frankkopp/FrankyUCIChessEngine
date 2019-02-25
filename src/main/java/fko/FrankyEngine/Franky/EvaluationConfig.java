@@ -30,6 +30,16 @@ package fko.FrankyEngine.Franky;
  */
 class EvaluationConfig {
 
+  // NPS Hit ~35% - Evaluation Hit: ~70%
+  static final boolean USE_BOARDCONTROL = false;
+
+  static final float MATERIAL_WEIGHT       = 1;
+  static final float POSITION_WEIGHT       = 0.5f;
+  static final float MOBILITY_WEIGHT       = 2;
+  static final float KING_SAFETY_WEIGHT    = 1;
+  static final float PAWN_STRUCTURE_WEIGHT = 1;
+  static final float BOARDCONTROL_WEIGHT   = 5;
+
   static final int TEMPO       = 10;
   static final int CHECK_VALUE = 30;
 
@@ -41,13 +51,6 @@ class EvaluationConfig {
   static final int BISHOP_MOBILITY_FACTOR  = 2;
   static final int ROOK_MOBILITY_FACTOR    = 2;
   static final int QUEEN_MOBILITY_FACTOR   = 1;
-
-  static final float MATERIAL_WEIGHT       = 1;
-  static final float POSITION_WEIGHT       = 0.5f;
-  static final float MOBILITY_WEIGHT       = 2;
-  static final float KING_SAFETY_WEIGHT    = 1;
-  static final float PAWN_STRUCTURE_WEIGHT = 1;
-  static final float BOARDCONTROL_WEIGHT   = 5;
 
   static final int KING_SAFETY_PAWNSHIELD   = 10;
   static final int KING_RING_ATTACK_PENALTY = -10;

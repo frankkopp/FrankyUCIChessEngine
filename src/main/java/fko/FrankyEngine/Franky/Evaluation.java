@@ -360,9 +360,7 @@ public class Evaluation {
    * Iterates over all squares an does evaluations specific to the square
    */
   private void iterateOverSquares() {
-    for (int i = 0; i < 64; i++) {
-      boardControl(i);
-    }
+    if (USE_BOARDCONTROL) for (int i = 0; i < 64; i++) boardControl(i);
   }
 
   private void materialEvaluation() {
@@ -401,10 +399,10 @@ public class Evaluation {
       this.endGamePiecePosition += pawnsEndGame[bbIdx];
 
       // penalty for doubled pawn
-      int count = Long.bitCount(
-        Bitboard.rays[Bitboard.NORTH][bbIdx] & position.getPiecesBitboards(WHITE, PAWN));
-      this.midGamePawnStructure += count * DOUBLED_PAWN_PENALTY;
-      this.endGamePawnStructure += count * DOUBLED_PAWN_PENALTY;
+      if ((Bitboard.rays[Bitboard.NORTH][bbIdx] & position.getPiecesBitboards(WHITE, PAWN)) != 0) {
+        this.midGamePawnStructure += DOUBLED_PAWN_PENALTY;
+        this.endGamePawnStructure += DOUBLED_PAWN_PENALTY;
+      }
 
       // bonus for passed pawn (no opponent pawn on file and neighbour files
       if ((Bitboard.passedPawnMask[WHITE][bbIdx] & position.getPiecesBitboards(BLACK, PAWN)) == 0
@@ -414,7 +412,7 @@ public class Evaluation {
       }
 
       // count all attacks to squares
-      buildAttackTo(square, WHITE, Square.pawnAttackDirections);
+      if (USE_BOARDCONTROL) buildAttackTo(square, WHITE, Square.pawnAttackDirections);
     }
 
     for (int i = 0, size = pawnSquares[BLACK].size(); i < size; i++) {
@@ -429,10 +427,10 @@ public class Evaluation {
       this.endGamePiecePosition -= pawnsEndGame[63 - bbIdx];
 
       // penalty for doubled pawn
-      int count = Long.bitCount(
-        Bitboard.rays[Bitboard.SOUTH][bbIdx] & position.getPiecesBitboards(BLACK, PAWN));
-      this.midGamePawnStructure -= count * DOUBLED_PAWN_PENALTY;
-      this.endGamePawnStructure -= count * DOUBLED_PAWN_PENALTY;
+      if ((Bitboard.rays[Bitboard.SOUTH][bbIdx] & position.getPiecesBitboards(BLACK, PAWN)) != 0) {
+        this.midGamePawnStructure -= DOUBLED_PAWN_PENALTY;
+        this.endGamePawnStructure -= DOUBLED_PAWN_PENALTY;
+      }
 
       // bonus for passed pawn (no opponent pawn on file and neighbour file
       if ((Bitboard.passedPawnMask[BLACK][bbIdx] & position.getPiecesBitboards(WHITE, PAWN)) == 0
@@ -442,7 +440,7 @@ public class Evaluation {
       }
 
       // count all attacks to squares
-      buildAttackTo(square, BLACK, Square.pawnAttackDirections);
+      if (USE_BOARDCONTROL) buildAttackTo(square, BLACK, Square.pawnAttackDirections);
     }
   }
 
@@ -584,8 +582,10 @@ public class Evaluation {
     // count all attacks to squares
     // we do this first then we have all attacks and can use them in the king
     // evaluation
-    buildAttackTo(kingSquares[WHITE], WHITE, kingDirections);
-    buildAttackTo(kingSquares[BLACK], BLACK, kingDirections);
+    if (USE_BOARDCONTROL) {
+      buildAttackTo(kingSquares[WHITE], WHITE, kingDirections);
+      buildAttackTo(kingSquares[BLACK], BLACK, kingDirections);
+    }
 
     { // WHITE
       final Square kingSquare = kingSquares[WHITE];
@@ -758,13 +758,15 @@ public class Evaluation {
         // We also count capturing and defending a piece a mobility
         numberOfMoves++;
 
-        final Square squareTo = getSquare(to);
-        // bitboard of all attacked squares by color
-        attackedSquares[colorIdx] |= squareTo.bitboard();
-        // build an index to count all attacks to a square by color
-        controlAttacks[colorIdx][squareTo.bbIndex()]++;
-        // get a bitboard of all attacks to this square
-        attacksTo[squareTo.bbIndex()] |= square.bitboard();
+        if (USE_BOARDCONTROL) {
+          final Square squareTo = getSquare(to);
+          // bitboard of all attacked squares by color
+          attackedSquares[colorIdx] |= squareTo.bitboard();
+          // build an index to count all attacks to a square by color
+          controlAttacks[colorIdx][squareTo.bbIndex()]++;
+          // get a bitboard of all attacks to this square
+          attacksTo[squareTo.bbIndex()] |= square.bitboard();
+        }
 
         // break if you hit another piece
         if (position.getPiece(Square.getSquare(to)) != NOPIECE) break;
@@ -801,18 +803,32 @@ public class Evaluation {
       }
     }
   }
+
+  private void boardControl(int bbIndex) {
+    // Board control
+    if (controlAttacks[WHITE][bbIndex] == 0 && controlAttacks[BLACK][bbIndex] > 0)
+      ownership[bbIndex] = -1;
+    else if (controlAttacks[WHITE][bbIndex] > 0 && controlAttacks[BLACK][bbIndex] == 0)
+      ownership[bbIndex] = 1;
+      // extra evaluation of ownership - very expensive
+    else ownership[bbIndex] = evaluateOwnership(position, bbIndex);
+    // sum up overall control
+    boardControl += Integer.compare(ownership[bbIndex], 0);
+  }
+
   /**
    * Evaluate ownership of aquare be determining which side has the most low
    * value piece attacks.
    * Credit to Beowulf.
    * @param position
-   * @param i
+   * @param squareBBidx
    * @return positive is ownership is for white, negative if ownership if for black
    */
-  private int evaluateOwnership(Position position, int i) {
+  private int evaluateOwnership(Position position, int squareBBidx) {
+
     // get the attacks from both colors
-    long attacks = Attacks.attacksTo(position, index64Map[i], Color.WHITE)
-      | Attacks.attacksTo(position, index64Map[i], Color.BLACK);
+    long attacks = Attacks.attacksTo(position, index64Map[squareBBidx], Color.WHITE)
+      | Attacks.attacksTo(position, index64Map[squareBBidx], Color.BLACK);
 
     // Test all attackers from the least valuable upwards
     // Ownership is determined by the most less valuable pieces attacking the square
@@ -851,18 +867,6 @@ public class Evaluation {
     return 0;
   }
 
-  private void boardControl(int bbIndex) {
-    // Board control
-    if (controlAttacks[WHITE][bbIndex] == 0 && controlAttacks[BLACK][bbIndex] == 0)
-      ownership[bbIndex] = 0;
-    else if (controlAttacks[WHITE][bbIndex] == 0 && controlAttacks[BLACK][bbIndex] > 0)
-      ownership[bbIndex] = -1;
-    else if (controlAttacks[WHITE][bbIndex] > 0 && controlAttacks[BLACK][bbIndex] == 0)
-      ownership[bbIndex] = 1;
-    else ownership[bbIndex] = evaluateOwnership(position, bbIndex); // extra evaluation of ownership
-    // sum uup overall control
-    boardControl += Integer.compare(ownership[bbIndex], 0);
-  }
 
   /**
    * @param position
@@ -994,24 +998,29 @@ public class Evaluation {
       '}';
   }
 
-  public void printEvaluation() {
+  /**
+   * Returns a string with a nicely formatted view on the evaluation results.
+   * @return
+   */
+  public String printEvaluation() {
     // @formatter:off
-    LOG.debug("==========================================================================================");
-    LOG.debug(String.format("Evaluation: Last move was %s", Move.toString(position.getLastMove())));
-    LOG.debug(String.format("%n%s", position.toBoardString()));
-    LOG.debug(String.format("Position has check? %s", position.hasCheck()));
-    LOG.debug(String.format("Next Move: %s", position.getNextPlayer().toString()));
-    LOG.debug(String.format("Gamephase:           %5d (%,.2f)", position.getGamePhaseValue(), position.getGamePhaseFactor()));
-    LOG.debug("-----------------------------------------------");
-    LOG.debug(String.format("Material:        %,2.1f %5d (%5d, %5d)", MATERIAL_WEIGHT, material, midGameMaterial, endGameMaterial));
-    LOG.debug(String.format("Piece Position   %,2.1f %5d (%5d, %5d)", POSITION_WEIGHT, piecePosition, midGamePiecePosition, endGamePiecePosition));
-    LOG.debug(String.format("Mobility:        %,2.1f %5d (%5d, %5d)", MOBILITY_WEIGHT, mobility, midGameMobility, endGameMobility));
-    LOG.debug(String.format("King Safety:     %,2.1f %5d (%5d, %5d)", KING_SAFETY_WEIGHT, kingSafety, midGameKingSafety, endGameKingSafety));
-    LOG.debug(String.format("Pawn Structure:  %,2.1f %5d (%5d, %5d)", PAWN_STRUCTURE_WEIGHT, pawnStructure, midGamePawnStructure, endGamePawnStructure));
-    LOG.debug(String.format("Board Control:   %,2.1f %5d", BOARDCONTROL_WEIGHT, boardControl));
-    LOG.debug(String.format("Special:             %5d ", special));
-    LOG.debug("-----------------------------------------------");
-    LOG.debug(String.format("Evaluation:          %5d ", value));
+    StringBuilder output = new StringBuilder();
+    output.append("==========================================================================================\n");
+    output.append(String.format("Evaluation: Last move was %s%n", Move.toString(position.getLastMove())));
+    output.append(String.format("%n%s%n", position.toBoardString()));
+    output.append(String.format("Position has check? %s%n", position.hasCheck()));
+    output.append(String.format("Next Move: %s%n", position.getNextPlayer().toString()));
+    output.append(String.format("Gamephase:           %5d (%,.2f)%n", position.getGamePhaseValue(), position.getGamePhaseFactor()));
+    output.append("-----------------------------------------------\n");
+    output.append(String.format("Material:        %,2.1f %5d (%5d, %5d)%n", MATERIAL_WEIGHT, material, midGameMaterial, endGameMaterial));
+    output.append(String.format("Piece Position   %,2.1f %5d (%5d, %5d)%n", POSITION_WEIGHT, piecePosition, midGamePiecePosition, endGamePiecePosition));
+    output.append(String.format("Mobility:        %,2.1f %5d (%5d, %5d)%n", MOBILITY_WEIGHT, mobility, midGameMobility, endGameMobility));
+    output.append(String.format("King Safety:     %,2.1f %5d (%5d, %5d)%n", KING_SAFETY_WEIGHT, kingSafety, midGameKingSafety, endGameKingSafety));
+    output.append(String.format("Pawn Structure:  %,2.1f %5d (%5d, %5d)%n", PAWN_STRUCTURE_WEIGHT, pawnStructure, midGamePawnStructure, endGamePawnStructure));
+    output.append(String.format("Board Control:   %,2.1f %5d%n", BOARDCONTROL_WEIGHT, boardControl));
+    output.append(String.format("Special:             %5d%n", special));
+    output.append("-----------------------------------------------\n");
+    output.append(String.format("Evaluation:          %5d%n", value));
     // @formatter:on
 
     //    for (int i = 0; i < 64; i++) {
@@ -1019,7 +1028,7 @@ public class Evaluation {
     //      System.out.println(square);
     //      System.out.println(Bitboard.toString(attacksTo[i]));
     //    }
-
+    return output.toString();
   }
 
   /**

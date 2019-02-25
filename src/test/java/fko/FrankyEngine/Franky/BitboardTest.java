@@ -156,6 +156,7 @@ class BitboardTest {
     bitboard = bitboard << (8 * 7);
     System.out.printf("Long: %d%n", bitboard);
     System.out.println(Bitboard.toString(bitboard));
+
   }
 
   @Test

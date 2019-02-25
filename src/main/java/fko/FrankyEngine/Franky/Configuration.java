@@ -115,8 +115,9 @@ public class Configuration {
 
   /**
    * Uses SEE to determine QSearch moves
+   * NPS Hit ~19%
    */
-  public boolean USE_SEE = true;
+  public boolean USE_SEE = false;
 
   /**
    * Use AlphaBeta Pruning

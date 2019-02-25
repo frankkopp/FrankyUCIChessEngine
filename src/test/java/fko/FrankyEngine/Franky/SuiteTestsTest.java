@@ -151,7 +151,9 @@ public class SuiteTestsTest {
   @Disabled
   void startSTSSuite() {
     /*
-
+    Franky-1.1
+    Successful: 765 (51 Prozent)
+    Failed:     735 (49 Prozent)
      */
     testSuite = new TestSuite("./testsets/STS1-STS15_LAN.EPD");
     testSuite.setSearchTime(10000);

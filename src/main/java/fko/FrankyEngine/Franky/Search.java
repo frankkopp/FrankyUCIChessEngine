@@ -33,6 +33,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
@@ -69,7 +70,7 @@ public class Search implements Runnable {
   // constant so the compiler can completely remove it if set to false
   private static final boolean TRACE = false;
 
-  // how often shall an update of the search be send to UCI in ms
+  // how often shall an update of the search be^^ send to UCI in ms
   private static final int UCI_UPDATE_INTERVAL = 500;
 
   /** Maximum depth this search can go. */
@@ -1852,8 +1853,8 @@ public class Search implements Runnable {
     int evalFromCache;
     final int value;
 
-    // timing
-    //    long start = System.nanoTime();
+    // DEBUG timing
+    long start = System.nanoTime();
 
     // check cache
     if (config.USE_EVAL_CACHE
@@ -1862,20 +1863,25 @@ public class Search implements Runnable {
     }
     // do evaluation
     else {
+
+      // System.out.println("DEBUG: "+currentVariation.toNotationString());
       value = evaluator.evaluate(position, alpha, beta);
+      // System.out.println(evaluator.printEvaluation());
+
       assert value >= Short.MIN_VALUE;
       assert value <= Short.MAX_VALUE;
       // store value int cache
       if (config.USE_EVAL_CACHE) evalCache.put(position.getZobristKey(), (short) value);
     }
 
-    //    evalTime += System.nanoTime() - start;
-
     // DEBUG
-    //    if (searchCounter.leafPositionsEvaluated % 100000 == 0)
-    //      System.out.printf("Evals: %,d Avg time: %,d ns %n", searchCounter
-    //      .leafPositionsEvaluated,
-    //                        evalTime / searchCounter.leafPositionsEvaluated);
+    evalTime += System.nanoTime() - start;
+    if (searchCounter.leafPositionsEvaluated % 500_000 == 0) {
+      System.out.printf("Evals: %,d Time: %,d ns Avg time per eval: %,d ns %n",
+                        searchCounter.leafPositionsEvaluated,
+                        evalTime,
+                        evalTime / searchCounter.leafPositionsEvaluated);
+    }
 
     if (TRACE) {
       trace("%SEvaluation: %s = %d  ply: %d  currline: <%s>  position: %s", getSpaces(ply),
