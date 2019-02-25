@@ -91,10 +91,8 @@ public class SquareList {
    * @param square
    */
   public void remove(Square square) {
-    /*
-     * Go over the array from left to right until you found the element.
-     * copy the next element to the elements place (overwriting it).
-     */
+    // Go over the array from left to right until you found the element.
+    // copy the next element to the elements place (overwriting it).
     Square toBeRemoved = square;
     for (int i = 0; i < size; i++) {
       if (toBeRemoved == elements[i]) { // hit
