@@ -30,19 +30,19 @@ package fko.FrankyEngine.Franky;
  */
 public enum Piece {
 
-  NOPIECE(PieceType.NOTYPE, Color.NOCOLOR, ""),// 0
-  WHITE_PAWN(PieceType.PAWN, Color.WHITE, "P"), // 1
-  WHITE_KNIGHT(PieceType.KNIGHT, Color.WHITE, "N"), // 2
-  WHITE_BISHOP(PieceType.BISHOP, Color.WHITE, "B"), // 3
-  WHITE_ROOK(PieceType.ROOK, Color.WHITE, "R"), // 4
-  WHITE_QUEEN(PieceType.QUEEN, Color.WHITE, "Q"), // 5
-  WHITE_KING(PieceType.KING, Color.WHITE, "K"), // 6
-  BLACK_PAWN(PieceType.PAWN, Color.BLACK, "p"), // 7
-  BLACK_KNIGHT(PieceType.KNIGHT, Color.BLACK, "n"), // 8
-  BLACK_BISHOP(PieceType.BISHOP, Color.BLACK, "b"), // 9
-  BLACK_ROOK(PieceType.ROOK, Color.BLACK, "r"), // 10
-  BLACK_QUEEN(PieceType.QUEEN, Color.BLACK, "q"), // 11
-  BLACK_KING(PieceType.KING, Color.BLACK, "k"); // 12
+  NOPIECE(PieceType.NOTYPE, Color.NOCOLOR, ""),      // 0  0b0000
+  WHITE_PAWN(PieceType.PAWN, Color.WHITE, "P"),      // 1  0b0001
+  WHITE_KNIGHT(PieceType.KNIGHT, Color.WHITE, "N"),  // 2  0b0010
+  WHITE_BISHOP(PieceType.BISHOP, Color.WHITE, "B"),  // 3  0b0011
+  WHITE_ROOK(PieceType.ROOK, Color.WHITE, "R"),      // 4  0b0100
+  WHITE_QUEEN(PieceType.QUEEN, Color.WHITE, "Q"),    // 5  0b0101
+  WHITE_KING(PieceType.KING, Color.WHITE, "K"),      // 6  0b0110
+  BLACK_PAWN(PieceType.PAWN, Color.BLACK, "p"),      // 7  0b0111
+  BLACK_KNIGHT(PieceType.KNIGHT, Color.BLACK, "n"),  // 8  0b1000
+  BLACK_BISHOP(PieceType.BISHOP, Color.BLACK, "b"),  // 9  0b1001
+  BLACK_ROOK(PieceType.ROOK, Color.BLACK, "r"),      // 10 0b1010
+  BLACK_QUEEN(PieceType.QUEEN, Color.BLACK, "q"),    // 11 0b1011
+  BLACK_KING(PieceType.KING, Color.BLACK, "k");      // 12 0b1100
 
   static final Piece[] values;
 
@@ -81,6 +81,17 @@ public enum Piece {
     return shortName;
   }
 
+  /**
+   * @return the enum name
+   */
+  public String getLongName() {
+    return super.name();
+  }
+
+  /**
+   * Returns the short name for convenience
+   * @return
+   */
   @Override
   public String toString() {
     return shortName;
@@ -93,8 +104,6 @@ public enum Piece {
    * @return matching Piece
    */
   public static Piece getPiece(PieceType type, Color color) {
-    // this only works if the ordinal of all enums stay the same - if they change this
-    // has to be changed as well
     return Piece.values[(color.ordinal() * 6) + type.ordinal()];
   }
 

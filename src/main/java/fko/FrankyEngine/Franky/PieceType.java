@@ -32,12 +32,12 @@ public enum PieceType {
 
   // order has influence on Piece
   NOTYPE("-", false, 0),    // 0
-  PAWN("P", false, 100),  // 1
+  PAWN("P", false, 100),    // 1
   KNIGHT("N", false, 320),  // 2
-  BISHOP("B", true, 330),  // 3
-  ROOK("R", true, 500),  // 4
-  QUEEN("Q", true, 900),  // 5
-  KING("K", false, 2000); // 6
+  BISHOP("B", true, 330),   // 3
+  ROOK("R", true, 500),     // 4
+  QUEEN("Q", true, 900),    // 5
+  KING("K", false, 2000);   // 6
 
   static final PieceType[] values = {
     NOTYPE,
@@ -78,11 +78,6 @@ public enum PieceType {
    */
   protected int getValue() {
     return this.value;
-  }
-
-  @Override
-  public String toString() {
-    return shortName;
   }
 
 }

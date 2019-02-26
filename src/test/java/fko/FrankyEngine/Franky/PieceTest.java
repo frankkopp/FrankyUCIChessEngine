@@ -27,23 +27,15 @@ package fko.FrankyEngine.Franky;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * @author fkopp
- *
- */
 public class PieceTest {
 
-    /**
-     *
-     */
     @Test
-    public void test() {
-        // get piece
+    public void getPiece() {
         Piece op = Piece.getPiece(PieceType.KNIGHT, Color.BLACK);
-        assertTrue(op.equals(Piece.BLACK_KNIGHT));
-
+        assertEquals(op, Piece.BLACK_KNIGHT);
     }
 
 }

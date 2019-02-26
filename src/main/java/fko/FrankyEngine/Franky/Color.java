@@ -29,11 +29,12 @@ package fko.FrankyEngine.Franky;
  * <p>
  * The Color class represents the two colors of a Chessly game and a special color for empty
  * fields (NONE).
+ * </p>
  * This class can not be instantiated. It keeps public references to the only possible instances
  * BLACK, WHITE, NONE.
+ * </p>
  * These instances are immutable. As it is not possible to have any other instances of
- * ChesslyColors the use of
- * these instances is as fast as if using an int.
+ * ChesslyColors the use of these instances is as fast as if using an int.
  * </p>
  *
  * @author Frank Kopp (frank@familie-kopp.de)
@@ -43,14 +44,15 @@ public enum Color {
   // order has influence on Piece
   WHITE(1),      // 0
   BLACK(-1),     // 1
-  NOCOLOR(0);      // 2
+  NOCOLOR(0);    // 2
 
   /**
    * This is 1 for white and -1 for black. Useful in evaluation and pawn directions
    */
-  public final int   factor;
-  private      Color opponentColor;
-  private      char  shortName;
+  public final int factor;
+
+  private Color opponentColor;
+  private char  shortName;
 
   Color(int factor) {
     this.factor = factor;
@@ -83,17 +85,6 @@ public enum Color {
    */
   public Color inverse() {
     return opponentColor;
-  }
-
-  /**
-   * Returns a character to use for a String representation of the field.<br>
-   * It accepts ChesslyColor.BLACK (X), ChesslyColor.WHITE (O), ChesslyColor.EMPTY (-) otherwise
-   * returns
-   * an empty character.
-   * @return char - one of 'X', '-', 'O' or ' '
-   */
-  public char toCharSymbol() {
-    return shortName;
   }
 
   /**

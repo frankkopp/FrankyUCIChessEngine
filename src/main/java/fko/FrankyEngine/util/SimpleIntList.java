@@ -307,21 +307,11 @@ public class SimpleIntList implements Iterable<Integer> {
    * @param j
    */
   public void swap(int i, int j) {
-    if (i < 0) {
-      throw new ArrayIndexOutOfBoundsException("Index i < 0");
-    }
-    if (j < 0) {
-      throw new ArrayIndexOutOfBoundsException("Index j < 0");
-    }
-    if (_tail <= _head) {
-      throw new ArrayIndexOutOfBoundsException("List is empty");
-    }
-    if (_head + i >= _tail) {
-      throw new ArrayIndexOutOfBoundsException("Index i too high");
-    }
-    if (_head + j >= _tail) {
-      throw new ArrayIndexOutOfBoundsException("Index j too high");
-    }
+    if (i < 0) throw new ArrayIndexOutOfBoundsException("Index i < 0");
+    if (j < 0) throw new ArrayIndexOutOfBoundsException("Index j < 0");
+    if (_tail <= _head) throw new ArrayIndexOutOfBoundsException("List is empty");
+    if (_head + i >= _tail) throw new ArrayIndexOutOfBoundsException("Index i too high");
+    if (_head + j >= _tail) throw new ArrayIndexOutOfBoundsException("Index j too high");
     exchange(_head + i, _head + j);
   }
 
@@ -480,16 +470,9 @@ public class SimpleIntList implements Iterable<Integer> {
     return s.toString();
   }
 
-  /* (non-Javadoc)
-   * @see java.lang.Object#hashCode()
-   */
-
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + Arrays.hashCode(this.toArray());
-    return result;
+    return Arrays.hashCode(this.toArray());
   }
 
   /**

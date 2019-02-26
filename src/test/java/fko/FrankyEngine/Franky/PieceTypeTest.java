@@ -22,33 +22,29 @@
  * SOFTWARE.
  *
  */
-package fko.FrankyEngine.Franky.openingbook;
 
+package fko.FrankyEngine.Franky;
 
-/**
- * @author fkopp
- */
-public class Openingbook_Configuration {
+import org.junit.jupiter.api.Test;
 
-    /**
-     * If set to true this object will produce info output to System.out
-     */
-    public boolean VERBOSE = true;
+import static fko.FrankyEngine.Franky.PieceType.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-    /**
-     * If set to true will ignore an existing cache file and recreate it
-     */
-    public boolean FORCE_CREATE = false;
+class PieceTypeTest {
 
-    /** default value for folder to books */
-    public String               _folderPath    = "/book/";
-    /** default value for serialization folder */
-    public String               _serPath       = "./var/book_cache";
-    /** default opening book */
-    public String               _fileNamePlain = "ecoe.pgn";
-    /** default mode */
-    public OpeningBookImpl.Mode _mode          = OpeningBookImpl.Mode.PGN;
+  @Test
+  void isSliding() {
+    assertFalse(PAWN.isSliding());
+    assertTrue(QUEEN.isSliding());
+  }
 
-    /** Creates opening book configuration object */
-    public Openingbook_Configuration() {}
+  @Test
+  void getValue() {
+    assertEquals(320, KNIGHT.getValue());
+  }
+
+  @Test
+  void toStringTest() {
+    assertEquals("KING", KING.toString());
+  }
 }
