@@ -43,10 +43,12 @@ public class MoveListTest {
     testEmptyList(list);
 
     // add one entry
-    int move1 =
-      Move.createMove(MoveType.NORMAL, Square.b1, Square.c3, Piece.WHITE_KNIGHT, Piece.NOPIECE,
-                      Piece.NOPIECE);
-
+    int move1 = Move.createMove(MoveType.NORMAL,
+                                Square.b1,
+                                Square.c3,
+                                Piece.WHITE_KNIGHT,
+                                Piece.NOPIECE,
+                                Piece.NOPIECE);
     int value = move1;
 
     list.add(value);
@@ -66,42 +68,70 @@ public class MoveListTest {
     testEmptyList(list);
 
     // add 10 entries
-    for (int i = 100; i < 110; i++) {
-      int move = Move.createMove(MoveType.NORMAL, Square.getValueList().get(i - 100),
-                                 Square.getValueList().get(i - 100), Piece.WHITE_PAWN,
-                                 Piece.NOPIECE, Piece.NOPIECE);
+    for (int i = 20; i < 50; i++) {
+      int move = Move.createMove(MoveType.NORMAL,
+                                 Square.getSquare(i),
+                                 Square.getSquare(i + 1),
+                                 Piece.WHITE_PAWN,
+                                 Piece.NOPIECE,
+                                 Piece.NOPIECE);
       list.add(move);
-      assertEquals(list.size(), i - 100 + 1);
+      assertEquals(list.size(), i - 20 + 1);
       assertFalse(list.empty());
     }
 
     // get one entry
-    assertEquals(list.get(4), Move.createMove(MoveType.NORMAL, Square.values[4], Square.values[4],
-                                              Piece.WHITE_PAWN, Piece.NOPIECE, Piece.NOPIECE));
+    assertEquals(list.get(4), Move.createMove(MoveType.NORMAL,
+                                              Square.values[24],
+                                              Square.values[25],
+                                              Piece.WHITE_PAWN,
+                                              Piece.NOPIECE,
+                                              Piece.NOPIECE));
 
     // remove one entry
     element = list.removeLast();
-    assertEquals(element, Move.createMove(MoveType.NORMAL, Square.b2, Square.b2, Piece.WHITE_PAWN,
-                                          Piece.NOPIECE, Piece.NOPIECE));
-    assertEquals(list.getLast(),
-                 Move.createMove(MoveType.NORMAL, Square.a2, Square.a2, Piece.WHITE_PAWN,
-                                 Piece.NOPIECE, Piece.NOPIECE));
+    assertEquals(element, Move.createMove(MoveType.NORMAL,
+                                          Square.b2,
+                                          Square.c2,
+                                          Piece.WHITE_PAWN,
+                                          Piece.NOPIECE,
+                                          Piece.NOPIECE));
+
+    assertEquals(list.getLast(), Move.createMove(MoveType.NORMAL,
+                                                 Square.a2,
+                                                 Square.b2,
+                                                 Piece.WHITE_PAWN,
+                                                 Piece.NOPIECE,
+                                                 Piece.NOPIECE));
+
     element = list.removeFirst();
-    assertEquals(element, Move.createMove(MoveType.NORMAL, Square.a1, Square.a1, Piece.WHITE_PAWN,
-                                          Piece.NOPIECE, Piece.NOPIECE));
-    assertEquals(list.getFirst(),
-                 Move.createMove(MoveType.NORMAL, Square.b1, Square.b1, Piece.WHITE_PAWN,
-                                 Piece.NOPIECE, Piece.NOPIECE));
-    assertEquals(8, list.size());
+    assertEquals(element, Move.createMove(MoveType.NORMAL,
+                                          Square.e6,
+                                          Square.f6,
+                                          Piece.WHITE_PAWN,
+                                          Piece.NOPIECE,
+                                          Piece.NOPIECE));
+
+    assertEquals(list.getFirst(), Move.createMove(MoveType.NORMAL,
+                                                  Square.f6,
+                                                  Square.g6,
+                                                  Piece.WHITE_PAWN,
+                                                  Piece.NOPIECE,
+                                                  Piece.NOPIECE));
+
+    assertEquals(28, list.size());
 
     // get one entry
-    assertEquals(list.get(4),
-                 Move.createMove(MoveType.NORMAL, Square.f1, Square.f1, Piece.WHITE_PAWN,
-                                 Piece.NOPIECE, Piece.NOPIECE));
+    assertEquals(list.get(4), Move.createMove(MoveType.NORMAL,
+                                              Square.b5,
+                                              Square.c5,
+                                              Piece.WHITE_PAWN,
+                                              Piece.NOPIECE,
+                                              Piece.NOPIECE));
 
     // get entry higher than size
     try {
-      list.get(11);
+      list.get(30);
       fail("");
     } catch (ArrayIndexOutOfBoundsException e) {
       assertTrue(true);
@@ -161,6 +191,7 @@ public class MoveListTest {
     }
   }
 
+  // DEBUG>
   //  @Test
   //  public void testSort() {
   //    Position board =

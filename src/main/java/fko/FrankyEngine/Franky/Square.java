@@ -30,7 +30,6 @@ import java.util.List;
 
 /**
  * This enumeration class represents all squares on a chess board.
- * It uses a numbering for a x88 board so that a1=0 and a2=16
  * It has several convenience methods for calculation in relation
  * to other squares.
  * <p>
@@ -371,11 +370,11 @@ public enum Square {
   }
 
   /**
-   * @param x88index
+   * @param index
    * @return the Square for the given index of a 0x88 board or NOSQUARE if not a valid index
    */
-  public static Square getSquare(int x88index) {
-    return Square.values[x88index];
+  public static Square getSquare(int index) {
+    return Square.values[index];
   }
   /**
    * Returns the Square for the given file and rank
