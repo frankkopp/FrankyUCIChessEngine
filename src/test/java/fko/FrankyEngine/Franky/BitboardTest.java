@@ -2130,4 +2130,272 @@ class BitboardTest {
   //
   //  }
 
+  @Test
+  void shiftBitboardTest() {
+    // @formatter:off
+    long bitboard, shifted;
+    String expected, actual;
+    Square square;
+    int shift;
+
+
+    bitboard = e4.bitboard();
+    shift = SE;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 1 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = e4.bitboard();
+    shift = S;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = e4.bitboard();
+    shift = SW;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = e4.bitboard();
+    shift = W;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = e4.bitboard();
+    shift = NW;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+
+    bitboard = e4.bitboard();
+    shift = N;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+
+    bitboard = e4.bitboard();
+    shift = NE;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 1 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = e4.bitboard();
+    shift = E;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 1 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = a4.bitboard();
+    shift = NW;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = a4.bitboard();
+    shift = NE;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 1 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = h4.bitboard();
+    shift = NW;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 1 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = h4.bitboard();
+    shift = NE;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = h8.bitboard();
+    shift = NE;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = h8.bitboard();
+    shift = SW;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 1 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = e1.bitboard();
+    shift = S;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+    bitboard = whiteSquares;
+    shift = W;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 1 0 1 0 1 0 0 \n"
+              + "1 0 1 0 1 0 1 0 \n"
+              + "0 1 0 1 0 1 0 0 \n"
+              + "1 0 1 0 1 0 1 0 \n"
+              + "0 1 0 1 0 1 0 0 \n"
+              + "1 0 1 0 1 0 1 0 \n"
+              + "0 1 0 1 0 1 0 0 \n"
+              + "1 0 1 0 1 0 1 0";
+    assertEquals(expected, actual);
+
+    bitboard = a1UpDiag;
+    shift = E;
+    LOG.debug("Bitboard:\n{}", Bitboard.toString(bitboard));
+    actual = Bitboard.toString(Bitboard.shiftBitboard(shift, bitboard));
+    LOG.debug("Shifted by {}\n{}", shift, actual);
+    expected =  "0 0 0 0 0 0 0 0 \n"
+              + "0 0 0 0 0 0 0 1 \n"
+              + "0 0 0 0 0 0 1 0 \n"
+              + "0 0 0 0 0 1 0 0 \n"
+              + "0 0 0 0 1 0 0 0 \n"
+              + "0 0 0 1 0 0 0 0 \n"
+              + "0 0 1 0 0 0 0 0 \n"
+              + "0 1 0 0 0 0 0 0";
+    assertEquals(expected, actual);
+
+
+  }
 }

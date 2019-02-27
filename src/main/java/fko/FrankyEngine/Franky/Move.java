@@ -88,15 +88,37 @@ public class Move {
   }
 
   /**
-   * Create a Move.
+   * Creates a move from the given Squares
+   * @param movetype
+   * @param start
+   * @param end
+   * @param piece
+   * @param target
+   * @param promotion
+   * @return move
    */
   public static int createMove(MoveType movetype, Square start, Square end, Piece piece,
                                Piece target, Piece promotion) {
+    return createMove(movetype, start.ordinal(), end.ordinal(), piece, target, promotion);
+  }
+
+  /**
+   * Creates a move from the given Squares indexes
+   * @param movetype
+   * @param start
+   * @param end
+   * @param piece
+   * @param target
+   * @param promotion
+   * @return
+   */
+  public static int createMove(MoveType movetype, int start, int end, Piece piece, Piece target,
+                               Piece promotion) {
     int move = 0;
     // Encode start
-    move |= start.ordinal() << START_SQUARE_SHIFT;
+    move |= start << START_SQUARE_SHIFT;
     // Encode end
-    move |= end.ordinal() << END_SQUARE_SHIFT;
+    move |= end << END_SQUARE_SHIFT;
     // Encode piece
     move |= piece.ordinal() << PIECE_SHIFT;
     // Encode target
@@ -243,26 +265,6 @@ public class Move {
   //    Square to = Square.fromUCINotation(move.substring(2, 4));
   //    String promotion = "";
   //    if (move.length() > 4) {
-  //      promotion = move.substring(4, 5);
-  //    }
-  //
-  //    // to find the move type it is easiest to generate all legal moves and then look
-  //    // for a move with the same from and to
-  //    MoveGenerator omg = new MoveGenerator(position);
-  //    MoveList moves = omg.getLegalMoves();
-  //
-  //    for (int m : moves) {
-  //      Square f = Move.getStart(m);
-  //      Square t = Move.getEnd(m);
-  //      if (from.equals(f) && to.equals(t)) {
-  //        if (promotion.isEmpty()) return m;
-  //        if (Move.getMoveType(m).equals(MoveType.PROMOTION)
-  //          && Move.getPromotion(m).getShortName().toLowerCase().equals(promotion)) return m;
-  //      }
-  //    }
-  //    return NOMOVE;
-  //  }
-
   /**
    * @param position
    * @param move
@@ -384,6 +386,26 @@ public class Move {
   //    }
   //
   //    return moveFromSAN;
+  //  }
+
+  //      promotion = move.substring(4, 5);
+  //    }
+  //
+  //    // to find the move type it is easiest to generate all legal moves and then look
+  //    // for a move with the same from and to
+  //    MoveGenerator omg = new MoveGenerator(position);
+  //    MoveList moves = omg.getLegalMoves();
+  //
+  //    for (int m : moves) {
+  //      Square f = Move.getStart(m);
+  //      Square t = Move.getEnd(m);
+  //      if (from.equals(f) && to.equals(t)) {
+  //        if (promotion.isEmpty()) return m;
+  //        if (Move.getMoveType(m).equals(MoveType.PROMOTION)
+  //          && Move.getPromotion(m).getShortName().toLowerCase().equals(promotion)) return m;
+  //      }
+  //    }
+  //    return NOMOVE;
   //  }
 
   /**

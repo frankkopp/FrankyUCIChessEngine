@@ -549,6 +549,37 @@ public class Bitboard {
   }
   static final long[][] movesDownDiag = new long[64][256];
 
+  /**
+   * Shifts a position (bitboard) into the direction given
+   *
+   * @param direction
+   * @return shifted bitboard
+   */
+  public static long shiftBitboard(int direction, long bitboard) {
+    // move the nits a clear the left our right file after the shift to erase bit jumping over
+    switch (direction) {
+      case N:
+        return (bitboard >>> 8);
+      case NE:
+        return (bitboard >>> 7) & ~File.a.bitBoard;
+      case E:
+        return (bitboard << 1) & ~File.a.bitBoard;
+      case SE:
+        return (bitboard << 9) & ~File.a.bitBoard;
+      case S:
+        return (bitboard << 8);
+      case SW:
+        return (bitboard << 7) & ~File.h.bitBoard;
+      case W:
+        return (bitboard >>> 1) & ~File.h.bitBoard;
+      case NW:
+        return (bitboard >>> 9) & ~File.h.bitBoard;
+      default:
+        break;
+    }
+    return bitboard;
+  }
+
   // Pre compute bitboards for later use in move gen, evaluation, etc.
   // As this is done only once speed is not an issue
   // readability and correctness have priority
