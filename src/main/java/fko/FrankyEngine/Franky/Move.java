@@ -396,6 +396,7 @@ public class Move {
    * @return true if we could extract valid squares and pieces
    */
   static boolean isValid(int move) {
+    if (move == NOMOVE) return false;
     // is it a valid move type (excludes NOMOVETYPE)
     int type = ((move & MOVETYPE_MASK) >>> MOVETYPE_SHIFT);
     if (type == 0 || !MoveType.isValid(type)) return false;

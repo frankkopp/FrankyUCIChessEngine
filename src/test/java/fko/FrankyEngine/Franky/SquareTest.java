@@ -544,4 +544,10 @@ public class SquareTest {
 
   }
 
+  @Test
+  public void testFromNotation() {
+    Square os = Square.fromUCINotation("e2");
+    assertEquals(Square.e2, os);
+  }
+
 }

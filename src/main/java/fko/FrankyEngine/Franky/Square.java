@@ -389,6 +389,18 @@ public enum Square {
   }
 
   /**
+   * Finds the first set bit in a bitboard and returns the according square index.
+   * Can be used to loop through all set squares in a bitboard in conjunction
+   * with removeFirstSquare()
+   *
+   * @param bitboard
+   * @return the first Square index of the given Bitboard from a8-h8-h1
+   */
+  public static int getFirstSquareIndex(long bitboard) {
+    return Long.numberOfTrailingZeros(bitboard);
+  }
+
+  /**
    * Finds the first set bit in a bitboard and returns the according Square.
    * Can be used to loop through all set squares in a bitboard in conjunction
    * with removeFirstSquare()
@@ -397,7 +409,7 @@ public enum Square {
    * @return the first Square of the given Bitboard from a8-h8-h1
    */
   public static Square getFirstSquare(long bitboard) {
-    return trailingZerosMap[Long.numberOfTrailingZeros(bitboard)];
+    return trailingZerosMap[getFirstSquareIndex(bitboard)];
   }
 
   /**

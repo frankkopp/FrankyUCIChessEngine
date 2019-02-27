@@ -59,6 +59,8 @@ public class MoveTest {
     move = Move.createMove(MoveType.NOMOVETYPE, Square.NOSQUARE, Square.d3, Piece.WHITE_PAWN,
                            Piece.BLACK_KNIGHT, Piece.NOPIECE);
     assertFalse(Move.isValid(move));
+
+    assertFalse(Move.isValid(Move.NOMOVE));
   }
 
   @Test
