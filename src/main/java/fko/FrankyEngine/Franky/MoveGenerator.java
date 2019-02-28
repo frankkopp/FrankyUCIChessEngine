@@ -702,30 +702,7 @@ public class MoveGenerator {
                                                Piece.NOPIECE));
           }
           else {
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + SE,
-                                               sqx,
-                                               Piece.WHITE_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.WHITE_QUEEN));
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + SE,
-                                               sqx,
-                                               Piece.WHITE_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.WHITE_ROOK));
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + SE,
-                                               sqx,
-                                               Piece.WHITE_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.WHITE_BISHOP));
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + SE,
-                                               sqx,
-                                               Piece.WHITE_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.WHITE_KNIGHT));
+            createPromotionMoves(sqx, capturingMoves, SE, Piece.WHITE_PAWN, position.getPiece(sqx));
           }
           tmpCaptures = removeFirstSquare(tmpCaptures);
         }
@@ -741,30 +718,7 @@ public class MoveGenerator {
                                                Piece.NOPIECE));
           }
           else {
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + SW,
-                                               sqx,
-                                               Piece.WHITE_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.WHITE_QUEEN));
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + SW,
-                                               sqx,
-                                               Piece.WHITE_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.WHITE_ROOK));
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + SW,
-                                               sqx,
-                                               Piece.WHITE_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.WHITE_BISHOP));
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + SW,
-                                               sqx,
-                                               Piece.WHITE_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.WHITE_KNIGHT));
+            createPromotionMoves(sqx, capturingMoves, SW, Piece.WHITE_PAWN, position.getPiece(sqx));
           }
           tmpCaptures = removeFirstSquare(tmpCaptures);
         }
@@ -782,30 +736,7 @@ public class MoveGenerator {
                                                Piece.NOPIECE));
           }
           else { // promotion
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + NE,
-                                               sqx,
-                                               Piece.BLACK_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.BLACK_QUEEN));
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + NE,
-                                               sqx,
-                                               Piece.BLACK_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.BLACK_ROOK));
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + NE,
-                                               sqx,
-                                               Piece.BLACK_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.WHITE_BISHOP));
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + NE,
-                                               sqx,
-                                               Piece.BLACK_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.BLACK_KNIGHT));
+            createPromotionMoves(sqx, capturingMoves, NE, Piece.BLACK_PAWN, position.getPiece(sqx));
           }
           tmpCaptures = removeFirstSquare(tmpCaptures);
         }
@@ -821,30 +752,7 @@ public class MoveGenerator {
                                                Piece.NOPIECE));
           }
           else { // promotion
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + NW,
-                                               sqx,
-                                               Piece.BLACK_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.BLACK_QUEEN));
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + NW,
-                                               sqx,
-                                               Piece.BLACK_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.BLACK_ROOK));
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + NW,
-                                               sqx,
-                                               Piece.BLACK_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.WHITE_BISHOP));
-            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                               sqx + NW,
-                                               sqx,
-                                               Piece.BLACK_PAWN,
-                                               position.getPiece(sqx),
-                                               Piece.BLACK_KNIGHT));
+            createPromotionMoves(sqx, capturingMoves, NW, Piece.BLACK_PAWN, position.getPiece(sqx));
           }
           tmpCaptures = removeFirstSquare(tmpCaptures);
         }
@@ -924,11 +832,11 @@ public class MoveGenerator {
         // double pawn steps
         while ((sqx = Square.getFirstSquareIndex(tmpMovesDouble)) != NOSQUARE.ordinal()) {
           nonCapturingMoves.add(Move.createMove(MoveType.PAWNDOUBLE,
-                                             sqx + S + S,
-                                             sqx,
-                                             Piece.WHITE_PAWN,
-                                             Piece.NOPIECE,
-                                             Piece.NOPIECE));
+                                                sqx + S + S,
+                                                sqx,
+                                                Piece.WHITE_PAWN,
+                                                Piece.NOPIECE,
+                                                Piece.NOPIECE));
           tmpMovesDouble = removeFirstSquare(tmpMovesDouble);
         }
         // single pawn steps
@@ -940,31 +848,9 @@ public class MoveGenerator {
                                                   Piece.WHITE_PAWN,
                                                   Piece.NOPIECE,
                                                   Piece.NOPIECE));
-          } else { // promotion
-            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                                  sqx + S,
-                                                  sqx,
-                                                  Piece.WHITE_PAWN,
-                                                  Piece.NOPIECE,
-                                                  Piece.WHITE_QUEEN));
-            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                                  sqx + S,
-                                                  sqx,
-                                                  Piece.WHITE_PAWN,
-                                                  Piece.NOPIECE,
-                                                  Piece.WHITE_ROOK));
-            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                                  sqx + S,
-                                                  sqx,
-                                                  Piece.WHITE_PAWN,
-                                                  Piece.NOPIECE,
-                                                  Piece.WHITE_BISHOP));
-            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                                  sqx + S,
-                                                  sqx,
-                                                  Piece.WHITE_PAWN,
-                                                  Piece.NOPIECE,
-                                                  Piece.WHITE_KNIGHT));
+          }
+          else { // promotion
+            createPromotionMoves(sqx, nonCapturingMoves, S, Piece.WHITE_PAWN, Piece.NOPIECE);
           }
           tmpMoves = removeFirstSquare(tmpMoves);
         }
@@ -977,11 +863,11 @@ public class MoveGenerator {
         // double pawn steps
         while ((sqx = Square.getFirstSquareIndex(tmpMovesDouble)) != NOSQUARE.ordinal()) {
           nonCapturingMoves.add(Move.createMove(MoveType.PAWNDOUBLE,
-                                             sqx + N + N,
-                                             sqx,
-                                             Piece.BLACK_PAWN,
-                                             Piece.NOPIECE,
-                                             Piece.NOPIECE));
+                                                sqx + N + N,
+                                                sqx,
+                                                Piece.BLACK_PAWN,
+                                                Piece.NOPIECE,
+                                                Piece.NOPIECE));
           tmpMovesDouble = removeFirstSquare(tmpMovesDouble);
         }
         // single pawn steps
@@ -993,31 +879,9 @@ public class MoveGenerator {
                                                   Piece.BLACK_PAWN,
                                                   Piece.NOPIECE,
                                                   Piece.NOPIECE));
-          } else { // promotion
-            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                                  sqx + N,
-                                                  sqx,
-                                                  Piece.BLACK_PAWN,
-                                                  Piece.NOPIECE,
-                                                  Piece.BLACK_QUEEN));
-            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                                  sqx + N,
-                                                  sqx,
-                                                  Piece.BLACK_PAWN,
-                                                  Piece.NOPIECE,
-                                                  Piece.BLACK_ROOK));
-            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                                  sqx + N,
-                                                  sqx,
-                                                  Piece.BLACK_PAWN,
-                                                  Piece.NOPIECE,
-                                                  Piece.BLACK_BISHOP));
-            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
-                                                  sqx + N,
-                                                  sqx,
-                                                  Piece.BLACK_PAWN,
-                                                  Piece.NOPIECE,
-                                                  Piece.BLACK_KNIGHT));
+          }
+          else { // promotion
+            createPromotionMoves(sqx, nonCapturingMoves, N, Piece.BLACK_PAWN, Piece.NOPIECE);
           }
           tmpMoves = removeFirstSquare(tmpMoves);
         }
@@ -1025,11 +889,27 @@ public class MoveGenerator {
     }
   }
 
+  private void createPromotionMoves(int sqx, MoveList moveList, int direction, Piece pawn,
+                                    Piece target) {
+
+    int offset = pawn.getColor().isWhite()
+                 ? Piece.WHITE_QUEEN.ordinal()
+                 : Piece.BLACK_QUEEN.ordinal();
+
+    for (int pt = offset, pte = offset - 4; pt >= pte; pt--) {
+      moveList.add(Move.createMove(MoveType.PROMOTION,
+                                   sqx + direction,
+                                   sqx,
+                                   pawn,
+                                   target,
+                                   Piece.values[pt]
+                                  ));
+    }
+  }
+
   private void generateKnightMoves() {
     final long myKnight = position.getPiecesBitboards(activePlayer, PieceType.KNIGHT);
     final long oppPieces = position.getOccupiedBitboards(activePlayer.inverse());
-
-
 
     //    final PieceType type = PieceType.KNIGHT;
     //    // iterate over all squares where we have a piece
