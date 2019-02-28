@@ -623,6 +623,15 @@ public enum Square {
       return File.values[file - 1];
     }
 
+    /**
+     * Get the file index from a square index
+     * @param sqx
+     * @return
+     */
+    public static int index2file(int sqx) {
+      return sqx & 7 ;
+    }
+
     @Override
     public String toString() {
       if (this == NOFILE) {
@@ -667,6 +676,15 @@ public enum Square {
      */
     public static Rank get(int rank) {
       return Rank.values[rank - 1];
+    }
+
+    /**
+     * Get rank index from square index
+     * @param sqx
+     * @return
+     */
+    public static int index2rank(int sqx) {
+      return 7 - (sqx >>> 3) ;
     }
 
     @Override

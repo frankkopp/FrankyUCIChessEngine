@@ -52,15 +52,37 @@ public class MoveGeneratorTest {
     MoveGenerator moveGenerator;
     MoveList moves;
 
+    // simple pawn capture
+    System.out.println("Simple Pawn Capture");
     position = new Position("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -");
     moveGenerator = new MoveGenerator(position);
     moves = moveGenerator.getPseudoLegalMoves();
     System.out.println(moves);
 
+    // several captures and en passant pawn capture
+    System.out.println("Several Captures and en passant black");
     position = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2qpPp2/B5R1/pbp2PPP/1R4K1 b kq e3");
     moveGenerator = new MoveGenerator(position);
     moves = moveGenerator.getPseudoLegalMoves();
     System.out.println(moves);
+
+    System.out.println("Several Captures and en passant white");
+    position = new Position("1k4r1/ppp2PBP/1r5b/2PpPQ2/3p4/1N1Q1Q2/P3NPP1/R2K3R w - d6");
+    moveGenerator = new MoveGenerator(position);
+    moves = moveGenerator.getPseudoLegalMoves();
+    System.out.println(moves);
+
+    // pawn capture promotion
+    System.out.println("Pawn Capture Promotion");
+    position = new Position("1n1n2K1/2P2N1p/6pr/b1pp3b/3Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - -");
+    moveGenerator = new MoveGenerator(position);
+    moves = moveGenerator.getPseudoLegalMoves();
+    System.out.println(moves);
+
+
+    // pawn moves and pawn promotions
+
+
   }
 
   @Test

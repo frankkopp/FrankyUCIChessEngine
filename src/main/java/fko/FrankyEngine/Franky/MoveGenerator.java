@@ -49,7 +49,6 @@ import static fko.FrankyEngine.Franky.Square.*;
  *
  * @author Frank Kopp
  */
-@SuppressWarnings("ForLoopReplaceableByForEach")
 public class MoveGenerator {
 
   private static final Logger LOG = LoggerFactory.getLogger(MoveGenerator.class);
@@ -678,7 +677,7 @@ public class MoveGenerator {
     final long myPawns = position.getPiecesBitboards(activePlayer, PieceType.PAWN);
     final long oppPieces = position.getOccupiedBitboards(activePlayer.inverse());
 
-    // generating captures?
+    // captures
     if ((genMode & GEN_CAPTURES) > 0) {
       long tmpCaptures = 0L; // temp capture bitmap
       int sqx; // square index
@@ -693,227 +692,339 @@ public class MoveGenerator {
       if (activePlayer.isWhite()) {
         // normal pawn captures to the west
         tmpCaptures |= shiftBitboard(NW, myPawns) & oppPieces;
-        sqx = 0;
         while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
-          // TODO check promotion
-          capturingMoves.add(Move.createMove(MoveType.NORMAL,
-                                             sqx + SE,
-                                             sqx,
-                                             Piece.WHITE_PAWN,
-                                             position.getPiece(sqx),
-                                             Piece.NOPIECE));
+          if (Rank.index2rank(sqx) < 7) { // no promotion
+            capturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                               sqx + SE,
+                                               sqx,
+                                               Piece.WHITE_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.NOPIECE));
+          }
+          else {
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + SE,
+                                               sqx,
+                                               Piece.WHITE_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.WHITE_QUEEN));
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + SE,
+                                               sqx,
+                                               Piece.WHITE_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.WHITE_ROOK));
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + SE,
+                                               sqx,
+                                               Piece.WHITE_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.WHITE_BISHOP));
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + SE,
+                                               sqx,
+                                               Piece.WHITE_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.WHITE_KNIGHT));
+          }
           tmpCaptures = removeFirstSquare(tmpCaptures);
         }
+        // normal pawn captures to the east
         tmpCaptures |= shiftBitboard(NE, myPawns) & oppPieces;
-        sqx = 0;
         while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
-          // TODO check promotion
-          capturingMoves.add(Move.createMove(MoveType.NORMAL,
-                                             sqx + SW,
-                                             sqx,
-                                             Piece.WHITE_PAWN,
-                                             position.getPiece(sqx),
-                                             Piece.NOPIECE));
+          if (Rank.index2rank(sqx) < 7) { // no promotion
+            capturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                               sqx + SW,
+                                               sqx,
+                                               Piece.WHITE_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.NOPIECE));
+          }
+          else {
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + SW,
+                                               sqx,
+                                               Piece.WHITE_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.WHITE_QUEEN));
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + SW,
+                                               sqx,
+                                               Piece.WHITE_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.WHITE_ROOK));
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + SW,
+                                               sqx,
+                                               Piece.WHITE_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.WHITE_BISHOP));
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + SW,
+                                               sqx,
+                                               Piece.WHITE_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.WHITE_KNIGHT));
+          }
           tmpCaptures = removeFirstSquare(tmpCaptures);
         }
       }
       else { // black
         // normal pawn captures to the west
         tmpCaptures |= shiftBitboard(SW, myPawns) & oppPieces;
-        sqx = 0;
         while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
-          // TODO check promotion
-          capturingMoves.add(Move.createMove(MoveType.NORMAL,
-                                             sqx + NE,
-                                             sqx,
-                                             Piece.BLACK_PAWN,
-                                             position.getPiece(sqx),
-                                             Piece.NOPIECE));
+          if (Rank.index2rank(sqx) > 0) { // no promotion
+            capturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                               sqx + NE,
+                                               sqx,
+                                               Piece.BLACK_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.NOPIECE));
+          }
+          else { // promotion
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + NE,
+                                               sqx,
+                                               Piece.BLACK_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.BLACK_QUEEN));
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + NE,
+                                               sqx,
+                                               Piece.BLACK_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.BLACK_ROOK));
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + NE,
+                                               sqx,
+                                               Piece.BLACK_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.WHITE_BISHOP));
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + NE,
+                                               sqx,
+                                               Piece.BLACK_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.BLACK_KNIGHT));
+          }
           tmpCaptures = removeFirstSquare(tmpCaptures);
         }
+        // normal pawn captures to the east
         tmpCaptures |= shiftBitboard(SE, myPawns) & oppPieces;
-        sqx = 0;
         while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
-          // TODO check promotion
-          capturingMoves.add(Move.createMove(MoveType.NORMAL,
-                                             sqx + NW,
-                                             sqx,
-                                             Piece.BLACK_PAWN,
-                                             position.getPiece(sqx),
-                                             Piece.NOPIECE));
+          if (Rank.index2rank(sqx) > 0) { // no promotion
+            capturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                               sqx + NW,
+                                               sqx,
+                                               Piece.BLACK_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.NOPIECE));
+          }
+          else { // promotion
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + NW,
+                                               sqx,
+                                               Piece.BLACK_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.BLACK_QUEEN));
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + NW,
+                                               sqx,
+                                               Piece.BLACK_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.BLACK_ROOK));
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + NW,
+                                               sqx,
+                                               Piece.BLACK_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.WHITE_BISHOP));
+            capturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                               sqx + NW,
+                                               sqx,
+                                               Piece.BLACK_PAWN,
+                                               position.getPiece(sqx),
+                                               Piece.BLACK_KNIGHT));
+          }
           tmpCaptures = removeFirstSquare(tmpCaptures);
         }
       }
-      // TODO en passant
 
-      //      Square enPassantSquare = position.getEnPassantSquare();
-      //      if (enPassantSquare != NOSQUARE) {
-      //        capturesW |= shiftBitboard(N, enPassantSquare.bitboard() & shiftBitboard(SW,
-      //        myPawns));
-      //        capturesE |= shiftBitboard(N, enPassantSquare.bitboard() & shiftBitboard(SE,
-      //        myPawns));
-      //      }
-      //      capturesE |= shiftBitboard(NE, myPawns) & oppPieces;
-      //      Square enPassantSquare = position.getEnPassantSquare();
-      //      if (enPassantSquare != NOSQUARE) {
-      //        capturesW |= shiftBitboard(S, enPassantSquare.bitboard() & shiftBitboard(NW,
-      //        myPawns));
-      //        capturesE |= shiftBitboard(S, enPassantSquare.bitboard() & shiftBitboard(NE,
-      //        myPawns));
-      //      }
-
+      // en passant captures
+      final Square enPassantSquare = position.getEnPassantSquare();
+      if (enPassantSquare != NOSQUARE) {
+        if (activePlayer.isWhite()) {
+          // left
+          tmpCaptures = shiftBitboard(SW, enPassantSquare.bitboard()) & myPawns;
+          if (tmpCaptures != 0) {
+            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            capturingMoves.add(Move.createMove(MoveType.ENPASSANT,
+                                               sqx,
+                                               sqx + NE,
+                                               Piece.WHITE_PAWN,
+                                               Piece.BLACK_PAWN,
+                                               Piece.NOPIECE));
+          }
+          // right
+          tmpCaptures = shiftBitboard(SE, enPassantSquare.bitboard()) & myPawns;
+          if (tmpCaptures != 0) {
+            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            capturingMoves.add(Move.createMove(MoveType.ENPASSANT,
+                                               sqx,
+                                               sqx + NW,
+                                               Piece.WHITE_PAWN,
+                                               Piece.BLACK_PAWN,
+                                               Piece.NOPIECE));
+          }
+        }
+        else { // black
+          // left
+          tmpCaptures = shiftBitboard(NW, enPassantSquare.bitboard()) & myPawns;
+          if (tmpCaptures != 0) {
+            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            capturingMoves.add(Move.createMove(MoveType.ENPASSANT,
+                                               sqx,
+                                               sqx + SE,
+                                               Piece.BLACK_PAWN,
+                                               Piece.WHITE_PAWN,
+                                               Piece.NOPIECE));
+          }
+          // right
+          tmpCaptures = shiftBitboard(NE, enPassantSquare.bitboard()) & myPawns;
+          if (tmpCaptures != 0) {
+            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            capturingMoves.add(Move.createMove(MoveType.ENPASSANT,
+                                               sqx,
+                                               sqx + SW,
+                                               Piece.BLACK_PAWN,
+                                               Piece.WHITE_PAWN,
+                                               Piece.NOPIECE));
+          }
+        }
+      }
     }
+
     // generate non captures
     if ((genMode & GEN_NONCAPTURES) > 0) {
+      long tmpMoves = 0L; // temp capture bitmap
+      int sqx; // square index
 
+      /*
+      Move my pawns forward one step and keep all on not occupied sqaures
+      Move pawns now on rank 3 (rank 6) another square forward to check for pawn doubles.
+      Loop over pawns remaining on unoccupied squares and add moves.
+       */
+
+      if (activePlayer.isWhite()) {
+        // pawns - check step one to unoccupied squares
+        tmpMoves = shiftBitboard(N, myPawns) & ~position.getAllOccupiedBitboard();
+        // pawns double - check step two to unoccupied squares
+        long tmpMovesDouble = shiftBitboard(N, tmpMoves & Rank.r3.bitBoard)
+          & ~position.getAllOccupiedBitboard();
+        // double pawn steps
+        while ((sqx = Square.getFirstSquareIndex(tmpMovesDouble)) != NOSQUARE.ordinal()) {
+          nonCapturingMoves.add(Move.createMove(MoveType.PAWNDOUBLE,
+                                             sqx + S + S,
+                                             sqx,
+                                             Piece.WHITE_PAWN,
+                                             Piece.NOPIECE,
+                                             Piece.NOPIECE));
+          tmpMovesDouble = removeFirstSquare(tmpMovesDouble);
+        }
+        // single pawn steps
+        while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+          // TODO promotions
+          if (Rank.index2rank(sqx) < 7) { // no promotion
+            nonCapturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                                  sqx + S,
+                                                  sqx,
+                                                  Piece.WHITE_PAWN,
+                                                  Piece.NOPIECE,
+                                                  Piece.NOPIECE));
+          } else { // promotion
+            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                                  sqx + S,
+                                                  sqx,
+                                                  Piece.WHITE_PAWN,
+                                                  Piece.NOPIECE,
+                                                  Piece.WHITE_QUEEN));
+            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                                  sqx + S,
+                                                  sqx,
+                                                  Piece.WHITE_PAWN,
+                                                  Piece.NOPIECE,
+                                                  Piece.WHITE_ROOK));
+            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                                  sqx + S,
+                                                  sqx,
+                                                  Piece.WHITE_PAWN,
+                                                  Piece.NOPIECE,
+                                                  Piece.WHITE_BISHOP));
+            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                                  sqx + S,
+                                                  sqx,
+                                                  Piece.WHITE_PAWN,
+                                                  Piece.NOPIECE,
+                                                  Piece.WHITE_KNIGHT));
+          }
+          tmpMoves = removeFirstSquare(tmpMoves);
+        }
+      }
+      else {
+        // pawn doubles - check step one and two unoccupied
+        tmpMoves = shiftBitboard(S, myPawns) & ~position.getAllOccupiedBitboard();
+        long tmpMovesDouble = shiftBitboard(S, tmpMoves & Rank.r6.bitBoard)
+          & ~position.getAllOccupiedBitboard();
+        // double pawn steps
+        while ((sqx = Square.getFirstSquareIndex(tmpMovesDouble)) != NOSQUARE.ordinal()) {
+          nonCapturingMoves.add(Move.createMove(MoveType.PAWNDOUBLE,
+                                             sqx + N + N,
+                                             sqx,
+                                             Piece.BLACK_PAWN,
+                                             Piece.NOPIECE,
+                                             Piece.NOPIECE));
+          tmpMovesDouble = removeFirstSquare(tmpMovesDouble);
+        }
+        // single pawn steps
+        while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+          // TODO promotions
+          if (Rank.index2rank(sqx) > 0) { // no promotion
+            nonCapturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                                  sqx + N,
+                                                  sqx,
+                                                  Piece.BLACK_PAWN,
+                                                  Piece.NOPIECE,
+                                                  Piece.NOPIECE));
+          } else { // promotion
+            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                                  sqx + N,
+                                                  sqx,
+                                                  Piece.BLACK_PAWN,
+                                                  Piece.NOPIECE,
+                                                  Piece.BLACK_QUEEN));
+            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                                  sqx + N,
+                                                  sqx,
+                                                  Piece.BLACK_PAWN,
+                                                  Piece.NOPIECE,
+                                                  Piece.BLACK_ROOK));
+            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                                  sqx + N,
+                                                  sqx,
+                                                  Piece.BLACK_PAWN,
+                                                  Piece.NOPIECE,
+                                                  Piece.BLACK_BISHOP));
+            nonCapturingMoves.add(Move.createMove(MoveType.PROMOTION,
+                                                  sqx + N,
+                                                  sqx,
+                                                  Piece.BLACK_PAWN,
+                                                  Piece.NOPIECE,
+                                                  Piece.BLACK_KNIGHT));
+          }
+          tmpMoves = removeFirstSquare(tmpMoves);
+        }
+      }
     }
-
-    //    // iterate over all squares where we have a pawn
-    //    for (int i = 0, size = position.getPawnSquares()[activePlayer.ordinal()].size();
-    //         i < size;
-    //         i++) {
-    //
-    //      final Square square = position.getPawnSquares()[activePlayer.ordinal()].get(i);
-    //      assert position.getPiece(square).getType() == PieceType.PAWN;
-    //
-    //      // get all possible x88 index values for pawn moves
-    //      // these are basically int values to add or subtract from the
-    //      // current square index. Very efficient with a x88 board.
-    //      int[] pawnDirections = Square.pawnDirections;
-    //      for (int j = 0, length = pawnDirections.length; j < length; j++) {
-    //        int d = pawnDirections[j];
-    //
-    //        // calculate the to square
-    //        final int to = square.ordinal() + d * activePlayer.factor;
-    //
-    //        if ((to & 0x88) == 0) { // valid square
-    //
-    //          final MoveType type = MoveType.NORMAL;
-    //          final Square fromSquare = Square.getSquare(square.ordinal());
-    //          final Square toSquare = Square.getSquare(to);
-    //          final Piece piece = Piece.getPiece(PieceType.PAWN, activePlayer);
-    //          final Piece target = position.getPiece(to);
-    //          final Piece promotion = Piece.NOPIECE;
-    //
-    //          // capture
-    //          if (d != Square.N) { // not straight
-    //            if ((genMode & GEN_CAPTURES) > 0) {  // generating captures?
-    //              if (target != Piece.NOPIECE // not empty
-    //                && (target.getColor() == activePlayer.inverse())) { // opponents color
-    //                assert target.getType() != PieceType.KING; // did we miss a check?
-    //                // capture & promotion
-    //                if (to > 111) { // rank 8
-    //                  assert activePlayer.isWhite(); // checking for  color is probably redundant
-    //                  capturingMoves.add(
-    //                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                    Piece.WHITE_QUEEN));
-    //                  capturingMoves.add(
-    //                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                    Piece.WHITE_KNIGHT));
-    //                  capturingMoves.add(
-    //                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                    Piece.WHITE_ROOK));
-    //                  capturingMoves.add(
-    //                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                    Piece.WHITE_BISHOP));
-    //                }
-    //                else if (to < 8) { // rank 1
-    //                  assert activePlayer.isBlack(); // checking for  color is probably redundant
-    //                  capturingMoves.add(
-    //                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                    Piece.BLACK_QUEEN));
-    //                  capturingMoves.add(
-    //                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                    Piece.BLACK_KNIGHT));
-    //                  capturingMoves.add(
-    //                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                    Piece.BLACK_ROOK));
-    //                  capturingMoves.add(
-    //                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                    Piece.BLACK_BISHOP));
-    //                }
-    //                else { // normal capture
-    //                  capturingMoves.add(
-    //                    Move.createMove(type, fromSquare, toSquare, piece, target, promotion));
-    //                }
-    //              }
-    //              else { // empty but maybe en passant
-    //                if (toSquare == position.getEnPassantSquare()) { //  en passant capture
-    //                  // which target?
-    //                  final int t = activePlayer.isWhite()
-    //                                ? position.getEnPassantSquare().getSouth().ordinal()
-    //                                : position.getEnPassantSquare().getNorth().ordinal();
-    //                  capturingMoves.add(
-    //                    Move.createMove(MoveType.ENPASSANT, fromSquare, toSquare, piece,
-    //                                    position.getPiece(t), promotion));
-    //                }
-    //              }
-    //            }
-    //          }
-    //          // no capture
-    //          else { // straight
-    //            if ((genMode & GEN_NONCAPTURES) > 0 // generate non captures
-    //              && target == Piece.NOPIECE) { // way needs to be free
-    //              // promotion
-    //              if (to > 111) { // rank 8
-    //                assert activePlayer.isWhite(); // checking for color is probably redundant
-    //                nonCapturingMoves.add(
-    //                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                  Piece.WHITE_QUEEN));
-    //                nonCapturingMoves.add(
-    //                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                  Piece.WHITE_KNIGHT));
-    //                nonCapturingMoves.add(
-    //                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                  Piece.WHITE_ROOK));
-    //                nonCapturingMoves.add(
-    //                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                  Piece.WHITE_BISHOP));
-    //              }
-    //              else if (to < 8) { // rank 1
-    //                assert activePlayer.isBlack(); // checking for color is probably redundant
-    //                nonCapturingMoves.add(
-    //                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                  Piece.BLACK_QUEEN));
-    //                nonCapturingMoves.add(
-    //                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                  Piece.BLACK_KNIGHT));
-    //                nonCapturingMoves.add(
-    //                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                  Piece.BLACK_ROOK));
-    //                nonCapturingMoves.add(
-    //                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-    //                                  Piece.BLACK_BISHOP));
-    //              }
-    //              else {
-    //                // pawndouble
-    //                if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow()
-    //                  && (position.getPiece(fromSquare.ordinal() + (2 * Square.N)))
-    //                  == Piece.NOPIECE) {
-    //                  // on rank 2 && rank 4 is free(rank 3 already checked via target)
-    //                  nonCapturingMoves.add(
-    //                    Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getNorth(),
-    //                    piece,
-    //                                    target, promotion));
-    //                }
-    //                else if (activePlayer.isBlack() && fromSquare.isBlackPawnBaseRow()
-    //                  && position.getPiece(fromSquare.ordinal() + (2 * Square.S))
-    //                  == Piece.NOPIECE) {
-    //                  // on rank 7 && rank 5 is free(rank 6 already checked via target)
-    //                  nonCapturingMoves.add(
-    //                    Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getSouth(),
-    //                    piece,
-    //                                    target, promotion));
-    //                }
-    //                // normal pawn move
-    //                nonCapturingMoves.add(
-    //                  Move.createMove(type, fromSquare, toSquare, piece, target, promotion));
-    //              }
-    //            }
-    //          }
-    //        }
-    //      }
-    //    }
   }
 
   private void generateKnightMoves() {
