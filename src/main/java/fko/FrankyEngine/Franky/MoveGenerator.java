@@ -933,7 +933,6 @@ public class MoveGenerator {
         }
         // single pawn steps
         while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
-          // TODO promotions
           if (Rank.index2rank(sqx) < 7) { // no promotion
             nonCapturingMoves.add(Move.createMove(MoveType.NORMAL,
                                                   sqx + S,
@@ -987,7 +986,6 @@ public class MoveGenerator {
         }
         // single pawn steps
         while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
-          // TODO promotions
           if (Rank.index2rank(sqx) > 0) { // no promotion
             nonCapturingMoves.add(Move.createMove(MoveType.NORMAL,
                                                   sqx + N,
@@ -1028,6 +1026,11 @@ public class MoveGenerator {
   }
 
   private void generateKnightMoves() {
+    final long myKnight = position.getPiecesBitboards(activePlayer, PieceType.KNIGHT);
+    final long oppPieces = position.getOccupiedBitboards(activePlayer.inverse());
+
+
+
     //    final PieceType type = PieceType.KNIGHT;
     //    // iterate over all squares where we have a piece
     //    for (int i = 0, size = position.getKnightSquares()[activePlayer.ordinal()].size();
