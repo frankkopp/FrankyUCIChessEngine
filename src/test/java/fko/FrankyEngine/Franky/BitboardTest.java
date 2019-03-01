@@ -1683,7 +1683,7 @@ class BitboardTest {
 
     square = b1;
     blocker = e1.bitboard();
-    moves = getSlidingMovesRank(square, blocker);
+    moves = getSlidingMovesRank(square.ordinal(), blocker);
     actual = Bitboard.toString(moves);
     LOG.debug("\n{}", actual);
     expected =  "0 0 0 0 0 0 0 0 \n"
@@ -1699,7 +1699,7 @@ class BitboardTest {
 
     square = e5;
     blocker = b5.bitboard();
-    moves = getSlidingMovesRank(square, blocker);
+    moves = getSlidingMovesRank(square.ordinal(), blocker);
     actual = Bitboard.toString(moves);
     LOG.debug("\n{}", actual);
     expected =  "0 0 0 0 0 0 0 0 \n"
@@ -1744,7 +1744,7 @@ class BitboardTest {
 
     square = b1;
     blocker = b5.bitboard();
-    moves = getSlidingMovesFile(square, blocker);
+    moves = getSlidingMovesFile(square.ordinal(), blocker);
     actual = Bitboard.toString(moves);
     LOG.debug("\n{}", actual);
     expected =  "0 0 0 0 0 0 0 0 \n"
@@ -1760,7 +1760,7 @@ class BitboardTest {
 
     square = e5;
     blocker = e3.bitboard();
-    moves = getSlidingMovesFile(square, blocker);
+    moves = getSlidingMovesFile(square.ordinal(), blocker);
     actual = Bitboard.toString(moves);
     LOG.debug("\n{}", actual);
     expected =  "0 0 0 0 1 0 0 0 \n"
@@ -1776,7 +1776,7 @@ class BitboardTest {
 
     square = e5;
     blocker = e3.bitboard() | e1.bitboard();
-    moves = getSlidingMovesFile(square, blocker);
+    moves = getSlidingMovesFile(square.ordinal(), blocker);
     actual = Bitboard.toString(moves);
     LOG.debug("\n{}", actual);
     expected =  "0 0 0 0 1 0 0 0 \n"
@@ -1839,7 +1839,7 @@ class BitboardTest {
     LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
 
     // retrieve all possible moves for this square with the current content
-    bitboard = getSlidingMovesDiagUp(square, blockers);
+    bitboard = getSlidingMovesDiagUp(square.ordinal(), blockers);
 
     actual = Bitboard.toString(bitboard);
     LOG.debug("{}",String.format("%n%s", actual));
@@ -1866,7 +1866,7 @@ class BitboardTest {
     LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
 
     // retrieve all possible moves for this square with the current content
-    bitboard = getSlidingMovesDiagUp(square, blockers);
+    bitboard = getSlidingMovesDiagUp(square.ordinal(), blockers);
 
     actual = Bitboard.toString(bitboard);
     LOG.debug("{}",String.format("%n%s", actual));
@@ -1894,7 +1894,7 @@ class BitboardTest {
     LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
 
     // retrieve all possible moves for this square with the current content
-    bitboard = getSlidingMovesDiagUp(square, blockers);
+    bitboard = getSlidingMovesDiagUp(square.ordinal(), blockers);
 
     actual = Bitboard.toString(bitboard);
     LOG.debug("{}",String.format("%n%s", actual));
@@ -1931,7 +1931,7 @@ class BitboardTest {
     LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
 
     // retrieve all possible moves for this square with the current content
-    bitboard = getSlidingMovesDiagDown(square, blockers);
+    bitboard = getSlidingMovesDiagDown(square.ordinal(), blockers);
 
     actual = Bitboard.toString(bitboard);
     LOG.debug("{}",String.format("%n%s", actual));
@@ -1959,7 +1959,7 @@ class BitboardTest {
     LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
 
     // retrieve all possible moves for this square with the current content
-    bitboard = getSlidingMovesDiagDown(square, blockers);
+    bitboard = getSlidingMovesDiagDown(square.ordinal(), blockers);
 
     actual = Bitboard.toString(bitboard);
     LOG.debug("{}",String.format("%n%s", actual));
@@ -1987,7 +1987,7 @@ class BitboardTest {
     LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
 
     // retrieve all possible moves for this square with the current content
-    bitboard = getSlidingMovesDiagDown(square, blockers);
+    bitboard = getSlidingMovesDiagDown(square.ordinal(), blockers);
 
     actual = Bitboard.toString(bitboard);
     LOG.debug("{}",String.format("%n%s", actual));

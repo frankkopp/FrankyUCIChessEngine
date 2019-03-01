@@ -58,6 +58,7 @@ public class MoveGeneratorTest {
     moveGenerator = new MoveGenerator(position);
     moves = moveGenerator.getPseudoLegalMoves();
     System.out.println(moves);
+    System.out.println();
 
     // several captures and en passant pawn capture
     System.out.println("Several Captures and en passant black");
@@ -65,12 +66,14 @@ public class MoveGeneratorTest {
     moveGenerator = new MoveGenerator(position);
     moves = moveGenerator.getPseudoLegalMoves();
     System.out.println(moves);
+    System.out.println();
 
     System.out.println("Several Captures and en passant white");
-    position = new Position("1k4r1/ppp2PBP/1r5b/2PpPQ2/3p4/1N1Q1Q2/P3NPP1/R2K3R w - d6");
+    position = new Position("1k4r1/ppp2PBP/1r5b/2PpPQ2/3p4/1N1Q1Q2/P3NPP1/R3K2R w KQ d6");
     moveGenerator = new MoveGenerator(position);
     moves = moveGenerator.getPseudoLegalMoves();
     System.out.println(moves);
+    System.out.println();
 
     // pawn capture promotion
     System.out.println("Pawn Capture Promotion");
@@ -78,10 +81,9 @@ public class MoveGeneratorTest {
     moveGenerator = new MoveGenerator(position);
     moves = moveGenerator.getPseudoLegalMoves();
     System.out.println(moves);
-
+    System.out.println();
 
     // pawn moves and pawn promotions
-
 
   }
 
@@ -126,35 +128,35 @@ public class MoveGeneratorTest {
   @Test
   public void testPerftDirect() {
 
-    //    System.out.println("Standard PERFT Test");
-    //    System.out.println("==============================");
-    //
-    //    // @formatter:off
-//    long[][] results = {
-//          //N  Nodes      Captures EP     Checks  Mates
-//          { 0, 1,         0,       0,     0,      0},
-//          { 1, 20,        0,       0,     0,      0},
-//          { 2, 400,       0,       0,     0,      0},
-//          { 3, 8902,      34,      0,     12,     0},
-//          { 4, 197281,    1576,    0,     469,    8},
-//          { 5, 4865609,   82719,   258,   27351,  347},
-//          { 6, 119060324, 2812008, 5248,  809099, 10828},
-//    };
-//    // @formatter:on
-    //
-    //    int maxDepth = 5;
-    //
-    //    PERFT perftTest = new PERFT();
-    //
-    //    for (int i = 1; i <= maxDepth; i++) {
-    //      perftTest.testPerft(i);
-    //      assertEquals(results[i][1], perftTest.get_nodes());
-    //      assertEquals(results[i][2], perftTest.get_captureCounter());
-    //      assertEquals(results[i][3], perftTest.get_enpassantCounter());
-    //      assertEquals(results[i][4], perftTest.get_checkCounter());
-    //      assertEquals(results[i][5], perftTest.get_checkMateCounter());
-    //    }
-    //    System.out.println("==============================");
+    System.out.println("Standard PERFT Test");
+    System.out.println("==============================");
+
+    // @formatter:off
+    long[][] results = {
+          //N  Nodes      Captures EP     Checks  Mates
+          { 0, 1,         0,       0,     0,      0},
+          { 1, 20,        0,       0,     0,      0},
+          { 2, 400,       0,       0,     0,      0},
+          { 3, 8902,      34,      0,     12,     0},
+          { 4, 197281,    1576,    0,     469,    8},
+          { 5, 4865609,   82719,   258,   27351,  347},
+          { 6, 119060324, 2812008, 5248,  809099, 10828},
+    };
+    // @formatter:on
+
+    int maxDepth = 5;
+
+    PERFT perftTest = new PERFT();
+
+    for (int i = 1; i <= maxDepth; i++) {
+      perftTest.testPerft(i);
+      assertEquals(results[i][1], perftTest.get_nodes());
+      assertEquals(results[i][2], perftTest.get_captureCounter());
+      assertEquals(results[i][3], perftTest.get_enpassantCounter());
+      assertEquals(results[i][4], perftTest.get_checkCounter());
+      assertEquals(results[i][5], perftTest.get_checkMateCounter());
+    }
+    System.out.println("==============================");
   }
 
   /**
@@ -164,19 +166,19 @@ public class MoveGeneratorTest {
   @Test
   public void testPerftOnDemand() {
 
-    //    long[][] perftResults = {
-    //      // @formatter:off
-//      //N  Nodes        Captures   EP      Checks    Mates
-//      { 0, 1,           0,         0,      0,        0},
-//      { 1, 20,          0,         0,      0,        0},
-//      { 2, 400,         0,         0,      0,        0},
-//      { 3, 8902,        34,        0,      12,       0},
-//      { 4, 197281,      1576,      0,      469,      8},
-//      { 5, 4865609,     82719,     258,    27351,    347},
-//      { 6, 119060324,   2812008,   5248,   809099,   10828},
-//      { 7, 3195901860L, 108329926, 319617, 33103848, 435816 }};
-//      // @formatter:on
-    //
+    long[][] perftResults = {
+      // @formatter:off
+      //N  Nodes        Captures   EP      Checks    Mates
+      { 0, 1,           0,         0,      0,        0},
+      { 1, 20,          0,         0,      0,        0},
+      { 2, 400,         0,         0,      0,        0},
+      { 3, 8902,        34,        0,      12,       0},
+      { 4, 197281,      1576,      0,      469,      8},
+      { 5, 4865609,     82719,     258,    27351,    347},
+      { 6, 119060324,   2812008,   5248,   809099,   10828},
+      { 7, 3195901860L, 108329926, 319617, 33103848, 435816 }};
+      // @formatter:on
+
     //    final int depth = 5;
     //    LOG.info("Start PERFT Test for depth {}", depth);
     //
@@ -187,7 +189,7 @@ public class MoveGeneratorTest {
     //    String fen = Position.STANDARD_BOARD_FEN;
     //    Position position = new Position(fen);
     //    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false,
-    //    false, true);
+    //                                           false, true);
     //    search.startSearch(position, searchMode);
     //    search.waitWhileSearching();
     //
@@ -198,7 +200,7 @@ public class MoveGeneratorTest {
     //    assertEquals(perftResults[depth][5], search.getSearchCounter().checkMateCounter);
     //
     //    LOG.info("BOARDS: {}", String.format("%,d", search.getSearchCounter()
-    //    .leafPositionsEvaluated));
+    //      .leafPositionsEvaluated));
     //    LOG.info("PERFT Test for depth 5 successful.");
   }
 
@@ -226,7 +228,7 @@ public class MoveGeneratorTest {
 
     assertEquals(49, pseudo_moves.size());
     assertEquals(48, legal_moves.size());
-    assertEquals(2, qsearch_moves.size());
+    assertEquals(1, qsearch_moves.size());
 
     for (int plMove : pseudo_moves) {
       boolean found = false;

@@ -167,7 +167,7 @@ public class Position {
 
   // internal move generator for check if position is mate - might not be good place
   // as it couples this class to the Move Generator class
-  // DEBUG private final MoveGenerator mateCheckMG = new MoveGenerator();
+  private final MoveGenerator mateCheckMG = new MoveGenerator();
 
   // Flag for boolean states with undetermined state
   private enum Flag {
@@ -556,7 +556,7 @@ public class Position {
   private void putPiece(Square square, Piece piece) {
     assert square.isValidSquare();
     assert piece != Piece.NOPIECE;
-    assert pieces[square.ordinal()] == Piece.NOPIECE; // should be empty
+    assert pieces[square.ordinal()] == Piece.NOPIECE : "Square not empty!";
 
     // put
     pieces[square.ordinal()] = piece;
@@ -575,8 +575,7 @@ public class Position {
   private Piece removePiece(Square square, Piece piece) {
     assert square.isValidSquare();
     assert piece != Piece.NOPIECE;
-    assert pieces[square.ordinal()] == piece // check if removed piece is indeed there
-      : "piece to be removed not there";
+    assert pieces[square.ordinal()] == piece : "piece to be removed not there";
 
     // remove
     Piece old = pieces[square.ordinal()];
@@ -1027,11 +1026,10 @@ public class Position {
   public boolean hasCheckMate() {
     if (!hasCheck()) return false;
     if (hasMate != Flag.TBD) return hasMate == Flag.TRUE;
-    //    DEBUG
-    //    if (!mateCheckMG.hasLegalMove(this)) {
-    //      hasMate = Flag.TRUE;
-    //      return true;
-    //    }
+    if (!mateCheckMG.hasLegalMove(this)) {
+      hasMate = Flag.TRUE;
+      return true;
+    }
     hasMate = Flag.FALSE;
     return false;
   }
@@ -1050,8 +1048,7 @@ public class Position {
     assert (attackedSquare != Square.NOSQUARE);
     assert (!attackerColor.isNone());
 
-    final int squareOrdinal = attackedSquare.ordinal();
-    final int squareIndex64 = attackedSquare.ordinal();
+    final int attackedSqx = attackedSquare.ordinal();
 
     final boolean isWhite = attackerColor.isWhite();
 
@@ -1060,39 +1057,39 @@ public class Position {
     final long[] attackerPiecesBitboard = piecesBitboards[attacker];
 
     // check pawns
-    if ((Bitboard.pawnAttacks[opponent][squareIndex64]
+    if ((Bitboard.pawnAttacks[opponent][attackedSqx]
       & attackerPiecesBitboard[PieceType.PAWN.ordinal()]) != 0) return true;
 
     // check knights
-    if ((Bitboard.knightAttacks[squareIndex64]
+    if ((Bitboard.knightAttacks[attackedSqx]
       & attackerPiecesBitboard[PieceType.KNIGHT.ordinal()]) != 0) return true;
 
     // check king
-    if ((Bitboard.kingAttacks[squareIndex64]
+    if ((Bitboard.kingAttacks[attackedSqx]
       & attackerPiecesBitboard[PieceType.KING.ordinal()]) != 0) return true;
 
     // Sliding
     // rooks and queens
     if (
-      (Bitboard.rookPseudoAttacks[squareIndex64]
+      (Bitboard.rookPseudoAttacks[attackedSqx]
         & attackerPiecesBitboard[ROOK.ordinal()]) != 0
-        || ((Bitboard.queenPseudoAttacks[squareIndex64]
+        || ((Bitboard.queenPseudoAttacks[attackedSqx]
         & attackerPiecesBitboard[PieceType.QUEEN.ordinal()]) != 0)) {
 
-      if (((Bitboard.getSlidingMovesRank(attackedSquare, getAllOccupiedBitboard())
-        | Bitboard.getSlidingMovesFile(attackedSquare, getAllOccupiedBitboard()))
+      if (((Bitboard.getSlidingMovesRank(attackedSqx, getAllOccupiedBitboard())
+        | Bitboard.getSlidingMovesFile(attackedSqx, getAllOccupiedBitboard()))
         & (attackerPiecesBitboard[ROOK.ordinal()]
         | attackerPiecesBitboard[PieceType.QUEEN.ordinal()])) != 0) return true;
     }
 
     // bishop and queens
-    if ((Bitboard.bishopPseudoAttacks[squareIndex64]
+    if ((Bitboard.bishopPseudoAttacks[attackedSqx]
       & attackerPiecesBitboard[PieceType.BISHOP.ordinal()]) != 0
-      || ((Bitboard.queenPseudoAttacks[squareIndex64]
+      || ((Bitboard.queenPseudoAttacks[attackedSqx]
       & attackerPiecesBitboard[PieceType.QUEEN.ordinal()]) != 0)) {
 
-      if (((Bitboard.getSlidingMovesDiagUp(attackedSquare, getAllOccupiedBitboard())
-        | Bitboard.getSlidingMovesDiagDown(attackedSquare, getAllOccupiedBitboard()))
+      if (((Bitboard.getSlidingMovesDiagUp(attackedSqx, getAllOccupiedBitboard())
+        | Bitboard.getSlidingMovesDiagDown(attackedSqx, getAllOccupiedBitboard()))
         & (attackerPiecesBitboard[PieceType.BISHOP.ordinal()]
         | attackerPiecesBitboard[PieceType.QUEEN.ordinal()])) != 0) return true;
     }
@@ -1106,11 +1103,11 @@ public class Position {
         // this is indeed the en passant attacked square
         && this.enPassantSquare.getSouth() == attackedSquare) {
         // left
-        if ((squareOrdinal + Square.W & 0x88) == 0
-          && pieces[squareOrdinal + Square.W] == Piece.WHITE_PAWN) return true;
+        if ((attackedSqx + Square.W & 0x88) == 0
+          && pieces[attackedSqx + Square.W] == Piece.WHITE_PAWN) return true;
         // right
-        return (squareOrdinal + Square.E & 0x88) == 0
-          && pieces[squareOrdinal + Square.E] == Piece.WHITE_PAWN;
+        return (attackedSqx + Square.E & 0x88) == 0
+          && pieces[attackedSqx + Square.E] == Piece.WHITE_PAWN;
       }
       // black is attacker (assume not noColor)
       else if (!isWhite
@@ -1119,11 +1116,11 @@ public class Position {
         // this is indeed the en passant attacked square
         && this.enPassantSquare.getNorth() == attackedSquare) {
         // attack from left
-        if ((squareOrdinal + Square.W & 0x88) == 0
-          && pieces[squareOrdinal + Square.W] == Piece.BLACK_PAWN) return true;
+        if ((attackedSqx + Square.W & 0x88) == 0
+          && pieces[attackedSqx + Square.W] == Piece.BLACK_PAWN) return true;
         // attack from right
-        return (squareOrdinal + Square.E & 0x88) == 0
-          && pieces[squareOrdinal + Square.E] == Piece.BLACK_PAWN;
+        return (attackedSqx + Square.E & 0x88) == 0
+          && pieces[attackedSqx + Square.E] == Piece.BLACK_PAWN;
       }
     }
     return false;
@@ -1136,6 +1133,8 @@ public class Position {
   public boolean isAttacked2(Color attackerColor, Square attackedSquare) {
     assert (attackedSquare != Square.NOSQUARE);
     assert (!attackerColor.isNone());
+
+    final int attackedSqx = attackedSquare.ordinal();
 
     // check pawns
     if (
@@ -1157,8 +1156,8 @@ public class Position {
       || ((Bitboard.queenPseudoAttacks[attackedSquare.ordinal()]
       & piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()]) != 0)) {
 
-      if (((Bitboard.getSlidingMovesRank(attackedSquare, getAllOccupiedBitboard())
-        | Bitboard.getSlidingMovesFile(attackedSquare, getAllOccupiedBitboard()))
+      if (((Bitboard.getSlidingMovesRank(attackedSqx, getAllOccupiedBitboard())
+        | Bitboard.getSlidingMovesFile(attackedSqx, getAllOccupiedBitboard()))
         & (piecesBitboards[attackerColor.ordinal()][ROOK.ordinal()]
         | piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()])) != 0) return true;
     }
@@ -1169,8 +1168,8 @@ public class Position {
       || ((Bitboard.queenPseudoAttacks[attackedSquare.ordinal()]
       & piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()]) != 0)) {
 
-      if (((Bitboard.getSlidingMovesDiagUp(attackedSquare, getAllOccupiedBitboard())
-        | Bitboard.getSlidingMovesDiagDown(attackedSquare, getAllOccupiedBitboard()))
+      if (((Bitboard.getSlidingMovesDiagUp(attackedSqx, getAllOccupiedBitboard())
+        | Bitboard.getSlidingMovesDiagDown(attackedSqx, getAllOccupiedBitboard()))
         & (piecesBitboards[attackerColor.ordinal()][PieceType.BISHOP.ordinal()]
         | piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()])) != 0) return true;
     }

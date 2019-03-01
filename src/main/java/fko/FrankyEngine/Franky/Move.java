@@ -218,16 +218,16 @@ public class Move {
     if (getMoveType(move) == MoveType.CASTLING) {
       switch (getEnd(move)) {
         case g1:
-          s += "O-O";
+          s += "CASTLING O-O";
           break;
         case c1:
-          s += "O-O-O";
+          s += "CASTLING O-O-O";
           break;
         case g8:
-          s += "o-o";
+          s += "CASTLING o-o";
           break;
         case c8:
-          s += "o-o-o";
+          s += "CASTLING o-o-o";
           break;
         default:
           break;

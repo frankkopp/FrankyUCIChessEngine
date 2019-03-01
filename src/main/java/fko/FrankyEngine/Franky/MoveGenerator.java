@@ -627,7 +627,7 @@ public class MoveGenerator {
         return 9200;
       }
       // all other moves
-      return 10000; // DEBUG - Evaluation.getPositionValue(position, move);
+      return 10000 - Evaluation.getPositionValue(position, move);
     }
   }
 
@@ -637,10 +637,12 @@ public class MoveGenerator {
    *
    * @param moveList
    */
+  int[] sortIdx = new int[250]; // prepare array for sort
   private void moveListSort(MoveList moveList) {
     // create index array - this is faster then to call getSortValue() every
     // time a compare takes place
-    int[] sortIdx = new int[moveList.size()];
+    // we re-use a prepared array - does not have to be re-initialized as
+    // it will be overwritten only used up to the overwritten index.
     for (int i = 0, size = moveList.size(); i < size; i++) {
       sortIdx[i] = getSortValue(moveList.get(i));
     }
@@ -896,7 +898,8 @@ public class MoveGenerator {
                  ? Piece.WHITE_QUEEN.ordinal()
                  : Piece.BLACK_QUEEN.ordinal();
 
-    for (int pt = offset, pte = offset - 4; pt >= pte; pt--) {
+    // loop over the PieceTypes Q, R, B, K
+    for (int pt = offset, pte = offset - 4; pt > pte; pt--) {
       moveList.add(Move.createMove(MoveType.PROMOTION,
                                    sqx + direction,
                                    sqx,
@@ -908,187 +911,295 @@ public class MoveGenerator {
   }
 
   private void generateKnightMoves() {
-    final long myKnight = position.getPiecesBitboards(activePlayer, PieceType.KNIGHT);
-    final long oppPieces = position.getOccupiedBitboards(activePlayer.inverse());
+    final Piece piece = activePlayer.isWhite() ? Piece.WHITE_KNIGHT : Piece.BLACK_KNIGHT;
 
-    //    final PieceType type = PieceType.KNIGHT;
-    //    // iterate over all squares where we have a piece
-    //    for (int i = 0, size = position.getKnightSquares()[activePlayer.ordinal()].size();
-    //         i < size;
-    //         i++) {
-    //      final Square square = position.getKnightSquares()[activePlayer.ordinal()].get(i);
-    //      assert position.getPiece(square).getType() == type;
-    //      generateMoves(type, square, Square.knightDirections);
-    //    }
+    int sqxFrom, sqxTo; // square index
+    long tmpKnights = position.getPiecesBitboards(activePlayer, PieceType.KNIGHT);
+    long tmpKnightMoves;
+
+    while ((sqxFrom = Square.getFirstSquareIndex(tmpKnights)) != NOSQUARE.ordinal()) {
+
+      // captures
+      if ((genMode & GEN_CAPTURES) > 0) {
+        tmpKnightMoves = Bitboard.knightAttacks[sqxFrom] & position.getOccupiedBitboards(
+          activePlayer.inverse());
+        while ((sqxTo = Square.getFirstSquareIndex(tmpKnightMoves)) != NOSQUARE.ordinal()) {
+          capturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                             sqxFrom,
+                                             sqxTo,
+                                             piece,
+                                             position.getPiece(sqxTo),
+                                             Piece.NOPIECE));
+          tmpKnightMoves = removeFirstSquare(tmpKnightMoves);
+        }
+      }
+
+      // non captures
+      if ((genMode & GEN_NONCAPTURES) > 0) {
+        tmpKnightMoves = Bitboard.knightAttacks[sqxFrom] & ~position.getAllOccupiedBitboard();
+        while ((sqxTo = Square.getFirstSquareIndex(tmpKnightMoves)) != NOSQUARE.ordinal()) {
+          nonCapturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                                sqxFrom,
+                                                sqxTo,
+                                                piece,
+                                                Piece.NOPIECE,
+                                                Piece.NOPIECE));
+          tmpKnightMoves = removeFirstSquare(tmpKnightMoves);
+        }
+      }
+      tmpKnights = removeFirstSquare(tmpKnights);
+    }
   }
 
   private void generateBishopMoves() {
-    //    final PieceType type = PieceType.BISHOP;
-    //    // iterate over all squares where we have this piece type
-    //    for (int i = 0, size = position.getBishopSquares()[activePlayer.ordinal()].size();
-    //         i < size;
-    //         i++) {
-    //      final Square square = position.getBishopSquares()[activePlayer.ordinal()].get(i);
-    //      assert position.getPiece(square).getType() == type;
-    //      generateMoves(type, square, Square.bishopDirections);
-    //    }
+    final Piece piece = activePlayer.isWhite() ? Piece.WHITE_BISHOP : Piece.BLACK_BISHOP;
+    final long allOccupiedBitboard = position.getAllOccupiedBitboard();
+
+    int sqxFrom, sqxTo; // square index
+    long tmpMoves;
+
+    // get all bishops...
+    long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.BISHOP);
+    // ...and loop over them
+    while ((sqxFrom = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+      // get all possible moves from pre-computed lists
+      tmpMoves = Bitboard.getSlidingMovesDiagUp(sqxFrom, allOccupiedBitboard)
+        | Bitboard.getSlidingMovesDiagDown(sqxFrom, allOccupiedBitboard);
+
+      // captures
+      if ((genMode & GEN_CAPTURES) > 0) {
+        // get all capturing moves by ANDing with opponents pieces...
+        long tmpCapMoves = tmpMoves & position.getOccupiedBitboards(activePlayer.inverse());
+        // ...and loop over them to create moves
+        while ((sqxTo = Square.getFirstSquareIndex(tmpCapMoves)) != NOSQUARE.ordinal()) {
+          capturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                             sqxFrom,
+                                             sqxTo,
+                                             piece,
+                                             position.getPiece(sqxTo),
+                                             Piece.NOPIECE));
+          tmpCapMoves = removeFirstSquare(tmpCapMoves);
+        }
+      }
+
+      // non captures
+      if ((genMode & GEN_NONCAPTURES) > 0) {
+        long tmpNonCapMoves = tmpMoves & ~allOccupiedBitboard;
+        while ((sqxTo = Square.getFirstSquareIndex(tmpNonCapMoves)) != NOSQUARE.ordinal()) {
+          nonCapturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                                sqxFrom,
+                                                sqxTo,
+                                                piece,
+                                                Piece.NOPIECE,
+                                                Piece.NOPIECE));
+          tmpNonCapMoves = removeFirstSquare(tmpNonCapMoves);
+        }
+      }
+      tmpPieces = removeFirstSquare(tmpPieces);
+    }
   }
 
   private void generateRookMoves() {
-    //    final PieceType type = PieceType.ROOK;
-    //    // iterate over all squares where we have this piece type
-    //    for (int i = 0, size = position.getRookSquares()[activePlayer.ordinal()].size();
-    //         i < size;
-    //         i++) {
-    //      final Square square = position.getRookSquares()[activePlayer.ordinal()].get(i);
-    //      assert position.getPiece(square).getType() == type;
-    //      generateMoves(type, square, Square.rookDirections);
-    //    }
+    final Piece piece = activePlayer.isWhite() ? Piece.WHITE_ROOK : Piece.BLACK_ROOK;
+    final long allOccupiedBitboard = position.getAllOccupiedBitboard();
+
+    int sqxFrom, sqxTo; // square index
+    long tmpMoves;
+
+    long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.ROOK);
+
+    while ((sqxFrom = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+      tmpMoves = Bitboard.getSlidingMovesFile(sqxFrom, allOccupiedBitboard)
+        | Bitboard.getSlidingMovesRank(sqxFrom, allOccupiedBitboard);
+
+      // captures
+      if ((genMode & GEN_CAPTURES) > 0) {
+        long tmpCapMoves = tmpMoves & position.getOccupiedBitboards(activePlayer.inverse());
+
+        while ((sqxTo = Square.getFirstSquareIndex(tmpCapMoves)) != NOSQUARE.ordinal()) {
+          capturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                             sqxFrom,
+                                             sqxTo,
+                                             piece,
+                                             position.getPiece(sqxTo),
+                                             Piece.NOPIECE));
+          tmpCapMoves = removeFirstSquare(tmpCapMoves);
+        }
+      }
+
+      // non captures
+      if ((genMode & GEN_NONCAPTURES) > 0) {
+        long tmpNonCapMoves = tmpMoves & ~allOccupiedBitboard;
+
+        while ((sqxTo = Square.getFirstSquareIndex(tmpNonCapMoves)) != NOSQUARE.ordinal()) {
+          nonCapturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                                sqxFrom,
+                                                sqxTo,
+                                                piece,
+                                                Piece.NOPIECE,
+                                                Piece.NOPIECE));
+          tmpNonCapMoves = removeFirstSquare(tmpNonCapMoves);
+        }
+      }
+      tmpPieces = removeFirstSquare(tmpPieces);
+    }
   }
 
   private void generateQueenMoves() {
-    //    final PieceType type = PieceType.QUEEN;
-    //    // iterate over all squares where we have this piece type
-    //    for (int i = 0, size = position.getQueenSquares()[activePlayer.ordinal()].size();
-    //         i < size;
-    //         i++) {
-    //      final Square square = position.getQueenSquares()[activePlayer.ordinal()].get(i);
-    //      assert position.getPiece(square).getType() == type;
-    //      generateMoves(type, square, Square.queenDirections);
-    //    }
+    final Piece piece = activePlayer.isWhite() ? Piece.WHITE_QUEEN : Piece.BLACK_QUEEN;
+    final long allOccupiedBitboard = position.getAllOccupiedBitboard();
+
+    int sqxFrom, sqxTo; // square index
+    long tmpMoves;
+
+    long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.QUEEN);
+
+    while ((sqxFrom = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+      tmpMoves = Bitboard.getSlidingMovesDiagUp(sqxFrom, allOccupiedBitboard)
+        | Bitboard.getSlidingMovesDiagDown(sqxFrom, allOccupiedBitboard)
+        | Bitboard.getSlidingMovesFile(sqxFrom, allOccupiedBitboard)
+        | Bitboard.getSlidingMovesRank(sqxFrom, allOccupiedBitboard);
+
+      // captures
+      if ((genMode & GEN_CAPTURES) > 0) {
+        long tmpCapMoves = tmpMoves & position.getOccupiedBitboards(activePlayer.inverse());
+
+        while ((sqxTo = Square.getFirstSquareIndex(tmpCapMoves)) != NOSQUARE.ordinal()) {
+          capturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                             sqxFrom,
+                                             sqxTo,
+                                             piece,
+                                             position.getPiece(sqxTo),
+                                             Piece.NOPIECE));
+          tmpCapMoves = removeFirstSquare(tmpCapMoves);
+        }
+      }
+
+      // non captures
+      if ((genMode & GEN_NONCAPTURES) > 0) {
+        long tmpNonCapMoves = tmpMoves & ~allOccupiedBitboard;
+
+        while ((sqxTo = Square.getFirstSquareIndex(tmpNonCapMoves)) != NOSQUARE.ordinal()) {
+          nonCapturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                                sqxFrom,
+                                                sqxTo,
+                                                piece,
+                                                Piece.NOPIECE,
+                                                Piece.NOPIECE));
+          tmpNonCapMoves = removeFirstSquare(tmpNonCapMoves);
+        }
+      }
+      tmpPieces = removeFirstSquare(tmpPieces);
+    }
   }
 
   private void generateKingMoves() {
-    //    final PieceType type = PieceType.KING;
-    //    Square square = position.getKingSquares()[activePlayer.ordinal()];
-    //    assert position.getPiece(square.ordinal()).getType() == type;
-    //    generateMoves(type, square, Square.kingDirections);
-  }
+    final Piece piece = activePlayer.isWhite() ? Piece.WHITE_KING : Piece.BLACK_KING;
+    final int sqxFrom = Square.getFirstSquareIndex(
+      position.getPiecesBitboards(activePlayer, PieceType.KING));
 
-  /**
-   * @param type
-   * @param square
-   * @param pieceDirections
-   */
-  private void generateMoves(PieceType type, Square square, int[] pieceDirections) {
-    // get all possible x88 index values for piece's moves
-    // these are basically int values to add or subtract from the
-    // current square index. Very efficient with a x88 board.
-    //    for (int i = 0, pieceDirectionsLength = pieceDirections.length;
-    //         i < pieceDirectionsLength;
-    //         i++) {
-    //
-    //      int d = pieceDirections[i];
-    //      int to = square.ordinal() + d;
-    //
-    //      while ((to & 0x88) == 0) { // slide while valid square
-    //        final Piece target = position.getPiece(to);
-    //
-    //        // free square - non capture
-    //        if (target == Piece.NOPIECE) { // empty
-    //          if ((genMode & GEN_NONCAPTURES) > 0) { // generate non captures
-    //            nonCapturingMoves.add(Move.createMove(MoveType.NORMAL, square, Square.getSquare
-    //            (to),
-    //                                                  Piece.getPiece(type, activePlayer), target,
-    //                                                  Piece.NOPIECE));
-    //          }
-    //        }
-    //        // occupied square - capture if opponent and stop sliding
-    //        else {
-    //          if ((genMode & GEN_CAPTURES) > 0) { // generate captures
-    //            if (target.getColor() == activePlayer.inverse()) { // opponents color
-    //              assert target.getType() != PieceType.KING; // did we miss a check?
-    //              capturingMoves.add(Move.createMove(MoveType.NORMAL, square, Square.getSquare
-    //              (to),
-    //                                                 Piece.getPiece(type, activePlayer), target,
-    //                                                 Piece.NOPIECE));
-    //            }
-    //          }
-    //          break;
-    //        }
-    //        if (type.isSliding()) {
-    //          to += d; // next sliding field in this factor
-    //        }
-    //        else {
-    //          break; // no sliding piece type
-    //        }
-    //      }
-    //    }
+    int sqxTo; // square index
+    long tmpKingMoves;
+
+    // captures
+    if ((genMode & GEN_CAPTURES) > 0) {
+      tmpKingMoves = Bitboard.kingAttacks[sqxFrom] & position.getOccupiedBitboards(
+        activePlayer.inverse());
+      while ((sqxTo = Square.getFirstSquareIndex(tmpKingMoves)) != NOSQUARE.ordinal()) {
+        capturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                           sqxFrom,
+                                           sqxTo,
+                                           piece,
+                                           position.getPiece(sqxTo),
+                                           Piece.NOPIECE));
+        tmpKingMoves = removeFirstSquare(tmpKingMoves);
+      }
+    }
+
+    // non captures
+    if ((genMode & GEN_NONCAPTURES) > 0) {
+      tmpKingMoves = Bitboard.kingAttacks[sqxFrom] & ~position.getAllOccupiedBitboard();
+      while ((sqxTo = Square.getFirstSquareIndex(tmpKingMoves)) != NOSQUARE.ordinal()) {
+        nonCapturingMoves.add(Move.createMove(MoveType.NORMAL,
+                                              sqxFrom,
+                                              sqxTo,
+                                              piece,
+                                              Piece.NOPIECE,
+                                              Piece.NOPIECE));
+        tmpKingMoves = removeFirstSquare(tmpKingMoves);
+      }
+    }
   }
 
   private void generateCastlingMoves() {
 
-    //    if (position.hasCheck() // no castling if we are in check
-    //      || (genMode & GEN_NONCAPTURES) == 0) // only when generating non captures
-    //    {
-    //      return;
-    //    }
-    //
-    //    // iterate over all available castlings at this position
-    //    if (activePlayer.isWhite()) {
-    //      if (position.isCastlingWK()) {
-    //        // f1 free, g1 free and f1 not attacked
-    //        // we will not check if g1 is attacked as this is a pseudo legal move
-    //        // and this to be checked separately e.g. when filtering for legal moves
-    //        if (position.getPiece(Square.f1.ordinal()) == Piece.NOPIECE // passing square free
-    //          && !position.isAttacked(activePlayer.inverse(), Square.f1)
-    //          // passing square not attacked
-    //          && position.getPiece(Square.g1.ordinal()) == Piece.NOPIECE) // to square free
-    //        {
-    //          nonCapturingMoves.add(
-    //            Move.createMove(MoveType.CASTLING, Square.e1, Square.g1, Piece.WHITE_KING,
-    //                            Piece.NOPIECE, Piece.NOPIECE));
-    //        }
-    //      }
-    //      if (position.isCastlingWQ()) {
-    //        // d1 free, c1 free and d1 not attacked
-    //        // we will not check if d1 is attacked as this is a pseudo legal move
-    //        // and this to be checked separately e.g. when filtering for legal moves
-    //        if (position.getPiece(Square.d1.ordinal()) == Piece.NOPIECE // passing square free
-    //          && position.getPiece(Square.b1.ordinal()) == Piece.NOPIECE
-    //          // rook passing square free
-    //          && !position.isAttacked(activePlayer.inverse(), Square.d1)
-    //          // passing square not attacked
-    //          && position.getPiece(Square.c1.ordinal()) == Piece.NOPIECE) // to square free
-    //        {
-    //          nonCapturingMoves.add(
-    //            Move.createMove(MoveType.CASTLING, Square.e1, Square.c1, Piece.WHITE_KING,
-    //                            Piece.NOPIECE, Piece.NOPIECE));
-    //        }
-    //      }
-    //    }
-    //    else {
-    //      if (position.isCastlingBK()) {
-    //        // f8 free, g8 free and f8 not attacked
-    //        // we will not check if g8 is attacked as this is a pseudo legal move
-    //        // and this to be checked separately e.g. when filtering for legal moves
-    //        if (position.getPiece(Square.f8.ordinal()) == Piece.NOPIECE // passing square free
-    //          && !position.isAttacked(activePlayer.inverse(), Square.f8)
-    //          // passing square not attacked
-    //          && position.getPiece(Square.g8.ordinal()) == Piece.NOPIECE) // to square free
-    //        {
-    //          nonCapturingMoves.add(
-    //            Move.createMove(MoveType.CASTLING, Square.e8, Square.g8, Piece.BLACK_KING,
-    //                            Piece.NOPIECE, Piece.NOPIECE));
-    //        }
-    //      }
-    //      if (position.isCastlingBQ()) {
-    //        // d8 free, c8 free and d8 not attacked
-    //        // we will not check if d8 is attacked as this is a pseudo legal move
-    //        // and this to be checked separately e.g. when filtering for legal moves
-    //        if (position.getPiece(Square.d8.ordinal()) == Piece.NOPIECE // passing square free
-    //          && position.getPiece(Square.b8.ordinal()) == Piece.NOPIECE
-    //          // rook passing square free
-    //          && !position.isAttacked(activePlayer.inverse(), Square.d8)
-    //          // passing square not attacked
-    //          && position.getPiece(Square.c8.ordinal()) == Piece.NOPIECE) // to square free
-    //        {
-    //          nonCapturingMoves.add(
-    //            Move.createMove(MoveType.CASTLING, Square.e8, Square.c8, Piece.BLACK_KING,
-    //                            Piece.NOPIECE, Piece.NOPIECE));
-    //        }
-    //      }
-    //    }
+    if (position.hasCheck() // no castling if we are in check
+      || (genMode & GEN_NONCAPTURES) == 0) // only when generating non captures
+      return;
+
+    // iterate over all available castlings at this position
+    if (activePlayer.isWhite()) {
+      if (position.isCastlingWK()) {
+        // f1 free, g1 free and f1 not attacked
+        // we will not check if g1 is attacked as this is a pseudo legal move
+        // and this to be checked separately e.g. when filtering for legal moves
+        if (position.getPiece(Square.f1.ordinal()) == Piece.NOPIECE // passing square free
+          // TODO: check this after move is done in isLegalMove()
+          && !position.isAttacked(activePlayer.inverse(), Square.f1) // passing square not
+          // attacked
+          && position.getPiece(Square.g1.ordinal()) == Piece.NOPIECE) // to square free
+        {
+          nonCapturingMoves.add(Move.createMove(MoveType.CASTLING, Square.e1, Square.g1,
+                                                Piece.WHITE_KING, Piece.NOPIECE, Piece.NOPIECE));
+        }
+      }
+      if (position.isCastlingWQ()) {
+        // d1 free, c1 free and d1 not attacked
+        // we will not check if d1 is attacked as this is a pseudo legal move
+        // and this to be checked separately e.g. when filtering for legal moves
+        if (position.getPiece(Square.d1.ordinal()) == Piece.NOPIECE // passing square free
+          && position.getPiece(Square.b1.ordinal()) == Piece.NOPIECE // rook passing square free
+          // TODO: check this after move is done in isLegalMove()
+          && !position.isAttacked(activePlayer.inverse(), Square.d1) // passing square not
+          // attacked
+          && position.getPiece(Square.c1.ordinal()) == Piece.NOPIECE) // to square free
+        {
+          nonCapturingMoves.add(Move.createMove(MoveType.CASTLING, Square.e1, Square.c1,
+                                                Piece.WHITE_KING, Piece.NOPIECE, Piece.NOPIECE));
+        }
+      }
+    }
+    else {
+      if (position.isCastlingBK()) {
+        // f8 free, g8 free and f8 not attacked
+        // we will not check if g8 is attacked as this is a pseudo legal move
+        // and this to be checked separately e.g. when filtering for legal moves
+        if (position.getPiece(Square.f8.ordinal()) == Piece.NOPIECE // passing square free
+          // TODO: check this after move is done in isLegalMove()
+          && !position.isAttacked(activePlayer.inverse(), Square.f8) // passing square not
+          // attacked
+          && position.getPiece(Square.g8.ordinal()) == Piece.NOPIECE) // to square free
+        {
+          nonCapturingMoves.add(Move.createMove(MoveType.CASTLING, Square.e8, Square.g8,
+                                                Piece.BLACK_KING, Piece.NOPIECE, Piece.NOPIECE));
+        }
+      }
+      if (position.isCastlingBQ()) {
+        // d8 free, c8 free and d8 not attacked
+        // we will not check if d8 is attacked as this is a pseudo legal move
+        // and this to be checked separately e.g. when filtering for legal moves
+        if (position.getPiece(Square.d8.ordinal()) == Piece.NOPIECE // passing square free
+          && position.getPiece(Square.b8.ordinal()) == Piece.NOPIECE // rook passing square free
+          // TODO: check this after move is done in isLegalMove()
+          && !position.isAttacked(activePlayer.inverse(), Square.d8) // passing square not
+          // attacked
+          && position.getPiece(Square.c8.ordinal()) == Piece.NOPIECE) // to square free
+        {
+          nonCapturingMoves.add(Move.createMove(MoveType.CASTLING, Square.e8, Square.c8,
+                                                Piece.BLACK_KING, Piece.NOPIECE, Piece.NOPIECE));
+        }
+      }
+    }
   }
 
   /**
@@ -1126,20 +1237,235 @@ public class MoveGenerator {
     /*
      * Find a move by finding at least one moves for a piece type
      */
-    return findKingMove() || findPawnMove() || findKnightMove() || findQueenMove() || findRookMove()
-      || findBishopMove();
+    return
+      findKingMove()
+        || findPawnMove()
+        || findKnightMove()
+        || findQueenMove()
+        || findRookMove()
+        || findBishopMove();
   }
 
   /**
-   * Find a King move and return immediately if found. No need to check castling extra to find a
-   * legal move.
+   * Find a legal king move and return immediately if found. No need to check
+   * castling extra to find a legal move.
    *
-   * @return true if a move has been found
+   * @return true if a legal move has been found
    */
   private boolean findKingMove() {
-    //    PieceType type = PieceType.KING;
-    //    Square square = position.getKingSquares()[activePlayer.ordinal()];
-    //    return findMove(type, square, Square.kingDirections);
+    final Piece piece = activePlayer.isWhite() ? Piece.WHITE_KING : Piece.BLACK_KING;
+    final int sqxFrom = Square.getFirstSquareIndex(
+      position.getPiecesBitboards(activePlayer, PieceType.KING));
+
+    int sqxTo; // square index
+    long tmpMoves;
+    long[] pieceAttacks = Bitboard.kingAttacks;
+
+    // non captures
+    if ((genMode & GEN_NONCAPTURES) > 0) {
+      tmpMoves = pieceAttacks[sqxFrom] & ~position.getAllOccupiedBitboard();
+      while ((sqxTo = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+        if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                        sqxFrom,
+                                        sqxTo,
+                                        piece,
+                                        Piece.NOPIECE,
+                                        Piece.NOPIECE))) return true;
+        tmpMoves = removeFirstSquare(tmpMoves);
+      }
+    }
+
+    // captures
+    if ((genMode & GEN_CAPTURES) > 0) {
+      tmpMoves = pieceAttacks[sqxFrom] & position.getOccupiedBitboards(
+        activePlayer.inverse());
+      while ((sqxTo = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+        if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                        sqxFrom,
+                                        sqxTo,
+                                        piece,
+                                        position.getPiece(sqxTo),
+                                        Piece.NOPIECE))) return true;
+        tmpMoves = removeFirstSquare(tmpMoves);
+      }
+    }
+    // no legal move found
+    return false;
+  }
+
+  /**
+   * Find a legal pawn move and return immediately if found. No need to check
+   * promotions or pawn doubles.
+   *
+   * @return true if a legal move has been found
+   */
+  private boolean findPawnMove() {
+    final long myPawns = position.getPiecesBitboards(activePlayer, PieceType.PAWN);
+    final long oppPieces = position.getOccupiedBitboards(activePlayer.inverse());
+
+    // generate non captures
+    if ((genMode & GEN_NONCAPTURES) > 0) {
+      long tmpMoves = 0L; // temp capture bitmap
+      int sqx; // square index
+
+      /*
+      Move my pawns forward one step and keep all on not occupied squares
+      Move pawns now on rank 3 (rank 6) another square forward to check for pawn
+      doubles.
+      Loop over pawns remaining on unoccupied squares and add moves.
+      Returns immediately if a legal move has been found.
+      No need to extra check pawn doubles or promotions as the are included in
+      normal moves.
+       */
+
+      if (activePlayer.isWhite()) {
+        // pawns - check step one to unoccupied squares
+        tmpMoves = shiftBitboard(N, myPawns) & ~position.getAllOccupiedBitboard();
+        // single pawn steps
+        while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+          if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                          sqx + S,
+                                          sqx,
+                                          Piece.WHITE_PAWN,
+                                          Piece.NOPIECE,
+                                          Piece.NOPIECE))) return true;
+          tmpMoves = removeFirstSquare(tmpMoves);
+        }
+      }
+      else {
+        // pawn doubles - check step one and two unoccupied
+        tmpMoves = shiftBitboard(S, myPawns) & ~position.getAllOccupiedBitboard();
+        // single pawn steps
+        while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+          if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                          sqx + N,
+                                          sqx,
+                                          Piece.BLACK_PAWN,
+                                          Piece.NOPIECE,
+                                          Piece.NOPIECE))) return true;
+          tmpMoves = removeFirstSquare(tmpMoves);
+        }
+      }
+    }
+
+    // captures
+    if ((genMode & GEN_CAPTURES) > 0) {
+      long tmpCaptures = 0L; // temp capture bitmap
+      int sqx; // square index
+
+      /*
+      This algorithm shifts the own pawn bitboard in the direction of pawn captures
+      and ANDs it with the opponents pieces. With this we get all possible captures
+      and can easily create and check the legality of moves by using a loop over
+      all captures and using the backward shift for the from-Square.
+      Returns immediately if a legal move has been found.
+      No need to extra check pawn doubles or promotions as the are included in normal
+      moves.
+       */
+
+      if (activePlayer.isWhite()) {
+        // normal pawn captures to the west
+        tmpCaptures |= shiftBitboard(NW, myPawns) & oppPieces;
+        while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
+          if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                          sqx + SE,
+                                          sqx,
+                                          Piece.WHITE_PAWN,
+                                          position.getPiece(sqx),
+                                          Piece.NOPIECE))) return true;
+          tmpCaptures = removeFirstSquare(tmpCaptures);
+        }
+        // normal pawn captures to the east
+        tmpCaptures |= shiftBitboard(NE, myPawns) & oppPieces;
+        while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
+          if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                          sqx + SW,
+                                          sqx,
+                                          Piece.WHITE_PAWN,
+                                          position.getPiece(sqx),
+                                          Piece.NOPIECE))) return true;
+          tmpCaptures = removeFirstSquare(tmpCaptures);
+        }
+      }
+      else { // black
+        // normal pawn captures to the west
+        tmpCaptures |= shiftBitboard(SW, myPawns) & oppPieces;
+        while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
+          if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                          sqx + NE,
+                                          sqx,
+                                          Piece.BLACK_PAWN,
+                                          position.getPiece(sqx),
+                                          Piece.NOPIECE))) return true;
+          tmpCaptures = removeFirstSquare(tmpCaptures);
+        }
+        // normal pawn captures to the east
+        tmpCaptures |= shiftBitboard(SE, myPawns) & oppPieces;
+        while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
+          if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                          sqx + NW,
+                                          sqx,
+                                          Piece.BLACK_PAWN,
+                                          position.getPiece(sqx),
+                                          Piece.NOPIECE))) return true;
+          tmpCaptures = removeFirstSquare(tmpCaptures);
+        }
+      }
+
+      // en passant captures
+      final Square enPassantSquare = position.getEnPassantSquare();
+      if (enPassantSquare != NOSQUARE) {
+        if (activePlayer.isWhite()) {
+          // left
+          tmpCaptures = shiftBitboard(SW, enPassantSquare.bitboard()) & myPawns;
+          if (tmpCaptures != 0) {
+            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            if (isLegalMove(Move.createMove(MoveType.ENPASSANT,
+                                            sqx,
+                                            sqx + NE,
+                                            Piece.WHITE_PAWN,
+                                            Piece.BLACK_PAWN,
+                                            Piece.NOPIECE))) return true;
+          }
+          // right
+          tmpCaptures = shiftBitboard(SE, enPassantSquare.bitboard()) & myPawns;
+          if (tmpCaptures != 0) {
+            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            if (isLegalMove(Move.createMove(MoveType.ENPASSANT,
+                                            sqx,
+                                            sqx + NW,
+                                            Piece.WHITE_PAWN,
+                                            Piece.BLACK_PAWN,
+                                            Piece.NOPIECE))) return true;
+          }
+        }
+        else { // black
+          // left
+          tmpCaptures = shiftBitboard(NW, enPassantSquare.bitboard()) & myPawns;
+          if (tmpCaptures != 0) {
+            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            if (isLegalMove(Move.createMove(MoveType.ENPASSANT,
+                                            sqx,
+                                            sqx + SE,
+                                            Piece.BLACK_PAWN,
+                                            Piece.WHITE_PAWN,
+                                            Piece.NOPIECE))) return true;
+          }
+          // right
+          tmpCaptures = shiftBitboard(NE, enPassantSquare.bitboard()) & myPawns;
+          if (tmpCaptures != 0) {
+            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            if (isLegalMove(Move.createMove(MoveType.ENPASSANT,
+                                            sqx,
+                                            sqx + SW,
+                                            Piece.BLACK_PAWN,
+                                            Piece.WHITE_PAWN,
+                                            Piece.NOPIECE))) return true;
+          }
+        }
+      }
+    }
+    // no legal pawn move found
     return false;
   }
 
@@ -1149,12 +1475,45 @@ public class MoveGenerator {
    * @return true if a move has been found
    */
   private boolean findKnightMove() {
-    //    PieceType type = PieceType.KNIGHT;
-    //    final SquareList squareList = position.getKnightSquares()[activePlayer.ordinal()];
-    //    for (int i = 0, size = squareList.size(); i < size; i++) {
-    //      final Square os = squareList.get(i);
-    //      if (findMove(type, os, Square.knightDirections)) return true;
-    //    }
+    final Piece piece = activePlayer.isWhite() ? Piece.WHITE_KNIGHT : Piece.BLACK_KNIGHT;
+    final long[] pieceAttacks = Bitboard.knightAttacks;
+
+    int sqxFrom, sqxTo; // square index
+    long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.KNIGHT);
+    long tmpMoves;
+
+    while ((sqxFrom = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+
+      // non captures
+      if ((genMode & GEN_NONCAPTURES) > 0) {
+        tmpMoves = pieceAttacks[sqxFrom] & ~position.getAllOccupiedBitboard();
+        while ((sqxTo = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+          if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                          sqxFrom,
+                                          sqxTo,
+                                          piece,
+                                          Piece.NOPIECE,
+                                          Piece.NOPIECE))) return true;
+          tmpMoves = removeFirstSquare(tmpMoves);
+        }
+      }
+
+      // captures
+      if ((genMode & GEN_CAPTURES) > 0) {
+        tmpMoves = pieceAttacks[sqxFrom] & position.getOccupiedBitboards(
+          activePlayer.inverse());
+        while ((sqxTo = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+          if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                          sqxFrom,
+                                          sqxTo,
+                                          piece,
+                                          position.getPiece(sqxTo),
+                                          Piece.NOPIECE))) return true;
+          tmpMoves = removeFirstSquare(tmpMoves);
+        }
+      }
+      tmpPieces = removeFirstSquare(tmpPieces);
+    }
     return false;
   }
 
@@ -1164,12 +1523,51 @@ public class MoveGenerator {
    * @return true if a move has been found
    */
   private boolean findQueenMove() {
-    //    PieceType type = PieceType.QUEEN;
-    //    final SquareList squareList = position.getQueenSquares()[activePlayer.ordinal()];
-    //    for (int i = 0, size = squareList.size(); i < size; i++) {
-    //      final Square os = squareList.get(i);
-    //      if (findMove(type, os, Square.queenDirections)) return true;
-    //    }
+    final Piece piece = activePlayer.isWhite() ? Piece.WHITE_QUEEN : Piece.BLACK_QUEEN;
+    final long allOccupiedBitboard = position.getAllOccupiedBitboard();
+
+    int sqxFrom, sqxTo; // square index
+    long tmpMoves;
+
+    long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.QUEEN);
+
+    while ((sqxFrom = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+      tmpMoves = Bitboard.getSlidingMovesDiagUp(sqxFrom, allOccupiedBitboard)
+        | Bitboard.getSlidingMovesDiagDown(sqxFrom, allOccupiedBitboard)
+        | Bitboard.getSlidingMovesFile(sqxFrom, allOccupiedBitboard)
+        | Bitboard.getSlidingMovesRank(sqxFrom, allOccupiedBitboard);
+
+      // non captures
+      if ((genMode & GEN_NONCAPTURES) > 0) {
+        long tmpNonCapMoves = tmpMoves & ~allOccupiedBitboard;
+
+        while ((sqxTo = Square.getFirstSquareIndex(tmpNonCapMoves)) != NOSQUARE.ordinal()) {
+          if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                          sqxFrom,
+                                          sqxTo,
+                                          piece,
+                                          Piece.NOPIECE,
+                                          Piece.NOPIECE))) return true;
+          tmpNonCapMoves = removeFirstSquare(tmpNonCapMoves);
+        }
+      }
+
+      // captures
+      if ((genMode & GEN_CAPTURES) > 0) {
+        long tmpCapMoves = tmpMoves & position.getOccupiedBitboards(activePlayer.inverse());
+
+        while ((sqxTo = Square.getFirstSquareIndex(tmpCapMoves)) != NOSQUARE.ordinal()) {
+          if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                          sqxFrom,
+                                          sqxTo,
+                                          piece,
+                                          position.getPiece(sqxTo),
+                                          Piece.NOPIECE))) return true;
+          tmpCapMoves = removeFirstSquare(tmpCapMoves);
+        }
+      }
+      tmpPieces = removeFirstSquare(tmpPieces);
+    }
     return false;
   }
 
@@ -1179,13 +1577,50 @@ public class MoveGenerator {
    * @return true if a move has been found
    */
   private boolean findBishopMove() {
-    //    PieceType type = PieceType.BISHOP;
-    //    // iterate over all squares where we have this piece type
-    //    final SquareList squareList = position.getBishopSquares()[activePlayer.ordinal()];
-    //    for (int i = 0, size = squareList.size(); i < size; i++) {
-    //      final Square os = squareList.get(i);
-    //      if (findMove(type, os, Square.bishopDirections)) return true;
-    //    }
+    final Piece piece = activePlayer.isWhite() ? Piece.WHITE_BISHOP : Piece.BLACK_BISHOP;
+    final long allOccupiedBitboard = position.getAllOccupiedBitboard();
+
+    int sqxFrom, sqxTo; // square index
+    long tmpMoves;
+
+    long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.BISHOP);
+
+    while ((sqxFrom = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+      tmpMoves = Bitboard.getSlidingMovesDiagUp(sqxFrom, allOccupiedBitboard)
+        | Bitboard.getSlidingMovesDiagDown(sqxFrom, allOccupiedBitboard);
+
+      // non captures
+      if ((genMode & GEN_NONCAPTURES) > 0) {
+        long tmpNonCapMoves = tmpMoves & ~allOccupiedBitboard;
+
+        while ((sqxTo = Square.getFirstSquareIndex(tmpNonCapMoves)) != NOSQUARE.ordinal()) {
+          if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                          sqxFrom,
+                                          sqxTo,
+                                          piece,
+                                          Piece.NOPIECE,
+                                          Piece.NOPIECE))) return true;
+          tmpNonCapMoves = removeFirstSquare(tmpNonCapMoves);
+        }
+      }
+
+      // captures
+      if ((genMode & GEN_CAPTURES) > 0) {
+        long tmpCapMoves = tmpMoves & position.getOccupiedBitboards(activePlayer.inverse());
+
+        while ((sqxTo = Square.getFirstSquareIndex(tmpCapMoves)) != NOSQUARE.ordinal()) {
+          if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                          sqxFrom,
+                                          sqxTo,
+                                          piece,
+                                          position.getPiece(sqxTo),
+                                          Piece.NOPIECE))) return true;
+          tmpCapMoves = removeFirstSquare(tmpCapMoves);
+        }
+      }
+
+      tmpPieces = removeFirstSquare(tmpPieces);
+    }
     return false;
   }
 
@@ -1195,124 +1630,50 @@ public class MoveGenerator {
    * @return true if a move has been found
    */
   private boolean findRookMove() {
-    //    PieceType type = PieceType.ROOK;
-    //    // iterate over all squares where we have this piece type
-    //    final SquareList rookSquare = position.getRookSquares()[activePlayer.ordinal()];
-    //    for (int i = 0, size = rookSquare.size(); i < size; i++) {
-    //      final Square os = rookSquare.get(i);
-    //      if (findMove(type, os, Square.rookDirections)) return true;
-    //    }
-    return false;
-  }
+    final Piece piece = activePlayer.isWhite() ? Piece.WHITE_ROOK : Piece.BLACK_ROOK;
+    final long allOccupiedBitboard = position.getAllOccupiedBitboard();
 
-  /**
-   * Finds moves of the given piece type and the given square. Returns immediately if a move has
-   * been found.
-   *
-   * @param type
-   * @param square
-   * @param pieceDirections
-   * @return true if a move has been found
-   */
-  private boolean findMove(PieceType type, Square square, int[] pieceDirections) {
-    //    int move;
-    //    for (int i = 0, pieceDirectionsLength = pieceDirections.length;
-    //         i < pieceDirectionsLength;
-    //         i++) {
-    //
-    //      int d = pieceDirections[i];
-    //      int to = square.ordinal() + d;
-    //      while ((to & 0x88) == 0) { // slide while valid square
-    //        final Piece target = position.getPiece(to);
-    //        // free square - non capture
-    //        if (target == Piece.NOPIECE) { // empty
-    //          move = Move.createMove(MoveType.NORMAL, Square.getSquare(square.ordinal()),
-    //                                 Square.getSquare(to), Piece.getPiece(type, activePlayer),
-    //                                 target,
-    //                                 Piece.NOPIECE);
-    //          if (isLegalMove(move)) return true;
-    //        }
-    //        // occupied square - capture if opponent and stop sliding
-    //        else {
-    //          if (target.getColor() == activePlayer.inverse()) { // opponents color
-    //            move = Move.createMove(MoveType.NORMAL, Square.getSquare(square.ordinal()),
-    //                                   Square.getSquare(to), Piece.getPiece(type, activePlayer)
-    //                                   , target,
-    //                                   Piece.NOPIECE);
-    //            if (isLegalMove(move)) return true;
-    //          }
-    //          break; // stop sliding;
-    //        }
-    //        if (type.isSliding()) {
-    //          to += d; // next sliding field in this factor
-    //        }
-    //        else {
-    //          break; // no sliding piece type
-    //        }
-    //      }
-    //    }
-    return false;
-  }
+    int sqxFrom, sqxTo; // square index
+    long tmpMoves;
 
-  /**
-   * Find a Pawn move and return immediately if found. No need to check promotions or pawn doubles.
-   *
-   * @return true if a move has been found
-   */
-  private boolean findPawnMove() {
-    //    int move;
-    //
-    //    // iterate over all squares where we have a pawn
-    //    for (int i = 0, size = position.getPawnSquares()[activePlayer.ordinal()].size();
-    //         i < size;
-    //         i++) {
-    //
-    //      final Square square = position.getPawnSquares()[activePlayer.ordinal()].get(i);
-    //
-    //      // get all possible x88 index values for pawn moves
-    //      // these are basically int values to add or subtract from the
-    //      // current square index. Very efficient with a x88 board.
-    //      int[] directions = Square.pawnDirections;
-    //      for (int i1 = 0, directionsLength = directions.length; i1 < directionsLength; i1++) {
-    //        int d = directions[i1];
-    //        // calculate the to square
-    //        final int to = square.ordinal() + d * activePlayer.factor;
-    //        if ((to & 0x88) == 0) { // valid square
-    //          final MoveType type = MoveType.NORMAL;
-    //          final Square fromSquare = Square.getSquare(square.ordinal());
-    //          final Square toSquare = Square.getSquare(to);
-    //          final Piece piece = Piece.getPiece(PieceType.PAWN, activePlayer);
-    //          final Piece target = position.getPiece(to);
-    //          final Piece promotion = Piece.NOPIECE;
-    //          // capture
-    //          if (d != Square.N) { // not straight
-    //            if (target != Piece.NOPIECE // not empty
-    //              && (target.getColor() == activePlayer.inverse())) { // opponents color
-    //              move = Move.createMove(type, fromSquare, toSquare, piece, target, promotion);
-    //              if (isLegalMove(move)) return true;
-    //            }
-    //            else { // empty but maybe en passant
-    //              if (toSquare == position.getEnPassantSquare()) { //  en passant capture
-    //                // which target?
-    //                final int t = activePlayer.isWhite()
-    //                              ? position.getEnPassantSquare().getSouth().ordinal()
-    //                              : position.getEnPassantSquare().getNorth().ordinal();
-    //                move = Move.createMove(MoveType.ENPASSANT, fromSquare, toSquare, piece,
-    //                                       position.getPiece(t), promotion);
-    //                if (isLegalMove(move)) return true;
-    //              }
-    //            }
-    //          }
-    //          // no capture
-    //          else { // straight
-    //            if (target == Piece.NOPIECE) { // way needs to be free
-    //              move = Move.createMove(type, fromSquare, toSquare, piece, target, promotion);
-    //              if (isLegalMove(move)) return true;
-    //            }
-    //          }
-    //        }
-    //      }
-    //    }
+    long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.ROOK);
+
+    while ((sqxFrom = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+      tmpMoves = Bitboard.getSlidingMovesFile(sqxFrom, allOccupiedBitboard)
+        | Bitboard.getSlidingMovesRank(sqxFrom, allOccupiedBitboard);
+
+      // non captures
+      if ((genMode & GEN_NONCAPTURES) > 0) {
+        long tmpNonCapMoves = tmpMoves & ~allOccupiedBitboard;
+
+        while ((sqxTo = Square.getFirstSquareIndex(tmpNonCapMoves)) != NOSQUARE.ordinal()) {
+          if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                          sqxFrom,
+                                          sqxTo,
+                                          piece,
+                                          Piece.NOPIECE,
+                                          Piece.NOPIECE))) return true;
+          tmpNonCapMoves = removeFirstSquare(tmpNonCapMoves);
+        }
+
+        // captures
+        if ((genMode & GEN_CAPTURES) > 0) {
+          long tmpCapMoves = tmpMoves & position.getOccupiedBitboards(activePlayer.inverse());
+
+          while ((sqxTo = Square.getFirstSquareIndex(tmpCapMoves)) != NOSQUARE.ordinal()) {
+            if (isLegalMove(Move.createMove(MoveType.NORMAL,
+                                            sqxFrom,
+                                            sqxTo,
+                                            piece,
+                                            position.getPiece(sqxTo),
+                                            Piece.NOPIECE))) return true;
+            tmpCapMoves = removeFirstSquare(tmpCapMoves);
+          }
+        }
+
+      }
+      tmpPieces = removeFirstSquare(tmpPieces);
+    }
     return false;
   }
 
@@ -1323,16 +1684,17 @@ public class MoveGenerator {
    * @return true if king of active player is not attacked after the move
    */
   private boolean isLegalMove(int move) {
-    //    assert Move.isValid(move);
-    //    // make the move on the position
-    //    position.makeMove(move);
-    //    // check if the move leaves the king in check
-    //    if (!position.isAttacked(activePlayer.inverse(),
-    //                             position.getKingSquares()[activePlayer.ordinal()])) {
-    //      position.undoMove();
-    //      return true;
-    //    }
-    //    position.undoMove();
+    assert Move.isValid(move);
+    // make the move on the position
+    position.makeMove(move);
+    // check if the move leaves the king in check
+    // TODO: check castling intermediate squares
+    if (!position.isAttacked(activePlayer.inverse(), Square.getFirstSquare(
+      position.getPiecesBitboards(activePlayer, PieceType.KING)))) {
+      position.undoMove();
+      return true;
+    }
+    position.undoMove();
     return false;
   }
 
