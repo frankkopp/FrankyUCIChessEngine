@@ -525,7 +525,6 @@ public class MoveGeneratorTest {
       System.out.printf("%-20s %d (%d) %n", Move.toString(move), move,
                         Evaluation.getPositionValue(position, move));
     }
-
   }
 
   /**
@@ -1093,6 +1092,6 @@ public class MoveGeneratorTest {
     // repeat the first
     fen.add("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 b kq e3");
     return fen;
-
   }
+
 }

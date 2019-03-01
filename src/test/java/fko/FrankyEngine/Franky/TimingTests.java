@@ -92,6 +92,27 @@ public class TimingTests {
     timingTest(5, 50, 1_000_000, f1, f2);
   }
 
+  @Test
+  @Disabled
+  public void testTimingMoveGen() {
+    Position position = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3");
+    final MoveGenerator mg = new MoveGenerator();
+    Function f1 = o -> {
+      mg.setPosition(position);
+      mg.getPseudoLegalMoves();
+      return null;
+    };
+    Function f2 = o -> {
+      mg.setPosition(position);
+      int move;
+      while ((move = mg.getNextPseudoLegalMove(false)) != Move.NOMOVE) {
+        // nothing
+      }
+      return null;
+    };
+    timingTest(5, 50, 100_000, f1, f2);
+  }
+
   private void timingTest(final int rounds, final int iterations, final int repetitions,
                           Function... functions) {
 
@@ -116,7 +137,7 @@ public class TimingTests {
           sum += end - start;
         }
         float avg1 = ((float) sum / iterations) / 1e9f;
-        result.add(String.format("Round %d Test %d avg: %,.3f sec", round, testNr++, avg1));
+        result.add(String.format("Round %d Test %d avg: %,.6f sec", round, testNr++, avg1));
       }
     }
 
