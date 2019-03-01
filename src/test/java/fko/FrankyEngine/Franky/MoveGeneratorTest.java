@@ -573,6 +573,42 @@ public class MoveGeneratorTest {
 
   }
 
+  @Test
+  public void testSpeed() {
+
+    System.out.println("Standard PERFT Test");
+    System.out.println("==============================");
+
+    // @formatter:off
+    long[][] results = {
+          //N  Nodes      Captures EP     Checks  Mates
+          { 0, 1,         0,       0,     0,      0},
+          { 1, 20,        0,       0,     0,      0},
+          { 2, 400,       0,       0,     0,      0},
+          { 3, 8902,      34,      0,     12,     0},
+          { 4, 197281,    1576,    0,     469,    8},
+          { 5, 4865609,   82719,   258,   27351,  347},
+          { 6, 119060324, 2812008, 5248,  809099, 10828},
+    };
+    // @formatter:on
+
+    int maxDepth = 6;
+
+    PERFT perftTest = new PERFT();
+
+    for (int i = 1; i <= maxDepth; i++) {
+      perftTest.testPerft(i);
+    }
+    System.out.println("==============================");
+
+    /*
+    Testing at depth 6
+    Leaf Nodes: 119.060.324 Captures: 2.812.008 EnPassant: 5.248 Checks: 809.099 Checkmates: 10.828
+    Duration: 00:00:38.746
+    n/s: 3.072.762
+     */
+  }
+
   /**
    * Tests the timing
    */

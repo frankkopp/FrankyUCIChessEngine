@@ -894,7 +894,7 @@ public class MoveGenerator {
   private void createPromotionMoves(int sqx, MoveList moveList, int direction, Piece pawn,
                                     Piece target) {
 
-    int offset = pawn.getColor().isWhite()
+    final int offset = pawn.getColor().isWhite()
                  ? Piece.WHITE_QUEEN.ordinal()
                  : Piece.BLACK_QUEEN.ordinal();
 
