@@ -158,7 +158,7 @@ public class TimingTests {
           sum += end - start;
         }
         float avg1 = ((float) sum / iterations) / 1e9f;
-        result.add(String.format("Round %d Test %d avg: %,.3f sec", round, testNr++, avg1));
+        result.add(String.format("Round %d Test %d avg: %,.6f sec", round, testNr++, avg1));
       }
     }
 

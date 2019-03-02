@@ -84,12 +84,6 @@ public enum Square {
   public static final int[] queenDirections      = {N, NE, E, SE, S, SW, W, NW};
   public static final int[] kingDirections       = {N, NE, E, SE, S, SW, W, NW};
 
-  /*
-   * pre computed mapping from position of bit in bitboard to square
-   * To get position use <code>Long.numberOfLeadingZeros</code>
-   */
-  private static Square[] trailingZerosMap = new Square[65];
-
   // precomputed values
   private boolean validSquare;
   private long    bitBoard;
@@ -146,9 +140,6 @@ public enum Square {
 
       // set bit for bitboard
       s.bitBoard = 1L << s.ordinal();
-
-      // mapping between enum ordinal and bbIndex
-      trailingZerosMap[Long.numberOfTrailingZeros(s.bitBoard)] = s;
 
       // pre-compute file and rank
       s.file = File.values[s.ordinal() & 7];
@@ -263,11 +254,6 @@ public enum Square {
       s.isPawnBaseRow[WHITE] = (s.rank == Rank.r2);
       s.isPawnBaseRow[BLACK] = (s.rank == Rank.r7);
     }
-
-    // When we have to find a bit in a zero-bitmap the number of trailingZeros
-    // is 64 and would lead to an out of array range. Therefore this array has
-    // 65 elements and the last is NOSQUARE
-    trailingZerosMap[64] = NOSQUARE;
 
   }
 
@@ -409,19 +395,20 @@ public enum Square {
    * @return the first Square of the given Bitboard from a8-h8-h1
    */
   public static Square getFirstSquare(long bitboard) {
-    return trailingZerosMap[getFirstSquareIndex(bitboard)];
+    return Square.getSquare(getFirstSquareIndex(bitboard));
   }
 
   /**
-   * Finds the first set bit in a bitboard and removes it.
+   * Removes the given bit in a bitboard.
    * Can be used to loop through all set squares in a bitboard in conjunction
    * with getFirstSquare()
    *
    * @param bitboard
+   * @param sqx
    * @return the bitboard without the removed square
    */
-  public static long removeFirstSquare(long bitboard) {
-    final long bit = trailingZerosMap[Long.numberOfTrailingZeros(bitboard)].bitboard();
+  public static long removeSquare(long bitboard, int sqx) {
+    final long bit = 1L << sqx;
     assert (bitboard & bit) != 0 : "Bit to be removed not set.";
     return bitboard ^ bit;
   }

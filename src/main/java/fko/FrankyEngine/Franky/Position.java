@@ -33,7 +33,7 @@ import java.util.Random;
 
 import static fko.FrankyEngine.Franky.PieceType.*;
 import static fko.FrankyEngine.Franky.Square.NOSQUARE;
-import static fko.FrankyEngine.Franky.Square.removeFirstSquare;
+import static fko.FrankyEngine.Franky.Square.removeSquare;
 
 /**
  * This class represents the chess board and its position.<br>
@@ -954,7 +954,7 @@ public class Position {
         if (isEnPassant) boardAfterMove ^= epTargetSquare.bitboard();
         // if squares in between are not occupied then it is a check
         if ((intermediate & boardAfterMove) == 0) return true;
-        rooks = removeFirstSquare(rooks);
+        rooks = removeSquare(rooks, sqIdx);
       }
     }
 
@@ -976,7 +976,7 @@ public class Position {
         if (isEnPassant) boardAfterMove ^= epTargetSquare.bitboard();
         // if squares in between are not occupied then it is a check
         if ((intermediate & boardAfterMove) == 0) return true;
-        bishops = removeFirstSquare(bishops);
+        bishops = removeSquare(bishops, sqIdx);
       }
     }
 
@@ -998,7 +998,7 @@ public class Position {
         if (isEnPassant) boardAfterMove ^= epTargetSquare.bitboard();
         // if squares in between are not occupied then it is a check
         if ((intermediate & boardAfterMove) == 0) return true;
-        queens = removeFirstSquare(queens);
+        queens = removeSquare(queens, sqIdx);
       }
     }
 

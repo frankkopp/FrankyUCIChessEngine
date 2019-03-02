@@ -25,729 +25,336 @@
 
 package fko.FrankyEngine.Franky;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.openjdk.jol.info.ClassLayout;
-import org.openjdk.jol.vm.VM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
-
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 
 /**
- * @author Frank
+ * SearchTreeSizeTest
  */
-public class MoveGeneratorTest {
+public class SearchTreeSizeTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MoveGeneratorTest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SearchTreeSizeTest.class);
+  private              int    HASH_SIZE;
+  private              int    THREADS;
 
-  @Test
-  @Disabled
-  void developMoveGen() {
-    Position position;
-    MoveGenerator moveGenerator;
-    MoveList moves;
-
-    // simple pawn capture
-    System.out.println("Simple Pawn Capture");
-    position = new Position("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -");
-    moveGenerator = new MoveGenerator(position);
-    moves = moveGenerator.getPseudoLegalMoves();
-    System.out.println(moves);
-    System.out.println();
-
-    // several captures and en passant pawn capture
-    System.out.println("Several Captures and en passant black");
-    position = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2qpPp2/B5R1/pbp2PPP/1R4K1 b kq e3");
-    moveGenerator = new MoveGenerator(position);
-    moves = moveGenerator.getPseudoLegalMoves();
-    System.out.println(moves);
-    System.out.println();
-
-    System.out.println("Several Captures and en passant white");
-    position = new Position("1k4r1/ppp2PBP/1r5b/2PpPQ2/3p4/1N1Q1Q2/P3NPP1/R3K2R w KQ d6");
-    moveGenerator = new MoveGenerator(position);
-    moves = moveGenerator.getPseudoLegalMoves();
-    System.out.println(moves);
-    System.out.println();
-
-    // pawn capture promotion
-    System.out.println("Pawn Capture Promotion");
-    position = new Position("1n1n2K1/2P2N1p/6pr/b1pp3b/3Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - -");
-    moveGenerator = new MoveGenerator(position);
-    moves = moveGenerator.getPseudoLegalMoves();
-    System.out.println(moves);
-    System.out.println();
-
-    // pawn moves and pawn promotions
-
+  class SingleTest {
+    String name  = "";
+    long   nodes = 0;
+    int    nps   = 0;
+    long   time  = 0;
+    int    move  = Move.NOMOVE;
+    int    value = Evaluation.NOVALUE;
+    String pv    = "";
   }
 
-  @Test
-  public void testFromStandardBoard() {
+  class Result {
+    String           fen;
+    List<SingleTest> tests = new ArrayList<>();
 
-    {
-      // Standard position has 20 moves to make
-      Position position = new Position();
-      MoveGenerator moveGenerator = new MoveGenerator(position);
-      MoveList moves = moveGenerator.getLegalMoves();
-      System.out.println(moves);
-      assertEquals(20, moves.size());
-    }
-
-    {
-      // 83 moves to make
-      String testFen = "r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3";
-      Position position = new Position(testFen);
-      MoveGenerator moveGenerator = new MoveGenerator(position);
-      MoveList moves = moveGenerator.getLegalMoves();
-      System.out.println(moves);
-      assertEquals(83, moves.size());
-    }
-
-    {
-      // 218 moves to make
-      String testFen = "R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1";
-      Position position = new Position(testFen);
-      MoveGenerator moveGenerator = new MoveGenerator(position);
-      MoveList moves = moveGenerator.getLegalMoves();
-      System.out.println(moves);
-      assertEquals(218, moves.size());
+    public Result(String fen) {
+      this.fen = fen;
     }
   }
 
-  /**
-   * Perft Test https://chessprogramming.wikispaces.com/Perft+Results
-   *
-   * Uses own MinMax PERFT class. This uses direct move generation.
-   */
-  @Test
-  public void testPerftDirect() {
+  @BeforeEach
+  void setUp() {
 
-    System.out.println("Standard PERFT Test");
-    System.out.println("==============================");
-
-    // @formatter:off
-    long[][] results = {
-          //N  Nodes      Captures EP     Checks  Mates
-          { 0, 1,         0,       0,     0,      0},
-          { 1, 20,        0,       0,     0,      0},
-          { 2, 400,       0,       0,     0,      0},
-          { 3, 8902,      34,      0,     12,     0},
-          { 4, 197281,    1576,    0,     469,    8},
-          { 5, 4865609,   82719,   258,   27351,  347},
-          { 6, 119060324, 2812008, 5248,  809099, 10828},
-    };
-    // @formatter:on
-
-    int maxDepth = 5;
-
-    PERFT perftTest = new PERFT();
-
-    for (int i = 1; i <= maxDepth; i++) {
-      perftTest.testPerft(i);
-      assertEquals(results[i][1], perftTest.get_nodes());
-      assertEquals(results[i][2], perftTest.get_captureCounter());
-      assertEquals(results[i][3], perftTest.get_enpassantCounter());
-      assertEquals(results[i][4], perftTest.get_checkCounter());
-      assertEquals(results[i][5], perftTest.get_checkMateCounter());
-    }
-    System.out.println("==============================");
-  }
-
-  /**
-   * This uses the standard search class which uses on demand generation.
-   * Attention: DEpendency to <code>Search</code>.
-   */
-  @Test
-  public void testPerftOnDemand() {
-
-    long[][] perftResults = {
-      // @formatter:off
-      //N  Nodes        Captures   EP      Checks    Mates
-      { 0, 1,           0,         0,      0,        0},
-      { 1, 20,          0,         0,      0,        0},
-      { 2, 400,         0,         0,      0,        0},
-      { 3, 8902,        34,        0,      12,       0},
-      { 4, 197281,      1576,      0,      469,      8},
-      { 5, 4865609,     82719,     258,    27351,    347},
-      { 6, 119060324,   2812008,   5248,   809099,   10828},
-      { 7, 3195901860L, 108329926, 319617, 33103848, 435816 }};
-      // @formatter:on
-
-    //    final int depth = 5;
-    //    LOG.info("Start PERFT Test for depth {}", depth);
-    //
-    //    FrankyEngine engine = new FrankyEngine();
-    //    Search search = engine.getSearch();
-    //    search.config.USE_BOOK = false;
-    //
-    //    String fen = Position.STANDARD_BOARD_FEN;
-    //    Position position = new Position(fen);
-    //    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false,
-    //                                           false, true);
-    //    search.startSearch(position, searchMode);
-    //    search.waitWhileSearching();
-    //
-    //    assertEquals(perftResults[depth][1], search.getSearchCounter().leafPositionsEvaluated);
-    //    assertEquals(perftResults[depth][2], search.getSearchCounter().captureCounter);
-    //    assertEquals(perftResults[depth][3], search.getSearchCounter().enPassantCounter);
-    //    assertEquals(perftResults[depth][4], search.getSearchCounter().checkCounter);
-    //    assertEquals(perftResults[depth][5], search.getSearchCounter().checkMateCounter);
-    //
-    //    LOG.info("BOARDS: {}", String.format("%,d", search.getSearchCounter()
-    //      .leafPositionsEvaluated));
-    //    LOG.info("PERFT Test for depth 5 successful.");
-  }
-
-  @Test
-  public void testMaxMovesPosition() {
-    String testFen = "R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - -"; // 218 moves to make
-    Position board = new Position(testFen);
-    MoveGenerator moveGenerator = new MoveGenerator(board);
-    MoveList legal_moves = moveGenerator.getLegalMoves().clone();
-    MoveList pseudo_moves = moveGenerator.getPseudoLegalMoves().clone();
-    assertEquals(218, legal_moves.size());
-    assertEquals(218, pseudo_moves.size());
-  }
-
-  @Test
-  public void testAllGenerators() {
-
-    String testFen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -";
-    Position board = new Position(testFen);
-
-    MoveGenerator moveGenerator = new MoveGenerator(board);
-    MoveList pseudo_moves = moveGenerator.getPseudoLegalMoves().clone();
-    MoveList legal_moves = moveGenerator.getLegalMoves().clone();
-    MoveList qsearch_moves = moveGenerator.getPseudoLegalQSearchMoves().clone();
-
-    assertEquals(49, pseudo_moves.size());
-    assertEquals(48, legal_moves.size());
-    assertEquals(1, qsearch_moves.size());
-
-    for (int plMove : pseudo_moves) {
-      boolean found = false;
-      System.out.print("Move: " + Move.toSimpleString(plMove) + " ");
-      for (int lMove : legal_moves) {
-        if (plMove == lMove) {
-          System.out.print(Move.toSimpleString(lMove) + " ");
-          found = true;
-        }
-      }
-      if (!found) {
-        System.out.print("---- ");
-      }
-      found = false;
-      for (int qMove : qsearch_moves) {
-        if (plMove == qMove) {
-          System.out.print(Move.toSimpleString(qMove) + " ");
-          found = true;
-        }
-      }
-      if (!found) {
-        System.out.print("----");
-      }
-      System.out.println();
-    }
-  }
-
-  /**
-   * Tests mate position
-   */
-  @Test
-  public void testMatePosition() {
-
-    String testFen = "rnb1kbnr/pppp1ppp/4p3/8/5P1q/N7/PPPPP1PP/R1BQKBNR w KQkq - 2 3";
-
-    Position board = new Position(testFen);
-    MoveGenerator moveGenerator = new MoveGenerator(board);
-
-    boolean hasLegalMoves = moveGenerator.hasLegalMove();
-    MoveList moves = moveGenerator.getLegalMoves();
-    boolean hasMate = board.hasCheckMate();
-
-    assertFalse(hasMate);
-    assertFalse(moves.empty());
-    assertTrue(hasLegalMoves);
-
-  }
-
-  /**
-   * Tests the generated moves from board setup with killer moves sorting
-   */
-  @Test
-  public void testKillerDirect() {
-
-    String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq - 0 113";
-    Position board = new Position(testFen);
-
-    final int killer1 = 67178790; // 67178790 (NORMAL Rg3-c3)
-    final int killer2 = 67178534; // 67178534 (NORMAL Rg3-a3)
-    final int killer3 = 67130005; // already at first position
-
-    final MoveList killerList = new MoveList();
-    killerList.add(killer1);
-    killerList.add(killer2);
-    killerList.add(killer3);
-
-    MoveGenerator moveGenerator = new MoveGenerator(board);
-    moveGenerator.setKillerMoves(killerList);
-    MoveList moves = moveGenerator.getLegalMoves();
-
-    int lastCapture = 0;
-    for (int i = 0; i < moves.size(); i++) {
-      // skip the captures
-      if (!Move.getTarget(moves.get(i)).equals(Piece.NOPIECE)) {
-        lastCapture = i;
-        continue;
-      }
-      // now we should have our two killers
-      assertTrue(i == lastCapture + 1 && moves.get(i) == killer1 && moves.get(i + 1) == killer2);
-      break;
-    }
-  }
-
-  /**
-   * Tests the generated moves from board setup with killer moves sorting
-   */
-  @Test
-  public void testKillerOnDemand() {
-
-    String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq - 0 113";
-    Position board = new Position(testFen);
-
-    int killer1 = 67178790; // 67178790 (NORMAL Rg3-c3)
-    int killer2 = 67178534; // 67178534 (NORMAL Rg3-a3)
-    int killer3 = 67130005; // already at first position
-
-    final MoveList killerList = new MoveList();
-    killerList.add(killer1);
-    killerList.add(killer2);
-    killerList.add(killer3);
-
-    MoveGenerator moveGenerator = new MoveGenerator(board);
-    moveGenerator.setKillerMoves(killerList);
-
-    int lastCapture = 0;
-    int i = 0;
-    int move;
-    while ((move = moveGenerator.getNextPseudoLegalMove(false)) != Move.NOMOVE) {
-      // skip the captures
-      if (!Move.getTarget(move).equals(Piece.NOPIECE)) {
-        lastCapture = i++;
-        continue;
-      }
-      // now we should have our two killers
-      assertTrue(i == lastCapture + 1 && move == killer1
-                   && moveGenerator.getNextPseudoLegalMove(false) == killer2);
-      break;
-    }
-  }
-
-  /**
-   * Tests the generated moves from a standard board setup
-   */
-  @Test
-  public void testOnDemandvsDirect() {
-
-    Position position = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3");
-
-    MoveGenerator moveGenerator = new MoveGenerator();
-    moveGenerator.SORT_MOVES = true;
-
-    final int killer1 = 67320564;
-    final int killer2 = 67318516;
-
-    final MoveList killerList = new MoveList();
-    killerList.add(killer1);
-    killerList.add(killer2);
-
-    // direct list
-    moveGenerator.setPosition(position);
-    moveGenerator.setKillerMoves(killerList);
-    moveGenerator.setPVMove(67248483);
-    MoveList movesDirect = moveGenerator.getPseudoLegalMoves().clone();
-
-    // OD list
-    moveGenerator.setPosition(position);
-    moveGenerator.setKillerMoves(killerList);
-    moveGenerator.setPVMove(67248483);
-    MoveList movesOD = new MoveList();
-    int tmp;
-    while ((tmp = moveGenerator.getNextPseudoLegalMove(false)) != Move.NOMOVE) {
-      movesOD.add(tmp);
-    }
-
-    System.out.printf("POSITION: %s %n", position.toFENString());
-    System.out.printf("Bulk: %,d OnDemand: %,d %n", movesDirect.size(), movesOD.size());
-    System.out.printf("%3s  %-20s %-20s %n", "No.", "Direct", "OnDemand");
-    System.out.printf("---------------------------------------------%n");
-
-    for (int j = 0; j < Math.max(movesDirect.size(), movesOD.size()); j++) {
-      final int moveOD = movesOD.get(j);
-      final int moveDirect = movesDirect.get(j);
-      System.out.printf("%3d. %-20s %-20s ", j, movesOD.size() > j ? Move.toString(moveOD) : "-",
-                        movesDirect.size() > j ? Move.toString(moveDirect) : "-");
-      if (moveDirect != moveOD) {
-        System.out.printf(" <<<<<<<<<<<<<<<<<< DIFFERENT");
-      }
-      System.out.println();
-    }
-    assertEquals(movesDirect, movesOD);
-    System.out.println();
-  }
-
-  /**
-   * Tests many position against move generation direct vs. on demand
-   */
-  @Test
-  public void testMultipleOnDemandvsDirect() {
-
-    int i = 0;
-    ArrayList<String> fens = getFENs();
-    for (String fen : fens) {
-      i++;
-      Position position = new Position(fen);
-
-      MoveGenerator moveGenerator = new MoveGenerator();
-      moveGenerator.SORT_MOVES = true;
-
-      // get some example killer and pv moves
-      moveGenerator.setPosition(position);
-      MoveList tmp = moveGenerator.getPseudoLegalMoves().clone();
-      int pvMove = Move.NOMOVE;
-      final MoveList killerList = new MoveList();
-      if (tmp.size() > 10) {
-        pvMove = tmp.get(4);
-        killerList.add(tmp.get(9));
-        killerList.add(tmp.get(10));
-      }
-
-      // direct list
-      moveGenerator.setPosition(position);
-      if (tmp.size() > 10) {
-        moveGenerator.setKillerMoves(killerList);
-        moveGenerator.setPVMove(pvMove);
-      }
-      MoveList movesDirect = moveGenerator.getPseudoLegalMoves().clone();
-
-      // OD list
-      moveGenerator.setPosition(position);
-      if (tmp.size() > 10) {
-        moveGenerator.setKillerMoves(killerList);
-        moveGenerator.setPVMove(pvMove);
-      }
-      MoveList movesOD = new MoveList();
-      int tmpMove;
-      while ((tmpMove = moveGenerator.getNextPseudoLegalMove(false)) != Move.NOMOVE) {
-        movesOD.add(tmpMove);
-      }
-
-      System.out.printf("POSITION: %d. %s %n", i + 1, position.toFENString());
-      System.out.printf("Bulk: %,d OnDemand: %,d %n", movesDirect.size(), movesOD.size());
-      System.out.printf("Killer 1: %-20s Killer 2: %-20s PV: %-20s%n",
-                        killerList.size() > 0 ? Move.toString(killerList.get(0)) : "none",
-                        killerList.size() > 1 ? Move.toString(killerList.get(1)) : "none",
-                        Move.toString(pvMove));
-      System.out.printf("%3s  %-20s %-20s %n", "No.", "Direct", "OnDemand");
-      System.out.printf("---------------------------------------------%n");
-
-      for (int j = 0; j < Math.max(movesDirect.size(), movesOD.size()); j++) {
-        final int moveOD = movesOD.size() > j ? movesOD.get(j) : Move.NOMOVE;
-        final int moveDirect = movesDirect.size() > j ? movesDirect.get(j) : Move.NOMOVE;
-        System.out.printf("%3d. %-20s %-20s ", j, Move.toString(moveDirect), Move.toString(moveOD));
-        if (moveDirect != moveOD) {
-          System.out.print(" <<<<<<<<<<<<<<<<<< DIFFERENT");
-        }
-        System.out.println();
-      }
-      assertEquals(movesDirect, movesOD);
-      System.out.println();
-    }
-  }
-
-  @Test
-  public void testMoveSortingCaptures() {
-
-    MoveGenerator moveGenerator = new MoveGenerator();
-    Position position;
-
-    int i = 0;
-    ArrayList<String> fens = getFENs();
-    for (String fen : fens) {
-      i++;
-      position = new Position(fen);
-
-      System.out.printf("POSITION: %d. %s %n", i, position.toFENString());
-
-      moveGenerator.setPosition(position);
-      MoveList moves = moveGenerator.getPseudoLegalMoves(true);
-
-      for (int j = 0; j < moves.size(); j++) {
-        final int move = moves.get(j);
-        if (Move.isCapturing(move)) {
-          final int captureValue =
-            Move.getPiece(move).getType().getValue()
-              - Move.getTarget(move).getType().getValue();
-
-          System.out.print(Move.toString(move));
-          System.out.print(" " + captureValue);
-          if (j + 1 < moves.size()) {
-            final int nextMove = moves.get(j + 1);
-            final int capVal2 = Move.getPiece(nextMove).getType().getValue() - Move.getTarget(
-              nextMove)
-                                                                                   .getType()
-                                                                                   .getValue();
-            System.out.print(" " + Move.toString(nextMove));
-            System.out.print(" " + capVal2);
-            //assertTrue(captureValue <= capVal2);
-          }
-          System.out.println();
-
-        }
-      }
-      System.out.println();
-    }
-  }
-
-  @Test
-  public void testSingleMoveSorting() {
-
-    //    Position position = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b
-    //    kq e3");
-    //    MoveGenerator moveGenerator = new MoveGenerator(position);
-    //
-    //    int killer1 = 67320564;
-    //    int killer2 = 67318516;
-    //    int pvMove = 67248483;
-    //
-    //    final MoveList killerList = new MoveList();
-    //    killerList.add(killer1);
-    //    killerList.add(killer2);
-    //
-    //    // OD list
-    //    MoveList movesOD = new MoveList();
-    //    moveGenerator.setPosition(position);
-    //    moveGenerator.setKillerMoves(killerList);
-    //    moveGenerator.setPVMove(pvMove);
-    //    int m;
-    //    while ((m = moveGenerator.getNextPseudoLegalMove(false)) != Move.NOMOVE) {
-    //      movesOD.add(m);
-    //    }
-    //
-    //    // direct list
-    //    moveGenerator.setPosition(position);
-    //    moveGenerator.setKillerMoves(killerList);
-    //    moveGenerator.setPVMove(pvMove);
-    //    MoveList moves = moveGenerator.getPseudoLegalMoves().clone();
-    //
-    //    assertEquals(moves.size(), movesOD.size());
-    //
-    //    assertEquals(pvMove, movesOD.getFirst());
-    //
-    //    int lastCapture = 0;
-    //    // we start with 1 as 0 could be noncapturing pvMove
-    //    for (int i = 1; i < movesOD.size(); i++) {
-    //      // skip the captures
-    //      if (!Move.getTarget(movesOD.get(i)).equals(Piece.NOPIECE)) {
-    //        lastCapture = i;
-    //        continue;
-    //      }
-    //      // now we should have our two killers
-    //      assertTrue(i == lastCapture + 1 && movesOD.get(i) == killer1 && movesOD.get(i + 1) ==
-    //      killer2
-    //                 && movesOD.get(i + 2) == 247578640 // queen promotion
-    //                );
-    //      break;
-    //    }
-    //
-    //    for (int move : movesOD) {
-    //      System.out.printf("%-20s %d (%d) %n", Move.toString(move), move,
-    //                        Evaluation.getPositionValue(position, move));
-    //    }
-
-  }
-
-  /**
-   * Tests the timing
-   */
-  @Test
-  @Disabled
-  public void testTimingOnDemand() {
-
-    int ITERATIONS = 0;
-    int DURATION = 1;
-
-    MoveGenerator moveGenerator = new MoveGenerator();
-    Position board = null;
-    Instant start = null;
-
-    int i = 0;
-    ArrayList<String> fens = getFENs();
-    for (String fen : fens) {
-      board = new Position(fen);
-
-      // Pseudo Legal Moves
-      MoveList moves;
-      start = Instant.now();
-      while (true) {
-        ITERATIONS++;
-        moveGenerator.setPosition(board);
-        moves = moveGenerator.getPseudoLegalMoves();
-        if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) {
-          break;
-        }
-      }
-      //System.out.println(moves);
-      System.out.println(
-        String.format("   PseudoLegal: %,10d runs/s for %s (%,d)", ITERATIONS / DURATION,
-                      fens.get(i), moves.size()));
-
-      // Legal Moves On Demand
-      ITERATIONS = 0;
-      int moveCounter = 0;
-      start = Instant.now();
-      while (true) {
-        ITERATIONS++;
-        moveCounter = 0;
-        moveGenerator.setPosition(board);
-        int move;
-        while ((move = moveGenerator.getNextPseudoLegalMove(false)) != Move.NOMOVE) {
-          moveCounter++;
-        }
-        if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) {
-          break;
-        }
-      }
-      System.out.println(
-        String.format("OD PseudoLegal: %,10d runs/s for %s (%,d)", ITERATIONS / DURATION,
-                      fens.get(i), moveCounter));
-
-      // Legal Moves
-      ITERATIONS = 0;
-      start = Instant.now();
-      while (true) {
-        ITERATIONS++;
-        moveGenerator.setPosition(board);
-        moves = moveGenerator.getLegalMoves();
-        if (Duration.between(start, Instant.now()).getSeconds() >= DURATION) {
-          break;
-        }
-      }
-      System.out.println(
-        String.format("         Legal: %,10d runs/s for %s (%,d)", ITERATIONS / DURATION,
-                      fens.get(i), moves.size()));
-      i++;
-    }
   }
 
   @Test
   @Disabled
-  public void testTiming() {
+  public void sizeOfSearchTreeTest() throws ExecutionException, InterruptedException {
 
-    ArrayList<String> result = new ArrayList<>();
+    final int NO_OF_TESTS = 5; //  Integer.MAX_VALUE;
+    final int START_NO = 0;
+    final int DEPTH = 6;
+    HASH_SIZE = 1024;
+    THREADS = 1;
 
-    MoveList m1 = new MoveList();
-    MoveList m2 = new MoveList();
-    final Position position =
-      new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3 0 113");
+    LOG.info("Start SIZE Test for depth {}", DEPTH);
+    List<String> fens = getFENs();
+    List<Result> results = new ArrayList<>();
 
-    int ROUNDS = 5;
-    int ITERATIONS = 25;
-    int REPETITIONS = 20000;
+    // ForkJoinPool allows to limit the number of threads for lambda .parallel
+    // to individual values.
+    ForkJoinPool forkJoinPool = new ForkJoinPool(THREADS);
+    forkJoinPool.submit(() -> fens.parallelStream().skip(START_NO)
+                                  .limit(NO_OF_TESTS)
+                                  .forEach(fen -> results.add(featureMeasurements(DEPTH, fen))))
+                .get();
 
-    for (int round = 0; round < ROUNDS; round++) {
-      long start = 0, end = 0, sum = 0;
-
-      System.out.printf("Running round %d of Timing Test Test 1 vs. Test 2%n", round);
-      System.gc();
-
-      int i = 0;
-      while (++i <= ITERATIONS) {
-        start = System.nanoTime();
-        for (int j = 0; j < REPETITIONS; j++) {
-          m1 = test1(position);
-        }
-        end = System.nanoTime();
-        sum += end - start;
-      }
-      float avg1 = ((float) sum / ITERATIONS) / 1e9f;
-
-      i = 0;
-      sum = 0;
-      while (++i <= ITERATIONS) {
-        start = System.nanoTime();
-        for (int j = 0; j < REPETITIONS; j++) {
-          m2 = test2(position);
-        }
-        end = System.nanoTime();
-        sum += end - start;
-      }
-      float avg2 = ((float) sum / ITERATIONS) / 1e9f;
-
-      result.add(String.format("Round %d Test 1 avg: %,.3f sec", round, avg1));
-      result.add(String.format("Round %d Test 2 avg: %,.3f sec", round, avg2));
-    }
-
+    // Print result
     System.out.println();
-    System.out.printf("%-20s %-20s %n", "Test 1", "Test 2");
-    for (int i = 0; i < m1.size(); i++) {
-      System.out.printf("%-20s %-20s %n", Move.toString(m1.get(i)), Move.toString(m2.get(i)));
-    }
-
+    System.out.printf("################## RESULTS for depth %d ##########################%n",
+                      DEPTH);
     System.out.println();
-    for (String s : result) {
-      System.out.println(s);
+    System.out.printf("%-12s | %6s | %8s | %15s | %12s | %12s | %s | %s %n", "Test Name", "Move",
+                      "Value", "Nodes", "Nps", "Time", "PV", "Fen");
+    System.out.println("-----------------------------------------------------------------------"
+                       + "-----------------------------------------------------------------------");
+
+    Map<String, Long> sumNodes = new LinkedHashMap<>();
+    Map<String, Long> sumNps = new LinkedHashMap<>();
+    Map<String, Long> sumTime = new LinkedHashMap<>();
+
+    for (Result result : results) {
+      int lastMove = Move.NOMOVE;
+      long lastNodes = 0;
+      for (SingleTest test : result.tests) {
+        long oldNodes = sumNodes.get(test.name) == null ? 0 : sumNodes.get(test.name);
+        long oldNps = sumNps.get(test.name) == null ? 0 : sumNps.get(test.name);
+        long oldTime = sumTime.get(test.name) == null ? 0 : sumTime.get(test.name);
+        sumNodes.put(test.name, oldNodes + test.nodes);
+        sumNps.put(test.name, oldNps + test.nps);
+        sumTime.put(test.name, oldTime + test.time);
+
+        String changeFlagMove = "";
+        if (lastMove != Move.NOMOVE && test.move != lastMove) changeFlagMove = ">";
+        lastMove = test.move;
+
+        String changeFlagNodes = "";
+        if (lastNodes != 0) {
+          if (test.nodes > lastNodes) changeFlagNodes = "^";
+          if (test.nodes == lastNodes) changeFlagNodes = "=";
+        }
+        lastNodes = test.nodes;
+
+        // @formatter:off
+        System.out.printf("%-12s | %1s%5s | %8s | %1s%,14d | %,12d | %,12d | %s | %s %n",
+                          test.name,
+                          changeFlagMove,
+                          Move.toSimpleString(test.move),
+                          test.value,
+                          changeFlagNodes,
+                          test.nodes,
+                          test.nps,
+                          test.time,
+                          test.pv,
+                          result.fen);
+        // @formatter:on
+      }
+      System.out.println();
     }
+    System.out.println("-----------------------------------------------------------------------"
+                       + "-----------------------------------------------------------------------");
+    System.out.println();
+    long lastNodes = 0;
+    long lastTime = 0;
+    for (String key : sumNodes.keySet()) {
+
+      String changeFlagNodes = "";
+      if (lastNodes != 0) {
+        if (sumNodes.get(key) > lastNodes) changeFlagNodes = "^";
+        else if (sumNodes.get(key) == lastNodes) changeFlagNodes = "=";
+      }
+      lastNodes = sumNodes.get(key);
+
+      String changeFlagTime = "";
+      if (lastTime != 0) {
+        if (sumTime.get(key) > lastTime) changeFlagTime = "^";
+        else if (sumTime.get(key) == lastTime) changeFlagTime = "=";
+      }
+      lastTime = sumTime.get(key);
+
+      System.out.printf("Test: %-12s  Nodes: %1s%,15d  Nps: %,15d  Time: %1s%,15d %n", key,
+                        changeFlagNodes, sumNodes.get(key), sumNps.get(key), changeFlagTime,
+                        sumTime.get(key));
+    }
+    System.out.println();
 
   }
 
-  private MoveList test1(final Position position) {
+  private Result featureMeasurements(final int depth, final String fen) {
 
-    final MoveGenerator mG = new MoveGenerator(position);
-    mG.SORT_MOVES = false;
-    mG.SORT_CAPTURING_MOVES = true;
+    FrankyEngine engine = new FrankyEngine();
+    Search search = engine.getSearch();
+    search.config.USE_BOOK = false;
+    search.setHashSize(HASH_SIZE);
 
-    final MoveList killerList = new MoveList();
-    killerList.add(67320564);
-    killerList.add(67318516);
-    mG.setKillerMoves(killerList);
+    Result result = new Result(fen);
 
-    return mG.getPseudoLegalMoves();
+    Position position = new Position(fen);
+    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false);
+
+    // turn off all optimizations to get a reference value of the search tree size
+    search.config.USE_ALPHABETA_PRUNING = false;
+    search.config.USE_PVS = false;
+    search.config.USE_PVS_ORDERING = false;
+    search.config.USE_KILLER_MOVES = false;
+    search.config.USE_ASPIRATION_WINDOW = false;
+    search.config.USE_MTDf = false;
+
+    search.config.USE_TRANSPOSITION_TABLE = false;
+    search.config.USE_TT_ROOT = false;
+
+    search.config.USE_MDP = false;
+    search.config.USE_MPP = false;
+
+    search.config.USE_RFP = false;
+    search.config.USE_NMP = false;
+    search.config.USE_RAZOR_PRUNING = false;
+
+    search.config.USE_IID = false;
+
+    search.config.USE_EXTENSIONS = false;
+
+    search.config.USE_LIMITED_RAZORING = false;
+    search.config.USE_EXTENDED_FUTILITY_PRUNING = false;
+    search.config.USE_FUTILITY_PRUNING = false;
+    search.config.USE_LMP = false;
+    search.config.USE_LMR = false;
+
+    search.config.USE_QUIESCENCE = false;
+    search.config.USE_QFUTILITY_PRUNING = false;
+    search.config.USE_SEE = false;
+
+    // pure MiniMax
+    search.config.USE_QUIESCENCE = true;
+    //result.tests.add(measureTreeSize(search, position, searchMode, "MINIMAX+QS", true));
+    //
+    //    search.config.USE_SEE = true;
+    //    result.tests.add(measureTreeSize(search, position, searchMode, "+SEE", true));
+
+    // AlphaBeta with TT and SORT
+    search.config.USE_ALPHABETA_PRUNING = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "ALPHABETA", true));
+
+    // MTDf - just for debugging for now
+    //    search.config.USE_MTDf = true;
+    //    search.config.MTDf_START_DEPTH = 2;
+    //    result.tests.add(measureTreeSize(search, position, searchMode, "MTDf", true));
+    //    search.config.USE_MTDf = false;
+
+    // PVS
+    search.config.USE_PVS = true;
+    search.config.USE_PVS_ORDERING = true;
+    search.config.USE_KILLER_MOVES = true;
+    search.config.NO_KILLER_MOVES = 2;
+    result.tests.add(measureTreeSize(search, position, searchMode, "PVS", true));
+
+    search.config.USE_TRANSPOSITION_TABLE = true;
+    search.config.USE_TT_ROOT = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "TT", true));
+
+    // Aspiration
+    search.config.USE_ASPIRATION_WINDOW = true;
+    search.config.ASPIRATION_START_DEPTH = 2;
+    result.tests.add(measureTreeSize(search, position, searchMode, "ASPIRATION", true));
+
+    // Minor Pruning
+    search.config.USE_MDP = true;
+    search.config.USE_MPP = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "MDP_MPP", true));
+
+    // Reverse Futility Pruning
+    search.config.USE_RFP = true;
+    search.config.RFP_MARGIN = 300;
+    result.tests.add(measureTreeSize(search, position, searchMode, "RFP", true));
+
+    // Null move pruning
+    search.config.USE_NMP = true;
+    search.config.NMP_DEPTH = 3;
+    search.config.USE_VERIFY_NMP = true;
+    search.config.NMP_VERIFICATION_DEPTH = 3;
+    result.tests.add(measureTreeSize(search, position, searchMode, "NMP", true));
+
+    // Razor reduction
+    search.config.USE_RAZOR_PRUNING = true;
+    search.config.RAZOR_DEPTH = 3;
+    search.config.RAZOR_MARGIN = 600;
+    result.tests.add(measureTreeSize(search, position, searchMode, "RAZOR", true));
+
+    // Internal Iterative Deepening
+    search.config.USE_IID = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "IID", true));
+
+    // Search extensions
+    search.config.USE_EXTENSIONS = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "EXTENSION", true));
+
+    // Futility Pruning
+    search.config.USE_FUTILITY_PRUNING = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "FP", true));
+    search.config.USE_QFUTILITY_PRUNING = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "QFP", true));
+    search.config.USE_LIMITED_RAZORING = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "LR", true));
+    search.config.USE_EXTENDED_FUTILITY_PRUNING = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "EFP", true));
+
+    //    // Late Move Pruning
+    //    search.config.USE_LMP = true;
+    //    search.config.LMP_MIN_DEPTH = 3;
+    //    search.config.LMP_MIN_MOVES = 6;
+    //    result.tests.add(measureTreeSize(search, position, searchMode, "LMP", true));
+
+    // Late Move Reduction
+    search.config.USE_LMR = true;
+    search.config.LMR_MIN_DEPTH = 2;
+    search.config.LMR_MIN_MOVES = 3;
+    search.config.LMR_REDUCTION = 1;
+    result.tests.add(measureTreeSize(search, position, searchMode, "LMR", true));
+
+    search.config.USE_SEE = true;
+    result.tests.add(measureTreeSize(search, position, searchMode, "+SEE", true));
+
+    return result;
 
   }
 
-  private MoveList test2(final Position position) {
+  private SingleTest measureTreeSize(Search search, final Position position,
+                                     final SearchMode searchMode, final String feature,
+                                     final boolean clearTT) {
 
-    final MoveGenerator mG = new MoveGenerator(position);
-    mG.SORT_MOVES = true;
-    mG.SORT_CAPTURING_MOVES = true;
+    System.out.println("Testing. " + feature);
+    if (clearTT) search.clearHashTables();
+    search.startSearch(position, searchMode);
+    search.waitWhileSearching();
 
-    final MoveList killerList = new MoveList();
-    killerList.add(67320564);
-    killerList.add(67318516);
-    mG.setKillerMoves(killerList);
+    SingleTest test = new SingleTest();
+    test.name = feature;
+    test.nodes = search.getSearchCounter().nodesVisited;
+    test.move = search.getLastSearchResult().bestMove;
+    test.value = search.getLastSearchResult().resultValue;
+    test.nps = (int) ((1e3 * search.getSearchCounter().nodesVisited) / (
+      search.getSearchCounter().lastSearchTime + 1));
+    test.time = search.getSearchCounter().lastSearchTime;
+    test.pv = search.getPrincipalVariationString(0);
 
-    return mG.getPseudoLegalMoves();
-  }
+    return test;
 
-  @Test
-  @Disabled
-  public void showSize() {
-    System.out.println(VM.current().details());
-    System.out.println(ClassLayout.parseClass(MoveGenerator.class).toPrintable());
   }
 
   ArrayList<String> getFENs() {
 
     ArrayList<String> fen = new ArrayList<>();
+
+    fen.add(Position.STANDARD_BOARD_FEN);
+    fen.add("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    fen.add("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -");
+    fen.add("r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -");
+    fen.add("1r1r2k1/2p1qp1p/6p1/ppQB1b2/5Pn1/2R1P1P1/PP5P/R1B3K1 b - -");
+    fen.add("2q1r1k1/1ppb4/r2p1Pp1/p4n1p/2P1n3/5NPP/PP3Q1K/2BRRB2 w - -");
+    fen.add("2r4k/pB4bp/6p1/6q1/1P1n4/2N5/P4PPP/2R1Q1K1 b - -");
+    fen.add("6k1/1R4pp/2p5/8/P1rNp3/6Pb/4PK2/8 w - -");
+    fen.add("6K1/n1P2N1p/6pr/b1pp3b/n2Bp1k1/1R2R1Pp/3p1P2/2qN1B2 w - -");
+    fen.add("2b1rk2/r6p/1pP1p1p1/p2pNnR1/5Q2/P1B4q/1PP2P1P/1K4R1 w - -");
+    fen.add("8/8/8/p7/8/8/R6p/2K2Rbk w - -");
+    fen.add("8/8/8/4N3/2R5/4k3/8/5K2 w - -");
+    fen.add("2r1r1k1/pb1n1pp1/1p1qpn1p/4N1B1/2PP4/3B4/P2Q1PPP/3RR1K1 w - - ");
     fen.add("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3");
     fen.add("R6R/3Q4/1Q4Q1/4Q3/2Q4Q/Q4Q2/pp1Q4/kBNN1KB1 w - - 0 1"); // 218 moves to make
+
     fen.add("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 b kq e3");
     fen.add("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 w kq -");
     fen.add("8/1P6/6k1/8/8/8/p1K5/8 w - -");
@@ -1137,6 +744,6 @@ public class MoveGeneratorTest {
     // repeat the first
     fen.add("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/6R1/pbp2PPP/1R4K1 b kq e3");
     return fen;
-
   }
+
 }
