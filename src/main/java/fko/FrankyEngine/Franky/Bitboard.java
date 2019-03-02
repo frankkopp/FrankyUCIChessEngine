@@ -881,6 +881,7 @@ public class Bitboard {
   public static int getLSB(long bitboard) {
     return Long.numberOfTrailingZeros(bitboard);
   }
+
   /**
    * Finds the left most (in Java the Most Significant Bit from the left) set bit
    * in a bitboard and returns the according index.

@@ -188,7 +188,7 @@ public class TimingTests {
       return null;
     };
 
-    timingTest(5, 50, 50_000_000, f1, f2, f3, f4);
+    timingTest(5, 50, 5_000_000, f1, f2, f3, f4);
   }
 
   private void timingTest(final int rounds, final int iterations, final int repetitions,
