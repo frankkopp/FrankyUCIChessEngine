@@ -1179,7 +1179,7 @@ public class PositionTest {
         else hitSquare = Long.numberOfTrailingZeros(Long.highestOneBit(rayHits));
         // TODO TEST & DEBUG
         attacks |=
-          Bitboard.rays[d][sIdx] ^ Bitboard.rays[d][Square.getFirstSquare(hitSquare).ordinal()];
+          Bitboard.rays[d][sIdx] ^ Bitboard.rays[d][Square.getLSBSquare(hitSquare).ordinal()];
       }
     }
     return attacks;

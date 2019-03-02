@@ -694,7 +694,7 @@ public class MoveGenerator {
       if (activePlayer.isWhite()) {
         // normal pawn captures to the west
         tmpCaptures |= shiftBitboard(NW, myPawns) & oppPieces;
-        while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpCaptures)) != -1) {
           if (Rank.index2rank(sqx) < 7) { // no promotion
             capturingMoves.add(Move.createMove(MoveType.NORMAL,
                                                sqx + SE,
@@ -706,11 +706,11 @@ public class MoveGenerator {
           else {
             createPromotionMoves(sqx, capturingMoves, SE, Piece.WHITE_PAWN, position.getPiece(sqx));
           }
-          tmpCaptures = removeSquare(tmpCaptures, sqx);
+          tmpCaptures = Bitboard.removeMSB(tmpCaptures);
         }
         // normal pawn captures to the east
         tmpCaptures |= shiftBitboard(NE, myPawns) & oppPieces;
-        while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpCaptures)) != -1) {
           if (Rank.index2rank(sqx) < 7) { // no promotion
             capturingMoves.add(Move.createMove(MoveType.NORMAL,
                                                sqx + SW,
@@ -722,13 +722,13 @@ public class MoveGenerator {
           else {
             createPromotionMoves(sqx, capturingMoves, SW, Piece.WHITE_PAWN, position.getPiece(sqx));
           }
-          tmpCaptures = removeSquare(tmpCaptures, sqx);
+          tmpCaptures = Bitboard.removeMSB(tmpCaptures);
         }
       }
       else { // black
         // normal pawn captures to the west
         tmpCaptures |= shiftBitboard(SW, myPawns) & oppPieces;
-        while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpCaptures)) != -1) {
           if (Rank.index2rank(sqx) > 0) { // no promotion
             capturingMoves.add(Move.createMove(MoveType.NORMAL,
                                                sqx + NE,
@@ -740,11 +740,11 @@ public class MoveGenerator {
           else { // promotion
             createPromotionMoves(sqx, capturingMoves, NE, Piece.BLACK_PAWN, position.getPiece(sqx));
           }
-          tmpCaptures = removeSquare(tmpCaptures, sqx);
+          tmpCaptures = Bitboard.removeMSB(tmpCaptures);
         }
         // normal pawn captures to the east
         tmpCaptures |= shiftBitboard(SE, myPawns) & oppPieces;
-        while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpCaptures)) != -1) {
           if (Rank.index2rank(sqx) > 0) { // no promotion
             capturingMoves.add(Move.createMove(MoveType.NORMAL,
                                                sqx + NW,
@@ -756,7 +756,7 @@ public class MoveGenerator {
           else { // promotion
             createPromotionMoves(sqx, capturingMoves, NW, Piece.BLACK_PAWN, position.getPiece(sqx));
           }
-          tmpCaptures = removeSquare(tmpCaptures, sqx);
+          tmpCaptures = Bitboard.removeMSB(tmpCaptures);
         }
       }
 
@@ -767,7 +767,7 @@ public class MoveGenerator {
           // left
           tmpCaptures = shiftBitboard(SW, enPassantSquare.bitboard()) & myPawns;
           if (tmpCaptures != 0) {
-            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            sqx = 63 - Bitboard.getMSB(tmpCaptures);
             capturingMoves.add(Move.createMove(MoveType.ENPASSANT,
                                                sqx,
                                                sqx + NE,
@@ -778,7 +778,7 @@ public class MoveGenerator {
           // right
           tmpCaptures = shiftBitboard(SE, enPassantSquare.bitboard()) & myPawns;
           if (tmpCaptures != 0) {
-            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            sqx = 63 - Bitboard.getMSB(tmpCaptures);
             capturingMoves.add(Move.createMove(MoveType.ENPASSANT,
                                                sqx,
                                                sqx + NW,
@@ -791,7 +791,7 @@ public class MoveGenerator {
           // left
           tmpCaptures = shiftBitboard(NW, enPassantSquare.bitboard()) & myPawns;
           if (tmpCaptures != 0) {
-            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            sqx = 63 - Bitboard.getMSB(tmpCaptures);
             capturingMoves.add(Move.createMove(MoveType.ENPASSANT,
                                                sqx,
                                                sqx + SE,
@@ -802,7 +802,7 @@ public class MoveGenerator {
           // right
           tmpCaptures = shiftBitboard(NE, enPassantSquare.bitboard()) & myPawns;
           if (tmpCaptures != 0) {
-            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            sqx = 63 - Bitboard.getMSB(tmpCaptures);
             capturingMoves.add(Move.createMove(MoveType.ENPASSANT,
                                                sqx,
                                                sqx + SW,
@@ -832,17 +832,17 @@ public class MoveGenerator {
         long tmpMovesDouble = shiftBitboard(N, tmpMoves & Rank.r3.bitBoard)
           & ~position.getAllOccupiedBitboard();
         // double pawn steps
-        while ((sqx = Square.getFirstSquareIndex(tmpMovesDouble)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpMovesDouble)) != -1) {
           nonCapturingMoves.add(Move.createMove(MoveType.PAWNDOUBLE,
                                                 sqx + S + S,
                                                 sqx,
                                                 Piece.WHITE_PAWN,
                                                 Piece.NOPIECE,
                                                 Piece.NOPIECE));
-          tmpMovesDouble = removeSquare(tmpMovesDouble, sqx);
+          tmpMovesDouble = Bitboard.removeMSB(tmpMovesDouble);
         }
         // single pawn steps
-        while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpMoves)) != -1) {
           if (Rank.index2rank(sqx) < 7) { // no promotion
             nonCapturingMoves.add(Move.createMove(MoveType.NORMAL,
                                                   sqx + S,
@@ -854,7 +854,7 @@ public class MoveGenerator {
           else { // promotion
             createPromotionMoves(sqx, nonCapturingMoves, S, Piece.WHITE_PAWN, Piece.NOPIECE);
           }
-          tmpMoves = removeSquare(tmpMoves, sqx);
+          tmpMoves = Bitboard.removeMSB(tmpMoves);
         }
       }
       else {
@@ -863,17 +863,17 @@ public class MoveGenerator {
         long tmpMovesDouble = shiftBitboard(S, tmpMoves & Rank.r6.bitBoard)
           & ~position.getAllOccupiedBitboard();
         // double pawn steps
-        while ((sqx = Square.getFirstSquareIndex(tmpMovesDouble)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpMovesDouble)) != -1) {
           nonCapturingMoves.add(Move.createMove(MoveType.PAWNDOUBLE,
                                                 sqx + N + N,
                                                 sqx,
                                                 Piece.BLACK_PAWN,
                                                 Piece.NOPIECE,
                                                 Piece.NOPIECE));
-          tmpMovesDouble = removeSquare(tmpMovesDouble, sqx);
+          tmpMovesDouble = Bitboard.removeMSB(tmpMovesDouble);
         }
         // single pawn steps
-        while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpMoves)) != -1) {
           if (Rank.index2rank(sqx) > 0) { // no promotion
             nonCapturingMoves.add(Move.createMove(MoveType.NORMAL,
                                                   sqx + N,
@@ -885,7 +885,7 @@ public class MoveGenerator {
           else { // promotion
             createPromotionMoves(sqx, nonCapturingMoves, N, Piece.BLACK_PAWN, Piece.NOPIECE);
           }
-          tmpMoves = removeSquare(tmpMoves, sqx);
+          tmpMoves = Bitboard.removeMSB(tmpMoves);
         }
       }
     }
@@ -915,7 +915,7 @@ public class MoveGenerator {
     generateMoves(activePlayer.isWhite()
                   ? Piece.WHITE_KING
                   : Piece.BLACK_KING,
-                  Square.getFirstSquareIndex(
+                  63 - Bitboard.getMSB(
                     position.getPiecesBitboards(activePlayer, PieceType.KING)),
                   Bitboard.kingAttacks);
   }
@@ -926,9 +926,9 @@ public class MoveGenerator {
     // get all pieces for the next player...
     long tmpKnights = position.getPiecesBitboards(activePlayer, PieceType.KNIGHT);
     // .. and loop over them to create moves
-    while ((sqx = Square.getFirstSquareIndex(tmpKnights)) != NOSQUARE.ordinal()) {
+    while ((sqx = 63 - Bitboard.getMSB(tmpKnights)) != -1) {
       generateMoves(piece, sqx, Bitboard.knightAttacks);
-      tmpKnights = removeSquare(tmpKnights, sqx);
+      tmpKnights = Bitboard.removeMSB(tmpKnights);
     }
   }
 
@@ -939,20 +939,20 @@ public class MoveGenerator {
     // captures
     if ((genMode & GEN_CAPTURES) > 0) {
       tmpMoves = moves[sqxFrom] & position.getOccupiedBitboards(activePlayer.inverse());
-      while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+      while ((sqx = 63 - Bitboard.getMSB(tmpMoves)) != -1) {
         capturingMoves.add(Move.createMove(MoveType.NORMAL, sqxFrom, sqx, piece,
                                            position.getPiece(sqx), Piece.NOPIECE));
-        tmpMoves = removeSquare(tmpMoves, sqx);
+        tmpMoves = Bitboard.removeMSB(tmpMoves);
       }
     }
 
     // non captures
     if ((genMode & GEN_NONCAPTURES) > 0) {
       tmpMoves = moves[sqxFrom] & ~position.getAllOccupiedBitboard();
-      while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+      while ((sqx = 63 - Bitboard.getMSB(tmpMoves)) != -1) {
         nonCapturingMoves.add(Move.createMove(MoveType.NORMAL, sqxFrom, sqx, piece,
                                               Piece.NOPIECE, Piece.NOPIECE));
-        tmpMoves = removeSquare(tmpMoves, sqx);
+        tmpMoves = Bitboard.removeMSB(tmpMoves);
       }
     }
   }
@@ -965,12 +965,12 @@ public class MoveGenerator {
     // get all pieces...
     long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.BISHOP);
     // ...and loop over them to create possbile moves
-    while ((sqx = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+    while ((sqx = 63 - Bitboard.getMSB(tmpPieces)) != -1) {
       // get all possible moves from pre-computed lists
       tmpMoves = Bitboard.getSlidingMovesDiagUp(sqx, allOccupiedBitboard)
         | Bitboard.getSlidingMovesDiagDown(sqx, allOccupiedBitboard);
       generateSlidingMoves(piece, sqx, tmpMoves);
-      tmpPieces = removeSquare(tmpPieces, sqx);
+      tmpPieces = Bitboard.removeMSB(tmpPieces);
     }
   }
 
@@ -980,11 +980,11 @@ public class MoveGenerator {
     int sqx;
     long tmpMoves;
     long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.ROOK);
-    while ((sqx = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+    while ((sqx = 63 - Bitboard.getMSB(tmpPieces)) != -1) {
       tmpMoves = Bitboard.getSlidingMovesFile(sqx, allOccupiedBitboard)
         | Bitboard.getSlidingMovesRank(sqx, allOccupiedBitboard);
       generateSlidingMoves(piece, sqx, tmpMoves);
-      tmpPieces = removeSquare(tmpPieces, sqx);
+      tmpPieces = Bitboard.removeMSB(tmpPieces);
     }
   }
 
@@ -994,13 +994,13 @@ public class MoveGenerator {
     int sqx;
     long tmpMoves;
     long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.QUEEN);
-    while ((sqx = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+    while ((sqx = 63 - Bitboard.getMSB(tmpPieces)) != -1) {
       tmpMoves = Bitboard.getSlidingMovesDiagUp(sqx, allOccupiedBitboard)
         | Bitboard.getSlidingMovesDiagDown(sqx, allOccupiedBitboard)
         | Bitboard.getSlidingMovesFile(sqx, allOccupiedBitboard)
         | Bitboard.getSlidingMovesRank(sqx, allOccupiedBitboard);
       generateSlidingMoves(piece, sqx, tmpMoves);
-      tmpPieces = removeSquare(tmpPieces, sqx);
+      tmpPieces = Bitboard.removeMSB(tmpPieces);
     }
   }
 
@@ -1011,20 +1011,20 @@ public class MoveGenerator {
     // captures
     if ((genMode & GEN_CAPTURES) > 0) {
       tmpMoves = moves & position.getOccupiedBitboards(activePlayer.inverse());
-      while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+      while ((sqx = 63 - Bitboard.getMSB(tmpMoves)) != -1) {
         capturingMoves.add(Move.createMove(MoveType.NORMAL, sqxFrom, sqx, piece,
                                            position.getPiece(sqx), Piece.NOPIECE));
-        tmpMoves = removeSquare(tmpMoves, sqx);
+        tmpMoves = Bitboard.removeMSB(tmpMoves);
       }
     }
 
     // non captures
     if ((genMode & GEN_NONCAPTURES) > 0) {
       tmpMoves = moves & ~position.getAllOccupiedBitboard();
-      while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+      while ((sqx = 63 - Bitboard.getMSB(tmpMoves)) != -1) {
         nonCapturingMoves.add(Move.createMove(MoveType.NORMAL, sqxFrom, sqx, piece,
                                               Piece.NOPIECE, Piece.NOPIECE));
-        tmpMoves = removeSquare(tmpMoves, sqx);
+        tmpMoves = Bitboard.removeMSB(tmpMoves);
       }
     }
   }
@@ -1152,7 +1152,7 @@ public class MoveGenerator {
    */
   private boolean findKingMove() {
     final Piece piece = activePlayer.isWhite() ? Piece.WHITE_KING : Piece.BLACK_KING;
-    final int sqxFrom = Square.getFirstSquareIndex(
+    final int sqxFrom = 63 - Bitboard.getMSB(
       position.getPiecesBitboards(activePlayer, PieceType.KING));
 
     int sqxTo; // square index
@@ -1162,14 +1162,14 @@ public class MoveGenerator {
     // non captures
     if ((genMode & GEN_NONCAPTURES) > 0) {
       tmpMoves = pieceAttacks[sqxFrom] & ~position.getAllOccupiedBitboard();
-      while ((sqxTo = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+      while ((sqxTo = 63 - Bitboard.getMSB(tmpMoves)) != -1) {
         if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                         sqxFrom,
                                         sqxTo,
                                         piece,
                                         Piece.NOPIECE,
                                         Piece.NOPIECE))) return true;
-        tmpMoves = removeSquare(tmpMoves, sqxTo);
+        tmpMoves = Bitboard.removeBit(tmpMoves, sqxTo);
       }
     }
 
@@ -1177,14 +1177,14 @@ public class MoveGenerator {
     if ((genMode & GEN_CAPTURES) > 0) {
       tmpMoves = pieceAttacks[sqxFrom] & position.getOccupiedBitboards(
         activePlayer.inverse());
-      while ((sqxTo = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+      while ((sqxTo = 63 - Bitboard.getMSB(tmpMoves)) != -1) {
         if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                         sqxFrom,
                                         sqxTo,
                                         piece,
                                         position.getPiece(sqxTo),
                                         Piece.NOPIECE))) return true;
-        tmpMoves = removeSquare(tmpMoves, sqxTo);
+        tmpMoves = Bitboard.removeBit(tmpMoves, sqxTo);
       }
     }
     // no legal move found
@@ -1220,28 +1220,28 @@ public class MoveGenerator {
         // pawns - check step one to unoccupied squares
         tmpMoves = shiftBitboard(N, myPawns) & ~position.getAllOccupiedBitboard();
         // single pawn steps
-        while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpMoves)) != -1) {
           if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                           sqx + S,
                                           sqx,
                                           Piece.WHITE_PAWN,
                                           Piece.NOPIECE,
                                           Piece.NOPIECE))) return true;
-          tmpMoves = removeSquare(tmpMoves, sqx);
+          tmpMoves = Bitboard.removeMSB(tmpMoves);
         }
       }
       else {
         // pawn doubles - check step one and two unoccupied
         tmpMoves = shiftBitboard(S, myPawns) & ~position.getAllOccupiedBitboard();
         // single pawn steps
-        while ((sqx = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpMoves)) != -1) {
           if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                           sqx + N,
                                           sqx,
                                           Piece.BLACK_PAWN,
                                           Piece.NOPIECE,
                                           Piece.NOPIECE))) return true;
-          tmpMoves = removeSquare(tmpMoves, sqx);
+          tmpMoves = Bitboard.removeMSB(tmpMoves);
         }
       }
     }
@@ -1264,49 +1264,49 @@ public class MoveGenerator {
       if (activePlayer.isWhite()) {
         // normal pawn captures to the west
         tmpCaptures |= shiftBitboard(NW, myPawns) & oppPieces;
-        while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpCaptures)) != -1) {
           if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                           sqx + SE,
                                           sqx,
                                           Piece.WHITE_PAWN,
                                           position.getPiece(sqx),
                                           Piece.NOPIECE))) return true;
-          tmpCaptures = removeSquare(tmpCaptures, sqx);
+          tmpCaptures = Bitboard.removeMSB(tmpCaptures);
         }
         // normal pawn captures to the east
         tmpCaptures |= shiftBitboard(NE, myPawns) & oppPieces;
-        while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpCaptures)) != -1) {
           if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                           sqx + SW,
                                           sqx,
                                           Piece.WHITE_PAWN,
                                           position.getPiece(sqx),
                                           Piece.NOPIECE))) return true;
-          tmpCaptures = removeSquare(tmpCaptures, sqx);
+          tmpCaptures = Bitboard.removeMSB(tmpCaptures);
         }
       }
       else { // black
         // normal pawn captures to the west
         tmpCaptures |= shiftBitboard(SW, myPawns) & oppPieces;
-        while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpCaptures)) != -1) {
           if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                           sqx + NE,
                                           sqx,
                                           Piece.BLACK_PAWN,
                                           position.getPiece(sqx),
                                           Piece.NOPIECE))) return true;
-          tmpCaptures = removeSquare(tmpCaptures, sqx);
+          tmpCaptures = Bitboard.removeMSB(tmpCaptures);
         }
         // normal pawn captures to the east
         tmpCaptures |= shiftBitboard(SE, myPawns) & oppPieces;
-        while ((sqx = Square.getFirstSquareIndex(tmpCaptures)) != NOSQUARE.ordinal()) {
+        while ((sqx = 63 - Bitboard.getMSB(tmpCaptures)) != -1) {
           if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                           sqx + NW,
                                           sqx,
                                           Piece.BLACK_PAWN,
                                           position.getPiece(sqx),
                                           Piece.NOPIECE))) return true;
-          tmpCaptures = removeSquare(tmpCaptures, sqx);
+          tmpCaptures = Bitboard.removeMSB(tmpCaptures);
         }
       }
 
@@ -1317,7 +1317,7 @@ public class MoveGenerator {
           // left
           tmpCaptures = shiftBitboard(SW, enPassantSquare.bitboard()) & myPawns;
           if (tmpCaptures != 0) {
-            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            sqx = 63 - Bitboard.getMSB(tmpCaptures);
             if (isLegalMove(Move.createMove(MoveType.ENPASSANT,
                                             sqx,
                                             sqx + NE,
@@ -1328,7 +1328,7 @@ public class MoveGenerator {
           // right
           tmpCaptures = shiftBitboard(SE, enPassantSquare.bitboard()) & myPawns;
           if (tmpCaptures != 0) {
-            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            sqx = 63 - Bitboard.getMSB(tmpCaptures);
             if (isLegalMove(Move.createMove(MoveType.ENPASSANT,
                                             sqx,
                                             sqx + NW,
@@ -1341,7 +1341,7 @@ public class MoveGenerator {
           // left
           tmpCaptures = shiftBitboard(NW, enPassantSquare.bitboard()) & myPawns;
           if (tmpCaptures != 0) {
-            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            sqx = 63 - Bitboard.getMSB(tmpCaptures);
             if (isLegalMove(Move.createMove(MoveType.ENPASSANT,
                                             sqx,
                                             sqx + SE,
@@ -1352,7 +1352,7 @@ public class MoveGenerator {
           // right
           tmpCaptures = shiftBitboard(NE, enPassantSquare.bitboard()) & myPawns;
           if (tmpCaptures != 0) {
-            sqx = Square.getFirstSquareIndex(tmpCaptures);
+            sqx = 63 - Bitboard.getMSB(tmpCaptures);
             if (isLegalMove(Move.createMove(MoveType.ENPASSANT,
                                             sqx,
                                             sqx + SW,
@@ -1380,19 +1380,19 @@ public class MoveGenerator {
     long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.KNIGHT);
     long tmpMoves;
 
-    while ((sqxFrom = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+    while ((sqxFrom = 63 - Bitboard.getMSB(tmpPieces)) != -1) {
 
       // non captures
       if ((genMode & GEN_NONCAPTURES) > 0) {
         tmpMoves = pieceAttacks[sqxFrom] & ~position.getAllOccupiedBitboard();
-        while ((sqxTo = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+        while ((sqxTo = 63 - Bitboard.getMSB(tmpMoves)) != -1) {
           if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                           sqxFrom,
                                           sqxTo,
                                           piece,
                                           Piece.NOPIECE,
                                           Piece.NOPIECE))) return true;
-          tmpMoves = removeSquare(tmpMoves, sqxTo);
+          tmpMoves = Bitboard.removeBit(tmpMoves, sqxTo);
         }
       }
 
@@ -1400,17 +1400,17 @@ public class MoveGenerator {
       if ((genMode & GEN_CAPTURES) > 0) {
         tmpMoves = pieceAttacks[sqxFrom] & position.getOccupiedBitboards(
           activePlayer.inverse());
-        while ((sqxTo = Square.getFirstSquareIndex(tmpMoves)) != NOSQUARE.ordinal()) {
+        while ((sqxTo = 63 - Bitboard.getMSB(tmpMoves)) != -1) {
           if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                           sqxFrom,
                                           sqxTo,
                                           piece,
                                           position.getPiece(sqxTo),
                                           Piece.NOPIECE))) return true;
-          tmpMoves = removeSquare(tmpMoves, sqxTo);
+          tmpMoves = Bitboard.removeBit(tmpMoves, sqxTo);
         }
       }
-      tmpPieces = removeSquare(tmpPieces, sqxFrom);
+      tmpPieces = Bitboard.removeBit(tmpPieces, sqxFrom);
     }
     return false;
   }
@@ -1429,7 +1429,7 @@ public class MoveGenerator {
 
     long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.QUEEN);
 
-    while ((sqxFrom = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+    while ((sqxFrom = 63 - Bitboard.getMSB(tmpPieces)) != -1) {
       tmpMoves = Bitboard.getSlidingMovesDiagUp(sqxFrom, allOccupiedBitboard)
         | Bitboard.getSlidingMovesDiagDown(sqxFrom, allOccupiedBitboard)
         | Bitboard.getSlidingMovesFile(sqxFrom, allOccupiedBitboard)
@@ -1439,14 +1439,14 @@ public class MoveGenerator {
       if ((genMode & GEN_NONCAPTURES) > 0) {
         long tmpNonCapMoves = tmpMoves & ~allOccupiedBitboard;
 
-        while ((sqxTo = Square.getFirstSquareIndex(tmpNonCapMoves)) != NOSQUARE.ordinal()) {
+        while ((sqxTo = 63 - Bitboard.getMSB(tmpNonCapMoves)) != -1) {
           if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                           sqxFrom,
                                           sqxTo,
                                           piece,
                                           Piece.NOPIECE,
                                           Piece.NOPIECE))) return true;
-          tmpNonCapMoves = removeSquare(tmpNonCapMoves, sqxTo);
+          tmpNonCapMoves = Bitboard.removeBit(tmpNonCapMoves, sqxTo);
         }
       }
 
@@ -1454,17 +1454,17 @@ public class MoveGenerator {
       if ((genMode & GEN_CAPTURES) > 0) {
         long tmpCapMoves = tmpMoves & position.getOccupiedBitboards(activePlayer.inverse());
 
-        while ((sqxTo = Square.getFirstSquareIndex(tmpCapMoves)) != NOSQUARE.ordinal()) {
+        while ((sqxTo = 63 - Bitboard.getMSB(tmpCapMoves)) != -1) {
           if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                           sqxFrom,
                                           sqxTo,
                                           piece,
                                           position.getPiece(sqxTo),
                                           Piece.NOPIECE))) return true;
-          tmpCapMoves = removeSquare(tmpCapMoves, sqxTo);
+          tmpCapMoves = Bitboard.removeBit(tmpCapMoves, sqxTo);
         }
       }
-      tmpPieces = removeSquare(tmpPieces, sqxFrom);
+      tmpPieces = Bitboard.removeBit(tmpPieces, sqxFrom);
     }
     return false;
   }
@@ -1483,7 +1483,7 @@ public class MoveGenerator {
 
     long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.BISHOP);
 
-    while ((sqxFrom = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+    while ((sqxFrom = 63 - Bitboard.getMSB(tmpPieces)) != -1) {
       tmpMoves = Bitboard.getSlidingMovesDiagUp(sqxFrom, allOccupiedBitboard)
         | Bitboard.getSlidingMovesDiagDown(sqxFrom, allOccupiedBitboard);
 
@@ -1491,14 +1491,14 @@ public class MoveGenerator {
       if ((genMode & GEN_NONCAPTURES) > 0) {
         long tmpNonCapMoves = tmpMoves & ~allOccupiedBitboard;
 
-        while ((sqxTo = Square.getFirstSquareIndex(tmpNonCapMoves)) != NOSQUARE.ordinal()) {
+        while ((sqxTo = 63 - Bitboard.getMSB(tmpNonCapMoves)) != -1) {
           if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                           sqxFrom,
                                           sqxTo,
                                           piece,
                                           Piece.NOPIECE,
                                           Piece.NOPIECE))) return true;
-          tmpNonCapMoves = removeSquare(tmpNonCapMoves, sqxTo);
+          tmpNonCapMoves = Bitboard.removeBit(tmpNonCapMoves, sqxTo);
         }
       }
 
@@ -1506,18 +1506,18 @@ public class MoveGenerator {
       if ((genMode & GEN_CAPTURES) > 0) {
         long tmpCapMoves = tmpMoves & position.getOccupiedBitboards(activePlayer.inverse());
 
-        while ((sqxTo = Square.getFirstSquareIndex(tmpCapMoves)) != NOSQUARE.ordinal()) {
+        while ((sqxTo = 63 - Bitboard.getMSB(tmpCapMoves)) != -1) {
           if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                           sqxFrom,
                                           sqxTo,
                                           piece,
                                           position.getPiece(sqxTo),
                                           Piece.NOPIECE))) return true;
-          tmpCapMoves = removeSquare(tmpCapMoves, sqxTo);
+          tmpCapMoves = Bitboard.removeBit(tmpCapMoves, sqxTo);
         }
       }
 
-      tmpPieces = removeSquare(tmpPieces, sqxFrom);
+      tmpPieces = Bitboard.removeBit(tmpPieces, sqxFrom);
     }
     return false;
   }
@@ -1536,7 +1536,7 @@ public class MoveGenerator {
 
     long tmpPieces = position.getPiecesBitboards(activePlayer, PieceType.ROOK);
 
-    while ((sqxFrom = Square.getFirstSquareIndex(tmpPieces)) != NOSQUARE.ordinal()) {
+    while ((sqxFrom = 63 - Bitboard.getMSB(tmpPieces)) != -1) {
       tmpMoves = Bitboard.getSlidingMovesFile(sqxFrom, allOccupiedBitboard)
         | Bitboard.getSlidingMovesRank(sqxFrom, allOccupiedBitboard);
 
@@ -1544,33 +1544,33 @@ public class MoveGenerator {
       if ((genMode & GEN_NONCAPTURES) > 0) {
         long tmpNonCapMoves = tmpMoves & ~allOccupiedBitboard;
 
-        while ((sqxTo = Square.getFirstSquareIndex(tmpNonCapMoves)) != NOSQUARE.ordinal()) {
+        while ((sqxTo = 63 - Bitboard.getMSB(tmpNonCapMoves)) != -1) {
           if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                           sqxFrom,
                                           sqxTo,
                                           piece,
                                           Piece.NOPIECE,
                                           Piece.NOPIECE))) return true;
-          tmpNonCapMoves = removeSquare(tmpNonCapMoves, sqxTo);
+          tmpNonCapMoves = Bitboard.removeBit(tmpNonCapMoves, sqxTo);
         }
 
         // captures
         if ((genMode & GEN_CAPTURES) > 0) {
           long tmpCapMoves = tmpMoves & position.getOccupiedBitboards(activePlayer.inverse());
 
-          while ((sqxTo = Square.getFirstSquareIndex(tmpCapMoves)) != NOSQUARE.ordinal()) {
+          while ((sqxTo = 63 - Bitboard.getMSB(tmpCapMoves)) != -1) {
             if (isLegalMove(Move.createMove(MoveType.NORMAL,
                                             sqxFrom,
                                             sqxTo,
                                             piece,
                                             position.getPiece(sqxTo),
                                             Piece.NOPIECE))) return true;
-            tmpCapMoves = removeSquare(tmpCapMoves, sqxTo);
+            tmpCapMoves = Bitboard.removeBit(tmpCapMoves, sqxTo);
           }
         }
 
       }
-      tmpPieces = removeSquare(tmpPieces, sqxFrom);
+      tmpPieces = Bitboard.removeBit(tmpPieces, sqxFrom);
     }
     return false;
   }
@@ -1587,7 +1587,7 @@ public class MoveGenerator {
     position.makeMove(move);
     // check if the move leaves the king in check
     // TODO: check castling intermediate squares
-    if (!position.isAttacked(activePlayer.inverse(), Square.getFirstSquare(
+    if (!position.isAttacked(activePlayer.inverse(), getLSBSquare(
       position.getPiecesBitboards(activePlayer, PieceType.KING)))) {
       position.undoMove();
       return true;

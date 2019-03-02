@@ -61,7 +61,7 @@ public class PERFTTest {
     };
     // @formatter:on
 
-    int maxDepth = 8;
+    int maxDepth = 6;
 
     PERFT perftTest = new PERFT();
 

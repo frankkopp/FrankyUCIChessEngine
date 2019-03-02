@@ -251,15 +251,15 @@ public class SquareTest {
 
   @Test
   void getFirstSquareTest() {
-    assertEquals(a1, Square.getFirstSquare(a1.bitboard()));
-    assertEquals(a8, Square.getFirstSquare(a8.bitboard()));
-    assertEquals(h1, Square.getFirstSquare(h1.bitboard()));
-    assertEquals(h8, Square.getFirstSquare(h8.bitboard()));
+    assertEquals(a1, getLSBSquare(a1.bitboard()));
+    assertEquals(a8, getLSBSquare(a8.bitboard()));
+    assertEquals(h1, getLSBSquare(h1.bitboard()));
+    assertEquals(h8, getLSBSquare(h8.bitboard()));
 
-    assertEquals(h8, Square.getFirstSquare(h8.bitboard() | h1.bitboard()));
-    assertEquals(a8, Square.getFirstSquare(h8.bitboard() | a8.bitboard()));
-    assertEquals(g1, Square.getFirstSquare(g1.bitboard() | h1.bitboard()));
-    assertEquals(e4, Square.getFirstSquare(e4.bitboard() | e3.bitboard()));
+    assertEquals(h8, getLSBSquare(h8.bitboard() | h1.bitboard()));
+    assertEquals(a8, getLSBSquare(h8.bitboard() | a8.bitboard()));
+    assertEquals(g1, getLSBSquare(g1.bitboard() | h1.bitboard()));
+    assertEquals(e4, getLSBSquare(e4.bitboard() | e3.bitboard()));
   }
 
   /**
@@ -318,10 +318,10 @@ public class SquareTest {
     long bitboard = 0b11111111_11111111_00000000_00000000_00000000_00000000_11111111_11111111L;
     Square square;
     int counter = 0;
-    while ((square = Square.getFirstSquare(bitboard)) != NOSQUARE) {
+    while ((square = getLSBSquare(bitboard)) != NOSQUARE) {
       LOG.debug("{}", square);
       counter++;
-      bitboard = removeSquare(bitboard, square.ordinal());
+      bitboard = Bitboard.removeBit(bitboard, square.ordinal());
     }
     assertEquals(32, counter);
   }

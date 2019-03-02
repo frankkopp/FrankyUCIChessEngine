@@ -119,7 +119,7 @@ public class PERFT {
       int move = moves.get(i);
       position.makeMove(move);
 
-      Square kingSquare = Square.getFirstSquare(
+      Square kingSquare = Square.getLSBSquare(
         position.getPiecesBitboards(_activePlayer.ordinal(), PieceType.KING));
       if (!position.isAttacked(_passivePlayer, kingSquare)) {
         totalNodes += miniMax(depth - 1, position, mg, ply + 1);
@@ -151,7 +151,7 @@ public class PERFT {
     while ((move = mg[ply].getNextPseudoLegalMove(false)) != Move.NOMOVE) {
       position.makeMove(move);
 
-      Square kingSquare = Square.getFirstSquare(
+      Square kingSquare = Square.getLSBSquare(
         position.getPiecesBitboards(_activePlayer.ordinal(), PieceType.KING));
       if (!position.isAttacked(_passivePlayer, kingSquare)) {
         totalNodes += miniMaxOD(depthleft - 1, position, mg, ply + 1);

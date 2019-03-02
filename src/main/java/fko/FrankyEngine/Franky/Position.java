@@ -33,7 +33,7 @@ import java.util.Random;
 
 import static fko.FrankyEngine.Franky.PieceType.*;
 import static fko.FrankyEngine.Franky.Square.NOSQUARE;
-import static fko.FrankyEngine.Franky.Square.removeSquare;
+import static fko.FrankyEngine.Franky.Bitboard.removeBit;
 
 /**
  * This class represents the chess board and its position.<br>
@@ -814,7 +814,7 @@ public class Position {
 
     // opponents king square
     final long kingBB = piecesBitboards[getOpponent().ordinal()][PieceType.KING.ordinal()];
-    final Square kingSquare = Square.getFirstSquare(kingBB);
+    final Square kingSquare = Square.getLSBSquare(kingBB);
     // fromSquare
     final Square fromSquare = Move.getStart(move);
     // target square
@@ -941,7 +941,7 @@ public class Position {
     if ((Bitboard.rookPseudoAttacks[kingSquareIdx] & rooks) != 0) {
       // iterate over all pieces
       int sqIdx;
-      while ((sqIdx = Square.getFirstSquareIndex(rooks)) != NOSQUARE.ordinal()) {
+      while ((sqIdx = Bitboard.getLSB(rooks)) != NOSQUARE.ordinal()) {
         // if the square is not reachable from the piece's square we can skip this
         if ((Bitboard.rookPseudoAttacks[sqIdx] & kingSquare.bitboard()) == 0) continue;
         // if there are no occupied squares between the piece square and the
@@ -954,7 +954,7 @@ public class Position {
         if (isEnPassant) boardAfterMove ^= epTargetSquare.bitboard();
         // if squares in between are not occupied then it is a check
         if ((intermediate & boardAfterMove) == 0) return true;
-        rooks = removeSquare(rooks, sqIdx);
+        rooks = removeBit(rooks, sqIdx);
       }
     }
 
@@ -963,7 +963,7 @@ public class Position {
     if ((Bitboard.bishopPseudoAttacks[kingSquareIdx] & bishops) != 0) {
       // iterate over all pieces
       int sqIdx;
-      while ((sqIdx = Square.getFirstSquareIndex(bishops)) != NOSQUARE.ordinal()) {
+      while ((sqIdx = Bitboard.getLSB(bishops)) != NOSQUARE.ordinal()) {
         // if the square is not reachable from the piece's square we can skip this
         if ((Bitboard.bishopPseudoAttacks[sqIdx] & kingSquare.bitboard()) == 0) continue;
         // if there are no occupied squares between the piece square and the
@@ -976,7 +976,7 @@ public class Position {
         if (isEnPassant) boardAfterMove ^= epTargetSquare.bitboard();
         // if squares in between are not occupied then it is a check
         if ((intermediate & boardAfterMove) == 0) return true;
-        bishops = removeSquare(bishops, sqIdx);
+        bishops = removeBit(bishops, sqIdx);
       }
     }
 
@@ -985,7 +985,7 @@ public class Position {
     if ((Bitboard.queenPseudoAttacks[kingSquareIdx] & queens) != 0) {
       // iterate over all pieces
       int sqIdx;
-      while ((sqIdx = Square.getFirstSquareIndex(queens)) != NOSQUARE.ordinal()) {
+      while ((sqIdx = Bitboard.getLSB(queens)) != NOSQUARE.ordinal()) {
         // if the square is not reachable from the piece's square we can skip this
         if ((Bitboard.queenPseudoAttacks[sqIdx] & kingSquare.bitboard()) == 0) continue;
         // if there are no occupied squares between the piece square and the
@@ -998,7 +998,7 @@ public class Position {
         if (isEnPassant) boardAfterMove ^= epTargetSquare.bitboard();
         // if squares in between are not occupied then it is a check
         if ((intermediate & boardAfterMove) == 0) return true;
-        queens = removeSquare(queens, sqIdx);
+        queens = removeBit(queens, sqIdx);
       }
     }
 
@@ -1012,7 +1012,7 @@ public class Position {
   public boolean hasCheck() {
     if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
     final long kingBB = piecesBitboards[nextPlayer.ordinal()][PieceType.KING.ordinal()];
-    boolean check = isAttacked(nextPlayer.inverse(), Square.getFirstSquare(kingBB));
+    boolean check = isAttacked(nextPlayer.inverse(), Square.getLSBSquare(kingBB));
     hasCheck = check ? Flag.TRUE : Flag.FALSE;
     return check;
   }
