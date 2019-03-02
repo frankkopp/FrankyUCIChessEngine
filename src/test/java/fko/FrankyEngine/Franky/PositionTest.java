@@ -1063,7 +1063,7 @@ public class PositionTest {
       if (d <= 3) firstRayHit = Long.lowestOneBit(rayHits);
       else firstRayHit = Long.highestOneBit(rayHits);
       // DEBUG
-      Square hitSquare = Square.getFirstSquare(firstRayHit);
+      Square hitSquare = Square.getLSBSquare(firstRayHit);
 
       System.out.println("Ray hits first piece");
       System.out.println(Bitboard.toString(firstRayHit));
@@ -1139,7 +1139,7 @@ public class PositionTest {
         else hitSquare = Long.numberOfTrailingZeros(Long.highestOneBit(rayHits));
         // TODO TEST & DEBUG
         attacks |=
-          Bitboard.rays[d][sIdx] ^ Bitboard.rays[d][Square.getFirstSquare(hitSquare).bbIndex()];
+          Bitboard.rays[d][sIdx] ^ Bitboard.rays[d][Square.getLSBSquare(hitSquare).bbIndex()];
       }
     }
     return attacks;

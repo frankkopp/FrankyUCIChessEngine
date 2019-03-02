@@ -869,4 +869,56 @@ public class Bitboard {
 
   }
 
+  /**
+   * Finds the right most (in Java the Least Significant Bit from the right) set bit
+   * in a bitboard and returns the according index.
+   * Can be used to loop through all set squares in a bitboard in conjunction
+   * with removeFirstSquare()
+   *
+   * @param bitboard
+   * @return the first Square index of the given Bitboard from a8-h8-h1
+   */
+  public static int getLSB(long bitboard) {
+    return Long.numberOfTrailingZeros(bitboard);
+  }
+  /**
+   * Finds the left most (in Java the Most Significant Bit from the left) set bit
+   * in a bitboard and returns the according index.
+   * Can be used to loop through all set squares in a bitboard in conjunction
+   * with removeFirstSquare()
+   * Needs to be subtracted from 63 to get the correct bit index in a bitboard
+   *
+   * @param bitboard
+   * @return the first Square index of the given Bitboard from a8-h8-h1
+   */
+  public static int getMSB(long bitboard) {
+    return Long.numberOfLeadingZeros(bitboard);
+  }
+
+  /**
+   * Finds the most significant bit in a bitboard and removes it.
+   * Can be used to loop through all set squares in a bitboard in conjunction
+   * with getFirstSquare()
+   *
+   * @param bitboard
+   * @return the bitboard without the removed square
+   */
+  public static long removeMSB(long bitboard) {
+    return bitboard & (bitboard - 1);
+  }
+
+  /**
+   * Finds the bit in a bitboard and removes it.
+   * Can be used to loop through all set squares in a bitboard in conjunction
+   * with getFirstSquare()
+   *
+   * @param bitboard
+   * @param bitIdx LSB to MSB 0...63
+   * @return the bitboard without the removed square
+   */
+  public static long removeBit(long bitboard, int bitIdx) {
+    final long bit = 1L << bitIdx;
+    assert (bitboard & bit) != 0 : "Bit to be removed not set.";
+    return bitboard ^ bit;
+  }
 }

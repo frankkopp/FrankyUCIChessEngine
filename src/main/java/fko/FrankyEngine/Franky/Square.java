@@ -313,42 +313,31 @@ public enum Square {
     if ((x88index & 0x88) != 0) return NOSQUARE;
     return Square.values[x88index];
   }
+
   /**
-   * Finds the first set bit in a bitboard and returns the according Square.
+   * Finds the right most (in Java the Least Significant Bit from the right) set bit
+   * in a bitboard and returns the according Square.
    * Can be used to loop through all set squares in a bitboard in conjunction
    * with removeFirstSquare()
    *
    * @param bitboard
    * @return the first Square of the given Bitboard from a8-h8-h1
    */
-  public static Square getFirstSquare(long bitboard) {
-    return trailingZerosMap[Long.numberOfTrailingZeros(bitboard)];
+  public static Square getLSBSquare(long bitboard) {
+    return trailingZerosMap[Bitboard.getLSB(bitboard)];
   }
 
   /**
-   * Finds the first set bit in a bitboard and returns the according square index.
+   * Finds the left most (in Java the Most Significant Bit from the left) set bit
+   * in a bitboard and returns the according Square.
    * Can be used to loop through all set squares in a bitboard in conjunction
    * with removeFirstSquare()
    *
    * @param bitboard
-   * @return the first Square index of the given Bitboard from a8-h8-h1
+   * @return the first Square of the given Bitboard from a8-h8-h1
    */
-  public static int getFirstSquareIndex(long bitboard) {
-    return Long.numberOfTrailingZeros(bitboard);
-  }
-
-  /**
-   * Finds the first set bit in a bitboard and removes it.
-   * Can be used to loop through all set squares in a bitboard in conjunction
-   * with getFirstSquare()
-   *
-   * @param bitboard
-   * @return the bitboard without the removed square
-   */
-  public static long removeFirstSquare(long bitboard, int sqx) {
-    final long bit = trailingZerosMap[sqx].bitboard();
-    assert (bitboard & bit) != 0 : "Bit to be removed not set.";
-    return bitboard ^ bit;
+  public static Square getMSBSquare(long bitboard) {
+    return trailingZerosMap[63 - Bitboard.getMSB(bitboard)];
   }
 
   /**

@@ -244,22 +244,22 @@ public class Attacks {
 
     // check all piece types with increasing value
     if ((bitboard & pieceBB[c.ordinal()][PieceType.PAWN.ordinal()]) != 0)
-      return Square.getFirstSquare(bitboard & pieceBB[c.ordinal()][PieceType.PAWN.ordinal()]);
+      return Square.getLSBSquare(bitboard & pieceBB[c.ordinal()][PieceType.PAWN.ordinal()]);
 
     if ((bitboard & pieceBB[c.ordinal()][PieceType.KNIGHT.ordinal()]) != 0)
-      return Square.getFirstSquare(bitboard & pieceBB[c.ordinal()][PieceType.KNIGHT.ordinal()]);
+      return Square.getLSBSquare(bitboard & pieceBB[c.ordinal()][PieceType.KNIGHT.ordinal()]);
 
     if ((bitboard & pieceBB[c.ordinal()][PieceType.BISHOP.ordinal()]) != 0)
-      return Square.getFirstSquare(bitboard & pieceBB[c.ordinal()][PieceType.BISHOP.ordinal()]);
+      return Square.getLSBSquare(bitboard & pieceBB[c.ordinal()][PieceType.BISHOP.ordinal()]);
 
     if ((bitboard & pieceBB[c.ordinal()][PieceType.ROOK.ordinal()]) != 0)
-      return Square.getFirstSquare((bitboard & pieceBB[c.ordinal()][PieceType.ROOK.ordinal()]));
+      return Square.getLSBSquare((bitboard & pieceBB[c.ordinal()][PieceType.ROOK.ordinal()]));
 
     if ((bitboard & pieceBB[c.ordinal()][PieceType.QUEEN.ordinal()]) != 0)
-      return Square.getFirstSquare(bitboard & pieceBB[c.ordinal()][PieceType.QUEEN.ordinal()]);
+      return Square.getLSBSquare(bitboard & pieceBB[c.ordinal()][PieceType.QUEEN.ordinal()]);
 
     if ((bitboard & pieceBB[c.ordinal()][PieceType.KING.ordinal()]) != 0)
-      return Square.getFirstSquare(bitboard & pieceBB[c.ordinal()][PieceType.KING.ordinal()]);
+      return Square.getLSBSquare(bitboard & pieceBB[c.ordinal()][PieceType.KING.ordinal()]);
 
     return NOSQUARE;
   }
