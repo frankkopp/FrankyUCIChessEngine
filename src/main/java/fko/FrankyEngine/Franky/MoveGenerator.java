@@ -635,10 +635,12 @@ public class MoveGenerator {
    *
    * @param moveList
    */
+  private int[] sortIdx = new int[250]; // prepare array for sort
   private void moveListSort(MoveList moveList) {
     // create index array - this is faster then to call getSortValue() every
     // time a compare takes place
-    int[] sortIdx = new int[moveList.size()];
+    // we re-use a prepared array - does not have to be re-initialized as
+    // it will be overwritten only used up to the overwritten index.
     for (int i = 0, size = moveList.size(); i < size; i++) {
       sortIdx[i] = getSortValue(moveList.get(i));
     }
@@ -706,36 +708,12 @@ public class MoveGenerator {
                 && (target.getColor() == activePlayer.inverse())) { // opponents color
                 assert target.getType() != PieceType.KING; // did we miss a check?
                 // capture & promotion
-                if (to > 111) { // rank 8
-                  assert activePlayer.isWhite(); // checking for  color is probably redundant
-                  capturingMoves.add(
-                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                    Piece.WHITE_QUEEN));
-                  capturingMoves.add(
-                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                    Piece.WHITE_KNIGHT));
-                  capturingMoves.add(
-                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                    Piece.WHITE_ROOK));
-                  capturingMoves.add(
-                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                    Piece.WHITE_BISHOP));
-                }
-                else if (to < 8) { // rank 1
-                  assert activePlayer.isBlack(); // checking for  color is probably redundant
-                  capturingMoves.add(
-                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                    Piece.BLACK_QUEEN));
-                  capturingMoves.add(
-                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                    Piece.BLACK_KNIGHT));
-                  capturingMoves.add(
-                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                    Piece.BLACK_ROOK));
-                  capturingMoves.add(
-                    Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                    Piece.BLACK_BISHOP));
-                }
+                // rank 8
+                if (to > 111)
+                  makePromotionMove(fromSquare, toSquare, piece, target, capturingMoves);
+                else // rank 1
+                  if (to < 8)
+                    makePromotionMove(fromSquare, toSquare, piece, target, capturingMoves);
                 else { // normal capture
                   capturingMoves.add(
                     Move.createMove(type, fromSquare, toSquare, piece, target, promotion));
@@ -759,63 +737,55 @@ public class MoveGenerator {
             if ((genMode & GEN_NONCAPTURES) > 0 // generate non captures
               && target == Piece.NOPIECE) { // way needs to be free
               // promotion
-              if (to > 111) { // rank 8
-                assert activePlayer.isWhite(); // checking for color is probably redundant
-                nonCapturingMoves.add(
-                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                  Piece.WHITE_QUEEN));
-                nonCapturingMoves.add(
-                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                  Piece.WHITE_KNIGHT));
-                nonCapturingMoves.add(
-                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                  Piece.WHITE_ROOK));
-                nonCapturingMoves.add(
-                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                  Piece.WHITE_BISHOP));
-              }
-              else if (to < 8) { // rank 1
-                assert activePlayer.isBlack(); // checking for color is probably redundant
-                nonCapturingMoves.add(
-                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                  Piece.BLACK_QUEEN));
-                nonCapturingMoves.add(
-                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                  Piece.BLACK_KNIGHT));
-                nonCapturingMoves.add(
-                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                  Piece.BLACK_ROOK));
-                nonCapturingMoves.add(
-                  Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
-                                  Piece.BLACK_BISHOP));
-              }
-              else {
-                // pawndouble
-                if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow()
-                  && (position.getPiece(fromSquare.ordinal() + (2 * Square.N)))
-                  == Piece.NOPIECE) {
-                  // on rank 2 && rank 4 is free(rank 3 already checked via target)
+              // rank 8
+              if (to > 111)
+                makePromotionMove(fromSquare, toSquare, piece, target, nonCapturingMoves);
+              else // rank 1
+                if (to < 8)
+                  makePromotionMove(fromSquare, toSquare, piece, target, nonCapturingMoves);
+                else {
+                  // pawndouble
+                  if (activePlayer.isWhite() && fromSquare.isWhitePawnBaseRow()
+                    && (position.getPiece(fromSquare.ordinal() + (2 * Square.N)))
+                    == Piece.NOPIECE) {
+                    // on rank 2 && rank 4 is free(rank 3 already checked via target)
+                    nonCapturingMoves.add(
+                      Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getNorth(), piece,
+                                      target, promotion));
+                  }
+                  else if (activePlayer.isBlack() && fromSquare.isBlackPawnBaseRow()
+                    && position.getPiece(fromSquare.ordinal() + (2 * Square.S))
+                    == Piece.NOPIECE) {
+                    // on rank 7 && rank 5 is free(rank 6 already checked via target)
+                    nonCapturingMoves.add(
+                      Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getSouth(), piece,
+                                      target, promotion));
+                  }
+                  // normal pawn move
                   nonCapturingMoves.add(
-                    Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getNorth(), piece,
-                                    target, promotion));
+                    Move.createMove(type, fromSquare, toSquare, piece, target, promotion));
                 }
-                else if (activePlayer.isBlack() && fromSquare.isBlackPawnBaseRow()
-                  && position.getPiece(fromSquare.ordinal() + (2 * Square.S))
-                  == Piece.NOPIECE) {
-                  // on rank 7 && rank 5 is free(rank 6 already checked via target)
-                  nonCapturingMoves.add(
-                    Move.createMove(MoveType.PAWNDOUBLE, fromSquare, toSquare.getSouth(), piece,
-                                    target, promotion));
-                }
-                // normal pawn move
-                nonCapturingMoves.add(
-                  Move.createMove(type, fromSquare, toSquare, piece, target, promotion));
-              }
             }
           }
         }
       }
     }
+  }
+
+  private void makePromotionMove(Square fromSquare, Square toSquare, Piece piece, Piece target,
+                                 MoveList capturingMoves) {
+    capturingMoves.add(
+      Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
+                      piece.getColor().isWhite() ? Piece.WHITE_QUEEN : Piece.BLACK_QUEEN));
+    capturingMoves.add(
+      Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
+                      piece.getColor().isWhite() ? Piece.WHITE_ROOK : Piece.BLACK_ROOK));
+    capturingMoves.add(
+      Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
+                      piece.getColor().isWhite() ? Piece.WHITE_BISHOP : Piece.BLACK_BISHOP));
+    capturingMoves.add(
+      Move.createMove(MoveType.PROMOTION, fromSquare, toSquare, piece, target,
+                      piece.getColor().isWhite() ? Piece.WHITE_KNIGHT : Piece.BLACK_KNIGHT));
   }
 
   private void generateKnightMoves() {
@@ -912,12 +882,9 @@ public class MoveGenerator {
           }
           break;
         }
-        if (type.isSliding()) {
-          to += d; // next sliding field in this factor
-        }
-        else {
-          break; // no sliding piece type
-        }
+
+        if (type.isSliding()) to += d; // next sliding field in this factor
+        else break; // no sliding piece type
       }
     }
   }
@@ -926,9 +893,7 @@ public class MoveGenerator {
 
     if (position.hasCheck() // no castling if we are in check
       || (genMode & GEN_NONCAPTURES) == 0) // only when generating non captures
-    {
       return;
-    }
 
     // iterate over all available castlings at this position
     if (activePlayer.isWhite()) {
@@ -937,8 +902,8 @@ public class MoveGenerator {
         // we will not check if g1 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
         if (position.getPiece(Square.f1.ordinal()) == Piece.NOPIECE // passing square free
-          && !position.isAttacked(activePlayer.inverse(), Square.f1)
-          // passing square not attacked
+          // TODO move this to search
+          && !position.isAttacked(activePlayer.inverse(), Square.f1) // passing square not attacked
           && position.getPiece(Square.g1.ordinal()) == Piece.NOPIECE) // to square free
         {
           nonCapturingMoves.add(
@@ -951,10 +916,9 @@ public class MoveGenerator {
         // we will not check if d1 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
         if (position.getPiece(Square.d1.ordinal()) == Piece.NOPIECE // passing square free
-          && position.getPiece(Square.b1.ordinal()) == Piece.NOPIECE
-          // rook passing square free
-          && !position.isAttacked(activePlayer.inverse(), Square.d1)
-          // passing square not attacked
+          && position.getPiece(Square.b1.ordinal()) == Piece.NOPIECE // rook passing square free
+          // TODO move this to search
+          && !position.isAttacked(activePlayer.inverse(), Square.d1) // passing square not attacked
           && position.getPiece(Square.c1.ordinal()) == Piece.NOPIECE) // to square free
         {
           nonCapturingMoves.add(
@@ -969,8 +933,8 @@ public class MoveGenerator {
         // we will not check if g8 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
         if (position.getPiece(Square.f8.ordinal()) == Piece.NOPIECE // passing square free
-          && !position.isAttacked(activePlayer.inverse(), Square.f8)
-          // passing square not attacked
+          // TODO move this to search
+          && !position.isAttacked(activePlayer.inverse(), Square.f8) // passing square not attacked
           && position.getPiece(Square.g8.ordinal()) == Piece.NOPIECE) // to square free
         {
           nonCapturingMoves.add(
@@ -983,8 +947,8 @@ public class MoveGenerator {
         // we will not check if d8 is attacked as this is a pseudo legal move
         // and this to be checked separately e.g. when filtering for legal moves
         if (position.getPiece(Square.d8.ordinal()) == Piece.NOPIECE // passing square free
-          && position.getPiece(Square.b8.ordinal()) == Piece.NOPIECE
-          // rook passing square free
+          && position.getPiece(Square.b8.ordinal()) == Piece.NOPIECE // rook passing square free
+          // TODO move this to search
           && !position.isAttacked(activePlayer.inverse(), Square.d8)
           // passing square not attacked
           && position.getPiece(Square.c8.ordinal()) == Piece.NOPIECE) // to square free
@@ -1146,12 +1110,9 @@ public class MoveGenerator {
           }
           break; // stop sliding;
         }
-        if (type.isSliding()) {
-          to += d; // next sliding field in this factor
-        }
-        else {
-          break; // no sliding piece type
-        }
+
+        if (type.isSliding()) to += d; // next sliding field in this factor
+        else break; // no sliding piece type
       }
     }
     return false;

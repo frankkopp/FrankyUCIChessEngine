@@ -47,29 +47,32 @@ public class PERFTTest {
 
     // @formatter:off
     long[][] results = {
-          //N  Nodes      Captures EP     Checks  Mates
-          { 0, 1,         0,       0,     0,      0},
-          { 1, 20,        0,       0,     0,      0},
-          { 2, 400,       0,       0,     0,      0},
-          { 3, 8902,      34,      0,     12,     0},
-          { 4, 197281,    1576,    0,     469,    8},
-          { 5, 4865609,   82719,   258,   27351,  347},
-          { 6, 119060324, 2812008, 5248,  809099, 10828},
+          //N               Nodes          Captures           EP         Checks           Mates
+          { 0,                 0L,               0L,           0L,              0L,              0L},
+          { 1,                20L,               0L,           0L,              0L,              0L},
+          { 2,               400L,               0L,           0L,              0L,              0L},
+          { 3,             8_902L,              34L,           0L,             12L,              0L},
+          { 4,           197_281L,           1_576L,           0L,            469L,              8L},
+          { 5,         4_865_609L,          82_719L,         258L,         27_351L,            347L},
+          { 6,       119_060_324L,       2_812_008L,       5_248L,        809_099L,         10_828L},
+          { 7,     3_195_901_860L,     108_329_926L,     319_617L,     33_103_848L,        435_816L},
+          { 8,    84_998_978_956L,   3_523_740_106L,   7_187_977L,    968_981_593L,      9_852_036L},
+          { 9, 2_439_530_234_167L, 125_208_536_153L, 319_496_827L,  36_095_901_903L,   400_191_963L},
     };
     // @formatter:on
 
-    int maxDepth = 5;
+    int maxDepth = 8;
 
     PERFT perftTest = new PERFT();
 
     for (int i = 1; i <= maxDepth; i++) {
       perftTest.testPerft(i);
 
-      assertEquals(perftTest.get_nodes(), results[i][1]);
-      assertEquals(perftTest.get_captureCounter(), results[i][2]);
-      assertEquals(perftTest.get_enpassantCounter(), results[i][3]);
-      assertEquals(perftTest.get_checkCounter(), results[i][4]);
-      assertEquals(perftTest.get_checkMateCounter(), results[i][5]);
+      assertEquals(results[i][1], perftTest.get_nodes());
+      assertEquals(results[i][2], perftTest.get_captureCounter());
+      assertEquals(results[i][3], perftTest.get_enpassantCounter());
+      assertEquals(results[i][4], perftTest.get_checkCounter());
+      assertEquals(results[i][5], perftTest.get_checkMateCounter());
     }
     System.out.println("==============================");
   }

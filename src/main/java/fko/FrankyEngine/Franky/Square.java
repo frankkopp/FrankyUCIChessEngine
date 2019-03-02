@@ -326,6 +326,18 @@ public enum Square {
   }
 
   /**
+   * Finds the first set bit in a bitboard and returns the according square index.
+   * Can be used to loop through all set squares in a bitboard in conjunction
+   * with removeFirstSquare()
+   *
+   * @param bitboard
+   * @return the first Square index of the given Bitboard from a8-h8-h1
+   */
+  public static int getFirstSquareIndex(long bitboard) {
+    return Long.numberOfTrailingZeros(bitboard);
+  }
+
+  /**
    * Finds the first set bit in a bitboard and removes it.
    * Can be used to loop through all set squares in a bitboard in conjunction
    * with getFirstSquare()
@@ -333,8 +345,8 @@ public enum Square {
    * @param bitboard
    * @return the bitboard without the removed square
    */
-  public static long removeFirstSquare(long bitboard) {
-    final long bit = trailingZerosMap[Long.numberOfTrailingZeros(bitboard)].bitboard();
+  public static long removeFirstSquare(long bitboard, int sqx) {
+    final long bit = trailingZerosMap[sqx].bitboard();
     assert (bitboard & bit) != 0 : "Bit to be removed not set.";
     return bitboard ^ bit;
   }

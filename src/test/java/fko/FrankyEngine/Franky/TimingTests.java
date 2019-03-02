@@ -113,6 +113,49 @@ public class TimingTests {
     timingTest(5, 50, 100_000, f1, f2);
   }
 
+  @Test
+  @Disabled
+  public void testTimingMoveLoop() {
+    Position position = new Position("r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3");
+
+    SquareList sql = position.getPawnSquares()[1];
+    long pawnBB = position.getPiecesBitboards(1, PieceType.PAWN);
+
+    Function f1 = o -> {
+      // iterate over all squares where we have a pawn
+      for (int i = 0, size = sql.size();
+           i < size;
+           i++) {
+        final Square square = sql.get(i);
+        assert position.getPiece(square).getType() == PieceType.PAWN;
+      }
+      return null;
+    };
+
+    Function f2 = o -> {
+      // iterate over all squares where we have a pawn
+      int i = 0, size = sql.size();
+      while (i < size) {
+        final Square square = sql.get(i);
+        assert position.getPiece(square).getType() == PieceType.PAWN;
+        i++;
+      }
+      return null;
+    };
+
+    Function f3 = o -> {
+      int sqx;
+      long tmpBB = pawnBB;
+      while ((sqx = Square.getFirstSquareIndex(tmpBB)) != 64) {
+        final Square square = Square.index64Map[sqx];
+        assert position.getPiece(square).getType() == PieceType.PAWN;
+        tmpBB = Square.removeFirstSquare(tmpBB, sqx);
+      }
+      return null;
+    };
+    timingTest(5, 50, 3_000_000, f1, f2, f3);
+  }
+
   private void timingTest(final int rounds, final int iterations, final int repetitions,
                           Function... functions) {
 
