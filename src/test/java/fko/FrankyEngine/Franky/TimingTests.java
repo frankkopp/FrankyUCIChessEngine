@@ -30,8 +30,8 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.function.Function;
 
-import static fko.FrankyEngine.Franky.Bitboard.getLSB;
-import static fko.FrankyEngine.Franky.Bitboard.getMSB;
+import static fko.FrankyEngine.Franky.Bitboard.lsbIdx;
+import static fko.FrankyEngine.Franky.Bitboard.msbIdx;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** @author Frank */
@@ -103,18 +103,22 @@ public class TimingTests {
     final MoveGenerator mg = new MoveGenerator();
     Function f1 = o -> {
       mg.setPosition(position);
-      mg.getPseudoLegalMoves();
+      MoveList pseudoLegalMoves = mg.getPseudoLegalMoves();
+      for (int i = 0, size = pseudoLegalMoves.size(); i < size; i++) {
+        final int move = pseudoLegalMoves.get(i);
+        assert Move.isValid(move);
+      }
       return null;
     };
     Function f2 = o -> {
       mg.setPosition(position);
       int move;
       while ((move = mg.getNextPseudoLegalMove(false)) != Move.NOMOVE) {
-        // nothing
+        assert Move.isValid(move);
       }
       return null;
     };
-    timingTest(5, 50, 100_000, f1, f2);
+    timingTest(5, 50, 10_000, f1, f2);
   }
 
   @Test
@@ -123,13 +127,13 @@ public class TimingTests {
     final long bb = 0b00000000_00000000_00000000_00000000_10000000_00000000_00000000_00000000L;
 
     Function f1 = o -> {
-      int idx = getLSB(bb);
+      int idx = lsbIdx(bb);
       assert idx == 31;
       return null;
     };
 
     Function f2 = o -> {
-      int idx = 63 - getMSB(bb);
+      int idx = msbIdx(bb);
       assert idx == 31;
       return null;
     };
@@ -169,7 +173,7 @@ public class TimingTests {
     Function f3 = o -> {
       int sqx;
       long tmpBB = pawnBB;
-      while ((sqx = getMSB(tmpBB)) != 64) {
+      while ((sqx = msbIdx(tmpBB)) != -1) {
         final Square square = Square.index64Map[sqx];
         assertEquals(PieceType.PAWN, position.getPiece(square).getType());
         tmpBB = Bitboard.removeBit(tmpBB, sqx);
@@ -180,7 +184,7 @@ public class TimingTests {
     Function f4 = o -> {
       int sqx;
       long tmpBB = pawnBB;
-      while ((sqx = getLSB(tmpBB)) != -1) {
+      while ((sqx = lsbIdx(tmpBB)) != 64) {
         final Square square = Square.index64Map[sqx];
         assertEquals(PieceType.PAWN, position.getPiece(square).getType());
         tmpBB = Bitboard.removeLSB(tmpBB);
@@ -188,7 +192,7 @@ public class TimingTests {
       return null;
     };
 
-    timingTest(5, 50, 5_000_000, f1, f2, f3, f4);
+    timingTest(15, 50, 15_000_000, f1, f2, f3, f4);
   }
 
   private void timingTest(final int rounds, final int iterations, final int repetitions,

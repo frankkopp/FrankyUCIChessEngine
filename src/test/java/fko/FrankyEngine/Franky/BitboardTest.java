@@ -1403,8 +1403,28 @@ class BitboardTest {
     slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard());
     System.out.printf("Moves Diag Down %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
-    assertEquals(18049583016051201l, slidingMoves);
+    assertEquals(18049583016051201L, slidingMoves);
 
+  }
+
+  @Test
+  void LSB() {
+    long bitboard = 1;
+    assertEquals(0, Bitboard.lsbIdx(bitboard));
+    bitboard = -1;
+    assertEquals(0, Bitboard.lsbIdx(bitboard));
+    bitboard = Long.MIN_VALUE;
+    assertEquals(63, Bitboard.lsbIdx(bitboard));
+    assertEquals(64, Bitboard.lsbIdx(0L));
+  }
+
+  @Test
+  void MSB() {
+    long bitboard = 1;
+    assertEquals(0, Bitboard.msbIdx(bitboard));
+    bitboard = -1;
+    assertEquals(63, Bitboard.msbIdx(bitboard));
+    assertEquals(-1, Bitboard.msbIdx(0L));
   }
 
   @Test
@@ -1412,7 +1432,7 @@ class BitboardTest {
     long bitboard = -1;
     int sqx;
     int counter = 0;
-    while ((sqx = Bitboard.getLSB(bitboard)) != 64) {
+    while ((sqx = Bitboard.lsbIdx(bitboard)) != 64) {
       LOG.debug("{}", String.format("%n%s (%,d)", Bitboard.printBitString(bitboard), bitboard));
       LOG.debug("{}", Square.index64Map[sqx]);
       counter++;
@@ -1426,7 +1446,7 @@ class BitboardTest {
     long bitboard = -1;
     int sqx;
     int counter = 0;
-    while ((sqx = Bitboard.getMSB(bitboard)) != -1) {
+    while ((sqx = Bitboard.msbIdx(bitboard)) != -1) {
       LOG.debug("{}", String.format("%n%s (%,d)", Bitboard.printBitString(bitboard), bitboard));
       LOG.debug("{}", Square.index64Map[sqx]);
       counter++;

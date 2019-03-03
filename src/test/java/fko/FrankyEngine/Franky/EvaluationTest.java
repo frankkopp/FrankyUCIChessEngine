@@ -32,8 +32,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -210,20 +208,20 @@ public class EvaluationTest {
     // no in check
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2KR4 w - - 0 1");
     actual = evaluation.evaluate(position);
-    evaluation.printEvaluation();
-    assertEquals(204, actual);
+    LOG.debug("{}", String.format("%s", evaluation.printEvaluation()));
+    assertEquals(134, actual);
 
     // white gives check to black
     position = new Position("r2R3k/6R1/p4p1p/2p2P1P/1pq1PN2/6P1/1PP5/2K5 b - - 0 1");
     actual = evaluation.evaluate(position);
-    evaluation.printEvaluation();
-    assertEquals(-273, actual);
+    LOG.debug("{}", String.format("%s", evaluation.printEvaluation()));
+    assertEquals(-188, actual);
 
     // black gives check to white
     position = new Position("r6k/6R1/p4p1p/2p2P1P/1p1qPN2/6P1/1PPK4/3R4 w - - 0 2");
     actual = evaluation.evaluate(position);
-    evaluation.printEvaluation();
-    assertEquals(138, actual);
+    LOG.debug("{}", String.format("%s", evaluation.printEvaluation()));
+    assertEquals(93, actual);
   }
 
   @Test

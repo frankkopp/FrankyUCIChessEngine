@@ -401,7 +401,7 @@ public enum Square {
    * @return the first Square of the given Bitboard from a8-h8-h1
    */
   public static Square getLSBSquare(long bitboard) {
-    return trailingZerosMap[Bitboard.getLSB(bitboard)];
+    return trailingZerosMap[Bitboard.lsbIdx(bitboard)];
   }
 
   /**
@@ -414,7 +414,7 @@ public enum Square {
    * @return the first Square of the given Bitboard from a8-h8-h1
    */
   public static Square getMSBSquare(long bitboard) {
-    final int msb = Bitboard.getMSB(bitboard);
+    final int msb = Bitboard.msbIdx(bitboard);
     if (msb == -1) return NOSQUARE;
     return trailingZerosMap[msb];
   }

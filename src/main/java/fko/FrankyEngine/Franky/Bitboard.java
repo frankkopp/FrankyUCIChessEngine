@@ -992,28 +992,27 @@ public class Bitboard {
 
   /**
    * Finds the right most (in Java the Least Significant Bit from the right) set bit
-   * in a bitboard and returns the according index.
+   * in a bitboard and returns the according index or 64 if no bit is set.
    * Can be used to loop through all set squares in a bitboard in conjunction
    * with removeFirstSquare()
    *
    * @param bitboard
    * @return the first Square index of the given Bitboard from a8-h8-h1
    */
-  public static int getLSB(long bitboard) {
+  public static int lsbIdx(long bitboard) {
     return Long.numberOfTrailingZeros(bitboard);
   }
 
   /**
    * Finds the left most (in Java the Most Significant Bit from the left) set bit
-   * in a bitboard and returns the according index.
+   * in a bitboard and returns the according index or -1 when no bit is set.
    * Can be used to loop through all set squares in a bitboard in conjunction
-   * with removeFirstSquare()
-   * Needs to be subtracted from 63 to get the correct bit index in a bitboard
+   * with removeMSB()
    *
    * @param bitboard
-   * @return the first Square index of the given Bitboard from a8-h8-h1
+   * @return the first Square index of the given Bitboard from a8-h8-h1. -1 if no bits are set.
    */
-  public static int getMSB(long bitboard) {
+  public static int msbIdx(long bitboard) {
     return 63 - Long.numberOfLeadingZeros(bitboard);
   }
 
