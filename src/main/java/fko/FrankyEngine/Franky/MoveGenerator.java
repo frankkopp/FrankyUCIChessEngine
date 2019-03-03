@@ -90,15 +90,13 @@ public class MoveGenerator {
   private int      pvMove      = Move.NOMOVE;
 
   // Comparator for move most value victim least value attacker (incl. promotion)
-  // @formatter:off
   private static final SimpleIntList.IntComparator mvvlvaComparator = (move1, move2) ->
     (Move.getPiece(move1).getType().getValue()
-     - Move.getPromotion(move1).getType().getValue()
-     - Move.getTarget(move1).getType().getValue())
-    - (Move.getPiece(move2).getType().getValue()
-       - Move.getPromotion(move2).getType().getValue()
-       - Move.getTarget(move2).getType().getValue());
-  // @formatter:on
+      - Move.getPromotion(move1).getType().getValue()
+      - Move.getTarget(move1).getType().getValue())
+      - (Move.getPiece(move2).getType().getValue()
+      - Move.getPromotion(move2).getType().getValue()
+      - Move.getTarget(move2).getType().getValue());
 
   /**
    * Creates a new {@link MoveGenerator}
@@ -714,10 +712,10 @@ public class MoveGenerator {
                 else // rank 1
                   if (to < 8)
                     makePromotionMove(fromSquare, toSquare, piece, target, capturingMoves);
-                else { // normal capture
-                  capturingMoves.add(
-                    Move.createMove(type, fromSquare, toSquare, piece, target, promotion));
-                }
+                  else { // normal capture
+                    capturingMoves.add(
+                      Move.createMove(type, fromSquare, toSquare, piece, target, promotion));
+                  }
               }
               else { // empty but maybe en passant
                 if (toSquare == position.getEnPassantSquare()) { //  en passant capture
@@ -1190,6 +1188,8 @@ public class MoveGenerator {
     assert Move.isValid(move);
     // make the move on the position
     position.makeMove(move);
+    // TODO check castling intermediate square
+
     // check if the move leaves the king in check
     if (!position.isAttacked(activePlayer.inverse(),
                              position.getKingSquares()[activePlayer.ordinal()])) {

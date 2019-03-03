@@ -248,7 +248,7 @@ public class SquareTest {
   }
 
   @Test
-  void getFirstSquareTest() {
+  void getLSBSquareTest() {
     assertEquals(a1, Square.getLSBSquare(a1.bitboard()));
     assertEquals(a8, Square.getLSBSquare(a8.bitboard()));
     assertEquals(h1, Square.getLSBSquare(h1.bitboard()));
@@ -261,16 +261,44 @@ public class SquareTest {
   }
 
   @Test
-  void loopThroughPieces() {
-    long bitboard = new Position().getAllOccupiedBitboard();
+  void getMSBSquareTest() {
+    assertEquals(a1, Square.getMSBSquare(a1.bitboard()));
+    assertEquals(a8, Square.getMSBSquare(a8.bitboard()));
+    assertEquals(h1, Square.getMSBSquare(h1.bitboard()));
+    assertEquals(h8, Square.getMSBSquare(h8.bitboard()));
+
+    assertEquals(h1, Square.getMSBSquare(h8.bitboard() | h1.bitboard()));
+    assertEquals(h8, Square.getMSBSquare(h8.bitboard() | a8.bitboard()));
+    assertEquals(h1, Square.getMSBSquare(g1.bitboard() | h1.bitboard()));
+    assertEquals(e3, Square.getMSBSquare(e4.bitboard() | e3.bitboard()));
+  }
+
+  @Test
+  void loopThroughPiecesLSB() {
+    long bitboard = -1;
     Square square;
     int counter = 0;
     while ((square = Square.getLSBSquare(bitboard)) != NOSQUARE) {
+      LOG.debug("{}", String.format("%n%s (%,d)", Bitboard.printBitString(bitboard), bitboard));
       LOG.debug("{}", square);
       counter++;
-      bitboard = removeBit(bitboard, square.ordinal());
+      bitboard = removeLSB(bitboard);
     }
-    assertEquals(32, counter);
+    assertEquals(64, counter);
+  }
+
+  @Test
+  void loopThroughPiecesMSB() {
+    long bitboard = -1;
+    Square square;
+    int counter = 0;
+    while ((square = Square.getMSBSquare(bitboard)) != NOSQUARE) {
+      LOG.debug("{}", String.format("%n%s (%,d)", Bitboard.printBitString(bitboard), bitboard));
+      LOG.debug("{}", square);
+      counter++;
+      bitboard = removeBit(bitboard, square.bbIndex());
+    }
+    assertEquals(64, counter);
   }
 
   /**

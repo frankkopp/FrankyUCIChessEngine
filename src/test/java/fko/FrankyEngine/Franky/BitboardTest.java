@@ -196,8 +196,8 @@ class BitboardTest {
     System.out.println("BISHOPS\n");
     for (Square square : validSquares) {
       System.out.println(square);
-      System.out.println(printBitString(Bitboard.bishopAttacks[square.bbIndex()]));
-      System.out.println(Bitboard.toString(Bitboard.bishopAttacks[square.bbIndex()]));
+      System.out.println(printBitString(Bitboard.bishopPseudoAttacks[square.bbIndex()]));
+      System.out.println(Bitboard.toString(Bitboard.bishopPseudoAttacks[square.bbIndex()]));
       System.out.println();
     }
 
@@ -205,8 +205,8 @@ class BitboardTest {
     System.out.println("ROOKS\n");
     for (Square square : validSquares) {
       System.out.println(square);
-      System.out.println(printBitString(Bitboard.rookAttacks[square.bbIndex()]));
-      System.out.println(Bitboard.toString(Bitboard.rookAttacks[square.bbIndex()]));
+      System.out.println(printBitString(Bitboard.rookPseudoAttacks[square.bbIndex()]));
+      System.out.println(Bitboard.toString(Bitboard.rookPseudoAttacks[square.bbIndex()]));
       System.out.println();
     }
 
@@ -214,8 +214,8 @@ class BitboardTest {
     System.out.println("QUEEN\n");
     for (Square square : validSquares) {
       System.out.println(square);
-      System.out.println(printBitString(Bitboard.queenAttacks[square.bbIndex()]));
-      System.out.println(Bitboard.toString(Bitboard.queenAttacks[square.bbIndex()]));
+      System.out.println(printBitString(Bitboard.queenPseudoAttacks[square.bbIndex()]));
+      System.out.println(Bitboard.toString(Bitboard.queenPseudoAttacks[square.bbIndex()]));
       System.out.println();
     }
 
@@ -1405,6 +1405,34 @@ class BitboardTest {
     System.out.println();
     assertEquals(18049583016051201l, slidingMoves);
 
+  }
+
+  @Test
+  void loopThroughPiecesLSB() {
+    long bitboard = -1;
+    int sqx;
+    int counter = 0;
+    while ((sqx = Bitboard.getLSB(bitboard)) != 64) {
+      LOG.debug("{}", String.format("%n%s (%,d)", Bitboard.printBitString(bitboard), bitboard));
+      LOG.debug("{}", Square.index64Map[sqx]);
+      counter++;
+      bitboard = removeLSB(bitboard);
+    }
+    assertEquals(64, counter);
+  }
+
+  @Test
+  void loopThroughPiecesMSB() {
+    long bitboard = -1;
+    int sqx;
+    int counter = 0;
+    while ((sqx = Bitboard.getMSB(bitboard)) != -1) {
+      LOG.debug("{}", String.format("%n%s (%,d)", Bitboard.printBitString(bitboard), bitboard));
+      LOG.debug("{}", Square.index64Map[sqx]);
+      counter++;
+      bitboard = removeBit(bitboard, sqx);
+    }
+    assertEquals(64, counter);
   }
 
 }

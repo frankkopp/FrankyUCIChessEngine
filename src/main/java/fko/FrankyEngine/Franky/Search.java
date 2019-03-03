@@ -1298,6 +1298,9 @@ public class Search implements Runnable {
       if (check != givesCheck) {
         System.out.println("BUG");
         position.hasCheck();
+        position.undoMove();
+        position.givesCheck(move);
+        position.makeMove(move);
       }
       assert check == givesCheck
         : "Position check after move not the same as before the move";

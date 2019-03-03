@@ -954,7 +954,7 @@ public class Position {
 
       case ROOK:
         // is attack even possible
-        if ((Bitboard.rookAttacks[targetSquare.bbIndex()] & kingSquare.bitboard()) == 0)
+        if ((Bitboard.rookPseudoAttacks[targetSquare.bbIndex()] & kingSquare.bitboard()) == 0)
           break;
         // squares in between attacker and king
         intermediate = Bitboard.intermediate[targetSquare.bbIndex()][kingSquareIdx];
@@ -968,7 +968,7 @@ public class Position {
 
       case BISHOP:
         // is attack even possible
-        if ((Bitboard.bishopAttacks[targetSquare.bbIndex()] & kingSquare.bitboard()) == 0)
+        if ((Bitboard.bishopPseudoAttacks[targetSquare.bbIndex()] & kingSquare.bitboard()) == 0)
           break;
         // squares in between attacker and king
         intermediate = Bitboard.intermediate[targetSquare.bbIndex()][kingSquareIdx];
@@ -994,14 +994,14 @@ public class Position {
     // @formatter:off
     // rooks
     // Check if there are any rooks on possible attack squares
-    if ((Bitboard.rookAttacks[kingSquareIdx] &
+    if ((Bitboard.rookPseudoAttacks[kingSquareIdx] &
       piecesBitboards[attackerColorIdx][PieceType.ROOK.ordinal()]) != 0
     ) {
       // iterate over all pieces
       for (int s = 0, size = rookSquares[attackerColorIdx].size(); s < size; s++) {
         final int sqIdx = rookSquares[attackerColorIdx].get(s).bbIndex();
         // if the square is not reachable from the piece's square we can skip this
-        if ((Bitboard.rookAttacks[sqIdx] & kingSquare.bitboard()) == 0) continue;
+        if ((Bitboard.rookPseudoAttacks[sqIdx] & kingSquare.bitboard()) == 0) continue;
         // if there are no occupied squares between the piece square and the
         // target square we have a check
         intermediate = Bitboard.intermediate[sqIdx][kingSquareIdx];
@@ -1016,14 +1016,14 @@ public class Position {
     }
 
      // Check if there are any bishops on possible attack squares
-    if ((Bitboard.bishopAttacks[kingSquareIdx] &
+    if ((Bitboard.bishopPseudoAttacks[kingSquareIdx] &
       piecesBitboards[attackerColorIdx][PieceType.BISHOP.ordinal()]) != 0
     ) {
       // iterate over all pieces
       for (int s = 0, size = bishopSquares[attackerColorIdx].size(); s < size; s++) {
         final int sqIdx = bishopSquares[attackerColorIdx].get(s).bbIndex();
         // if the square is not reachable from the piece's square we can skip this
-        if ((Bitboard.bishopAttacks[sqIdx] & kingSquare.bitboard()) == 0) continue;
+        if ((Bitboard.bishopPseudoAttacks[sqIdx] & kingSquare.bitboard()) == 0) continue;
         // if there are no occupied squares between the piece square and the
         // target square we have a check
         intermediate = Bitboard.intermediate[sqIdx][kingSquareIdx];
@@ -1038,14 +1038,14 @@ public class Position {
     }
 
     // Check if there are any queens on possible attack squares
-    if ((Bitboard.queenAttacks[kingSquareIdx] &
+    if ((Bitboard.queenPseudoAttacks[kingSquareIdx] &
       piecesBitboards[attackerColorIdx][PieceType.QUEEN.ordinal()]) != 0
     ) {
       // iterate over all pieces
       for (int s = 0, size = queenSquares[attackerColorIdx].size(); s < size; s++) {
         final int sqIdx = queenSquares[attackerColorIdx].get(s).bbIndex();
         // if the square is not reachable from the piece's square we can skip this
-        if ((Bitboard.queenAttacks[sqIdx] & kingSquare.bitboard()) == 0) continue;
+        if ((Bitboard.queenPseudoAttacks[sqIdx] & kingSquare.bitboard()) == 0) continue;
         // if there are no occupied squares between the piece square and the
         // target square we have a check
         intermediate = Bitboard.intermediate[sqIdx][kingSquareIdx];
@@ -1067,7 +1067,7 @@ public class Position {
    * @return true if current position has check for next player
    */
   public boolean hasCheck() {
-    if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
+    //if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
     boolean check = isAttacked(nextPlayer.inverse(), kingSquares[nextPlayer.ordinal()]);
     hasCheck = check ? Flag.TRUE : Flag.FALSE;
     return check;
@@ -1128,9 +1128,9 @@ public class Position {
     // Sliding
     // rooks and queens
     if (
-      (Bitboard.rookAttacks[squareIndex64]
+      (Bitboard.rookPseudoAttacks[squareIndex64]
         & attackerPiecesBitboard[PieceType.ROOK.ordinal()]) != 0
-        || ((Bitboard.queenAttacks[squareIndex64]
+        || ((Bitboard.queenPseudoAttacks[squareIndex64]
         & attackerPiecesBitboard[PieceType.QUEEN.ordinal()]) != 0)) {
 
       if (((Bitboard.getSlidingMovesRank(attackedSquare, this)
@@ -1140,9 +1140,9 @@ public class Position {
     }
 
     // bishop and queens
-    if ((Bitboard.bishopAttacks[squareIndex64]
+    if ((Bitboard.bishopPseudoAttacks[squareIndex64]
       & attackerPiecesBitboard[PieceType.BISHOP.ordinal()]) != 0
-      || ((Bitboard.queenAttacks[squareIndex64]
+      || ((Bitboard.queenPseudoAttacks[squareIndex64]
       & attackerPiecesBitboard[PieceType.QUEEN.ordinal()]) != 0)) {
 
       if (((Bitboard.getSlidingMovesDiagUp(attackedSquare, this)
@@ -1206,9 +1206,9 @@ public class Position {
 
     // Sliding
     // rooks and queens
-    if ((Bitboard.rookAttacks[attackedSquare.bbIndex()]
+    if ((Bitboard.rookPseudoAttacks[attackedSquare.bbIndex()]
       & piecesBitboards[attackerColor.ordinal()][PieceType.ROOK.ordinal()]) != 0
-      || ((Bitboard.queenAttacks[attackedSquare.bbIndex()]
+      || ((Bitboard.queenPseudoAttacks[attackedSquare.bbIndex()]
       & piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()]) != 0)) {
 
       if (((Bitboard.getSlidingMovesRank(attackedSquare, this)
@@ -1218,9 +1218,9 @@ public class Position {
     }
 
     // bishop and queens
-    if ((Bitboard.bishopAttacks[attackedSquare.bbIndex()]
+    if ((Bitboard.bishopPseudoAttacks[attackedSquare.bbIndex()]
       & piecesBitboards[attackerColor.ordinal()][PieceType.BISHOP.ordinal()]) != 0
-      || ((Bitboard.queenAttacks[attackedSquare.bbIndex()]
+      || ((Bitboard.queenPseudoAttacks[attackedSquare.bbIndex()]
       & piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()]) != 0)) {
 
       if (((Bitboard.getSlidingMovesDiagUp(attackedSquare, this)

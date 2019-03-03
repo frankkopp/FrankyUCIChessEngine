@@ -169,7 +169,7 @@ public class TimingTests {
     Function f3 = o -> {
       int sqx;
       long tmpBB = pawnBB;
-      while ((sqx = getLSB(tmpBB)) != 64) {
+      while ((sqx = getMSB(tmpBB)) != 64) {
         final Square square = Square.index64Map[sqx];
         assertEquals(PieceType.PAWN, position.getPiece(square).getType());
         tmpBB = Bitboard.removeBit(tmpBB, sqx);
@@ -180,10 +180,10 @@ public class TimingTests {
     Function f4 = o -> {
       int sqx;
       long tmpBB = pawnBB;
-      while ((sqx = 63 - getMSB(tmpBB)) != -1) {
+      while ((sqx = getLSB(tmpBB)) != -1) {
         final Square square = Square.index64Map[sqx];
         assertEquals(PieceType.PAWN, position.getPiece(square).getType());
-        tmpBB = Bitboard.removeMSB(tmpBB);
+        tmpBB = Bitboard.removeLSB(tmpBB);
       }
       return null;
     };

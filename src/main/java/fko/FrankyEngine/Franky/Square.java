@@ -25,9 +25,8 @@
 
 package fko.FrankyEngine.Franky;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This enumeration class represents all squares on a chess board.
@@ -40,8 +39,7 @@ import java.util.stream.Collectors;
  */
 public enum Square {
 
-  // @formatter:off
-  /*
+  /* // @formatter:off
    0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15 */
   a1, b1, c1, d1, e1, f1, g1, h1, i1, j1, k1, l1, m1, n1, o1, p1, // 0-15
   a2, b2, c2, d2, e2, f2, g2, h2, i2, j2, k2, l2, m2, n2, o2, p2, // 16-31
@@ -91,11 +89,37 @@ public enum Square {
   public static final int[] queenDirections      = {N, NE, E, SE, S, SW, W, NW};
   public static final int[] kingDirections       = {N, NE, E, SE, S, SW, W, NW};
 
+  // precomputed values
+  private boolean validSquare;
+  private int     bbIndex;
+  private long    bitBoard;
+
+  // precomputed neighbours
+  private Square north;
+  private Square northEast;
+  private Square east;
+  private Square southEast;
+  private Square south;
+  private Square southWest;
+  private Square west;
+  private Square northWest;
+
+  // precomputed file and rank
+  private File file;
+  private Rank rank;
+
+  private boolean[] isPawnBaseRow = new boolean[2];
+
+  // precomputed diagonals
+  private long upDiag;
+  private long downDiag;
+
   /*
    * pre computed mapping from position of bit in bitboard to square
    * To get position use <code>Long.numberOfLeadingZeros</code>
    */
   private static Square[] trailingZerosMap = new Square[65];
+  private static Square[] leadingZerosMap  = new Square[65];
 
   /*
      Due to the weired way Java initializes Enums you can't access static values
@@ -107,70 +131,158 @@ public enum Square {
   // 1st static block
   static {
     values = Square.values();
+    validSquares = new ArrayList<>(64);
 
     // pre-compute fields
     for (Square s : values) {
-      // valid squares
-      if ((s.ordinal() & 0x88) == 0) {
-        s.validSquare = true;
 
-        // bbIndex is order a8=0 to h1=63
-        s.bbIndex = ((7 - (s.ordinal() / 16)) * 8) + (s.ordinal() % 16);
-        // System.out.printf("%s=%d ", this.name(), bbIndex);
-
-        // set bit for bitboard
-        final long bit = 0b1L; //1L;
-        s.bitBoard = bit << s.bbIndex;
-
-        // mapping between enum ordinal and bbIndex
-        index64Map[s.bbIndex] = s;
-        trailingZerosMap[Long.numberOfTrailingZeros(s.bitBoard)] = s;
-
-        // pre compute neighbours
-        if ((s.ordinal() + N & 0x88) == 0) s.north = Square.values()[s.ordinal() + N];
-        else s.north = NOSQUARE;
-        if ((s.ordinal() + NE & 0x88) == 0) s.northEast = Square.values()[s.ordinal() + NE];
-        else s.northEast = NOSQUARE;
-        if ((s.ordinal() + E & 0x88) == 0) s.east = Square.values()[s.ordinal() + E];
-        else s.east = NOSQUARE;
-        if ((s.ordinal() + SE & 0x88) == 0) s.southEast = Square.values()[s.ordinal() + SE];
-        else s.southEast = NOSQUARE;
-        if ((s.ordinal() + S & 0x88) == 0) s.south = Square.values()[s.ordinal() + S];
-        else s.south = NOSQUARE;
-        if ((s.ordinal() + SW & 0x88) == 0) s.southWest = Square.values()[s.ordinal() + SW];
-        else s.southWest = NOSQUARE;
-        if ((s.ordinal() + W & 0x88) == 0) s.west = Square.values()[s.ordinal() + W];
-        else s.west = NOSQUARE;
-        if ((s.ordinal() + NW & 0x88) == 0) s.northWest = Square.values()[s.ordinal() + NW];
-        else s.northWest = NOSQUARE;
-
-        // pre-compute file and rank
-        s.file = File.values[s.ordinal() % 16];
-        s.rank = Rank.values[s.ordinal() >>> 4];
-
-        // pre-compute base row squares
-        s.isPawnBaseRow[WHITE] = (s.rank.ordinal() == 1);
-        s.isPawnBaseRow[BLACK] = (s.rank.ordinal() == 6);
-      }
       // invalid squares
-      else {
+      if ((s.ordinal() & 0x88) != 0) {
         s.validSquare = false;
         s.bbIndex = -1;
         s.bitBoard = 0L;
         s.file = File.NOFILE;
         s.rank = Rank.NORANK;
+        continue;
       }
+
+      // valid squares
+      s.validSquare = true;
+      // add to valid squares list
+      validSquares.add(s);
+
+      // bbIndex is order a8=0 to h1=63
+      s.bbIndex = ((7 - (s.ordinal() / 16)) * 8) + (s.ordinal() % 16);
+      // System.out.printf("%s=%d ", this.name(), bbIndex);
+
+      // set bit for bitboard
+      s.bitBoard = 1L << s.bbIndex;
+
+      // mapping between enum ordinal and bbIndex
+      index64Map[s.bbIndex] = s;
+      trailingZerosMap[Long.numberOfTrailingZeros(s.bitBoard)] = s;
+      leadingZerosMap[Long.numberOfLeadingZeros(s.bitBoard)] = s;
+
+      // pre-compute file and rank
+      s.file = File.values[s.bbIndex & 7];
+      s.rank = Rank.values[7 - (s.bbIndex >>> 3)];
+
+      // pre-compute all neighbours
+      // middle squares have all neighbours
+      if (s.file.ordinal() > 0
+        && s.file.ordinal() < 7
+        && s.rank.ordinal() > 0
+        && s.rank.ordinal() < 7
+      ) {
+        s.north = Square.values()[s.ordinal() + N];
+        s.northEast = Square.values()[s.ordinal() + NE];
+        s.east = Square.values()[s.ordinal() + E];
+        s.southEast = Square.values()[s.ordinal() + SE];
+        s.south = Square.values()[s.ordinal() + S];
+        s.southWest = Square.values()[s.ordinal() + SW];
+        s.west = Square.values()[s.ordinal() + W];
+        s.northWest = Square.values()[s.ordinal() + NW];
+      }
+      // upper left corner
+      else if (s.file == File.a && s.rank == Rank.r8) {
+        s.north = NOSQUARE;
+        s.northEast = NOSQUARE;
+        s.east = Square.values()[s.ordinal() + E];
+        s.southEast = Square.values()[s.ordinal() + SE];
+        s.south = Square.values()[s.ordinal() + S];
+        s.southWest = NOSQUARE;
+        s.west = NOSQUARE;
+        s.northWest = NOSQUARE;
+      }
+      // upper right corner
+      else if (s.file == File.h && s.rank == Rank.r8) {
+        s.north = NOSQUARE;
+        s.northEast = NOSQUARE;
+        s.east = NOSQUARE;
+        s.southEast = NOSQUARE;
+        s.south = Square.values()[s.ordinal() + S];
+        s.southWest = Square.values()[s.ordinal() + SW];
+        s.west = Square.values()[s.ordinal() + W];
+        s.northWest = NOSQUARE;
+      }
+      // lower left corner
+      else if (s.file == File.a && s.rank == Rank.r1) {
+        s.north = Square.values()[s.ordinal() + N];
+        s.northEast = Square.values()[s.ordinal() + NE];
+        s.east = Square.values()[s.ordinal() + E];
+        s.southEast = NOSQUARE;
+        s.south = NOSQUARE;
+        s.southWest = NOSQUARE;
+        s.west = NOSQUARE;
+        s.northWest = NOSQUARE;
+      }
+      // lower right corner
+      else if (s.file == File.h && s.rank == Rank.r1) {
+        s.north = Square.values()[s.ordinal() + N];
+        s.northEast = NOSQUARE;
+        s.east = NOSQUARE;
+        s.southEast = NOSQUARE;
+        s.south = NOSQUARE;
+        s.southWest = NOSQUARE;
+        s.west = Square.values()[s.ordinal() + W];
+        s.northWest = Square.values()[s.ordinal() + NW];
+      }
+      // else upper rank
+      else if (s.rank == Rank.r8) {
+        s.north = NOSQUARE;
+        s.northEast = NOSQUARE;
+        s.east = Square.values()[s.ordinal() + E];
+        s.southEast = Square.values()[s.ordinal() + SE];
+        s.south = Square.values()[s.ordinal() + S];
+        s.southWest = Square.values()[s.ordinal() + SW];
+        s.west = Square.values()[s.ordinal() + W];
+        s.northWest = NOSQUARE;
+      }
+      // else file h
+      else if (s.file == File.h) {
+        s.north = Square.values()[s.ordinal() + N];
+        s.northEast = NOSQUARE;
+        s.east = NOSQUARE;
+        s.southEast = NOSQUARE;
+        s.south = Square.values()[s.ordinal() + S];
+        s.southWest = Square.values()[s.ordinal() + SW];
+        s.west = Square.values()[s.ordinal() + W];
+        s.northWest = Square.values()[s.ordinal() + NW];
+      }
+      // else lower rank
+      else if (s.rank == Rank.r1) {
+        s.north = Square.values()[s.ordinal() + N];
+        s.northEast = Square.values()[s.ordinal() + NE];
+        s.east = Square.values()[s.ordinal() + E];
+        s.southEast = NOSQUARE;
+        s.south = NOSQUARE;
+        s.southWest = NOSQUARE;
+        s.west = Square.values()[s.ordinal() + W];
+        s.northWest = Square.values()[s.ordinal() + NW];
+      }
+      // else file a
+      else if (s.file == File.a) {
+        s.north = Square.values()[s.ordinal() + N];
+        s.northEast = Square.values()[s.ordinal() + NE];
+        s.east = Square.values()[s.ordinal() + E];
+        s.southEast = Square.values()[s.ordinal() + SE];
+        s.south = Square.values()[s.ordinal() + S];
+        s.southWest = NOSQUARE;
+        s.west = NOSQUARE;
+        s.northWest = NOSQUARE;
+      }
+
+      // pre-compute base row squares
+      s.isPawnBaseRow[WHITE] = (s.rank.ordinal() == 1);
+      s.isPawnBaseRow[BLACK] = (s.rank.ordinal() == 6);
+
     }
 
     // When we have to find a bit in a zero-bitmap the number of trailingZeros
     // is 64 and would lead to an out of array range. Therefore this array has
     // 65 elements and the last is NOSQUARE
     trailingZerosMap[64] = NOSQUARE;
-
-    // pre-compute valid squares as an array
-    validSquares = Arrays.stream(values())
-                         .filter(Square::isValidSquare)
-                         .collect(Collectors.toList());
+    leadingZerosMap[64] = NOSQUARE;
   }
 
   // upward diagonal bitboards @formatter:off
@@ -210,46 +322,11 @@ public enum Square {
     long bitboard = 0L;
     do {
       bitboard |= square.bitBoard;
-      if (up) {
-        if (square.getNorth() != NOSQUARE && square.getEast() != NOSQUARE)
-          square = square.getEast().getNorth();
-        else break;
-      }
-      else {
-        if (square.getSouth() != NOSQUARE && square.getEast() != NOSQUARE)
-          square = square.getEast().getSouth();
-        else break;
-      }
-    } while (((square.ordinal() & 0x88) == 0));
+      if (up) square = square.getNorthEast();
+      else square = square.getSouthEast();
+    } while (square != NOSQUARE);
     return bitboard;
   }
-
-  // precomputed values
-  private boolean validSquare;
-  private int     bbIndex;
-  private long    bitBoard;
-
-  // precomputed neighbours
-  private Square north;
-  private Square northEast;
-  private Square east;
-  private Square southEast;
-  private Square south;
-  private Square southWest;
-  private Square west;
-  private Square northWest;
-
-  // precomputed file and rank
-  private File file;
-  private Rank rank;
-
-  private boolean[] isPawnBaseRow = new boolean[2];
-
-  // precomputed diagonals
-  private long upDiag;
-  private long downDiag;
-
-  // @formatter:on
 
   /**
    * Default enum constructor
@@ -337,7 +414,9 @@ public enum Square {
    * @return the first Square of the given Bitboard from a8-h8-h1
    */
   public static Square getMSBSquare(long bitboard) {
-    return trailingZerosMap[63 - Bitboard.getMSB(bitboard)];
+    final int msb = Bitboard.getMSB(bitboard);
+    if (msb == -1) return NOSQUARE;
+    return trailingZerosMap[msb];
   }
 
   /**
@@ -547,6 +626,15 @@ public enum Square {
     }
 
     /**
+     * Get the file index from a square index
+     * @param sqx
+     * @return
+     */
+    public static int index64file(int sqx) {
+      return sqx & 7 ;
+    }
+
+    /**
      * returns the enum File for a given file number
      *
      * @param file
@@ -590,6 +678,15 @@ public enum Square {
      */
     public int get() {
       return this.ordinal() + 1;
+    }
+
+    /**
+     * Get rank index from square index
+     * @param sqx
+     * @return
+     */
+    public static int index64rank(int sqx) {
+      return 7 - (sqx >>> 3) ;
     }
 
     /**

@@ -571,6 +571,7 @@ public class PositionTest {
     position = new Position("5k2/4pp2/1N2n1pp/r3P3/P5PP/2rR4/P2RK3/8 b - -");
     move = Move.fromUCINotation(position, "c3c2");
     assertFalse(position.givesCheck(move));
+
     // blocked own piece - no check
     position = new Position("5k2/4pp2/1N2n1pp/r3P3/P5PP/2rR4/P2nK3/3R4 b - -");
     move = Move.fromUCINotation(position, "c3c2");
@@ -679,6 +680,9 @@ public class PositionTest {
     assertTrue(position.givesCheck(move));
     position = new Position("r1bqkb1r/ppp1pppp/2n2n2/1B1P4/8/8/PPPP1PPP/RNBQK1NR w KQkq -");
     move = Move.fromUCINotation(position, "d5c6");
+    assertFalse(position.givesCheck(move));
+    position = new Position("rnbq1bnr/pppkpppp/8/3p4/3P4/3Q4/PPP1PPPP/RNB1KBNR w KQ -");
+    move = Move.fromUCINotation(position, "d3h7");
     assertFalse(position.givesCheck(move));
 
   }
@@ -1023,7 +1027,7 @@ public class PositionTest {
     Square queenSquare = Square.e4;
     int queenSquareIdx = queenSquare.bbIndex();
 
-    long queenRays = Bitboard.queenAttacks[queenSquareIdx];
+    long queenRays = Bitboard.queenPseudoAttacks[queenSquareIdx];
     System.out.println("All Queen rays");
     System.out.println(Bitboard.toString(queenRays));
     System.out.println();
@@ -1051,7 +1055,7 @@ public class PositionTest {
 
       if (rayHits == 0) continue;
 
-      //      queenAttacks ^= rayHits;
+      //      queenPseudoAttacks ^= rayHits;
 
       // diag_attacks=plus7[F5];
       //	blockers=diag_attacks & occupied_squares;
