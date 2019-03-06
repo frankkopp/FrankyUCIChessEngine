@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 
+import static fko.UCI.IUCIEngine.UCIOptionType.*;
+
 /**
  * Franky Engine for UCI GUIs
  */
@@ -126,46 +128,46 @@ public class FrankyEngine implements IUCIEngine {
   private void initOptions() {
     iUciOptions = new ArrayList<>();
     // @formatter:off
-    option("Hash", UCIOptionType.spin, "" + config.HASH_SIZE, "1", "4096", "");
-    option("Clear Hash", UCIOptionType.button, "", "", "", "");
-    option("Ponder", UCIOptionType.check, Boolean.toString(config.PONDER), "", "", "");
-    option("OwnBook", UCIOptionType.check, Boolean.toString(config.USE_BOOK), "", "", "");
-    option("UCI_ShowCurrLine", UCIOptionType.check, Boolean.toString(config.UCI_ShowCurrLine), "", "", "");
-    option("Use_TranspositionTable", UCIOptionType.check, Boolean.toString(config.USE_TRANSPOSITION_TABLE), "", "", "");
-    option("Use_QSearch", UCIOptionType.check, Boolean.toString(config.USE_QUIESCENCE), "", "", "");
-    option("Use_SEE", UCIOptionType.check, Boolean.toString(config.USE_SEE), "", "", "");
-    option("Use_AlphaBeta_Pruning", UCIOptionType.check, Boolean.toString(config.USE_ALPHABETA_PRUNING), "", "", "");
-    option("Use_Killer_Moves", UCIOptionType.check, Boolean.toString(config.USE_KILLER_MOVES), "", "", "");
-    option("Number_Killer_Moves", UCIOptionType.spin, Integer.toString(config.NO_KILLER_MOVES), "0", "10", "");
-    option("Use_PVS", UCIOptionType.check, Boolean.toString(config.USE_PVS), "", "", "");
-    option("Use_PVS_Move_Ordering", UCIOptionType.check, Boolean.toString(config.USE_PVS_ORDERING), "", "", "");
-    option("Use_Aspiration_Window_Search", UCIOptionType.check, Boolean.toString(config.USE_ASPIRATION_WINDOW), "", "", "");
-    option("Aspiration_Start_Depth", UCIOptionType.spin, Integer.toString(config.ASPIRATION_START_DEPTH), "2", "2", "8");
-    option("Use_Mate_Distance_Pruning", UCIOptionType.check, Boolean.toString(config.USE_MDP), "", "", "");
-    option("Use_Minor_Promotion_Pruning", UCIOptionType.check, Boolean.toString(config.USE_MPP), "", "", "");
-    option("Use_Reverse_Futility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_RFP), "", "", "");
-    option("RFP_Margin", UCIOptionType.spin, Integer.toString(config.RFP_MARGIN), "0", "1800", "");
-    option("Use_Null_Move_Pruning", UCIOptionType.check, Boolean.toString(config.USE_NMP), "", "", "");
-    option("Null_Move_Depth", UCIOptionType.spin, Integer.toString(config.NMP_DEPTH), "1", "3", "");
-    option("Null_Move_Verification", UCIOptionType.check, Boolean.toString(config.USE_VERIFY_NMP), "", "", "");
-    option("Null_Move_Verification_Depth", UCIOptionType.spin, Integer.toString(config.NMP_VERIFICATION_DEPTH), "1", "5", "");
-    option("Use_Razor_Pruning", UCIOptionType.check, Boolean.toString(config.USE_RAZOR_PRUNING), "", "", "");
-    option("Razor_Depth", UCIOptionType.spin, Integer.toString(config.RAZOR_DEPTH), "1", "5", "");
-    option("Razor_Margin", UCIOptionType.spin, Integer.toString(config.RAZOR_MARGIN), "0", "1800", "");
-    option("Use_IID", UCIOptionType.check, Boolean.toString(config.USE_IID), "", "", "");
-    option("IID_Reduction", UCIOptionType.spin, Integer.toString(config.IID_REDUCTION), "0", "10", "");
-    option("Use_Extensions", UCIOptionType.check, Boolean.toString(config.USE_EXTENSIONS), "", "", "");
-    option("Use_Limited_Razoring", UCIOptionType.check, Boolean.toString(config.USE_LIMITED_RAZORING), "", "", "");
-    option("Use_Extended_Futility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_EXTENDED_FUTILITY_PRUNING), "", "", "");
-    option("Use_Futility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_FUTILITY_PRUNING), "", "", "");
-    option("Use_QFutility_Pruning", UCIOptionType.check, Boolean.toString(config.USE_QFUTILITY_PRUNING), "", "", "");
-    option("Use_Late_Move_Pruning", UCIOptionType.check, Boolean.toString(config.USE_LMP), "", "", "");
-    option("LMP_Min_Depth", UCIOptionType.spin, Integer.toString(config.LMP_MIN_DEPTH), "2", "10", "");
-    option("LMP_Min_Moves", UCIOptionType.spin, Integer.toString(config.LMP_MIN_MOVES), "1", "15", "");
-    option("Use_Late_Move_Reduction", UCIOptionType.check, Boolean.toString(config.USE_LMR), "", "", "");
-    option("LMR_Depth", UCIOptionType.spin, Integer.toString(config.LMR_MIN_DEPTH), "2", "10", "");
-    option("LMR_Min_Moves", UCIOptionType.spin, Integer.toString(config.LMR_MIN_MOVES), "1", "15", "");
-    option("LMR_Reduction", UCIOptionType.spin, Integer.toString(config.LMR_REDUCTION), "0", "5", "");
+    option("Hash", spin, "" + config.HASH_SIZE, "1", "4096", "");
+    option("Clear Hash", button, "", "", "", "");
+    option("Ponder", check, Boolean.toString(config.PONDER), "", "", "");
+    option("OwnBook", check, Boolean.toString(config.USE_BOOK), "", "", "");
+    option("UCI_ShowCurrLine", check, Boolean.toString(config.UCI_ShowCurrLine), "", "", "");
+    option("Use_TranspositionTable", check, Boolean.toString(config.USE_TRANSPOSITION_TABLE), "", "", "");
+    option("Use_QSearch", check, Boolean.toString(config.USE_QUIESCENCE), "", "", "");
+    option("Use_SEE", check, Boolean.toString(config.USE_SEE), "", "", "");
+    option("Use_AlphaBeta_Pruning", check, Boolean.toString(config.USE_ALPHABETA_PRUNING), "", "", "");
+    option("Use_Killer_Moves", check, Boolean.toString(config.USE_KILLER_MOVES), "", "", "");
+    option("Number_Killer_Moves", spin, Integer.toString(config.NO_KILLER_MOVES), "0", "10", "");
+    option("Use_PVS", check, Boolean.toString(config.USE_PVS), "", "", "");
+    option("Use_PVS_Move_Ordering", check, Boolean.toString(config.USE_PVS_ORDERING), "", "", "");
+    option("Use_Aspiration_Window_Search", check, Boolean.toString(config.USE_ASPIRATION_WINDOW), "", "", "");
+    option("Aspiration_Start_Depth", spin, Integer.toString(config.ASPIRATION_START_DEPTH), "2", "8", "");
+    option("Use_Mate_Distance_Pruning", check, Boolean.toString(config.USE_MDP), "", "", "");
+    option("Use_Minor_Promotion_Pruning", check, Boolean.toString(config.USE_MPP), "", "", "");
+    option("Use_Reverse_Futility_Pruning", check, Boolean.toString(config.USE_RFP), "", "", "");
+    option("RFP_Margin", spin, Integer.toString(config.RFP_MARGIN), "0", "1800", "");
+    option("Use_Null_Move_Pruning", check, Boolean.toString(config.USE_NMP), "", "", "");
+    option("Null_Move_Depth", spin, Integer.toString(config.NMP_DEPTH), "1", "3", "");
+    option("Null_Move_Verification", check, Boolean.toString(config.USE_VERIFY_NMP), "", "", "");
+    option("Null_Move_Verification_Depth", spin, Integer.toString(config.NMP_VERIFICATION_DEPTH), "1", "5", "");
+    option("Use_Razor_Pruning", check, Boolean.toString(config.USE_RAZOR_PRUNING), "", "", "");
+    option("Razor_Depth", spin, Integer.toString(config.RAZOR_DEPTH), "1", "5", "");
+    option("Razor_Margin", spin, Integer.toString(config.RAZOR_MARGIN), "0", "1800", "");
+    option("Use_IID", check, Boolean.toString(config.USE_IID), "", "", "");
+    option("IID_Reduction", spin, Integer.toString(config.IID_REDUCTION), "0", "10", "");
+    option("Use_Extensions", check, Boolean.toString(config.USE_EXTENSIONS), "", "", "");
+    option("Use_Limited_Razoring", check, Boolean.toString(config.USE_LIMITED_RAZORING), "", "", "");
+    option("Use_Extended_Futility_Pruning", check, Boolean.toString(config.USE_EXTENDED_FUTILITY_PRUNING), "", "", "");
+    option("Use_Futility_Pruning", check, Boolean.toString(config.USE_FUTILITY_PRUNING), "", "", "");
+    option("Use_QFutility_Pruning", check, Boolean.toString(config.USE_QFUTILITY_PRUNING), "", "", "");
+    option("Use_Late_Move_Pruning", check, Boolean.toString(config.USE_LMP), "", "", "");
+    option("LMP_Min_Depth", spin, Integer.toString(config.LMP_MIN_DEPTH), "2", "10", "");
+    option("LMP_Min_Moves", spin, Integer.toString(config.LMP_MIN_MOVES), "1", "15", "");
+    option("Use_Late_Move_Reduction", check, Boolean.toString(config.USE_LMR), "", "", "");
+    option("LMR_Depth", spin, Integer.toString(config.LMR_MIN_DEPTH), "2", "10", "");
+    option("LMR_Min_Moves", spin, Integer.toString(config.LMR_MIN_MOVES), "1", "15", "");
+    option("LMR_Reduction", spin, Integer.toString(config.LMR_REDUCTION), "0", "5", "");
     // @formatter:on
   }
 
