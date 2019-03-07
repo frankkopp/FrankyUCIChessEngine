@@ -33,7 +33,6 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.directory.SearchResult;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
@@ -848,7 +847,7 @@ public class Search implements Runnable {
     // ###############################################
     // DRAW by REPETITION
     // Check draw through 50-moves-rule, 3-fold-repetition
-    // In non root nodes we evaluate each repetition as draw within
+    // In non-root nodes we evaluate each repetition as draw within
     // the search tree - this way we detect repetition
     // earlier - this should not weaken the search
     if (!PERFT) {
@@ -949,7 +948,7 @@ public class Search implements Runnable {
 
     // ###############################################
     // FORWARD PRUNING BETA             @formatter:off
-    // Pruning which return a beta value and not just
+    // Prunings which return a beta value and not just
     // skip moves.
     // - Static Eval
     // - RFP
