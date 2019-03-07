@@ -29,26 +29,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** UCIOption */
-public class UCIOption implements IUCIEngine.IUCIOption {
+public class UCIOption implements IUCIOption {
 
   private static final Logger LOG = LoggerFactory.getLogger(UCIOption.class);
 
-  final String nameID;
-  final IUCIEngine.UCIOptionType type;
-  final String defaultValue;
-  final String minValue;
-  final String maxValue;
-  final String varValue;
+  final String        nameID;
+  final UCIOptionType type;
+  final String        defaultValue;
+  final String        minValue;
+  final String        maxValue;
+  final String        varValue;
 
   String chosenValue;
 
   public UCIOption(
-      final String nameID,
-      final IUCIEngine.UCIOptionType type,
-      final String defaultValue,
-      final String minValue,
-      final String maxValue,
-      final String varValue) {
+    final String nameID,
+    final UCIOptionType type,
+    final String defaultValue,
+    final String minValue,
+    final String maxValue,
+    final String varValue) {
 
     this.nameID = nameID;
     this.type = type;
@@ -65,7 +65,7 @@ public class UCIOption implements IUCIEngine.IUCIOption {
   }
 
   @Override
-  public IUCIEngine.UCIOptionType getOptionType() {
+  public UCIOptionType getOptionType() {
     return type;
   }
 

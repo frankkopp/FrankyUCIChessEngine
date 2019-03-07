@@ -200,8 +200,8 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
     send("id name " + uciEngine.getIDName());
     send("id author " + uciEngine.getIDAuthor());
 
-    List<IUCIEngine.IUCIOption> uciOptionList = uciEngine.getOptions();
-    for (IUCIEngine.IUCIOption option : uciOptionList) {
+    List<IUCIOption> uciOptionList = uciEngine.getOptions();
+    for (IUCIOption option : uciOptionList) {
       String optionString = "option name " + option.getNameID();
       optionString += " type " + option.getOptionType().name();
       optionString += " default " + option.getDefaultValue();

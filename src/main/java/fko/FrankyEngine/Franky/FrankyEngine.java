@@ -25,10 +25,7 @@
 
 package fko.FrankyEngine.Franky;
 
-import fko.UCI.IUCIEngine;
-import fko.UCI.IUCIProtocolHandler;
-import fko.UCI.IUCISearchMode;
-import fko.UCI.UCIOption;
+import fko.UCI.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +35,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 
-import static fko.UCI.IUCIEngine.UCIOptionType.*;
+import static fko.UCI.IUCIOption.UCIOptionType.*;
 
 /**
  * Franky Engine for UCI GUIs
@@ -63,7 +60,7 @@ public class FrankyEngine implements IUCIEngine {
   private final String iDAuthor;
 
   // options of engine
-  private List<IUCIEngine.IUCIOption> iUciOptions;
+  private List<IUCIOption> iUciOptions;
 
   // engine state
   private Position   position;
@@ -171,7 +168,8 @@ public class FrankyEngine implements IUCIEngine {
     // @formatter:on
   }
 
-  private void option(String hash, UCIOptionType spin, String def, String min, String max,
+  private void option(String hash, IUCIOption.UCIOptionType spin, String def, String min,
+                      String max,
                       String val) {
     iUciOptions.add(new UCIOption(hash, spin, def, min, max, val));
   }
