@@ -37,6 +37,10 @@ import static fko.FrankyEngine.Franky.Square.*;
  *
  * Much of this is inspired and taken from Beowulf (Colin Frayn)
  * All credit goes to him!
+ *
+ * TODO:
+ *  * Magic Bitboards
+ *
  */
 public class Bitboard {
 
@@ -158,7 +162,7 @@ public class Bitboard {
   }
 
   /**
-   * Returns a string representing a bitboard as a binary long group in 8-bit
+   * Returns a string representing a bitboard as a binary long grouped in 8-bit
    * blocks.
    *
    * @param bitboard
@@ -353,6 +357,7 @@ public class Bitboard {
    * @return
    */
   public static int getShiftUp(Square square) { return shiftsDiagUp[square.bbIndex()]; }
+
   /**
    * To generate a bitboard where all diagonal squares are next to each other the
    * bitboard needs to be rotated. To get the diagonals squares into the lower
@@ -363,6 +368,7 @@ public class Bitboard {
    * @return
    */
   public static int getShiftUp(int idx) { return shiftsDiagUp[idx]; }
+
   private static final int[] shiftsDiagUp = new int[]{ // @formatter:off
      0,  1,  3,  6, 10, 15, 21, 28,
      1,  3,  6, 10, 15, 21, 28, 36,
@@ -384,6 +390,7 @@ public class Bitboard {
    * @return
    */
   public static int getShiftDown(Square square) { return shiftsDiagDown[square.bbIndex()]; }
+
   /**
    * To generate a bitboard where all diagonal squares are next to each other the
    * bitboard needs to be rotated. To get the diagonals squares into the lower
@@ -394,6 +401,7 @@ public class Bitboard {
    * @return
    */
   public static int getShiftDown(int idx) { return shiftsDiagDown[idx]; }
+
   private static final int[] shiftsDiagDown = new int[]{ // @formatter:off
     28, 21, 15, 10,  6,  3,  1,  0,
     36, 28, 21, 15, 10,  6,  3,  1,
@@ -415,6 +423,7 @@ public class Bitboard {
    * @return
    */
   public static long getLengthMaskUp(int idx) { return (1L << lengthDiagUp[idx]) - 1; }
+
   /**
    * To generate a bitboard where all diagonal squares are next to each other the
    * bitboard needs to be rotated. To get the diagonals squares into the lower
@@ -427,6 +436,7 @@ public class Bitboard {
   public static long getLengthMaskUp(Square square) {
     return (1L << lengthDiagUp[square.bbIndex()]) - 1;
   }
+
   static final int[] lengthDiagUp = new int[]{ // @formatter:off
     1, 2, 3, 4, 5, 6, 7, 8,
     2, 3, 4, 5, 6, 7, 8, 7,
@@ -450,6 +460,7 @@ public class Bitboard {
   public static long getLengthMaskDown(Square square) {
     return (1L << lengthDiagDown[square.bbIndex()]) - 1;
   }
+
   /**
    * To generate a bitboard where all diagonal squares are next to each other the
    * bitboard needs to be rotated. To get the diagonals squares into the lower
@@ -460,6 +471,7 @@ public class Bitboard {
    * @return
    */
   public static long getLengthMaskDown(int idx) { return (1L << lengthDiagDown[idx]) - 1; }
+
   /* These simply store the length of the diagonal in the required sense */
   static final int[] lengthDiagDown = new int[]{ // @formatter:off
     8, 7, 6, 5, 4, 3, 2, 1,
@@ -473,16 +485,12 @@ public class Bitboard {
   }; // @formatter:on
 
   /**
-   * Bitboards for all possible horizontal moves on the rank of the square with
-   * the rank content (blocking pieces) determined from the given position.
-   */
-  public static long getSlidingMovesRank(Square square, Position position) {
-    return getSlidingMovesRank(square, position.getAllOccupiedBitboard());
-  }
-
-  /**
    * Bitboard for all possible horizontal moves on the rank of the square with
    * the rank content (blocking pieces) determined from the given pieces bitboard.
+   * No rotation necessary.
+   * @param square
+   * @param content the non rotated content of the board
+   * @return bitboard with the possible moves including capturing of own pieces (defending)
    */
   public static long getSlidingMovesRank(Square square, long content) {
     // content = the pieces currently on the board and maybe blocking the moves
@@ -497,22 +505,29 @@ public class Bitboard {
   static final long[][] movesRank = new long[64][256];
 
   /**
-   * Bitboard for all possible horizontal moves on the file of the square with
-   * the file content (blocking pieces) determined from the given position.
+   * Bitboard for all possible horizontal moves on the rank of the square with
+   * the rank content (blocking pieces) determined from the given pieces bitboard.
+   * @param square
+   * @param content the content of the board
+   * @return bitboard with the possible moves including capturing of own pieces (defending)
    */
-  public static long getSlidingMovesFile(Square square, Position position) {
-    return getSlidingMoves(square, position.getAllOccupiedBitboardR90());
+  public static long getSlidingMovesFile(Square square, long content) {
+    return getSlidingMoves(square, rotateR90(content));
   }
 
   /**
    * Bitboard for all possible horizontal moves on the rank of the square with
    * the rank content (blocking pieces) determined from the given pieces bitboard.
+   * @param square
+   * @param content the content of the board
+   * @param isRotated if the content is not already rotated it will be rotated with R90
+   * @return bitboard with the possible moves including capturing of own pieces (defending)
    */
-  public static long getSlidingMovesFile(Square square, long content) {
+  public static long getSlidingMovesFile(Square square, long content, boolean isRotated) {
     // content = the pieces currently on the board and maybe blocking the moves
     // rotate the content of the board to get all file squares in a row
-    final long rotated = rotateR90(content);
-    return getSlidingMoves(square, rotated);
+    if (isRotated) return getSlidingMoves(square, content);
+    else return getSlidingMoves(square, rotateR90(content));
   }
 
   private static long getSlidingMoves(Square square, long rotated) {
@@ -527,44 +542,36 @@ public class Bitboard {
 
   /**
    * Bitboard for all possible diagonal up moves of the square with
-   * the content (blocking pieces) determined from the given pieces position.
+   * the content (blocking pieces) determined from the given pieces bitboard.
+   *
+   * @param square
+   * @param content the content of the board
+   * @param isRotated if the content is not already rotated it will be rotated with R45
+   * @return bitboard with the possible moves including capturing of own pieces (defending)
    */
-  public static long getSlidingMovesDiagUp(Square square, Position position) {
-    return getSlidingMovesDiag(square, position.getAllOccupiedBitboardR45(), getShiftUp(square),
-                               getLengthMaskUp(square), movesUpDiag);
-  }
-  /**
-   * Bitboard for all possible diagonal up moves of the square with
-   *    * the content (blocking pieces) determined from the given pieces bitboard.
-   */
-  public static long getSlidingMovesDiagUp(Square square, long content) {
+  public static long getSlidingMovesDiagUp(Square square, long content, boolean isRotated) {
     // content = the pieces currently on the board and maybe blocking the moves
     // rotate the content of the board to get all diagonals in a row
-    final long rotated = rotateR45(content);
-    //    System.out.printf("Rotated: %s%n", Bitboard.printBitString(rotated));
+    final long rotated = isRotated ? content : rotateR45(content);
+    // shift the correct row to the first byte (to the right in Java)
     return getSlidingMovesDiag(square, rotated, getShiftUp(square), getLengthMaskUp(square),
                                movesUpDiag);
   }
   static final long[][] movesUpDiag = new long[64][256];
 
   /**
-   * Bitboard for all possible diagonal down moves on the rank of the square with
-   * the rank content (blocking pieces) determined from the given pieces position.
-   */
-  public static long getSlidingMovesDiagDown(Square square, Position position) {
-    return getSlidingMovesDiag(square, position.getAllOccupiedBitboardL45(), getShiftDown(square),
-                               getLengthMaskDown(square), movesDownDiag);
-  }
-
-  /**
    * Bitboard for all possible horizontal moves on the rank of the square with
    * the rank content (blocking pieces) determined from the given pieces bitboard.
+   *
+   * @param square
+   * @param content the content of the board
+   * @param isRotated if the content is not already rotated it will be rotated with L45
+   * @return bitboard with the possible moves including capturing of own pieces (defending)
    */
-  public static long getSlidingMovesDiagDown(Square square, long content) {
+  public static long getSlidingMovesDiagDown(Square square, long content, boolean isRotated) {
     // content = the pieces currently on the board and maybe blocking the moves
     // rotate the content of the board to get all diagonals in a row
-    final long rotated = rotateL45(content);
-    //    System.out.printf("Rotated: %s%n", Bitboard.printBitString(rotated));
+    final long rotated = isRotated ? content : rotateL45(content);
     // shift the correct row to the first byte (to the right in Java)
     return getSlidingMovesDiag(square, rotated, getShiftDown(square), getLengthMaskDown(square),
                                movesDownDiag);
@@ -688,17 +695,17 @@ public class Bitboard {
 
         movesUpDiag[i][j] = mask2;
 
-        //        String bitString = printBitString(j);
-        //        Square square = index64Map[i];
-        //        System.out.printf(">Square %s: Length: %d movesUpDiag[ %2d ][ %8s ] = %s (%d)%n",
-        //                          square,
-        //                          lengthDiagUp[i],
-        //                          square.getIndex64(),
-        //                          bitString.substring(bitString.length() - 8),
-        //                          Bitboard.printBitString(movesUpDiag[i][j]),
-        //                          movesUpDiag[square.getIndex64()][j]);
+        // String bitString = printBitString(j);
+        // Square square = index64Map[i];
+        // System.out.printf(">Square %s: Length: %d movesUpDiag[ %2d ][ %8s ] = %s (%d)%n",
+        //                   square,
+        //                   lengthDiagUp[i],
+        //                   square.getIndex64(),
+        //                   bitString.substring(bitString.length() - 8),
+        //                   Bitboard.printBitString(movesUpDiag[i][j]),
+        //                   movesUpDiag[square.getIndex64()][j]);
       }
-      //System.out.println();
+      // System.out.println();
     }
 
     // All sliding attacks with blocker - down diag sliders
@@ -731,16 +738,14 @@ public class Bitboard {
         for (int x = 0; x < dl; x++) mask2 += (((mask >> x) & 1) << (diagstart + (9 * x)));
         movesDownDiag[i][j] = mask2;
 
-        //        long output = movesDownDiag[i][j];
-        //        String bitString = printBitString(j);
-        //        Square square = index64Map[i];
-        //        System.out.printf(">Square %s: Length: %d movesUpDiag[ %2d ][ %8s ] = %s (%d)
-        //        %n", square,
-        //                          dl, square.getIndex64(), bitString.substring(bitString.length
-        //                          () - 8),
-        //                          Bitboard.printBitString(output), output);
+        // long output = movesDownDiag[i][j];
+        // String bitString = printBitString(j);
+        // Square square = index64Map[i];
+        // System.out.printf(">Square %s: Length: %d movesUpDiag[ %2d ][ %8s ] = %s (%d)
+        // %n", square, dl, square.getIndex64(), bitString.substring(bitString.length() - 8),
+        // Bitboard.printBitString(output), output);
       }
-      //      System.out.println();
+      // System.out.println();
     }
 
     // white pawn attacks - ignore that pawns can'*t be on all squares
@@ -770,7 +775,7 @@ public class Bitboard {
       }
     });
 
-    // bishop attacks
+    // bishop & queen attacks
     validSquares.forEach(square -> {
       for (int d : bishopDirections) {
         int to = square.ordinal() + d;
@@ -778,79 +783,24 @@ public class Bitboard {
           final long toBitboard = getSquare(to).bitboard();
           final int sqIdx = square.bbIndex();
           bishopPseudoAttacks[sqIdx] |= toBitboard;
-          switch (d) {
-            case NW:
-              rays[NORTHWEST][sqIdx] |= toBitboard;
-              break;
-            case N:
-              rays[NORTH][sqIdx] |= toBitboard;
-              break;
-            case NE:
-              rays[NORTHEAST][sqIdx] |= toBitboard;
-              break;
-            case E:
-              rays[EAST][sqIdx] |= toBitboard;
-              break;
-            case SE:
-              rays[SOUTHEAST][sqIdx] |= toBitboard;
-              break;
-            case S:
-              rays[SOUTH][sqIdx] |= toBitboard;
-              break;
-            case SW:
-              rays[SOUTHWEST][sqIdx] |= toBitboard;
-              break;
-            case W:
-              rays[WEST][sqIdx] |= toBitboard;
-              break;
-          }
+          queenPseudoAttacks[sqIdx] |= toBitboard;
           to += d; // next sliding field in this factor
         }
       }
     });
-    // rook attacks
+
+    // rook & queen attacks
     validSquares.forEach(square -> {
       for (int d : rookDirections) {
         int to = square.ordinal() + d;
         while ((to & 0x88) == 0) { // slide while valid square
           final long toBitboard = getSquare(to).bitboard();
           final int sqIdx = square.bbIndex();
-          rookPseudoAttacks[square.bbIndex()] |= getSquare(to).bitboard();
-          switch (d) {
-            case NW:
-              rays[NORTHWEST][sqIdx] |= toBitboard;
-              break;
-            case N:
-              rays[NORTH][sqIdx] |= toBitboard;
-              break;
-            case NE:
-              rays[NORTHEAST][sqIdx] |= toBitboard;
-              break;
-            case E:
-              rays[EAST][sqIdx] |= toBitboard;
-              break;
-            case SE:
-              rays[SOUTHEAST][sqIdx] |= toBitboard;
-              break;
-            case S:
-              rays[SOUTH][sqIdx] |= toBitboard;
-              break;
-            case SW:
-              rays[SOUTHWEST][sqIdx] |= toBitboard;
-              break;
-            case W:
-              rays[WEST][sqIdx] |= toBitboard;
-              break;
-          }
+          rookPseudoAttacks[sqIdx] |= toBitboard;
+          queenPseudoAttacks[sqIdx] |= toBitboard;
           to += d; // next sliding field in this factor
         }
       }
-    });
-
-    // queen attacks
-    validSquares.forEach(square -> {
-      queenPseudoAttacks[square.bbIndex()] = rookPseudoAttacks[square.bbIndex()]
-        | bishopPseudoAttacks[square.bbIndex()];
     });
 
     // king attacks

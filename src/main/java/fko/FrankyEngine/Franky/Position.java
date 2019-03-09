@@ -696,8 +696,10 @@ public class Position {
       : "piece to move not there";
     assert (x88Board[toSquare.ordinal()] == Piece.NOPIECE) // // should be empty
       : "to square should be empty";
+
     // due to performance we do not call remove and put
     // no need to update counters when moving
+
     // remove
     x88Board[fromSquare.ordinal()] = Piece.NOPIECE;
     zobristKey = this.zobristKey ^ pieceZobrist[piece.ordinal()][fromSquare.ordinal()]; // out
@@ -705,6 +707,7 @@ public class Position {
     final int color = piece.getColor().ordinal();
     removeFromPieceLists(fromSquare, piece, color);
     removeFromBitboards(fromSquare, piece, color);
+
     // put
     x88Board[toSquare.ordinal()] = piece;
     zobristKey = this.zobristKey ^ pieceZobrist[piece.ordinal()][toSquare.ordinal()]; // in
@@ -717,6 +720,7 @@ public class Position {
     assert square.isValidSquare();
     assert piece != Piece.NOPIECE;
     assert x88Board[square.ordinal()] == Piece.NOPIECE; // should be empty
+
     // put
     x88Board[square.ordinal()] = piece;
     zobristKey = this.zobristKey ^ pieceZobrist[piece.ordinal()][square.ordinal()]; // in
@@ -736,6 +740,7 @@ public class Position {
     assert piece != Piece.NOPIECE;
     assert x88Board[square.ordinal()] == piece // check if removed piece is indeed there
       : "piece to be removed not there";
+
     // remove
     Piece old = x88Board[square.ordinal()];
     x88Board[square.ordinal()] = Piece.NOPIECE;
@@ -835,10 +840,8 @@ public class Position {
 
   private void removeFromBitboards(Square fromSquare, Piece piece, int color) {
     // update piece bitboards
-    assert (piecesBitboards[color][piece.getType().ordinal()]
-      & fromSquare.bitboard()) == fromSquare.bitboard()
-      : "Bit to be removed is not set!";
-    ;
+    assert (piecesBitboards[color][piece.getType().ordinal()] & fromSquare.bitboard()) == fromSquare
+      .bitboard() : "Bit to be removed is not set!";
     piecesBitboards[color][piece.getType().ordinal()] ^= fromSquare.bitboard();
 
     assert (occupiedBitboards[color] & fromSquare.bitboard()) == fromSquare.bitboard()
@@ -874,7 +877,7 @@ public class Position {
     // fromSquare
     final Square fromSquare = Move.getStart(move);
     // target square
-    Square targetSquare = Move.getEnd(move);
+    Square toSquare = Move.getEnd(move);
     // the moving piece
     PieceType pieceType = Move.getPiece(move).getType();
     // the square captured by en passant capture
@@ -889,21 +892,21 @@ public class Position {
       // set the target square to the rook square and
       // piece type to ROOK. King can't give check
       // also no revealed check possible in castling
-      switch (targetSquare) {
+      switch (toSquare) {
         case g1: // white king side castle
-          targetSquare = Square.f1;
+          toSquare = Square.f1;
           pieceType = PieceType.ROOK;
           break;
         case c1: // white queen side castle
-          targetSquare = Square.d1;
+          toSquare = Square.d1;
           pieceType = PieceType.ROOK;
           break;
         case g8: // black king side castle
-          targetSquare = Square.f8;
+          toSquare = Square.f8;
           pieceType = PieceType.ROOK;
           break;
         case c8: // black queen side castle
-          targetSquare = Square.d8;
+          toSquare = Square.d8;
           pieceType = PieceType.ROOK;
           break;
       }
@@ -911,16 +914,16 @@ public class Position {
     // en passant
     else if (Move.getMoveType(move) == MoveType.ENPASSANT) {
       epTargetSquare = Move.getTarget(move).getColor().isWhite()
-                       ? targetSquare.getNorth()
-                       : targetSquare.getSouth();
+                       ? toSquare.getNorth()
+                       : toSquare.getSouth();
     }
 
     // queen can be rook or bishop
     if (pieceType == PieceType.QUEEN) {
       // if queen on same rank or same file then she acts like rook
       // otherwise like bishop
-      if (targetSquare.getRank() == kingSquare.getRank()
-        || targetSquare.getFile() == kingSquare.getFile()) {
+      if (toSquare.getRank() == kingSquare.getRank()
+        || toSquare.getFile() == kingSquare.getFile()) {
         pieceType = PieceType.ROOK;
       }
       else {
@@ -935,7 +938,7 @@ public class Position {
     long intermediate, boardAfterMove;
 
     // #########################################################################
-    // Direct checks
+    // Direct checks (the moved piece is giving check)
     // #########################################################################
     switch (pieceType) {
       case NOTYPE:
@@ -943,39 +946,35 @@ public class Position {
 
       case PAWN:
         // normal pawn direct chess include en passant captures
-        if ((Bitboard.pawnAttacks[attackerColorIdx][targetSquare.bbIndex()]
+        if ((Bitboard.pawnAttacks[attackerColorIdx][toSquare.bbIndex()]
           & kingSquare.bitboard()) != 0) return true;
         break;
 
       case KNIGHT:
-        if ((Bitboard.knightAttacks[targetSquare.bbIndex()] & kingSquare.bitboard()) != 0)
+        if ((Bitboard.knightAttacks[toSquare.bbIndex()] & kingSquare.bitboard()) != 0)
           return true;
         break;
 
       case ROOK:
         // is attack even possible
-        if ((Bitboard.rookPseudoAttacks[targetSquare.bbIndex()] & kingSquare.bitboard()) == 0)
+        if ((Bitboard.rookPseudoAttacks[toSquare.bbIndex()] & kingSquare.bitboard()) == 0)
           break;
         // squares in between attacker and king
-        intermediate = Bitboard.intermediate[targetSquare.bbIndex()][kingSquareIdx];
+        intermediate = Bitboard.intermediate[toSquare.bbIndex()][kingSquareIdx];
         // adapt board by moving the piece on the bitboard
-        assert (allOccupiedBitboard & fromSquare.bitboard()) != 0;
-        boardAfterMove = allOccupiedBitboard ^ fromSquare.bitboard();
-        boardAfterMove |= targetSquare.bitboard();
+        boardAfterMove = (allOccupiedBitboard ^ fromSquare.bitboard()) | toSquare.bitboard();
         // if squares in between are not occupied then it is a check
         if ((intermediate & boardAfterMove) == 0) return true;
         break;
 
       case BISHOP:
         // is attack even possible
-        if ((Bitboard.bishopPseudoAttacks[targetSquare.bbIndex()] & kingSquare.bitboard()) == 0)
+        if ((Bitboard.bishopPseudoAttacks[toSquare.bbIndex()] & kingSquare.bitboard()) == 0)
           break;
         // squares in between attacker and king
-        intermediate = Bitboard.intermediate[targetSquare.bbIndex()][kingSquareIdx];
+        intermediate = Bitboard.intermediate[toSquare.bbIndex()][kingSquareIdx];
         // adapt board by moving the piece on the bitboard
-        assert (allOccupiedBitboard & fromSquare.bitboard()) != 0;
-        boardAfterMove = allOccupiedBitboard ^ fromSquare.bitboard();
-        boardAfterMove |= targetSquare.bitboard();
+        boardAfterMove = (allOccupiedBitboard ^ fromSquare.bitboard()) | toSquare.bitboard();
         // if squares in between are not occupied then it is a check
         if ((intermediate & boardAfterMove) == 0) return true;
         break;
@@ -1006,9 +1005,8 @@ public class Position {
         // target square we have a check
         intermediate = Bitboard.intermediate[sqIdx][kingSquareIdx];
         // adapt board by moving the piece on the bitboard
-        assert (allOccupiedBitboard & fromSquare.bitboard()) != 0;
-        boardAfterMove = allOccupiedBitboard ^ fromSquare.bitboard();
-        boardAfterMove |= targetSquare.bitboard();
+        boardAfterMove = (allOccupiedBitboard ^ fromSquare.bitboard()) | toSquare.bitboard();
+        // remove the captured pawn from en passant
         if (isEnPassant) boardAfterMove ^= epTargetSquare.bitboard();
         // if squares in between are not occupied then it is a check
         if ((intermediate & boardAfterMove) == 0) return true;
@@ -1028,9 +1026,8 @@ public class Position {
         // target square we have a check
         intermediate = Bitboard.intermediate[sqIdx][kingSquareIdx];
         // adapt board by moving the piece on the bitboard
-        assert (allOccupiedBitboard & fromSquare.bitboard()) != 0;
-        boardAfterMove = allOccupiedBitboard ^ fromSquare.bitboard();
-        boardAfterMove |= targetSquare.bitboard();
+        boardAfterMove = (allOccupiedBitboard ^ fromSquare.bitboard()) | toSquare.bitboard();
+        // remove the captured pawn from en passant
         if (isEnPassant) boardAfterMove ^= epTargetSquare.bitboard();
         // if squares in between are not occupied then it is a check
         if ((intermediate & boardAfterMove) == 0) return true;
@@ -1050,9 +1047,8 @@ public class Position {
         // target square we have a check
         intermediate = Bitboard.intermediate[sqIdx][kingSquareIdx];
         // adapt board by moving the piece on the bitboard
-        assert (allOccupiedBitboard & fromSquare.bitboard()) != 0;
-        boardAfterMove = allOccupiedBitboard ^ fromSquare.bitboard();
-        boardAfterMove |= targetSquare.bitboard();
+        boardAfterMove = allOccupiedBitboard ^ fromSquare.bitboard() | toSquare.bitboard();
+        // remove the captured pawn from en passant
         if (isEnPassant) boardAfterMove ^= epTargetSquare.bitboard();
         // if squares in between are not occupied then it is a check
         if ((intermediate & boardAfterMove) == 0) return true;
@@ -1067,7 +1063,7 @@ public class Position {
    * @return true if current position has check for next player
    */
   public boolean hasCheck() {
-    //if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
+    if (hasCheck != Flag.TBD) return hasCheck == Flag.TRUE;
     boolean check = isAttacked(nextPlayer.inverse(), kingSquares[nextPlayer.ordinal()]);
     hasCheck = check ? Flag.TRUE : Flag.FALSE;
     return check;
@@ -1133,8 +1129,8 @@ public class Position {
         || ((Bitboard.queenPseudoAttacks[squareIndex64]
         & attackerPiecesBitboard[PieceType.QUEEN.ordinal()]) != 0)) {
 
-      if (((Bitboard.getSlidingMovesRank(attackedSquare, this)
-        | Bitboard.getSlidingMovesFile(attackedSquare, this))
+      if (((Bitboard.getSlidingMovesRank(attackedSquare, this.getAllOccupiedBitboard())
+        | Bitboard.getSlidingMovesFile(attackedSquare, this.getAllOccupiedBitboardR90(), true))
         & (attackerPiecesBitboard[PieceType.ROOK.ordinal()]
         | attackerPiecesBitboard[PieceType.QUEEN.ordinal()])) != 0) return true;
     }
@@ -1145,8 +1141,8 @@ public class Position {
       || ((Bitboard.queenPseudoAttacks[squareIndex64]
       & attackerPiecesBitboard[PieceType.QUEEN.ordinal()]) != 0)) {
 
-      if (((Bitboard.getSlidingMovesDiagUp(attackedSquare, this)
-        | Bitboard.getSlidingMovesDiagDown(attackedSquare, this))
+      if (((Bitboard.getSlidingMovesDiagUp(attackedSquare, this.getAllOccupiedBitboardR45(), true)
+        | Bitboard.getSlidingMovesDiagDown(attackedSquare, this.getAllOccupiedBitboardL45(), true))
         & (attackerPiecesBitboard[PieceType.BISHOP.ordinal()]
         | attackerPiecesBitboard[PieceType.QUEEN.ordinal()])) != 0) return true;
     }
@@ -1211,8 +1207,8 @@ public class Position {
       || ((Bitboard.queenPseudoAttacks[attackedSquare.bbIndex()]
       & piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()]) != 0)) {
 
-      if (((Bitboard.getSlidingMovesRank(attackedSquare, this)
-        | Bitboard.getSlidingMovesFile(attackedSquare, this))
+      if (((Bitboard.getSlidingMovesRank(attackedSquare, this.getAllOccupiedBitboard())
+        | Bitboard.getSlidingMovesFile(attackedSquare, this.getAllOccupiedBitboardR90(), true))
         & (piecesBitboards[attackerColor.ordinal()][PieceType.ROOK.ordinal()]
         | piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()])) != 0) return true;
     }
@@ -1223,8 +1219,8 @@ public class Position {
       || ((Bitboard.queenPseudoAttacks[attackedSquare.bbIndex()]
       & piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()]) != 0)) {
 
-      if (((Bitboard.getSlidingMovesDiagUp(attackedSquare, this)
-        | Bitboard.getSlidingMovesDiagDown(attackedSquare, this))
+      if (((Bitboard.getSlidingMovesDiagUp(attackedSquare, this.getAllOccupiedBitboardR45(), true)
+        | Bitboard.getSlidingMovesDiagDown(attackedSquare, this.getAllOccupiedBitboardL45(), true))
         & (piecesBitboards[attackerColor.ordinal()][PieceType.BISHOP.ordinal()]
         | piecesBitboards[attackerColor.ordinal()][PieceType.QUEEN.ordinal()])) != 0) return true;
     }
@@ -1713,7 +1709,7 @@ public class Position {
       }
     }
 
-    // en passant - which filed and if null no en passant option
+    // en passant - which square and if null no en passant option
     if (parts.length >= 4) { // default "-"
       s = parts[3];
       if (!s.equals("-")) {

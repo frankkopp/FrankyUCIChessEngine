@@ -299,7 +299,7 @@ public class Evaluation {
     // ######################################
     // Sum up
     // @formatter:off
-    value = (int) (material      * MATERIAL_WEIGHT +
+    value = (int) (material   * MATERIAL_WEIGHT +
                 piecePosition * POSITION_WEIGHT +
                 mobility      * MOBILITY_WEIGHT +
                 kingSafety    * KING_SAFETY_WEIGHT +
@@ -1056,17 +1056,17 @@ public class Evaluation {
         break;
       case ROOK:
         m += Long.bitCount(getSlidingMovesRank(square, allOccupiedBitboard)
-                             | getSlidingMovesFile(square, allOccupiedBitboard));
+                             | getSlidingMovesFile(square, allOccupiedBitboard, false));
         break;
       case BISHOP:
-        m += Long.bitCount(getSlidingMovesDiagUp(square, allOccupiedBitboard)
-                             | getSlidingMovesDiagDown(square, allOccupiedBitboard));
+        m += Long.bitCount(getSlidingMovesDiagUp(square, allOccupiedBitboard, false)
+                             | getSlidingMovesDiagDown(square, allOccupiedBitboard, false));
         break;
       case QUEEN:
         m += Long.bitCount(getSlidingMovesRank(square, allOccupiedBitboard)
-                             | getSlidingMovesFile(square, allOccupiedBitboard)
-                             | getSlidingMovesDiagUp(square, allOccupiedBitboard)
-                             | getSlidingMovesDiagDown(square, allOccupiedBitboard));
+                             | getSlidingMovesFile(square, allOccupiedBitboard, false)
+                             | getSlidingMovesDiagUp(square, allOccupiedBitboard, false)
+                             | getSlidingMovesDiagDown(square, allOccupiedBitboard, false));
         break;
       default:
         break;

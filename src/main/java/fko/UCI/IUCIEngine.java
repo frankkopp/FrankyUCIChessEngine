@@ -182,12 +182,12 @@ public interface IUCIEngine {
    * Call back from the engine's search when a result has been found and should
    * be send via the UCIProtocolHandler to the UI.
    * <p>
-   * the engine has stopped searching and found the move <move> best in this position.
-   * the engine can send the move it likes to ponderOption on. The engine must not start pondering automatically.
-   * this command must always be sent if the engine stops searching, also in pondering mode if there is a
-   * "stop" command, so for every "go" command a "bestmove" command is needed!
-   * Directly before that the engine should send a final "info" command with the final search information,
-   * the the GUI has the complete statistics about the last search.
+   * The engine has stopped searching and found the move <move> best in this position.
+   * The engine can send the move it likes to ponder on. The engine must not start pondering
+   * automatically. This command must always be sent if the engine stops searching, also in
+   * pondering mode if there is a"stop" command, so for every "go" command a "bestmove"
+   * command is needed! Directly before that the engine should send a final "info" command with
+   * the final search information,the the GUI has the complete statistics about the last search.
    *
    * @param bestMove
    * @param ponderMove

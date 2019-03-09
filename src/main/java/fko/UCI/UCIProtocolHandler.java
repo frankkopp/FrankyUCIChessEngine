@@ -120,7 +120,11 @@ public class UCIProtocolHandler implements Runnable, IUCIProtocolHandler {
    */
   @Override
   public void run() {
+    receiveLoop();
+  }
 
+  @Override
+  public void receiveLoop() {
     final BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
 
     while (running) {

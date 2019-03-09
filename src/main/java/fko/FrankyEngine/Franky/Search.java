@@ -607,7 +607,7 @@ public class Search implements Runnable {
       sendUCIIterationEndInfo();
 
       // if the last iteration had many bestMoveChanges extend time
-      // TODO: if (depth > 4 && searchCounter.bestMoveChanges > (depth / 2) + 1) addExtraTime(1.4);
+      if (depth > 4 && searchCounter.bestMoveChanges > (depth / 2) + 1) addExtraTime(1.4);
 
       // check if we need to stop search - could be external or time.
       if (stopSearch || softTimeLimitReached() || hardTimeLimitReached()) break;

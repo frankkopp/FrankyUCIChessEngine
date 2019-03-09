@@ -30,21 +30,31 @@ public interface IUCIProtocolHandler {
   String START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
   /**
+   * Receiver loop should listen for any piped copmmands from the UI. Usually this will be
+   * done in a separate thread to make sure to be able to asynchronously get all commands
+   */
+  void receiveLoop();
+
+  /**
+   * Sends the UCI "info *" command plus the provided msg to the UI
    * @param msg
    */
   void sendInfoToUCI(String msg);
 
   /**
+   * Sends the UCI "info string *" command plus the provided msg to the UI
    * @param msg
    */
   void sendInfoStringToUCI(String msg);
 
   /**
+   * Sends the UCI "bestmove *" command to the UI
    * @param result
    */
   void sendResultToUCI(String result);
 
   /**
+   * Sends the UCI "bestmove * ponder *" command to the UI
    * @param result
    * @param ponder
    */

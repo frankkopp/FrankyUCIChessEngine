@@ -231,7 +231,6 @@ class BitboardTest {
 
   @Test
   public void pawnBitboards() {
-
     // White Pawns
     System.out.println("WHITE PAWNS");
     for (Square square : validSquares) {
@@ -1021,7 +1020,7 @@ class BitboardTest {
 
     square = b1;
     blocker = b5.bitboard();
-    moves = getSlidingMovesFile(square, blocker);
+    moves = getSlidingMovesFile(square, blocker, false);
     actual = Bitboard.toString(moves);
     LOG.debug("\n{}", actual);
     expected =  "0 0 0 0 0 0 0 0 \n"
@@ -1037,7 +1036,7 @@ class BitboardTest {
 
     square = e5;
     blocker = e3.bitboard();
-    moves = getSlidingMovesFile(square, blocker);
+    moves = getSlidingMovesFile(square, blocker, false);
     actual = Bitboard.toString(moves);
     LOG.debug("\n{}", actual);
     expected =  "0 0 0 0 1 0 0 0 \n"
@@ -1053,7 +1052,7 @@ class BitboardTest {
 
     square = e5;
     blocker = e3.bitboard() | e1.bitboard();
-    moves = getSlidingMovesFile(square, blocker);
+    moves = getSlidingMovesFile(square, blocker, false);
     actual = Bitboard.toString(moves);
     LOG.debug("\n{}", actual);
     expected =  "0 0 0 0 1 0 0 0 \n"
@@ -1116,7 +1115,7 @@ class BitboardTest {
     LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
 
     // retrieve all possible moves for this square with the current content
-    bitboard = getSlidingMovesDiagUp(square, blockers);
+    bitboard = getSlidingMovesDiagUp(square, blockers, false);
 
     actual = Bitboard.toString(bitboard);
     LOG.debug("{}",String.format("%n%s", actual));
@@ -1143,7 +1142,7 @@ class BitboardTest {
     LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
 
     // retrieve all possible moves for this square with the current content
-    bitboard = getSlidingMovesDiagUp(square, blockers);
+    bitboard = getSlidingMovesDiagUp(square, blockers, false);
 
     actual = Bitboard.toString(bitboard);
     LOG.debug("{}",String.format("%n%s", actual));
@@ -1171,7 +1170,7 @@ class BitboardTest {
     LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
 
     // retrieve all possible moves for this square with the current content
-    bitboard = getSlidingMovesDiagUp(square, blockers);
+    bitboard = getSlidingMovesDiagUp(square, blockers, false);
 
     actual = Bitboard.toString(bitboard);
     LOG.debug("{}",String.format("%n%s", actual));
@@ -1208,7 +1207,7 @@ class BitboardTest {
     LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
 
     // retrieve all possible moves for this square with the current content
-    bitboard = getSlidingMovesDiagDown(square, blockers);
+    bitboard = getSlidingMovesDiagDown(square, blockers, false);
 
     actual = Bitboard.toString(bitboard);
     LOG.debug("{}",String.format("%n%s", actual));
@@ -1236,7 +1235,7 @@ class BitboardTest {
     LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
 
     // retrieve all possible moves for this square with the current content
-    bitboard = getSlidingMovesDiagDown(square, blockers);
+    bitboard = getSlidingMovesDiagDown(square, blockers, false);
 
     actual = Bitboard.toString(bitboard);
     LOG.debug("{}",String.format("%n%s", actual));
@@ -1264,7 +1263,7 @@ class BitboardTest {
     LOG.debug("{}",String.format("%n%s", Bitboard.toString(blockers)));
 
     // retrieve all possible moves for this square with the current content
-    bitboard = getSlidingMovesDiagDown(square, blockers);
+    bitboard = getSlidingMovesDiagDown(square, blockers, false);
 
     actual = Bitboard.toString(bitboard);
     LOG.debug("{}",String.format("%n%s", actual));
@@ -1311,28 +1310,28 @@ class BitboardTest {
 
     // vertical on file
     square = e1;
-    slidingMoves = getSlidingMovesFile(square, position.getAllOccupiedBitboard());
+    slidingMoves = getSlidingMovesFile(square, position.getAllOccupiedBitboard(), false);
     System.out.printf("Vertical File Attacks for %s%n", square);
     System.out.printf("Moves File %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
     assertEquals(4521260802375680L, slidingMoves);
 
     square = e8;
-    slidingMoves = getSlidingMovesFile(square, position.getAllOccupiedBitboard());
+    slidingMoves = getSlidingMovesFile(square, position.getAllOccupiedBitboard(), false);
     System.out.printf("Vertical File Attacks for %s%n", square);
     System.out.printf("Moves File %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
     assertEquals(1052672L, slidingMoves);
 
     square = h4;
-    slidingMoves = getSlidingMovesFile(square, position.getAllOccupiedBitboard());
+    slidingMoves = getSlidingMovesFile(square, position.getAllOccupiedBitboard(), false);
     System.out.printf("Vertical File Attacks for %s%n", square);
     System.out.printf("Moves File %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
     assertEquals(-9187202500199972864L, slidingMoves);
 
     square = h5;
-    slidingMoves = getSlidingMovesFile(square, position.getAllOccupiedBitboard());
+    slidingMoves = getSlidingMovesFile(square, position.getAllOccupiedBitboard(), false);
     System.out.printf("Vertical File Attacks for %s%n", square);
     System.out.printf("Moves File %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
@@ -1341,27 +1340,27 @@ class BitboardTest {
     // diagonal upwards
     square = f3;
     System.out.printf("Diag Up Attacks for %s%n", square);
-    slidingMoves = getSlidingMovesDiagUp(square, position.getAllOccupiedBitboard());
+    slidingMoves = getSlidingMovesDiagUp(square, position.getAllOccupiedBitboard(), false);
     System.out.printf("Moves Diag Up %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
     assertEquals(580964626808700928L, slidingMoves);
 
     square = g6;
-    slidingMoves = getSlidingMovesDiagUp(square, position.getAllOccupiedBitboard());
+    slidingMoves = getSlidingMovesDiagUp(square, position.getAllOccupiedBitboard(), false);
     System.out.printf("Diag Up Attacks for %s%n", square);
     System.out.printf("Moves Diag Up %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
     assertEquals(536903680L, slidingMoves);
 
     square = h4;
-    slidingMoves = getSlidingMovesDiagUp(square, position.getAllOccupiedBitboard());
+    slidingMoves = getSlidingMovesDiagUp(square, position.getAllOccupiedBitboard(), false);
     System.out.printf("Diag Up Attacks for %s%n", square);
     System.out.printf("Moves Diag Up %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
     assertEquals(1161999072605765632L, slidingMoves);
 
     square = h5;
-    slidingMoves = getSlidingMovesDiagUp(square, position.getAllOccupiedBitboard());
+    slidingMoves = getSlidingMovesDiagUp(square, position.getAllOccupiedBitboard(), false);
     System.out.printf("Diag Up Attacks for %s%n", square);
     System.out.printf("Moves Diag Up %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
@@ -1372,35 +1371,35 @@ class BitboardTest {
     // diagonal downwards
     square = f8;
     System.out.printf("Diag Down Attacks for %s%n", square);
-    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard());
+    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard(), false);
     System.out.printf("Moves Diag Down %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
     assertEquals(8404992L, slidingMoves);
 
     square = g3;
     System.out.printf("Diag Down Attacks for %s%n", square);
-    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard());
+    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard(), false);
     System.out.printf("Moves Diag Down %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
     assertEquals(36028934726352896L, slidingMoves);
 
     square = f5;
     System.out.printf("Diag Down  Attacks for %s%n", square);
-    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard());
+    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard(), false);
     System.out.printf("Moves Diag Down %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
     assertEquals(274878957568L, slidingMoves);
 
     square = h4;
     System.out.printf("Diag Down Attacks for %s%n", square);
-    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard());
+    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard(), false);
     System.out.printf("Moves Diag Down %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
     assertEquals(1075838976L, slidingMoves);
 
     square = e4;
     System.out.printf("Diag Down Attacks for %s%n", square);
-    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard());
+    slidingMoves = getSlidingMovesDiagDown(square, position.getAllOccupiedBitboard(), false);
     System.out.printf("Moves Diag Down %s: %n%s%n", square, Bitboard.toString(slidingMoves));
     System.out.println();
     assertEquals(18049583016051201L, slidingMoves);
@@ -1416,6 +1415,11 @@ class BitboardTest {
     bitboard = Long.MIN_VALUE;
     assertEquals(63, Bitboard.lsbIdx(bitboard));
     assertEquals(64, Bitboard.lsbIdx(0L));
+
+    bitboard = 0b00000001_00000000_00000000_00000000_00000000_00000000_10000000_00000000L;
+    //                  ^ MSB (56)                                     ^ LSB (15)
+    assertEquals(15, Bitboard.lsbIdx(bitboard));
+
   }
 
   @Test
@@ -1425,6 +1429,10 @@ class BitboardTest {
     bitboard = -1;
     assertEquals(63, Bitboard.msbIdx(bitboard));
     assertEquals(-1, Bitboard.msbIdx(0L));
+
+    bitboard = 0b00000001_00000000_00000000_00000000_00000000_00000000_10000000_00000000L;
+    //                  ^ MSB (56)                                     ^ LSB (15)
+    assertEquals(56, Bitboard.msbIdx(bitboard));
   }
 
   @Test

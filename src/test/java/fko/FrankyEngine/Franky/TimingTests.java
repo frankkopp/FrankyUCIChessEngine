@@ -33,6 +33,7 @@ import java.util.function.Function;
 import static fko.FrankyEngine.Franky.Bitboard.lsbIdx;
 import static fko.FrankyEngine.Franky.Bitboard.msbIdx;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** @author Frank */
 @SuppressWarnings("SameParameterValue")
@@ -193,6 +194,45 @@ public class TimingTests {
     };
 
     timingTest(15, 50, 15_000_000, f1, f2, f3, f4);
+  }
+
+  @Test
+  @Disabled
+  public void testTimingGivesCheck() {
+    Position position = new Position("6k1/8/3P1bp1/2BNp3/8/1Q3P1q/7r/1K2R3 w - -");
+    int move = Move.fromUCINotation(position, "d5e7");
+    assertTrue(position.givesCheck(move));
+
+    final Square kingSquare = position.getKingSquares()[position.getOpponent().ordinal()];
+    final Square fromSquare = Move.getStart(move);
+    final Square toSquare = Move.getEnd(move);
+    final int kingSquareIdx = kingSquare.bbIndex();
+
+    Function f1 = o -> {
+      // adapt board by moving the piece on the bitboard
+      final long boardAfterMove = (position.getAllOccupiedBitboard()
+        ^ fromSquare.bitboard())
+        | toSquare.bitboard();      // if squares in between are not occupied then it is a check
+      // squares in between attacker and king
+      if ((Bitboard.intermediate[toSquare.bbIndex()][kingSquareIdx] & boardAfterMove) == 0)
+        return null;
+      return null;
+    };
+
+    Function f2 = o -> {
+      if ((Bitboard.getSlidingMovesFile(toSquare,
+                                        (position.getAllOccupiedBitboardR90()
+                                          ^ (1L << Bitboard.rotateIndexL90(fromSquare.bbIndex())))
+                                          | toSquare.bitboard(), true)
+        & kingSquare.bitboard()) != 0) return null;
+      if ((Bitboard.getSlidingMovesRank(toSquare,
+                                        (position.getAllOccupiedBitboard() ^ fromSquare.bitboard())
+                                          | toSquare.bitboard())
+        & kingSquare.bitboard()) != 0) return null;
+      return null;
+    };
+
+    timingTest(5, 50, 10_000_000, f1, f2);
   }
 
   private void timingTest(final int rounds, final int iterations, final int repetitions,

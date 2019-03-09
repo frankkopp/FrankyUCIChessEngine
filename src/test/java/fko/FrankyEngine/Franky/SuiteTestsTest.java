@@ -139,8 +139,8 @@ public class SuiteTestsTest {
     Successful: 376 (48 Prozent)
     Failed:     393 (51 Prozent)
     Franky-1.1
-    Successful: 478 (62 Prozent)
-    Failed:     291 (37 Prozent)
+    Successful: 507 (65 Prozent)
+    Failed:     262 (34 Prozent)
     */
     testSuite = new TestSuite("./testsets/ecm98.epd");
     testSuite.setSearchTime(10000);

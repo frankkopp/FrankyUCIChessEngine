@@ -82,14 +82,15 @@ public class Attacks {
 
     // Sliding
     // rooks and queens
-    attacksToTemp |= (Bitboard.getSlidingMovesRank(square, position)
-      | Bitboard.getSlidingMovesFile(square, position))
+    attacksToTemp |= (Bitboard.getSlidingMovesRank(square, position.getAllOccupiedBitboard())
+      | Bitboard.getSlidingMovesFile(square, position.getAllOccupiedBitboardR90(), true))
       & (pBB[PieceType.ROOK.ordinal()] | pBB[PieceType.QUEEN.ordinal()]);
 
     // bishop and queens
-    attacksToTemp |= (Bitboard.getSlidingMovesDiagUp(square, position)
-      | Bitboard.getSlidingMovesDiagDown(square, position))
-      & (pBB[PieceType.BISHOP.ordinal()] | pBB[PieceType.QUEEN.ordinal()]);
+    attacksToTemp |=
+      (Bitboard.getSlidingMovesDiagUp(square, position.getAllOccupiedBitboardR45(), true)
+        | Bitboard.getSlidingMovesDiagDown(square, position.getAllOccupiedBitboardL45(), true))
+        & (pBB[PieceType.BISHOP.ordinal()] | pBB[PieceType.QUEEN.ordinal()]);
 
     return attacksToTemp;
 
@@ -225,13 +226,15 @@ public class Attacks {
 
     // rooks and queens
     attacks |= (Bitboard.getSlidingMovesRank(square, occSet)
-      | Bitboard.getSlidingMovesFile(square, occSet)) & (whitePieces[PieceType.ROOK.ordinal()]
-      | whitePieces[PieceType.QUEEN.ordinal()]
-      | blackPieces[PieceType.ROOK.ordinal()] | blackPieces[PieceType.QUEEN.ordinal()]) & occSet;
+      | Bitboard.getSlidingMovesFile(square, occSet, false)) & (
+      whitePieces[PieceType.ROOK.ordinal()]
+        | whitePieces[PieceType.QUEEN.ordinal()]
+        | blackPieces[PieceType.ROOK.ordinal()] | blackPieces[PieceType.QUEEN.ordinal()]) & occSet;
 
     // bishop and queens
-    attacks |= (Bitboard.getSlidingMovesDiagUp(square, occSet)
-      | Bitboard.getSlidingMovesDiagDown(square, occSet)) & (whitePieces[PieceType.BISHOP.ordinal()]
+    attacks |= (Bitboard.getSlidingMovesDiagUp(square, occSet, false)
+      | Bitboard.getSlidingMovesDiagDown(square, occSet,
+                                         false)) & (whitePieces[PieceType.BISHOP.ordinal()]
       | whitePieces[PieceType.QUEEN.ordinal()]
       | blackPieces[PieceType.BISHOP.ordinal()] | blackPieces[PieceType.QUEEN.ordinal()]) & occSet;
 
@@ -302,12 +305,12 @@ public class Attacks {
       // Sliding - test reverse from the target square outgoing
       // does not matter for non pawns
       // rooks and queens
-      final long rqMoves = Bitboard.getSlidingMovesRank(square, position) | Bitboard.getSlidingMovesFile(square, position);
+      final long rqMoves = Bitboard.getSlidingMovesRank(square, position.getAllOccupiedBitboard()) | Bitboard.getSlidingMovesFile(square, position.getAllOccupiedBitboardR90(), true);
       attacksTo[WHITE][sIdx] |= rqMoves & (whitePieces[PieceType.ROOK.ordinal()] | whitePieces[PieceType.QUEEN.ordinal()]);
       attacksTo[BLACK][sIdx] |= rqMoves & (blackPieces[PieceType.ROOK.ordinal()] | blackPieces[PieceType.QUEEN.ordinal()]);
 
       // bishop and queens
-      final long bqMoves = Bitboard.getSlidingMovesDiagUp(square, position) | Bitboard.getSlidingMovesDiagDown(square, position);
+      final long bqMoves = Bitboard.getSlidingMovesDiagUp(square, position.getAllOccupiedBitboardR45(), true) | Bitboard.getSlidingMovesDiagDown(square, position.getAllOccupiedBitboardL45(), true);
       attacksTo[WHITE][sIdx] |= bqMoves & (whitePieces[PieceType.BISHOP.ordinal()] | whitePieces[PieceType.QUEEN.ordinal()]);
       attacksTo[BLACK][sIdx] |= bqMoves & (blackPieces[PieceType.BISHOP.ordinal()] | blackPieces[PieceType.QUEEN.ordinal()]);
 
