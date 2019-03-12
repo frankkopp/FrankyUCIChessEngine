@@ -231,7 +231,7 @@ public class Bitboard {
     24,	33,	42,	51,	60,
     32,	41,	50,	59,
     40,	49,	58,
-    48,	55,
+    48,	57,
     56
   };
   private static int[] indexL45 = new int[64];

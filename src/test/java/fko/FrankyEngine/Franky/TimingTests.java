@@ -219,6 +219,40 @@ public class TimingTests {
     timingTest(5, 50, 5_000_000, f1, f2, f3, f4);
   }
 
+  @Test
+  @Disabled
+  public void testTimingmakeMove() {
+    final Position position = new Position(
+      "r3k2r/1ppqbppp/2n2n2/1B2p1B1/3p2b1/2NP1N2/1PPQPPPP/R3K2R w KQkq - 0 1");
+
+    int m1 = Move.createMove(MoveType.PAWNDOUBLE, Square.e2, Square.e4, Piece.WHITE_PAWN,
+                             Piece.NOPIECE, Piece.NOPIECE);
+    int m2 = Move.createMove(MoveType.ENPASSANT, Square.d4, Square.e3, Piece.BLACK_PAWN,
+                             Piece.WHITE_PAWN, Piece.NOPIECE);
+    int m3 = Move.createMove(MoveType.NORMAL, Square.d2, Square.e3, Piece.WHITE_QUEEN,
+                             Piece.BLACK_PAWN, Piece.NOPIECE);
+    int m4 = Move.createMove(MoveType.CASTLING, Square.e8, Square.c8, Piece.BLACK_KING,
+                             Piece.NOPIECE, Piece.NOPIECE);
+    int m5 = Move.createMove(MoveType.CASTLING, Square.e1, Square.g1, Piece.WHITE_KING,
+                             Piece.NOPIECE, Piece.NOPIECE);
+
+    Function f1 = o -> {
+      position.makeMove(m1);
+      position.makeMove(m2);
+      position.makeMove(m3);
+      position.makeMove(m4);
+      position.makeMove(m5);
+      position.undoMove();
+      position.undoMove();
+      position.undoMove();
+      position.undoMove();
+      position.undoMove();
+      return null;
+    };
+
+    timingTest(5, 10, 2_000_000, f1);
+  }
+
   private void timingTest(final int rounds, final int iterations, final int repetitions,
                           Function... functions) {
 
