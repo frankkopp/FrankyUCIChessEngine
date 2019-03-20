@@ -1170,7 +1170,18 @@ public class MoveGenerator {
             if (target == Piece.NOPIECE) { // way needs to be free
               move = Move.createMove(type, fromSquare, toSquare, piece, target, promotion);
               if (isLegalMove(move)) return true;
+              // double pawn push
+              if (fromSquare.isPawnBaseRow(activePlayer)) {
+                Square toSquare2 = Square.getSquare(to + d * activePlayer.factor);
+                final Piece target2 = position.getPiece(toSquare2);
+                if (target2 == Piece.NOPIECE) { // way needs to be free
+                  final MoveType type2 = MoveType.PAWNDOUBLE;
+                  move = Move.createMove(type2, fromSquare, toSquare2, piece, target2, promotion);
+                  if (isLegalMove(move)) return true;
+                }
+              }
             }
+
           }
         }
       }

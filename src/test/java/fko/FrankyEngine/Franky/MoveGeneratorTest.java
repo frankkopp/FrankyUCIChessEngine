@@ -174,7 +174,7 @@ public class MoveGeneratorTest {
   @Test
   public void testAllGenerators() {
 
-    String testFen = "1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -";
+    String testFen = "r3k2r/1ppn3p/2q1q1n1/4P3/2q1Pp2/B5R1/pbp2PPP/1R4K1 b kq e3";
     Position board = new Position(testFen);
 
     MoveGenerator moveGenerator = new MoveGenerator(board);
@@ -182,13 +182,14 @@ public class MoveGeneratorTest {
     MoveList legal_moves = moveGenerator.getLegalMoves().clone();
     MoveList qsearch_moves = moveGenerator.getPseudoLegalQSearchMoves().clone();
 
-    assertEquals(49, pseudo_moves.size());
-    assertEquals(48, legal_moves.size());
-    assertEquals(1, qsearch_moves.size());
+    assertEquals(85, pseudo_moves.size());
+    assertEquals(83, legal_moves.size());
+    assertEquals(16, qsearch_moves.size());
 
+    int i = 1;
     for (int plMove : pseudo_moves) {
       boolean found = false;
-      System.out.print("Move: " + Move.toSimpleString(plMove) + " ");
+      System.out.print("" + i++ + " Move: " + Move.toSimpleString(plMove) + " ");
       for (int lMove : legal_moves) {
         if (plMove == lMove) {
           System.out.print(Move.toSimpleString(lMove) + " ");
