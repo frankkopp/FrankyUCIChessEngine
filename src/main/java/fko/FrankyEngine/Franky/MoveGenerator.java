@@ -589,7 +589,7 @@ public class MoveGenerator {
   }
 
   /**
-   * Sort value for all moves. Smaller values heapsort first
+   * Sort value for all moves. Smaller values first
    */
   private int getSortValue(int move) {
     // capturing moves including capturing promotions
@@ -1172,7 +1172,7 @@ public class MoveGenerator {
               if (isLegalMove(move)) return true;
               // double pawn push
               if (fromSquare.isPawnBaseRow(activePlayer)) {
-                Square toSquare2 = Square.getSquare(to + d * activePlayer.factor);
+                final Square toSquare2 = Square.getSquare(to + d * activePlayer.factor);
                 final Piece target2 = position.getPiece(toSquare2);
                 if (target2 == Piece.NOPIECE) { // way needs to be free
                   final MoveType type2 = MoveType.PAWNDOUBLE;
