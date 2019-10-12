@@ -37,7 +37,10 @@ public interface OpeningBook {
     void initialize();
 
     /**
-     * Returns move from opening book as string based on a position
+     * Returns move from opening book as string based on a position. Selection of
+     * which move is returned when multiple püossbile moves available is determined
+     * by the implementing class.
+     *
      * @param fen
      * @return returns book move or null if there is none
      */

@@ -1628,7 +1628,7 @@ public class Search implements Runnable {
     // StandPat
     // Use evaluation as a standing pat (lower bound)
     // https://www.chessprogramming.org/Quiescence_Search#Standing_Pat
-    // Assuption is that there is at least on move which would improve the
+    // Assumption is that there is at least on move which would improve the
     // current position. So if we are already >beta we don't need to look at it.
     if (!position.hasCheck()) {
       int standPat = evaluate(position, ply, alpha, beta);
@@ -1955,7 +1955,7 @@ public class Search implements Runnable {
   }
 
   /**
-   * Probes the openbook for the given position and returns a move from
+   * Probes the opening book for the given position and returns a move from
    * the opening book or null if no move was found.
    *
    * @param position
