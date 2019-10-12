@@ -101,7 +101,7 @@ public class Search implements Runnable {
   // the thread in which we will do the actual search
   private Thread searchThread = null;
 
-  // used to wait for move from search
+  // used to wait for search to be initialized before returning to caller
   private CountDownLatch waitForInitializationLatch;
 
   // flag to indicate to stop the search - can be called externally or via the timer clock.
@@ -1389,7 +1389,7 @@ public class Search implements Runnable {
         // this node
         if (value >= beta && config.USE_ALPHABETA_PRUNING) { // fail-high
 
-          // save killer moves so they will be search earlier on following nodes
+          // save killer moves so they will be searched earlier on following nodes
           if (config.USE_KILLER_MOVES && Move.getTarget(move) == Piece.NOPIECE) {
             if (!killerMoves[ply].pushToHeadStable(move)) {
               killerMoves[ply].addFront(move);
