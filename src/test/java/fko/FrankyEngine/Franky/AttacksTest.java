@@ -349,27 +349,27 @@ class AttacksTest {
 
     Position pos = new Position();
     final int e2e4 = Move.fromUCINotation(pos, "e2e4");
-    pos.makeMove(e2e4);
+    pos.doMove(e2e4);
     final int d7d5 = Move.fromUCINotation(pos, "d7d5");
-    pos.makeMove(d7d5);
+    pos.doMove(d7d5);
     final int e4d5 = Move.fromUCINotation(pos, "e4d5");
-    pos.makeMove(e4d5);
+    pos.doMove(e4d5);
     final int d8d5 = Move.fromUCINotation(pos, "d8d5");
-    pos.makeMove(d8d5);
+    pos.doMove(d8d5);
     final int b1c3 = Move.fromUCINotation(pos, "b1c3");
-    pos.makeMove(b1c3);
+    pos.doMove(b1c3);
     final int d5e5 = Move.fromUCINotation(pos, "d5e5");
-    pos.makeMove(d5e5);
+    pos.doMove(d5e5);
     final int f1e2 = Move.fromUCINotation(pos, "f1e2");
-    pos.makeMove(f1e2);
+    pos.doMove(f1e2);
     final int e8d8 = Move.fromUCINotation(pos, "e8d8");
-    pos.makeMove(e8d8);
+    pos.doMove(e8d8);
     final int g1f3 = Move.fromUCINotation(pos, "g1f3");
-    pos.makeMove(g1f3);
+    pos.doMove(g1f3);
     final int e5g5 = Move.fromUCINotation(pos, "e5g5");
-    pos.makeMove(e5g5);
+    pos.doMove(e5g5);
     final int e1g1 = Move.fromUCINotation(pos, "e1g1");
-    pos.makeMove(e1g1);
+    pos.doMove(e1g1);
     final int b8c6 = Move.fromUCINotation(pos, "b8c6");
     int[] moves = new int[]{e2e4, d7d5, e4d5, d8d5, b1c3, d5e5, f1e2, e8d8, g1f3, e5g5, e1g1, b8c6};
 
@@ -424,7 +424,7 @@ class AttacksTest {
 
   private void test1(final Position position, int[] moves) {
     for (int i = 0; i < moves.length; i++) {
-      position.makeMove(moves[i]);
+      position.doMove(moves[i]);
       attacks.computeAttacks(position);
     }
     for (int i = 0; i < moves.length; i++) position.undoMove();
@@ -432,7 +432,7 @@ class AttacksTest {
 
   private void test2(final Position position, int[] moves) {
     for (int i = 0; i < moves.length; i++) {
-      position.makeMove(moves[i]);
+      position.doMove(moves[i]);
       attacks.computeAttacks(position);
     }
     for (int i = 0; i < moves.length; i++) position.undoMove();

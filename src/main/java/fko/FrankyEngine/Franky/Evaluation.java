@@ -817,7 +817,7 @@ public class Evaluation {
   }
 
   /**
-   * Evaluate ownership of aquare be determining which side has the most low
+   * Evaluate ownership of square be determining which side has the most low
    * value piece attacks.
    * Credit to Beowulf.
    * @param position

@@ -312,16 +312,16 @@ public class SearchTest {
   public void testPonderMissSearch() throws InterruptedException {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
-    position.makeMove(Move.fromUCINotation(position, "e2e4"));
+    position.doMove(Move.fromUCINotation(position, "e2e4"));
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 3000, 0, 0, 0, null, true, false, false);
-    position.makeMove(Move.fromUCINotation(position, "e7e5"));
+    position.doMove(Move.fromUCINotation(position, "e7e5"));
     search.startSearch(position, searchMode);
     Thread.sleep(1000);
     search.stopSearch();
     // new search
     position = new Position(fen);
-    position.makeMove(Move.fromUCINotation(position, "e2e4"));
-    position.makeMove(Move.fromUCINotation(position, "c7c5"));
+    position.doMove(Move.fromUCINotation(position, "e2e4"));
+    position.doMove(Move.fromUCINotation(position, "c7c5"));
     searchMode = new SearchMode(0, 0, 0, 0, 0, 2000, 0, 0, 0, null, false, false, false);
     // Start search after miss
     search.startSearch(position, searchMode);
@@ -332,12 +332,12 @@ public class SearchTest {
   public void testPonderHitSearch() throws InterruptedException {
     String fen = Position.STANDARD_BOARD_FEN;
     Position position = new Position(fen);
-    position.makeMove(Move.fromUCINotation(position, "e2e4"));
+    position.doMove(Move.fromUCINotation(position, "e2e4"));
     // Test start and stop search
     for (int i = 0; i < 10; i++) {
       SearchMode searchMode =
         new SearchMode(0, 0, 0, 0, 0, 1000, 0, 0, 0, null, true, false, false);
-      position.makeMove(Move.fromUCINotation(position, "e7e5"));
+      position.doMove(Move.fromUCINotation(position, "e7e5"));
       search.startSearch(position, searchMode);
       Thread.sleep(new Random().nextInt(100));
       search.ponderHit();
@@ -352,10 +352,10 @@ public class SearchTest {
   public void testPonderHitFinishedSearch() throws InterruptedException {
     String fen = "8/8/8/8/8/4K3/R7/6k1 w - - 0 6"; // 9999
     Position position = new Position(fen);
-    position.makeMove(Move.fromUCINotation(position, "e3f3"));
+    position.doMove(Move.fromUCINotation(position, "e3f3"));
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 10000, 0, 0, 0, null, true, false, false);
     // set last ponder move
-    position.makeMove(Move.fromUCINotation(position, "g1h1"));
+    position.doMove(Move.fromUCINotation(position, "g1h1"));
     // Start pondering
     search.startSearch(position, searchMode);
     // wait a bit - ponder search will be finished during this time
@@ -369,11 +369,11 @@ public class SearchTest {
   public void testPonderStopFinishedSearch() throws InterruptedException {
     String fen = "8/8/8/8/8/4K3/R7/6k1 w - - 0 6"; // 9999
     Position position = new Position(fen);
-    position.makeMove(Move.fromUCINotation(position, "e3f3"));
+    position.doMove(Move.fromUCINotation(position, "e3f3"));
     SearchMode searchMode =
       new SearchMode(295000, 300000, 0, 0, 0, 0, 0, 0, 0, null, true, false, false);
     // set last ponder move
-    position.makeMove(Move.fromUCINotation(position, "g1h1"));
+    position.doMove(Move.fromUCINotation(position, "g1h1"));
     // Start pondering
     search.startSearch(position, searchMode);
     // wait a bit - ponder search will be finished during this time
@@ -387,14 +387,14 @@ public class SearchTest {
   public void test3FoldRep() {
     String fen = "8/p3Q1bk/1p4p1/5q2/P1N2p2/1P5p/2b4P/6K1 w - - 0 38";
     Position position = new Position(fen);
-    position.makeMove(Move.fromUCINotation(position, "e7h4")); // #1
-    position.makeMove(Move.fromUCINotation(position, "h7g8"));
-    position.makeMove(Move.fromUCINotation(position, "h4d8"));
-    position.makeMove(Move.fromUCINotation(position, "g8h7"));
-    position.makeMove(Move.fromUCINotation(position, "d8h4")); // #2
-    position.makeMove(Move.fromUCINotation(position, "h7g8"));
-    position.makeMove(Move.fromUCINotation(position, "h4d8"));
-    position.makeMove(Move.fromUCINotation(position, "g8h7"));
+    position.doMove(Move.fromUCINotation(position, "e7h4")); // #1
+    position.doMove(Move.fromUCINotation(position, "h7g8"));
+    position.doMove(Move.fromUCINotation(position, "h4d8"));
+    position.doMove(Move.fromUCINotation(position, "g8h7"));
+    position.doMove(Move.fromUCINotation(position, "d8h4")); // #2
+    position.doMove(Move.fromUCINotation(position, "h7g8"));
+    position.doMove(Move.fromUCINotation(position, "h4d8"));
+    position.doMove(Move.fromUCINotation(position, "g8h7"));
     // next white move would be 3-fold draw
 
     SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, 6, 0, null, false, true, false);
@@ -409,13 +409,13 @@ public class SearchTest {
              Move.toSimpleString(search.getLastSearchResult().ponderMove));
 
     position = new Position(fen);
-    position.makeMove(Move.fromUCINotation(position, "e7h4")); // #1
-    position.makeMove(Move.fromUCINotation(position, "h7g8"));
-    position.makeMove(Move.fromUCINotation(position, "h4d8"));
-    position.makeMove(Move.fromUCINotation(position, "g8h7"));
-    position.makeMove(Move.fromUCINotation(position, "d8h4")); // #2
-    position.makeMove(Move.fromUCINotation(position, "h7g8"));
-    position.makeMove(Move.fromUCINotation(position, "h4d8"));
+    position.doMove(Move.fromUCINotation(position, "e7h4")); // #1
+    position.doMove(Move.fromUCINotation(position, "h7g8"));
+    position.doMove(Move.fromUCINotation(position, "h4d8"));
+    position.doMove(Move.fromUCINotation(position, "g8h7"));
+    position.doMove(Move.fromUCINotation(position, "d8h4")); // #2
+    position.doMove(Move.fromUCINotation(position, "h7g8"));
+    position.doMove(Move.fromUCINotation(position, "h4d8"));
     // black should not move Kg8 as this would enable white to  3-fold repetition
     // although black is winning
 

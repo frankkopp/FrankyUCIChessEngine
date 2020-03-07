@@ -180,7 +180,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
       LOG.info(String.format("Opening Book: %s", pathString));
     }
 
-    if (tryFromCache(pathString)) return;
+     if (tryFromCache(pathString)) return;
 
     // NON CACHE
 
@@ -410,7 +410,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
       String lastFen = lastPosition.toFENString();
 
       // try to make move
-      currentPosition.makeMove(move);
+      currentPosition.doMove(move);
 
       // we have successfully made the move
       // get fen notation from position
@@ -463,7 +463,7 @@ public class OpeningBookImpl implements OpeningBook, Serializable {
     String lastFen = lastPosition.toFENString();
 
     // try to make move
-    currentPosition.makeMove(move);
+    currentPosition.doMove(move);
 
     // we have successfully made the move
     // get fen notation from position

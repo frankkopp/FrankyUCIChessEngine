@@ -1198,7 +1198,7 @@ public class MoveGenerator {
   private boolean isLegalMove(int move) {
     assert Move.isValid(move);
     // make the move on the position
-    position.makeMove(move);
+    position.doMove(move);
     // TODO check castling intermediate square
 
     // check if the move leaves the king in check

@@ -327,7 +327,7 @@ public class Position {
    *
    * @param move the move
    */
-  public void makeMove(int move) {
+  public void doMove(int move) {
     assert (move != Move.NOMOVE);
 
     Square fromSquare = Move.getStart(move);

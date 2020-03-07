@@ -96,18 +96,18 @@ public class PositionTest {
   public void test3RepetitionsSimple() {
     Position position = new Position();
 
-    position.makeMove(Move.fromSANNotation(position, "e4"));
-    position.makeMove(Move.fromSANNotation(position, "e5"));
+    position.doMove(Move.fromSANNotation(position, "e4"));
+    position.doMove(Move.fromSANNotation(position, "e5"));
     System.out.println("Repetitions: " + position.countRepetitions());
     assertEquals(0, position.countRepetitions());
 
     // Simple repetition
     // !EnPassant - takes 3 loops to get to repetition
     for (int i = 0; i <= 2; i++) {
-      position.makeMove(Move.fromSANNotation(position, "Nf3"));
-      position.makeMove(Move.fromSANNotation(position, "Nc6"));
-      position.makeMove(Move.fromSANNotation(position, "Ng1"));
-      position.makeMove(Move.fromSANNotation(position, "Nb8"));
+      position.doMove(Move.fromSANNotation(position, "Nf3"));
+      position.doMove(Move.fromSANNotation(position, "Nc6"));
+      position.doMove(Move.fromSANNotation(position, "Ng1"));
+      position.doMove(Move.fromSANNotation(position, "Nb8"));
       System.out.println("Repetitions: " + position.countRepetitions());
     }
 
@@ -119,17 +119,17 @@ public class PositionTest {
   public void test3RepetitionsAdvanced() {
     Position position = new Position("6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -");
 
-    position.makeMove(Move.fromSANNotation(position, "Qe3"));
-    position.makeMove(Move.fromSANNotation(position, "Kg2"));
+    position.doMove(Move.fromSANNotation(position, "Qe3"));
+    position.doMove(Move.fromSANNotation(position, "Kg2"));
     System.out.println("Repetitions: " + position.countRepetitions());
     assertEquals(0, position.countRepetitions());
 
     // takes 2 loops to get to repetition
     for (int i = 0; i < 2; i++) {
-      position.makeMove(Move.fromSANNotation(position, "Qe2"));
-      position.makeMove(Move.fromSANNotation(position, "Kg1"));
-      position.makeMove(Move.fromSANNotation(position, "Qe3"));
-      position.makeMove(Move.fromSANNotation(position, "Kg2"));
+      position.doMove(Move.fromSANNotation(position, "Qe2"));
+      position.doMove(Move.fromSANNotation(position, "Kg1"));
+      position.doMove(Move.fromSANNotation(position, "Qe3"));
+      position.doMove(Move.fromSANNotation(position, "Kg2"));
       System.out.println("Repetitions: " + position.countRepetitions());
     }
 
@@ -141,37 +141,37 @@ public class PositionTest {
   public void test3RepetitionsCanceled() {
     Position position = new Position("6k1/p3q2p/1n1Q2pB/8/5P2/6P1/PP5P/3R2K1 b - -");
 
-    position.makeMove(Move.fromSANNotation(position, "Qe3"));
-    position.makeMove(Move.fromSANNotation(position, "Kg2"));
+    position.doMove(Move.fromSANNotation(position, "Qe3"));
+    position.doMove(Move.fromSANNotation(position, "Kg2"));
     System.out.println("Repetitions: " + position.countRepetitions());
     assertEquals(0, position.countRepetitions());
 
     // takes 2 loops to get to repetition
     for (int i = 0; i < 2; i++) {
-      position.makeMove(Move.fromSANNotation(position, "Qe2"));
-      position.makeMove(Move.fromSANNotation(position, "Kg1"));
-      position.makeMove(Move.fromSANNotation(position, "Qe3"));
-      position.makeMove(Move.fromSANNotation(position, "Kg2"));
+      position.doMove(Move.fromSANNotation(position, "Qe2"));
+      position.doMove(Move.fromSANNotation(position, "Kg1"));
+      position.doMove(Move.fromSANNotation(position, "Qe3"));
+      position.doMove(Move.fromSANNotation(position, "Kg2"));
       System.out.println("Repetitions: " + position.countRepetitions());
     }
 
     System.out.println("3-Repetitions: " + position.countRepetitions());
     assertTrue(position.checkRepetitions(2));
 
-    position.makeMove(Move.fromSANNotation(position, "a5"));
-    position.makeMove(Move.fromSANNotation(position, "Kf1"));
-    position.makeMove(Move.fromSANNotation(position, "Qf3"));
-    position.makeMove(Move.fromSANNotation(position, "Kg1"));
-    position.makeMove(Move.fromSANNotation(position, "Qe3"));
-    position.makeMove(Move.fromSANNotation(position, "Kg2"));
+    position.doMove(Move.fromSANNotation(position, "a5"));
+    position.doMove(Move.fromSANNotation(position, "Kf1"));
+    position.doMove(Move.fromSANNotation(position, "Qf3"));
+    position.doMove(Move.fromSANNotation(position, "Kg1"));
+    position.doMove(Move.fromSANNotation(position, "Qe3"));
+    position.doMove(Move.fromSANNotation(position, "Kg2"));
     System.out.println("Repetitions: " + position.countRepetitions());
 
     // takes 2 loops to get to repetition
     for (int i = 0; i < 2; i++) {
-      position.makeMove(Move.fromSANNotation(position, "Qe2"));
-      position.makeMove(Move.fromSANNotation(position, "Kg1"));
-      position.makeMove(Move.fromSANNotation(position, "Qe3"));
-      position.makeMove(Move.fromSANNotation(position, "Kg2"));
+      position.doMove(Move.fromSANNotation(position, "Qe2"));
+      position.doMove(Move.fromSANNotation(position, "Kg1"));
+      position.doMove(Move.fromSANNotation(position, "Qe3"));
+      position.doMove(Move.fromSANNotation(position, "Kg2"));
       System.out.println("Repetitions: " + position.countRepetitions());
     }
 
@@ -254,7 +254,7 @@ public class PositionTest {
     String testFen = "r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 b kq e3 0 113";
 
     position = new Position(testFen);
-    position.makeMove(Move.fromUCINotation(position, "c4a4"));
+    position.doMove(Move.fromUCINotation(position, "c4a4"));
     assertEquals("r3k2r/1ppn3p/2q1q1n1/8/q3Pp2/6R1/p1p2PPP/1R4K1 w kq - 1 114",
                  position.toFENString());
     position.undoMove();
@@ -262,7 +262,7 @@ public class PositionTest {
                  position.toFENString());
 
     // normal pawn move
-    position.makeMove(Move.fromUCINotation(position, "b7b6"));
+    position.doMove(Move.fromUCINotation(position, "b7b6"));
     assertEquals("r3k2r/2pn3p/1pq1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq - 0 114",
                  position.toFENString());
     position.undoMove();
@@ -270,7 +270,7 @@ public class PositionTest {
                  position.toFENString());
 
     // normal capture
-    position.makeMove(Move.fromUCINotation(position, "c4e4"));
+    position.doMove(Move.fromUCINotation(position, "c4e4"));
     assertEquals("r3k2r/1ppn3p/2q1q1n1/8/4qp2/6R1/p1p2PPP/1R4K1 w kq - 0 114",
                  position.toFENString());
     position.undoMove();
@@ -278,7 +278,7 @@ public class PositionTest {
                  position.toFENString());
 
     // pawn double
-    position.makeMove(Move.fromUCINotation(position, "b7b5"));
+    position.doMove(Move.fromUCINotation(position, "b7b5"));
     assertEquals("r3k2r/2pn3p/2q1q1n1/1p6/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq b6 0 114",
                  position.toFENString());
     position.undoMove();
@@ -286,7 +286,7 @@ public class PositionTest {
                  position.toFENString());
 
     // castling
-    position.makeMove(Move.fromUCINotation(position, "e8g8"));
+    position.doMove(Move.fromUCINotation(position, "e8g8"));
     assertEquals("r4rk1/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w - - 1 114",
                  position.toFENString());
     position.undoMove();
@@ -294,7 +294,7 @@ public class PositionTest {
                  position.toFENString());
 
     // promotion
-    position.makeMove(Move.fromUCINotation(position, "a2a1q"));
+    position.doMove(Move.fromUCINotation(position, "a2a1q"));
     assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/2p2PPP/qR4K1 w kq - 0 114",
                  position.toFENString());
     position.undoMove();
@@ -302,7 +302,7 @@ public class PositionTest {
                  position.toFENString());
 
     // promotion capture
-    position.makeMove(Move.fromUCINotation(position, "a2b1r"));
+    position.doMove(Move.fromUCINotation(position, "a2b1r"));
     assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q1Pp2/6R1/2p2PPP/1r4K1 w kq - 0 114",
                  position.toFENString());
     position.undoMove();
@@ -310,7 +310,7 @@ public class PositionTest {
                  position.toFENString());
 
     // en passant
-    position.makeMove(Move.fromUCINotation(position, "f4e3"));
+    position.doMove(Move.fromUCINotation(position, "f4e3"));
     assertEquals("r3k2r/1ppn3p/2q1q1n1/8/2q5/4p1R1/p1p2PPP/1R4K1 w kq - 0 114",
                  position.toFENString());
     position.undoMove();
@@ -448,7 +448,7 @@ public class PositionTest {
     System.out.println("Test if zobrist after move/undo are equal.");
     initialZobrist = omegaBoard.getZobristKey();
     System.out.println(initialZobrist);
-    omegaBoard.makeMove(testMove);
+    omegaBoard.doMove(testMove);
     zobrist = omegaBoard.getZobristKey();
     System.out.println(zobrist);
     omegaBoard.undoMove();
@@ -459,7 +459,7 @@ public class PositionTest {
     // test if zobrist key is identical if one board comes to the same position
     // as a newly created one
     String fenAfterMove = "r3k2r/2pn3p/1pq1q1n1/8/2q1Pp2/6R1/p1p2PPP/1R4K1 w kq - 0 114";
-    omegaBoard.makeMove(testMove);
+    omegaBoard.doMove(testMove);
     Position omegaBoard2 = new Position(fenAfterMove);
     System.out.println(omegaBoard.getZobristKey() + " " + omegaBoard.toFENString());
     System.out.println(omegaBoard2.getZobristKey() + " " + omegaBoard2.toFENString());
@@ -735,18 +735,18 @@ public class PositionTest {
   @Test
   void bitBoardPosition() {
     Position pos = new Position();
-    pos.makeMove(Move.fromUCINotation(pos, "e2e4"));
-    pos.makeMove(Move.fromUCINotation(pos, "d7d5"));
-    pos.makeMove(Move.fromUCINotation(pos, "e4d5"));
-    pos.makeMove(Move.fromUCINotation(pos, "d8d5"));
-    pos.makeMove(Move.fromUCINotation(pos, "b1c3"));
-    pos.makeMove(Move.fromUCINotation(pos, "d5e5"));
-    pos.makeMove(Move.fromUCINotation(pos, "f1e2"));
-    pos.makeMove(Move.fromUCINotation(pos, "e8d8"));
-    pos.makeMove(Move.fromUCINotation(pos, "g1f3"));
-    pos.makeMove(Move.fromUCINotation(pos, "e5g5"));
-    pos.makeMove(Move.fromUCINotation(pos, "e1g1"));
-    pos.makeMove(Move.fromUCINotation(pos, "b8c6"));
+    pos.doMove(Move.fromUCINotation(pos, "e2e4"));
+    pos.doMove(Move.fromUCINotation(pos, "d7d5"));
+    pos.doMove(Move.fromUCINotation(pos, "e4d5"));
+    pos.doMove(Move.fromUCINotation(pos, "d8d5"));
+    pos.doMove(Move.fromUCINotation(pos, "b1c3"));
+    pos.doMove(Move.fromUCINotation(pos, "d5e5"));
+    pos.doMove(Move.fromUCINotation(pos, "f1e2"));
+    pos.doMove(Move.fromUCINotation(pos, "e8d8"));
+    pos.doMove(Move.fromUCINotation(pos, "g1f3"));
+    pos.doMove(Move.fromUCINotation(pos, "e5g5"));
+    pos.doMove(Move.fromUCINotation(pos, "e1g1"));
+    pos.doMove(Move.fromUCINotation(pos, "b8c6"));
 
     for (Color c : Color.values) {
       for (PieceType pt : PieceType.values) {
@@ -822,18 +822,18 @@ public class PositionTest {
   @Test
   void bitBoardCombinations2() {
     Position pos = new Position();
-    pos.makeMove(Move.fromUCINotation(pos, "e2e4"));
-    pos.makeMove(Move.fromUCINotation(pos, "d7d5"));
-    pos.makeMove(Move.fromUCINotation(pos, "e4d5"));
-    pos.makeMove(Move.fromUCINotation(pos, "d8d5"));
-    pos.makeMove(Move.fromUCINotation(pos, "b1c3"));
-    pos.makeMove(Move.fromUCINotation(pos, "d5e5"));
-    pos.makeMove(Move.fromUCINotation(pos, "f1e2"));
-    pos.makeMove(Move.fromUCINotation(pos, "e8d8"));
-    pos.makeMove(Move.fromUCINotation(pos, "g1f3"));
-    pos.makeMove(Move.fromUCINotation(pos, "e5g5"));
-    pos.makeMove(Move.fromUCINotation(pos, "e1g1"));
-    pos.makeMove(Move.fromUCINotation(pos, "b8c6"));
+    pos.doMove(Move.fromUCINotation(pos, "e2e4"));
+    pos.doMove(Move.fromUCINotation(pos, "d7d5"));
+    pos.doMove(Move.fromUCINotation(pos, "e4d5"));
+    pos.doMove(Move.fromUCINotation(pos, "d8d5"));
+    pos.doMove(Move.fromUCINotation(pos, "b1c3"));
+    pos.doMove(Move.fromUCINotation(pos, "d5e5"));
+    pos.doMove(Move.fromUCINotation(pos, "f1e2"));
+    pos.doMove(Move.fromUCINotation(pos, "e8d8"));
+    pos.doMove(Move.fromUCINotation(pos, "g1f3"));
+    pos.doMove(Move.fromUCINotation(pos, "e5g5"));
+    pos.doMove(Move.fromUCINotation(pos, "e1g1"));
+    pos.doMove(Move.fromUCINotation(pos, "b8c6"));
     final long white = pos.getOccupiedBitboards(Color.WHITE);
     final long black = pos.getOccupiedBitboards(Color.BLACK);
     System.out.printf("%s %d%n%s%n", Color.WHITE, white, Bitboard.toString(white));
@@ -916,7 +916,7 @@ public class PositionTest {
               + "1 1 0 1 1 1 1 1";
     assertEquals(expected, actual);
 
-    position.makeMove(Move.fromUCINotation(position, "e2e4"));
+    position.doMove(Move.fromUCINotation(position, "e2e4"));
     actual = Bitboard.toString(position.getAllOccupiedBitboardR90());
     LOG.debug("{}", String.format("%n%s%n", actual));
     expected =  "1 1 0 0 0 0 1 1 \n"
@@ -1212,32 +1212,79 @@ public class PositionTest {
   }
 
   @Test
-  @Disabled
+  public void testTiming2() {
+
+    final int rounds = 5;
+    final int iterations = 5_000_000;
+
+    // prepare moves
+    Position pos = new Position();
+    final int e2e4 = Move.fromUCINotation(pos, "e2e4");
+    pos.doMove(e2e4);
+    final int d7d5 = Move.fromUCINotation(pos, "d7d5");
+    pos.doMove(d7d5);
+    final int e4d5 = Move.fromUCINotation(pos, "e4d5");
+    pos.doMove(e4d5);
+    final int d8d5 = Move.fromUCINotation(pos, "d8d5");
+    pos.doMove(d8d5);
+    final int b1c3 = Move.fromUCINotation(pos, "b1c3");
+    pos.doMove(b1c3);
+
+    pos = new Position();
+
+    for (int round = 1; round <= rounds; round++) {
+      System.out.printf("Running round %,d with %,d iterations and 5 do/undo pairs\n", round,
+                        iterations);
+      System.gc();
+      int i = 0;
+      long start = System.nanoTime();
+      for (int j = 0; j < iterations; j++) {
+        pos.doMove(e2e4);
+        pos.doMove(d7d5);
+        pos.doMove(e4d5);
+        pos.doMove(d8d5);
+        pos.doMove(b1c3);
+        pos.undoMove();
+        pos.undoMove();
+        pos.undoMove();
+        pos.undoMove();
+        pos.undoMove();
+      }
+      long end = System.nanoTime();
+      long elapsed = end - start;
+      System.out.printf("Round %d:  %,d ns\n", round, elapsed);
+      System.out.printf("Round %d:  %,d ns per do/undo pair\n", round, elapsed / (iterations * 5));
+    }
+
+  }
+
+  @Test
+  //@Disabled
   public void testTiming() {
 
     Position pos = new Position();
     final int e2e4 = Move.fromUCINotation(pos, "e2e4");
-    pos.makeMove(e2e4);
+    pos.doMove(e2e4);
     final int d7d5 = Move.fromUCINotation(pos, "d7d5");
-    pos.makeMove(d7d5);
+    pos.doMove(d7d5);
     final int e4d5 = Move.fromUCINotation(pos, "e4d5");
-    pos.makeMove(e4d5);
+    pos.doMove(e4d5);
     final int d8d5 = Move.fromUCINotation(pos, "d8d5");
-    pos.makeMove(d8d5);
+    pos.doMove(d8d5);
     final int b1c3 = Move.fromUCINotation(pos, "b1c3");
-    pos.makeMove(b1c3);
+    pos.doMove(b1c3);
     final int d5e5 = Move.fromUCINotation(pos, "d5e5");
-    pos.makeMove(d5e5);
+    pos.doMove(d5e5);
     final int f1e2 = Move.fromUCINotation(pos, "f1e2");
-    pos.makeMove(f1e2);
+    pos.doMove(f1e2);
     final int e8d8 = Move.fromUCINotation(pos, "e8d8");
-    pos.makeMove(e8d8);
+    pos.doMove(e8d8);
     final int g1f3 = Move.fromUCINotation(pos, "g1f3");
-    pos.makeMove(g1f3);
+    pos.doMove(g1f3);
     final int e5g5 = Move.fromUCINotation(pos, "e5g5");
-    pos.makeMove(e5g5);
+    pos.doMove(e5g5);
     final int e1g1 = Move.fromUCINotation(pos, "e1g1");
-    pos.makeMove(e1g1);
+    pos.doMove(e1g1);
     final int b8c6 = Move.fromUCINotation(pos, "b8c6");
     int[] moves = new int[]{e2e4, d7d5, e4d5, d8d5, b1c3, d5e5, f1e2, e8d8, g1f3, e5g5, e1g1, b8c6};
     pos = new Position();
@@ -1293,12 +1340,12 @@ public class PositionTest {
   }
 
   private void test1(final Position position, int[] moves) {
-    for (int i = 0; i < moves.length; i++) position.makeMove(moves[i]);
+    for (int i = 0; i < moves.length; i++) position.doMove(moves[i]);
     for (int i = 0; i < moves.length; i++) position.undoMove();
   }
 
   private void test2(final Position position, int[] moves) {
-    for (int i = 0; i < moves.length; i++) position.makeMove(moves[i]);
+    for (int i = 0; i < moves.length; i++) position.doMove(moves[i]);
     for (int i = 0; i < moves.length; i++) position.undoMove();
   }
 

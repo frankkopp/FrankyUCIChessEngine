@@ -380,7 +380,6 @@ public class Search implements Runnable {
       if (TRACE) trace("START search for %s", currentPosition.toFENString());
       lastSearchResult = iterativeDeepening(currentPosition);
     }
-    assert lastSearchResult != null;
 
     // if the mode still is ponder at this point we finished the ponder
     // search early before a miss or hit has been signaled. We need to
@@ -1276,7 +1275,7 @@ public class Search implements Runnable {
       // ###############################################
       // MAKE MOVE and skip illegal moves
       // Root moves are always legal.
-      position.makeMove(move);
+      position.doMove(move);
       if (!ROOT && wasIllegalMove(position)) {
         if (TRACE) {
           trace("%sSearch in ply %d for depth %d: MOVE ILLEGAL %s (%d/%d) ", getSpaces(ply), ply,
@@ -1299,7 +1298,7 @@ public class Search implements Runnable {
         position.hasCheck();
         position.undoMove();
         position.givesCheck(move);
-        position.makeMove(move);
+        position.doMove(move);
       }
       assert check == givesCheck
         : "Position check after move not the same as before the move";
@@ -1715,7 +1714,7 @@ public class Search implements Runnable {
 
       // ###############################################
       // Make the move and skip illegal moves
-      position.makeMove(move);
+      position.doMove(move);
       if (wasIllegalMove(position)) {
         position.undoMove();
         continue;
@@ -1948,7 +1947,7 @@ public class Search implements Runnable {
     long ttEntry = transpositionTable.get(position.getZobristKey());
     if (ttEntry != 0 && TranspositionTable.getBestMove(ttEntry) != Move.NOMOVE) {
       pv.add(TranspositionTable.getBestMove(ttEntry));
-      position.makeMove(TranspositionTable.getBestMove(ttEntry));
+      position.doMove(TranspositionTable.getBestMove(ttEntry));
       getPVLine(position, (byte) (depth - 1), pv);
       position.undoMove();
     }
