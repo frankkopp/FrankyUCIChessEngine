@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fko.FrankyEngine</groupId>
-  <artifactId>Franky</artifactId>
+  <artifactId>FrankyUCIChessEngine</artifactId>
   <version>1.1</version>
   <profiles>
     <profile>
@@ -115,9 +115,9 @@
                 <configuration>
                   <executable>"C:\Program Files (x86)\Jar2Exe Wizard\j2ewiz.exe"</executable>
                   <commandlineArgs>/jar
-                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-1.1.jar
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\FrankyUCIChessEngine-1.1.jar
                                         /o
-                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-1.1.exe
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\FrankyUCIChessEngine-1.1.exe
                                         /m
                                         fko.FrankyEngine.Main
                                         /type
@@ -133,7 +133,7 @@
                                         /ve
                                         "ProductVersion=1.1"
                                         /ve
-                                        "ProductName=Franky Chess Engine"
+                                        "ProductName=FrankyUCIChessEngine Chess Engine"
                                         /ve
                                         "LegalCopyright=Copyright (c) 2018 by Frank Kopp"
                                         /ve
@@ -154,7 +154,7 @@
                   <executable>cmd.exe</executable>
                   <commandlineArgs>/C
                                         COPY
-                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\Franky-1.1*
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\FrankyUCIChessEngine-1.1*
                                         C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\Releases</commandlineArgs>
                   <workingDirectory>C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine</workingDirectory>
                 </configuration>

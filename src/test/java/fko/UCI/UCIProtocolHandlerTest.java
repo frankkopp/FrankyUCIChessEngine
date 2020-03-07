@@ -402,7 +402,7 @@ class UCIProtocolHandlerTest {
   }
 
   @Test
-  void ponderHitCommand() throws InterruptedException, IOException, InterruptedException {
+  void ponderHitCommand() throws IOException, InterruptedException {
 
     commandToEngine("position startpos moves e2e4 e7e5");
     assertEquals("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
@@ -465,7 +465,6 @@ class UCIProtocolHandlerTest {
   void debuggingTest() throws InterruptedException, IOException {
     commandToEngine("ucinewgame");
     clearBuffer();
-
 
     /*
     Trying to find a 3-fold repetition bug

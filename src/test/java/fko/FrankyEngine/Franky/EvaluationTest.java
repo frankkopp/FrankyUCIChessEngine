@@ -161,15 +161,15 @@ public class EvaluationTest {
     value = evaluation.position(this.position);
     assertEquals(0, value);
 
-    this.position.makeMove(Move.fromUCINotation(this.position, "e2e4"));
+    this.position.doMove(Move.fromUCINotation(this.position, "e2e4"));
     value = evaluation.position(this.position);
     assertEquals(-55, value);
 
-    this.position.makeMove(Move.fromUCINotation(this.position, "e7e5"));
+    this.position.doMove(Move.fromUCINotation(this.position, "e7e5"));
     value = evaluation.position(this.position);
     assertEquals(0, value);
 
-    this.position.makeMove(Move.fromUCINotation(this.position, "g1f3"));
+    this.position.doMove(Move.fromUCINotation(this.position, "g1f3"));
     value = evaluation.position(this.position);
     assertEquals(-50, value);
 

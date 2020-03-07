@@ -52,8 +52,8 @@ public class SearchTreeSizeTest {
     long   nodes = 0;
     int    nps   = 0;
     long   time  = 0;
-    int    move  = Move.NOMOVE;
-    int    value = Evaluation.NOVALUE;
+    int    move  = fko.FrankyEngine.Franky.Move.NOMOVE;
+    int    value = fko.FrankyEngine.Franky.Evaluation.NOVALUE;
     String pv    = "";
   }
 
@@ -72,12 +72,12 @@ public class SearchTreeSizeTest {
   }
 
   @Test
-  @Disabled
+  //@Disabled
   public void sizeOfSearchTreeTest() throws ExecutionException, InterruptedException {
 
-    final int NO_OF_TESTS = 5; //  Integer.MAX_VALUE;
+    final int NO_OF_TESTS = 20; //  Integer.MAX_VALUE;
     final int START_NO = 0;
-    final int DEPTH = 6;
+    final int DEPTH = 9;
     HASH_SIZE = 1024;
     THREADS = 1;
 
@@ -108,7 +108,7 @@ public class SearchTreeSizeTest {
     Map<String, Long> sumTime = new LinkedHashMap<>();
 
     for (Result result : results) {
-      int lastMove = Move.NOMOVE;
+      int lastMove = fko.FrankyEngine.Franky.Move.NOMOVE;
       long lastNodes = 0;
       for (SingleTest test : result.tests) {
         long oldNodes = sumNodes.get(test.name) == null ? 0 : sumNodes.get(test.name);
@@ -119,7 +119,7 @@ public class SearchTreeSizeTest {
         sumTime.put(test.name, oldTime + test.time);
 
         String changeFlagMove = "";
-        if (lastMove != Move.NOMOVE && test.move != lastMove) changeFlagMove = ">";
+        if (lastMove != fko.FrankyEngine.Franky.Move.NOMOVE && test.move != lastMove) changeFlagMove = ">";
         lastMove = test.move;
 
         String changeFlagNodes = "";
@@ -133,7 +133,7 @@ public class SearchTreeSizeTest {
         System.out.printf("%-12s | %1s%5s | %8s | %1s%,14d | %,12d | %,12d | %s | %s %n",
                           test.name,
                           changeFlagMove,
-                          Move.toSimpleString(test.move),
+                          fko.FrankyEngine.Franky.Move.toSimpleString(test.move),
                           test.value,
                           changeFlagNodes,
                           test.nodes,
@@ -176,15 +176,15 @@ public class SearchTreeSizeTest {
 
   private Result featureMeasurements(final int depth, final String fen) {
 
-    FrankyEngine engine = new FrankyEngine();
-    Search search = engine.getSearch();
+    fko.FrankyEngine.Franky.FrankyEngine engine = new fko.FrankyEngine.Franky.FrankyEngine();
+    fko.FrankyEngine.Franky.Search search = engine.getSearch();
     search.config.USE_BOOK = false;
     search.setHashSize(HASH_SIZE);
 
     Result result = new Result(fen);
 
     Position position = new Position(fen);
-    SearchMode searchMode = new SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false);
+    fko.FrankyEngine.Franky.SearchMode searchMode = new fko.FrankyEngine.Franky.SearchMode(0, 0, 0, 0, 0, 0, 0, depth, 0, null, false, true, false);
 
     // turn off all optimizations to get a reference value of the search tree size
     search.config.USE_ALPHABETA_PRUNING = false;
@@ -227,7 +227,7 @@ public class SearchTreeSizeTest {
 
     // AlphaBeta with TT and SORT
     search.config.USE_ALPHABETA_PRUNING = true;
-    result.tests.add(measureTreeSize(search, position, searchMode, "ALPHABETA", true));
+    //result.tests.add(measureTreeSize(search, position, searchMode, "ALPHABETA", true));
 
     // MTDf - just for debugging for now
     //    search.config.USE_MTDf = true;
@@ -240,21 +240,21 @@ public class SearchTreeSizeTest {
     search.config.USE_PVS_ORDERING = true;
     search.config.USE_KILLER_MOVES = true;
     search.config.NO_KILLER_MOVES = 2;
-    result.tests.add(measureTreeSize(search, position, searchMode, "PVS", true));
+//    result.tests.add(measureTreeSize(search, position, searchMode, "PVS", true));
 
     search.config.USE_TRANSPOSITION_TABLE = true;
     search.config.USE_TT_ROOT = true;
     result.tests.add(measureTreeSize(search, position, searchMode, "TT", true));
 
     // Aspiration
-    search.config.USE_ASPIRATION_WINDOW = true;
+//    search.config.USE_ASPIRATION_WINDOW = true;
     search.config.ASPIRATION_START_DEPTH = 2;
-    result.tests.add(measureTreeSize(search, position, searchMode, "ASPIRATION", true));
+//    result.tests.add(measureTreeSize(search, position, searchMode, "ASPIRATION", true));
 
     // Minor Pruning
     search.config.USE_MDP = true;
     search.config.USE_MPP = true;
-    result.tests.add(measureTreeSize(search, position, searchMode, "MDP_MPP", true));
+//    result.tests.add(measureTreeSize(search, position, searchMode, "MDP_MPP", true));
 
     // Reverse Futility Pruning
     search.config.USE_RFP = true;
@@ -269,22 +269,22 @@ public class SearchTreeSizeTest {
     result.tests.add(measureTreeSize(search, position, searchMode, "NMP", true));
 
     // Razor reduction
-    search.config.USE_RAZOR_PRUNING = true;
+//    search.config.USE_RAZOR_PRUNING = true;
     search.config.RAZOR_DEPTH = 3;
     search.config.RAZOR_MARGIN = 600;
     result.tests.add(measureTreeSize(search, position, searchMode, "RAZOR", true));
 
     // Internal Iterative Deepening
-    search.config.USE_IID = true;
-    result.tests.add(measureTreeSize(search, position, searchMode, "IID", true));
+//    search.config.USE_IID = true;
+//    result.tests.add(measureTreeSize(search, position, searchMode, "IID", true));
 
     // Search extensions
     search.config.USE_EXTENSIONS = true;
-    result.tests.add(measureTreeSize(search, position, searchMode, "EXTENSION", true));
+//    result.tests.add(measureTreeSize(search, position, searchMode, "EXTENSION", true));
 
     // Futility Pruning
     search.config.USE_FUTILITY_PRUNING = true;
-    result.tests.add(measureTreeSize(search, position, searchMode, "FP", true));
+//    result.tests.add(measureTreeSize(search, position, searchMode, "FP", true));
     search.config.USE_QFUTILITY_PRUNING = true;
     result.tests.add(measureTreeSize(search, position, searchMode, "QFP", true));
     search.config.USE_LIMITED_RAZORING = true;
@@ -306,14 +306,14 @@ public class SearchTreeSizeTest {
     result.tests.add(measureTreeSize(search, position, searchMode, "LMR", true));
 
     search.config.USE_SEE = true;
-    result.tests.add(measureTreeSize(search, position, searchMode, "+SEE", true));
+//    result.tests.add(measureTreeSize(search, position, searchMode, "+SEE", true));
 
     return result;
 
   }
 
-  private SingleTest measureTreeSize(Search search, final Position position,
-                                     final SearchMode searchMode, final String feature,
+  private SingleTest measureTreeSize(fko.FrankyEngine.Franky.Search search, final Position position,
+                                     final fko.FrankyEngine.Franky.SearchMode searchMode, final String feature,
                                      final boolean clearTT) {
 
     System.out.println("Testing. " + feature);
@@ -339,7 +339,7 @@ public class SearchTreeSizeTest {
 
     ArrayList<String> fen = new ArrayList<>();
 
-    fen.add(Position.STANDARD_BOARD_FEN);
+    fen.add(fko.FrankyEngine.Franky.Position.STANDARD_BOARD_FEN);
     fen.add("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
     fen.add("1r3rk1/1pnnq1bR/p1pp2B1/P2P1p2/1PP1pP2/2B3P1/5PK1/2Q4R w - -");
     fen.add("r1bq1rk1/pp2bppp/2n2n2/3p4/3P4/2N2N2/PPQ1BPPP/R1B2RK1 b - -");

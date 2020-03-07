@@ -203,176 +203,176 @@ public class FrankyEngine implements IUCIEngine {
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "UCI_ShowCurrLine":
-        config.UCI_ShowCurrLine = Boolean.valueOf(value);
+        config.UCI_ShowCurrLine = Boolean.parseBoolean(value);
         msg = "Engine UCI_ShowCurrLine set to " + (config.UCI_ShowCurrLine ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Ponder":
-        config.PONDER = Boolean.valueOf(value);
+        config.PONDER = Boolean.parseBoolean(value);
         msg = "Engine Ponder set to " + (config.PONDER ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "OwnBook":
-        config.USE_BOOK = Boolean.valueOf(value);
+        config.USE_BOOK = Boolean.parseBoolean(value);
         msg = "Engine Book set to " + (config.USE_BOOK ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_TranspositionTable":
-        config.USE_TRANSPOSITION_TABLE = Boolean.valueOf(value);
+        config.USE_TRANSPOSITION_TABLE = Boolean.parseBoolean(value);
         msg = "Use Hashtable set to " + (config.USE_TRANSPOSITION_TABLE ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_QSearch":
-        config.USE_QUIESCENCE = Boolean.valueOf(value);
+        config.USE_QUIESCENCE = Boolean.parseBoolean(value);
         msg = "Use Quiescence Search set to " + (config.USE_QUIESCENCE ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_SEE":
-        config.USE_SEE = Boolean.valueOf(value);
+        config.USE_SEE = Boolean.parseBoolean(value);
         msg = "Use SEE set to " + (config.USE_SEE ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_AlphaBeta_Pruning":
-        config.USE_ALPHABETA_PRUNING = Boolean.valueOf(value);
+        config.USE_ALPHABETA_PRUNING = Boolean.parseBoolean(value);
         msg = "Use AlphaBeta Pruning set to " + (config.USE_ALPHABETA_PRUNING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Killer_Moves":
-        config.USE_KILLER_MOVES = Boolean.valueOf(value);
+        config.USE_KILLER_MOVES = Boolean.parseBoolean(value);
         msg = "Use Killer Moves set to " + (config.USE_KILLER_MOVES ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Number_Killer_Moves":
-        config.NO_KILLER_MOVES = Integer.valueOf(value);
+        config.NO_KILLER_MOVES = Integer.parseInt(value);
         msg = "Number of Killer Moves set to " + config.NO_KILLER_MOVES;
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_PVS":
-        config.USE_PVS = Boolean.valueOf(value);
+        config.USE_PVS = Boolean.parseBoolean(value);
         msg = "Use PVSearch set to " + (config.USE_PVS ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_PVS_Move_Ordering":
-        config.USE_PVS_ORDERING = Boolean.valueOf(value);
+        config.USE_PVS_ORDERING = Boolean.parseBoolean(value);
         msg = "Use PVS Ordering set to " + (config.USE_PVS_ORDERING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Aspiration_Window_Search":
-        config.USE_ASPIRATION_WINDOW = Boolean.valueOf(value);
+        config.USE_ASPIRATION_WINDOW = Boolean.parseBoolean(value);
         msg =
           "Use Aspiration Window Search set to " + (config.USE_ASPIRATION_WINDOW ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Aspiration_Start_Depth":
-        config.ASPIRATION_START_DEPTH = Integer.valueOf(value);
+        config.ASPIRATION_START_DEPTH = Integer.parseInt(value);
         msg = "Aspiration Start Depth set to " + config.ASPIRATION_START_DEPTH;
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Mate_Distance_Pruning":
-        config.USE_MDP = Boolean.valueOf(value);
+        config.USE_MDP = Boolean.parseBoolean(value);
         msg = "Use Mate Distance Pruning set to " + (config.USE_MDP ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Minor_Promotion_Pruning":
-        config.USE_MPP = Boolean.valueOf(value);
+        config.USE_MPP = Boolean.parseBoolean(value);
         msg = "Use Minor Promotion Pruning set to " + (config.USE_MPP ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Reverse_Futility_Pruning":
-        config.USE_RFP = Boolean.valueOf(value);
+        config.USE_RFP = Boolean.parseBoolean(value);
         msg = "Use Reverse Futility Pruning set to " + (config.USE_RFP ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "RFP_Margin":
-        config.RFP_MARGIN = Integer.valueOf(value);
+        config.RFP_MARGIN = Integer.parseInt(value);
         msg = "RFP Margin set to " + (config.RFP_MARGIN);
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Null_Move_Pruning":
-        config.USE_NMP = Boolean.valueOf(value);
+        config.USE_NMP = Boolean.parseBoolean(value);
         msg = "Use Null Move Pruning set to " + (config.USE_NMP ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Null_Move_Depth":
-        config.NMP_DEPTH = Integer.valueOf(value);
+        config.NMP_DEPTH = Integer.parseInt(value);
         msg = "Null Move Depth set to " + (config.NMP_DEPTH);
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Null_Move_Verification":
-        config.USE_VERIFY_NMP = Boolean.valueOf(value);
+        config.USE_VERIFY_NMP = Boolean.parseBoolean(value);
         msg = "Null Move Verification set to " + (config.USE_VERIFY_NMP);
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Null_Move_Verification_Depth":
-        config.NMP_VERIFICATION_DEPTH = Integer.valueOf(value);
+        config.NMP_VERIFICATION_DEPTH = Integer.parseInt(value);
         msg = "Null Move Verification Depth set to " + (config.NMP_VERIFICATION_DEPTH);
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Razor_Pruning":
-        config.USE_RAZOR_PRUNING = Boolean.valueOf(value);
+        config.USE_RAZOR_PRUNING = Boolean.parseBoolean(value);
         msg = "Use Razor Pruning set to " + (config.USE_RAZOR_PRUNING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Razor_Depth":
-        config.RAZOR_DEPTH = Integer.valueOf(value);
+        config.RAZOR_DEPTH = Integer.parseInt(value);
         msg = "RFP Margin set to " + (config.RAZOR_DEPTH);
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Razor_Margin":
-        config.RFP_MARGIN = Integer.valueOf(value);
+        config.RFP_MARGIN = Integer.parseInt(value);
         msg = "Razor Margin set to " + (config.RAZOR_MARGIN);
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_IID":
-        config.USE_IID = Boolean.valueOf(value);
+        config.USE_IID = Boolean.parseBoolean(value);
         msg = "Use_IID set to " + (config.USE_IID ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "IID_Reduction":
-        config.IID_REDUCTION = Integer.valueOf(value);
+        config.IID_REDUCTION = Integer.parseInt(value);
         msg = "IID_Reduction set to " + (config.IID_REDUCTION);
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Extensions":
-        config.USE_EXTENSIONS = Boolean.valueOf(value);
+        config.USE_EXTENSIONS = Boolean.parseBoolean(value);
         msg = "Use Search Extensions set to " + (config.USE_EXTENSIONS ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Limited_Razoring":
-        config.USE_LIMITED_RAZORING = Boolean.valueOf(value);
+        config.USE_LIMITED_RAZORING = Boolean.parseBoolean(value);
         msg = "Use_Limited_Razoring set to " + (config.USE_LIMITED_RAZORING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Extended_Futility_Pruning":
-        config.USE_EXTENDED_FUTILITY_PRUNING = Boolean.valueOf(value);
+        config.USE_EXTENDED_FUTILITY_PRUNING = Boolean.parseBoolean(value);
         msg = "Use_Extended_Futility_Pruning set to " + (config.USE_EXTENDED_FUTILITY_PRUNING
                                                          ? "On"
                                                          : "Off");
@@ -380,55 +380,55 @@ public class FrankyEngine implements IUCIEngine {
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Futility_Pruning":
-        config.USE_FUTILITY_PRUNING = Boolean.valueOf(value);
+        config.USE_FUTILITY_PRUNING = Boolean.parseBoolean(value);
         msg = "Use_Futility_Pruning set to " + (config.USE_FUTILITY_PRUNING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_QFutility_Pruning":
-        config.USE_QFUTILITY_PRUNING = Boolean.valueOf(value);
+        config.USE_QFUTILITY_PRUNING = Boolean.parseBoolean(value);
         msg = "Use_QFutility_Pruning set to " + (config.USE_QFUTILITY_PRUNING ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Late_Move_Pruning":
-        config.USE_LMP = Boolean.valueOf(value);
+        config.USE_LMP = Boolean.parseBoolean(value);
         msg = "Use Late Move Pruning set to " + (config.USE_LMP ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "LMP_Min_Depth":
-        config.LMP_MIN_DEPTH = Integer.valueOf(value);
+        config.LMP_MIN_DEPTH = Integer.parseInt(value);
         msg = "Late Move Pruning Min Depth set to " + config.LMP_MIN_DEPTH;
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "LMP_Min_Moves":
-        config.LMP_MIN_MOVES = Integer.valueOf(value);
+        config.LMP_MIN_MOVES = Integer.parseInt(value);
         msg = "Late Move Pruning Min Moves set to " + config.LMP_MIN_MOVES;
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "Use_Late_Move_Reduction":
-        config.USE_LMR = Boolean.valueOf(value);
+        config.USE_LMR = Boolean.parseBoolean(value);
         msg = "Use Late Move Reduction set to " + (config.USE_LMR ? "On" : "Off");
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "LMR_Depth":
-        config.LMR_MIN_DEPTH = Integer.valueOf(value);
+        config.LMR_MIN_DEPTH = Integer.parseInt(value);
         msg = "Late Move Reduction Min Depth set to " + config.LMR_MIN_DEPTH;
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "LMR_Min_Moves":
-        config.LMR_MIN_MOVES = Integer.valueOf(value);
+        config.LMR_MIN_MOVES = Integer.parseInt(value);
         msg = "Late Move Reduction Min Moves set to " + config.LMR_MIN_MOVES;
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
         break;
       case "LMR_Reduction":
-        config.LMR_REDUCTION = Integer.valueOf(value);
+        config.LMR_REDUCTION = Integer.parseInt(value);
         msg = "Late Move Reduction amount set to " + config.LMR_REDUCTION;
         LOG.info(msg);
         uciProtocolHandler.sendInfoStringToUCI(msg);
@@ -462,7 +462,7 @@ public class FrankyEngine implements IUCIEngine {
   public void doMove(final String moveUCI) {
     LOG.debug("Engine got doMove command: " + moveUCI);
     final int move = Move.fromUCINotation(position, moveUCI);
-    position.makeMove(move);
+    position.doMove(move);
   }
 
   @Override
@@ -567,7 +567,7 @@ public class FrankyEngine implements IUCIEngine {
   }
 
   private void setHashSizeOption(final String value) {
-    this.config.HASH_SIZE = Integer.valueOf(value);
+    this.config.HASH_SIZE = Integer.parseInt(value);
     final String msg = "Hash Size set to " + this.config.HASH_SIZE;
     LOG.info(msg);
     search.setHashSize(this.config.HASH_SIZE);

@@ -91,7 +91,7 @@ public class PERFT {
 
   private long dividePerft(int depth, MoveGenerator[] mg, Position board, int move) {
     if (DIVIDE) System.out.print(Move.toSimpleString(move) + " ");
-    board.makeMove(move);
+    board.doMove(move);
     long r = miniMax(depth - 1, board, mg, 1);
     if (DIVIDE) System.out.println(r);
     board.undoMove();
@@ -117,7 +117,7 @@ public class PERFT {
     MoveList moves = mg[ply].getPseudoLegalMoves();
     for (int i = 0; i < moves.size(); i++) {
       int move = moves.get(i);
-      board.makeMove(move);
+      board.doMove(move);
       if (!board.isAttacked(_passivePlayer, board.getKingSquares()[_activePlayer.ordinal()])) {
         totalNodes += miniMax(depth - 1, board, mg, ply + 1);
       }
@@ -145,7 +145,7 @@ public class PERFT {
     mg[ply].setPosition(position);
     int move;
     while ((move = mg[ply].getNextPseudoLegalMove(false)) != Move.NOMOVE) {
-      position.makeMove(move);
+      position.doMove(move);
       if (!position.isAttacked(_passivePlayer,
                                position.getKingSquares()[_activePlayer.ordinal()])) {
         totalNodes += miniMaxOD(depthleft - 1, position, mg, ply + 1);

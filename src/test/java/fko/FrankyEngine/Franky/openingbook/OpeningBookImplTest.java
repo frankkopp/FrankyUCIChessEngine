@@ -31,7 +31,6 @@ package fko.FrankyEngine.Franky.openingbook;
 
 import fko.FrankyEngine.Franky.Position;
 import fko.FrankyEngine.util.HelperTools;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static fko.FrankyEngine.Franky.Move.NOMOVE;
@@ -46,20 +45,19 @@ public class OpeningBookImplTest {
   @Test
   public void testPGNBook() {
 
+    System.out.format("Testing Book...\n");
+
     long memStart = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 
-    OpeningBook book = new OpeningBookImpl("/book/pgn_test.pgn", OpeningBookImpl.Mode.PGN);
-
+    OpeningBook book = new OpeningBookImpl("/book/superbook.pgn", OpeningBookImpl.Mode.PGN);
     ((OpeningBookImpl) book)._config.FORCE_CREATE = true;
-
     book.initialize();
 
-    System.out.format("Testing Book...");
     Position currentBoard = new Position(OpeningBookImpl.STANDARD_BOARD_FEN);
     int bookMove;
     while ((bookMove = book.getBookMove(currentBoard.toFENString())) != NOMOVE) {
       //System.out.format("%s ==> %s%n",currentBoard.toFENString(),bookMove);
-      currentBoard.makeMove(bookMove);
+      currentBoard.doMove(bookMove);
     }
     assertNotEquals(OpeningBookImpl.STANDARD_BOARD_FEN, currentBoard.toFENString());
     System.out.format("Book OK%n%n");
@@ -95,7 +93,7 @@ public class OpeningBookImplTest {
     int bookMove;
     while ((bookMove = book.getBookMove(currentBoard.toFENString())) != NOMOVE) {
       //System.out.format("%s ==> %s%n",currentBoard.toFENString(),bookMove);
-      currentBoard.makeMove(bookMove);
+      currentBoard.doMove(bookMove);
     }
     assertNotEquals(OpeningBookImpl.STANDARD_BOARD_FEN, currentBoard.toFENString());
     System.out.format("Book OK%n%n");
@@ -131,7 +129,7 @@ public class OpeningBookImplTest {
     int bookMove;
     while ((bookMove = book.getBookMove(currentBoard.toFENString())) != NOMOVE) {
       //System.out.format("%s ==> %s%n",currentBoard.toFENString(),bookMove);
-      currentBoard.makeMove(bookMove);
+      currentBoard.doMove(bookMove);
     }
     assertNotEquals(OpeningBookImpl.STANDARD_BOARD_FEN, currentBoard.toFENString());
     System.out.format("Book OK%n%n");
@@ -170,7 +168,7 @@ public class OpeningBookImplTest {
      *
      */
     @Test
-    @Disabled
+    //@Disabled
     public void timingTest() {
 
         int runs = 0, runsPerRound = 1;
@@ -189,6 +187,7 @@ public class OpeningBookImplTest {
     void timedMethod() {
         //OpeningBook book = new OpeningBookImpl(null, FileSystems.getDefault().getPath("/book/book.txt"),Mode.SIMPLE);
         //OpeningBook book = new OpeningBookImpl(null, FileSystems.getDefault().getPath("/book/8moves_GM_LB.pgn"),Mode.PGN);
+
         OpeningBook book = new OpeningBookImpl("/book/Test_PGN/superbook.pgn", OpeningBookImpl.Mode.PGN);
         ((OpeningBookImpl) book)._config.FORCE_CREATE = true;
         book.initialize();
