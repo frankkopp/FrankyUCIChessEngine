@@ -27,11 +27,9 @@ package fko.FrankyEngine.Franky;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.openjdk.jol.info.ClassLayout;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -76,7 +74,7 @@ public class MoveTest {
   @Disabled
   public void showSize() {
     //System.out.println(VM.current().details());
-    System.out.println(ClassLayout.parseClass(Zug.class).toPrintable());
+//    System.out.println(ClassLayout.parseClass(Zug.class).toPrintable());
   }
 
   @Test
