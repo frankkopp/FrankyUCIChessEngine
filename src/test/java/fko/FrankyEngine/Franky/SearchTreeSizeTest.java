@@ -26,7 +26,6 @@
 package fko.FrankyEngine.Franky;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,12 +71,12 @@ public class SearchTreeSizeTest {
   }
 
   @Test
-  @Disabled
+  //@Disabled
   public void sizeOfSearchTreeTest() throws ExecutionException, InterruptedException {
 
     final int NO_OF_TESTS = 5; //  Integer.MAX_VALUE;
     final int START_NO = 0;
-    final int DEPTH = 6;
+    final int DEPTH = 4;
     HASH_SIZE = 1024;
     THREADS = 1;
 

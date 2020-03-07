@@ -47,7 +47,7 @@ public class TranspositionTable {
 
   private static final int KB = 1024;
   private static final int MB = KB * KB;
-  private static final int ENTRY_SIZE = 8;
+  private static final int ENTRY_SIZE = 16;
 
   // size and fill info
   private long sizeInByte;

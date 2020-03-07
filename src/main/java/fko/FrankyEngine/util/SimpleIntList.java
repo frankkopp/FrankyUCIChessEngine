@@ -566,7 +566,7 @@ public class SimpleIntList implements Iterable<Integer> {
   private void sort(int head, int tail, Comparator<Integer> comparator) {
     // Bigger arrays will be sorted with Arrays.sort. As Arrays.sort
     // only accepts object[] when using a comparator we need to convert.
-    // Therefore small arrays will be sorted with local insertion sort as convertion
+    // Therefore small arrays will be sorted with local insertion sort as conversion
     // is too expensive.
     // TODO: 5000 are arbitrarily chosen - needs timing tests
     if (tail - head < 5000 && comparator!=null) {
@@ -631,7 +631,6 @@ public class SimpleIntList implements Iterable<Integer> {
     return new SimpleIntListIterator();
   }
   private class SimpleIntListIterator implements Iterator<Integer> {
-
 
     // detect modifications
     final int initialHead = _head;

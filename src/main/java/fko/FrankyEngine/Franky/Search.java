@@ -33,7 +33,6 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
@@ -271,7 +270,7 @@ public class Search implements Runnable {
     if (searchMode.isPonder()) {
       if (searchThread == null || !searchThread.isAlive()) {
         // Ponder search has finished before we stopped it
-        // Per UCI protocoll we need to send the result anyway although a miss
+        // Per UCI protocol we need to send the result anyway although a miss
         LOG.info(
           "Pondering has been stopped after ponder search has finished. " + "Send obsolete result");
         LOG.info("Search result was: {} PV {}", lastSearchResult.toString(),
@@ -1294,6 +1293,7 @@ public class Search implements Runnable {
 
       // Check if our givesCheck(move) works correctly
       boolean check = position.hasCheck();
+      // DEBUG
       if (check != givesCheck) {
         System.out.println("BUG");
         position.hasCheck();
@@ -2042,7 +2042,7 @@ public class Search implements Runnable {
 
   /**
    * @param position
-   * @return true it last move made on poistion was illegal (left the king in check)
+   * @return true it last move made on position was illegal (left the king in check)
    */
   private boolean wasIllegalMove(final Position position) {
     return position.isAttacked(position.getNextPlayer(),
@@ -2084,7 +2084,7 @@ public class Search implements Runnable {
       }
 
       // for timed games with remaining time
-      hardTimeLimit = Duration.ofMillis((long) ((timeLeft / movesLeft) * 1.0f)).toMillis();
+      hardTimeLimit = (long) ((timeLeft / movesLeft) * 1.0f);
       softTimeLimit = (long) (hardTimeLimit * 0.8);
     }
 
