@@ -1215,7 +1215,7 @@ public class PositionTest {
   public void testTiming2() {
 
     final int rounds = 5;
-    final int iterations = 5_000_000;
+    final int iterations = 10_000_000;
 
     // prepare moves
     Position pos = new Position();

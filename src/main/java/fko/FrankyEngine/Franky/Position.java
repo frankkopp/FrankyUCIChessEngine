@@ -67,6 +67,7 @@ public class Position {
   private static final int BOARDSIZE = 128;
 
   /* Max History */
+  // TODO make history a block instead of each variable by itself
   private static final int MAX_HISTORY = 512;
 
   // Convenience constants
@@ -138,6 +139,7 @@ public class Position {
   private int nextHalfMoveNumber = 1;
 
   // Lists for all pieces
+  // TODO: make these Bitboards
   private final SquareList[] pawnSquares   = new SquareList[Color.values.length];
   private final SquareList[] knightSquares = new SquareList[Color.values.length];
   private final SquareList[] bishopSquares = new SquareList[Color.values.length];
