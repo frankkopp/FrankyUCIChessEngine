@@ -81,7 +81,8 @@ public class PERFT {
     //                .streamLegalMoves()
     //                .mapToLong((move) -> dividePerft(maxDepth, mg, position, move))
     //                .sum();
-    result = miniMaxOD(maxDepth, position, mg, 0);
+    //result = miniMaxOD(maxDepth, position, mg, 0);
+    result = miniMax(maxDepth, position, mg, 0);
     long endTime = System.currentTimeMillis();
     long duration = endTime - startTime;
 
