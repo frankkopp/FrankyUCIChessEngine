@@ -1349,4 +1349,40 @@ public class PositionTest {
     for (int i = 0; i < moves.length; i++) position.undoMove();
   }
 
+
+  @Test
+  void PositionTimingTest() {
+    final int rounds = 10;
+    final long iterations = 1_000_000L;
+
+    Position p = new Position("r3k2r/1ppn3p/4q1n1/8/4Pp2/3R4/p1p2PPP/R5K1 b kq e3 0 1");
+    int move1 = Move.createMove(MoveType.ENPASSANT, Square.f4, Square.e3, Piece.BLACK_PAWN, Piece.WHITE_PAWN, Piece.NOPIECE);
+    int move2 = Move.createMove(MoveType.NORMAL, Square.f2, Square.e3, Piece.WHITE_PAWN, Piece.BLACK_PAWN, Piece.NOPIECE);
+    int move3 = Move.createMove(MoveType.CASTLING, Square.e8, Square.g8, Piece.BLACK_KING, Piece.NOPIECE, Piece.NOPIECE);
+    int move4 = Move.createMove(MoveType.NORMAL, Square.d3, Square.c3, Piece.WHITE_ROOK, Piece.NOPIECE, Piece.NOPIECE);
+    int move5 = Move.createMove(MoveType.PROMOTION, Square.c2, Square.c1, Piece.BLACK_PAWN, Piece.NOPIECE, Piece.BLACK_QUEEN);
+
+    for (int r = 1; r <= rounds; r++) {
+      System.out.println("Round " + r);
+      long start = System.nanoTime();
+      for (long i = 0; i < iterations; i++) {
+        p.doMove(move1);
+        p.doMove(move2);
+        p.doMove(move3);
+        p.doMove(move4);
+        p.doMove(move5);
+        p.undoMove();
+        p.undoMove();
+        p.undoMove();
+        p.undoMove();
+        p.undoMove();
+      }
+      long stop = System.nanoTime();
+      long elapsed = stop - start;
+      System.out.println("Test took    " + String.format("%,d", elapsed) + " ns for " + String.format("%,d", iterations) + " iterations");
+      System.out.println("Test took    " + String.format("%,d", (elapsed / (5 * iterations))) + " ns per test");
+      System.out.println("Test per sec " + String.format("%,d", (long) (iterations * 5 * 1e9) / elapsed) + " tps");
+    }
+  }
+
 }

@@ -90,12 +90,12 @@
 
     <profiles>
         <profile>
-        <id>Franky</id>
-        <activation>
-            <property>
-                <name>Franky</name>
-            </property>
-        </activation>
+            <id>Franky</id>
+            <activation>
+                <property>
+                    <name>Franky</name>
+                </property>
+            </activation>
             <build>
                 <resources>
                     <resource>
@@ -216,7 +216,9 @@
                                         /config
                                         "option -Xmx8192m"
                                     </commandlineArgs>
-                                    <workingDirectory>C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target</workingDirectory>
+                                    <workingDirectory>
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target
+                                    </workingDirectory>
                                 </configuration>
                             </execution>
                             <execution>
@@ -232,7 +234,9 @@
                                         C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\target\${project.artifactId}-${project.version}*
                                         C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine\Releases
                                     </commandlineArgs>
-                                    <workingDirectory>C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine</workingDirectory>
+                                    <workingDirectory>
+                                        C:\Users\Frank\Dropbox\Private\Projekte\_GITHUB\FrankyUCIChessEngine
+                                    </workingDirectory>
                                 </configuration>
                             </execution>
                         </executions>
